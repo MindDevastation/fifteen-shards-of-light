@@ -91,7 +91,8 @@ Contains:
 - Optional Quit button.
 
 Behavior:
-- Start button starts a new playthrough and loads Level_01.
+- Stage 1A: Start button uses a safe placeholder handler that does not error while Level_01 does not exist.
+- Stage 1C: Start button starts a new playthrough and loads Level_01 after `Level_01.tscn` exists.
 - Quit button quits the game if present.
 
 No full menu system.
@@ -202,8 +203,8 @@ Attached to:
 
 Responsibilities:
 - Handle Start button.
-- Reset temporary playthrough progress if GameState exists.
-- Load Level_01.
+- Stage 1A: provide a safe placeholder Start handler that does not error while `Level_01.tscn` does not exist.
+- Stage 1C and later: reset temporary playthrough progress if GameState exists, then load Level_01.
 
 Out of scope:
 - Save/load.
@@ -388,10 +389,17 @@ Stage 1 text can be placeholder and does not need final poetry.
 
 ### Start Flow
 
+Completed Stage 1 flow:
+
 1. Project main scene loads StartScene.
 2. Player presses Start.
 3. GameState resets progress if available.
 4. Level_01 loads.
+
+Stage 1A exception:
+
+- Level_01 is not created until Stage 1C.
+- In Stage 1A, pressing Start must not error; it may use a safe placeholder handler instead of loading a level.
 
 ### Level Flow
 
@@ -504,6 +512,10 @@ Do not change unrelated project settings.
 Goal:
 Create minimal StartScene and set it as the main scene.
 
+Stage 1A must not create `Level_01.tscn`.
+
+The Start button may have a safe placeholder handler that does not error while `Level_01.tscn` does not exist. The actual StartScene → Level_01 loading behavior is wired in Stage 1C after `Level_01.tscn` exists.
+
 Expected files:
 - scenes/core/StartScene.tscn
 - scripts/ui/start_scene.gd
@@ -513,6 +525,8 @@ Manual check:
 - Godot opens project.
 - Running project shows StartScene.
 - Start button exists.
+- Pressing Start does not error while Level_01 is not present.
+- No Level_01 scene is created in Stage 1A.
 - No gameplay is implemented yet unless explicitly scoped.
 
 ### Stage 1B — Player and Camera Prototype
