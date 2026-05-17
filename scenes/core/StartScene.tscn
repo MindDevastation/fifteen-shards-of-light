@@ -57,6 +57,6 @@ text = "Quit"
 [node name="StatusLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Start is a placeholder until level loading is added in a later slice."
+text = "Press Start to begin Level_01."
 horizontal_alignment = 1
 autowrap_mode = 2
