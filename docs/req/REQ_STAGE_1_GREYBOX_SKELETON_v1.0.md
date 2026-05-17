@@ -184,7 +184,14 @@ It must contain:
 - Start button.
 - Optional Quit button.
 
-The Start button must begin the game at Level_01.
+By the completed Stage 1 flow, the Start button must begin the game at Level_01.
+
+Implementation sequencing:
+
+- Stage 1A creates StartScene, the Start button, optional Quit button, script shell, and main scene setup.
+- Stage 1A must not create `Level_01.tscn`.
+- In Stage 1A, the Start button may use a safe placeholder handler that does not error while `Level_01.tscn` does not exist.
+- The actual StartScene → Level_01 transition is wired in Stage 1C, after `Level_01.tscn` exists.
 
 ### FR-002 Player Control
 
