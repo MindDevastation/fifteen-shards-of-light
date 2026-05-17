@@ -37,7 +37,8 @@ Create a finished playable 15–20 minute gift version. This is a one-time gift 
 - `prompts/review` — QA review prompts.
 - `prompts/reusable` — reusable prompt fragments.
 - `scenes/core`, `scenes/levels`, `scenes/ui` — future Godot scenes.
-- `scripts/core`, `scripts/player`, `scripts/soul`, `scripts/ui` — future GDScript files.
+- `scripts/core`, `scripts/player`, `scripts/soul`, `scripts/ui` — future Godot GDScript game scripts only.
+- `tools` — future non-Godot helper scripts, shell scripts, validation scripts, or development utilities. No tooling scripts are present yet.
 - `assets/models`, `assets/materials`, `assets/audio`, `assets/fonts`, `assets/placeholders` — future assets.
 - `manual_tests` — human-run checks.
 - `handoff` — task handoff notes.

@@ -16,7 +16,8 @@ Create a lightweight repository scaffold for AI-assisted development without imp
 - `prompts/review` — review prompts.
 - `prompts/reusable` — reusable prompt fragments.
 - `scenes/core`, `scenes/levels`, `scenes/ui` — future Godot scene organization.
-- `scripts/core`, `scripts/player`, `scripts/soul`, `scripts/ui` — future GDScript organization.
+- `scripts/core`, `scripts/player`, `scripts/soul`, `scripts/ui` — future Godot GDScript game script organization only.
+- `tools` — future non-Godot helper scripts, shell scripts, validation scripts, or development utilities.
 - `assets/models`, `assets/materials`, `assets/audio`, `assets/fonts`, `assets/placeholders` — future asset organization.
 - `manual_tests` — human-run test notes.
 - `handoff` — per-slice handoff notes.
@@ -24,7 +25,7 @@ Create a lightweight repository scaffold for AI-assisted development without imp
 ## Stage 0 Rules
 - Do not create gameplay scripts.
 - Do not create Godot scenes.
-- Do not add player movement, camera logic, UI logic, art, audio, external dependencies, CI/CD, or automated test frameworks.
+- Do not add player movement, camera logic, UI logic, art, audio, external dependencies, CI/CD, automated test frameworks, or actual tooling scripts.
 - Use `.gitkeep` only where needed to preserve empty directories.
 
 ## Done Criteria

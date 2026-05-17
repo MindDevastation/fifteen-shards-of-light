@@ -29,6 +29,11 @@ Build a finished playable 15–20 minute gift version. This is a one-time gift b
 - Do not invent missing requirements.
 - Do not change unrelated files.
 
+## Repository Structure Rules
+- `scripts/` is reserved for Godot GDScript game scripts only.
+- `tools/` is reserved for future non-Godot helper scripts, shell scripts, validation scripts, or development utilities.
+- Do not add actual tooling scripts unless a future task explicitly requests them.
+
 ## Workflow Expectations
 Before applying changes:
 1. Inspect the current repository.
@@ -38,11 +43,13 @@ Before applying changes:
 
 When applying changes:
 - Keep changes scoped to the requested slice.
+- Future work branches should use `codex/*`, `feature/*`, or `fix/*`; do not use generic `work` branches for future tasks.
 - Prefer documentation and placeholders during Stage 0.
 - Do not implement gameplay unless the task explicitly requests a gameplay slice.
 - Preserve existing Godot project files unless a task explicitly requests a project setting change.
 
 After changes:
 - Provide a handoff report with summary, changed files, checks performed, risks, and not-verified items.
+- Every future handoff must include commit SHA, branch name, PR link if applicable, and push proof. If push proof is unavailable, mark it clearly as NOT VERIFIED.
 - Confirm whether the Godot project structure was preserved.
 - Confirm whether gameplay was implemented.

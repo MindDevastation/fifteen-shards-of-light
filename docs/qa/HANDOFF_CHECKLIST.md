@@ -8,9 +8,17 @@ Use this checklist at the end of each Codex task.
 - Manual checks performed.
 - Godot project structure preservation status.
 - Gameplay implementation status.
+- Commit SHA.
+- Branch name.
+- PR link if applicable.
+- Push proof.
 - Risks.
-- NOT VERIFIED.
-- Commit SHA and push proof when available.
+- NOT VERIFIED section for anything not checked, unavailable, or unconfirmed.
+
+## Branch and Push Checks
+- Future work branches should use `codex/*`, `feature/*`, or `fix/*`.
+- Do not use generic `work` branches for future tasks.
+- If push proof is unavailable, mark push proof clearly as NOT VERIFIED.
 
 ## Scope Checks
 - Confirm the task stayed within the requested slice.
