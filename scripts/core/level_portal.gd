@@ -57,6 +57,10 @@ func _on_portal_trigger_body_entered(body: Node3D) -> void:
 		return
 
 	_is_loading_scene = true
+	call_deferred("_change_scene_to_target")
+
+
+func _change_scene_to_target() -> void:
 	var error := get_tree().change_scene_to_file(target_scene_path)
 	if error != OK:
 		_is_loading_scene = false
