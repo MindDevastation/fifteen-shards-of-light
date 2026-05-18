@@ -112,29 +112,48 @@ Implementation files inspected for verification only:
 
 ## 6. Manual QA Checklist
 
-Manual interactive QA was not run in the Codex environment. The checklist below records static/headless evidence separately from interactive play requirements. No project-owner-provided manual results were supplied in this task prompt.
+Interactive manual QA was provided by the project owner, not run by Codex. The checklist below keeps Codex static/headless checks separate from project-owner-provided interactive manual QA results.
+
+### 6.0 Project-owner-provided Manual QA Result
+
+Manual result provided by project owner: PASS.
+
+The project owner confirmed:
+
+- Full greybox route works: `StartScene -> Level_01 -> ... -> Level_15 -> FinalScene`.
+- DevLevelMenu works.
+- FinalScene opens.
+- Player can approach the pedestal.
+- Enter does not activate the pedestal.
+- Space does not activate the pedestal.
+- E activates the pedestal.
+- Soul sphere appears and floats.
+- EndingOverlay appears.
+- `В главное меню` loads StartScene.
+- `Выйти` quits the game.
+- Runtime errors: none.
 
 ### 6.1 Full Path
 
 | Check | Result | Notes |
 | --- | --- | --- |
-| StartScene -> Level_01 | NOT RUN | Static script inspection shows Start button calls `change_scene_to_file("res://scenes/levels/Level_01.tscn")`; interactive button click was not run. |
-| Level_01 -> Level_02 | NOT RUN | Static target path is correct; interactive shard/UI/portal route was not run. |
-| Level_02 -> Level_03 | NOT RUN | Static target path is correct; interactive shard/UI/portal route was not run. |
-| Level_03 -> Level_04 | NOT RUN | Static target path is correct; interactive shard/UI/portal route was not run. |
-| Level_04 -> Level_05 | NOT RUN | Static target path is correct; interactive shard/UI/portal route was not run. |
-| Level_05 -> Level_06 | NOT RUN | Static target path is correct; interactive shard/UI/portal route was not run. |
-| Level_06 -> Level_07 | NOT RUN | Static target path is correct; interactive shard/UI/portal route was not run. |
-| Level_07 -> Level_08 | NOT RUN | Static target path is correct; interactive shard/UI/portal route was not run. |
-| Level_08 -> Level_09 | NOT RUN | Static target path is correct; interactive shard/UI/portal route was not run. |
-| Level_09 -> Level_10 | NOT RUN | Static target path is correct; interactive shard/UI/portal route was not run. |
-| Level_10 -> Level_11 | NOT RUN | Static target path is correct; interactive shard/UI/portal route was not run. |
-| Level_11 -> Level_12 | NOT RUN | Static target path is correct; interactive shard/UI/portal route was not run. |
-| Level_12 -> Level_13 | NOT RUN | Static target path is correct; interactive shard/UI/portal route was not run. |
-| Level_13 -> Level_14 | NOT RUN | Static target path is correct; interactive shard/UI/portal route was not run. |
-| Level_14 -> Level_15 | NOT RUN | Static target path is correct; interactive shard/UI/portal route was not run. |
-| Level_15 -> FinalScene | NOT RUN | Static target path is `res://scenes/core/FinalScene.tscn`; interactive shard/UI/final portal route was not run. |
-| FinalScene -> EndingOverlay | NOT RUN | Static script inspection shows E activation reveals `EndingOverlay`; interactive E activation was not run. |
+| StartScene -> Level_01 | PASS — project-owner-provided manual QA | Project owner confirmed the full greybox route works from StartScene through FinalScene. Codex did not run this interactive check. |
+| Level_01 -> Level_02 | PASS — project-owner-provided manual QA | Project owner confirmed the full greybox route works. Codex did not run this interactive check. |
+| Level_02 -> Level_03 | PASS — project-owner-provided manual QA | Project owner confirmed the full greybox route works. Codex did not run this interactive check. |
+| Level_03 -> Level_04 | PASS — project-owner-provided manual QA | Project owner confirmed the full greybox route works. Codex did not run this interactive check. |
+| Level_04 -> Level_05 | PASS — project-owner-provided manual QA | Project owner confirmed the full greybox route works. Codex did not run this interactive check. |
+| Level_05 -> Level_06 | PASS — project-owner-provided manual QA | Project owner confirmed the full greybox route works. Codex did not run this interactive check. |
+| Level_06 -> Level_07 | PASS — project-owner-provided manual QA | Project owner confirmed the full greybox route works. Codex did not run this interactive check. |
+| Level_07 -> Level_08 | PASS — project-owner-provided manual QA | Project owner confirmed the full greybox route works. Codex did not run this interactive check. |
+| Level_08 -> Level_09 | PASS — project-owner-provided manual QA | Project owner confirmed the full greybox route works. Codex did not run this interactive check. |
+| Level_09 -> Level_10 | PASS — project-owner-provided manual QA | Project owner confirmed the full greybox route works. Codex did not run this interactive check. |
+| Level_10 -> Level_11 | PASS — project-owner-provided manual QA | Project owner confirmed the full greybox route works. Codex did not run this interactive check. |
+| Level_11 -> Level_12 | PASS — project-owner-provided manual QA | Project owner confirmed the full greybox route works. Codex did not run this interactive check. |
+| Level_12 -> Level_13 | PASS — project-owner-provided manual QA | Project owner confirmed the full greybox route works. Codex did not run this interactive check. |
+| Level_13 -> Level_14 | PASS — project-owner-provided manual QA | Project owner confirmed the full greybox route works. Codex did not run this interactive check. |
+| Level_14 -> Level_15 | PASS — project-owner-provided manual QA | Project owner confirmed the full greybox route works. Codex did not run this interactive check. |
+| Level_15 -> FinalScene | PASS — project-owner-provided manual QA | Project owner confirmed the full greybox route reaches FinalScene. Codex did not run this interactive check. |
+| FinalScene -> EndingOverlay | PASS — project-owner-provided manual QA | Project owner confirmed E activates the pedestal and EndingOverlay appears. Codex did not run this interactive check. |
 
 ### 6.2 Level Consistency
 
@@ -153,38 +172,38 @@ Manual interactive QA was not run in the Codex environment. The checklist below 
 
 | Check | Result | Notes |
 | --- | --- | --- |
-| Portal appears after shard/UI | NOT RUN | Static script path is present: `SoulShard.collected` opens `PoemRewardUI`; `PoemRewardUI.closed` activates portal. Interactive timing was not run. |
-| Physical arch/frame works | NOT RUN | Static inspection found `LeftPost`, `RightPost`, `TopBeam`, and collision shapes; physical collision behavior was not interactively tested. |
-| Trigger is inside arch | NOT RUN | Static inspection found `PortalTrigger` in `LevelPortal.tscn`; spatial/player traversal behavior was not interactively tested. |
-| Opening faces approach direction | NOT RUN | Requires interactive/spatial QA; not verified in headless mode. |
-| No physics-callback error | PASS HEADLESS / NOT RUN INTERACTIVE | Headless scene loads produced no red physics-callback scene-change errors; interactive portal traversal was not run. |
+| Portal appears after shard/UI | PASS — project-owner-provided manual QA | Project owner confirmed the full greybox route works with no runtime errors. Codex did not run this interactive check. |
+| Physical arch/frame works | PASS — project-owner-provided manual QA | Project owner confirmed manual QA passed successfully. Codex did not run this interactive check. |
+| Trigger is inside arch | PASS — project-owner-provided manual QA | Project owner confirmed manual QA passed successfully. Codex did not run this interactive check. |
+| Opening faces approach direction | PASS — project-owner-provided manual QA | Project owner confirmed manual QA passed successfully. Codex did not run this interactive check. |
+| No physics-callback error | PASS — Codex headless and project-owner-provided manual QA | Headless scene loads produced no red physics-callback scene-change errors; project owner confirmed runtime errors: none. |
 | Target scene path is correct | PASS | Static inspection confirms Level_01 -> Level_02, Level_14 -> Level_15, and Level_15 -> FinalScene, with no Level_16 target. |
 
 ### 6.4 FinalScene
 
 | Check | Result | Notes |
 | --- | --- | --- |
-| FinalScene loads | PASS | `godot --headless --path . --scene res://scenes/core/FinalScene.tscn --quit` passed. |
-| Player can move | NOT RUN | Requires interactive play. |
-| Pedestal prompt appears | NOT RUN | Static scene/script contains `InteractionPrompt`; trigger behavior requires interactive play. |
-| Enter does not activate | NOT RUN | Static script checks `event.keycode == KEY_E`; interactive negative test was not run. |
-| Space does not activate | NOT RUN | Static script checks `event.keycode == KEY_E`; interactive negative test was not run. |
-| E activates | NOT RUN | Static script checks `event.keycode == KEY_E` and calls `_activate_pedestal()`; interactive positive test was not run. |
-| Soul sphere appears/floats | NOT RUN | Static script shows `soul_sphere.show()` and `_process()` float motion after activation; visual behavior was not interactively verified. |
-| EndingOverlay appears | NOT RUN | Static script shows `ending_overlay.show()` after E activation; interactive activation was not run. |
-| "В главное меню" loads StartScene | NOT RUN | Static script connects button to deferred `change_scene_to_file(START_SCENE_PATH)`; interactive button click was not run. |
-| "Выйти" quits | NOT RUN | Static script connects quit button to `get_tree().quit()`; interactive button click was not run. |
+| FinalScene loads | PASS — Codex headless and project-owner-provided manual QA | Headless scene load passed; project owner confirmed FinalScene opens. |
+| Player can move | PASS — project-owner-provided manual QA | Project owner confirmed the player can approach the pedestal. Codex did not run this interactive check. |
+| Pedestal prompt appears | PASS — project-owner-provided manual QA | Project owner confirmed the player can approach the pedestal and complete the pedestal interaction. Codex did not run this interactive check. |
+| Enter does not activate | PASS — project-owner-provided manual QA | Project owner confirmed Enter does not activate the pedestal. Codex did not run this interactive check. |
+| Space does not activate | PASS — project-owner-provided manual QA | Project owner confirmed Space does not activate the pedestal. Codex did not run this interactive check. |
+| E activates | PASS — project-owner-provided manual QA | Project owner confirmed E activates the pedestal. Codex did not run this interactive check. |
+| Soul sphere appears/floats | PASS — project-owner-provided manual QA | Project owner confirmed the soul sphere appears and floats. Codex did not run this interactive check. |
+| EndingOverlay appears | PASS — project-owner-provided manual QA | Project owner confirmed EndingOverlay appears. Codex did not run this interactive check. |
+| "В главное меню" loads StartScene | PASS — project-owner-provided manual QA | Project owner confirmed the button loads StartScene. Codex did not run this interactive check. |
+| "Выйти" quits | PASS — project-owner-provided manual QA | Project owner confirmed the button quits the game. Codex did not run this interactive check. |
 
 ### 6.5 DevLevelMenu
 
 | Check | Result | Notes |
 | --- | --- | --- |
-| Overlay appears | NOT RUN | Static scene contains `MenuPanel`; visual overlay behavior requires interactive play. |
-| F10 hides/shows | NOT RUN | Static script toggles `menu_panel.visible` on `KEY_F10`; interactive key test was not run. |
-| Level 01 loads Level_01 | NOT RUN | Static target exists; interactive button click was not run. |
-| Level 10 loads Level_10 | NOT RUN | Static target exists; interactive button click was not run. |
-| Level 15 loads Level_15 | NOT RUN | Static target exists; interactive button click was not run. |
-| Final loads FinalScene | NOT RUN | Static target exists; interactive button click was not run. |
+| Overlay appears | PASS — project-owner-provided manual QA | Project owner confirmed DevLevelMenu works. Codex did not run this interactive check. |
+| F10 hides/shows | PASS — project-owner-provided manual QA | Project owner confirmed DevLevelMenu works. Codex did not run this interactive check. |
+| Level 01 loads Level_01 | PASS — project-owner-provided manual QA | Project owner confirmed DevLevelMenu works. Codex did not run this interactive check. |
+| Level 10 loads Level_10 | PASS — project-owner-provided manual QA | Project owner confirmed DevLevelMenu works. Codex did not run this interactive check. |
+| Level 15 loads Level_15 | PASS — project-owner-provided manual QA | Project owner confirmed DevLevelMenu works. Codex did not run this interactive check. |
+| Final loads FinalScene | PASS — project-owner-provided manual QA | Project owner confirmed DevLevelMenu works and FinalScene opens. Codex did not run this interactive check. |
 
 ## 7. Scope Audit
 
@@ -211,34 +230,27 @@ Manual interactive QA was not run in the Codex environment. The checklist below 
 
 ### Blockers
 
-None found by static/headless verification.
+None found by static/headless verification or project-owner-provided manual QA.
 
-Important limitation: full interactive manual QA was NOT RUN in the Codex environment. If Producer requires Codex-verified interactive gameplay for final Stage 1 acceptance, that remains a verification gap rather than a code blocker found by this pass.
+Interactive manual QA was provided by the project owner, not run by Codex.
 
 ### Risks / Non-blockers
 
 - Remote freshness could not be verified because no `origin` remote is configured in this checkout. Local HEAD is the PR #12 merge commit.
 - The runtime scope audit found `Final cinematic placeholder` as label text in `FinalScene.tscn`. This is not a cinematic system or video playback implementation, but the wording should be kept in mind for later scope review.
-- Headless scene loads do not prove player collision feel, portal approach orientation, button clicks, E-only input behavior, or full route timing.
+- Headless scene loads alone do not prove player collision feel, portal approach orientation, button clicks, E-only input behavior, or full route timing; these interactive areas are now covered by project-owner-provided manual QA, not Codex-run QA.
 
 ### NOT VERIFIED
 
-- Interactive full path: StartScene -> Level_01 -> ... -> Level_15 -> FinalScene.
-- Interactive shard collection and PoemRewardUI close behavior in all levels.
-- Interactive portal activation timing and physical arch collision.
-- Interactive absence of red physics-callback errors during actual portal traversal.
-- Interactive FinalScene E-only behavior: Enter/Space negative tests and E positive test.
-- Interactive soul sphere visual float confirmation.
-- Interactive EndingOverlay button behavior.
-- Interactive DevLevelMenu overlay/F10/button behavior.
-- Remote freshness against GitHub `main`.
+- Remote freshness against GitHub `main` remains NOT VERIFIED because no `origin` remote is configured in this checkout.
+- Codex-run interactive manual QA remains NOT RUN; interactive PASS results in this report are project-owner-provided.
 
 ## 9. Final Verdict
 
-PASS WITH NOT VERIFIED ITEMS — Stage 1 greybox skeleton accepted with listed manual gaps.
+PASS — Stage 1 greybox skeleton accepted.
 
-Justification: required files exist, PR #12 merge is present locally at HEAD, main scene remains StartScene, all 15 level scenes and FinalScene load headlessly without parse/load errors, static portal targets form `Level_01 -> ... -> Level_15 -> FinalScene`, no Level_16 exists or is referenced in runtime files, and no forbidden runtime systems were found. Interactive manual QA was not run in this environment, so those checks are documented as NOT RUN / NOT VERIFIED rather than claimed as Codex-verified PASS.
+Justification: required files exist, PR #12 merge is present locally at HEAD, main scene remains StartScene, all 15 level scenes and FinalScene load headlessly without parse/load errors, static portal targets form `Level_01 -> ... -> Level_15 -> FinalScene`, no Level_16 exists or is referenced in runtime files, and no forbidden runtime systems were found. The project owner also provided manual QA PASS for the full greybox route, DevLevelMenu, FinalScene E-only pedestal interaction, soul sphere/EndingOverlay behavior, ending buttons, and no runtime errors. Interactive manual QA was provided by the project owner, not run by Codex.
 
 ## 10. Recommended Next Slice
 
-Next slice should be Producer-approved and should not add polish before Stage 1 acceptance is locked. If the Producer requires fully interactive confirmation before locking Stage 1, run a separate human manual QA pass using the checklist above and record the project-owner-provided results in this document or a follow-up QA note.
+Next slice should be Producer-approved and should not add polish before Stage 1 acceptance is locked.
