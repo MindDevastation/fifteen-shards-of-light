@@ -40,7 +40,7 @@ func _on_soul_shard_collected() -> void:
 		return
 
 	if _poem_reward_ui.has_method("show_placeholder_reward"):
-		_poem_reward_ui.call("show_placeholder_reward", reward_text if not reward_text.is_empty() else _poem_reward_ui.get("DEFAULT_PLACEHOLDER_TEXT"))
+		_poem_reward_ui.call("show_placeholder_reward", reward_text)
 	else:
 		_poem_reward_ui.show()
 
