@@ -1,0 +1,190 @@
+[gd_scene load_steps=20 format=3]
+
+[ext_resource type="Script" path="res://scripts/core/final_scene.gd" id="1_final_scene"]
+[ext_resource type="PackedScene" path="res://scenes/core/Player.tscn" id="2_player"]
+[ext_resource type="Script" path="res://scripts/player/camera_controller.gd" id="3_camera_controller"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_floor_grey"]
+albedo_color = Color(0.32, 0.32, 0.34, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wall_grey"]
+albedo_color = Color(0.42, 0.42, 0.45, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pedestal_grey"]
+albedo_color = Color(0.55, 0.55, 0.6, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sphere_placeholder"]
+albedo_color = Color(0.72, 0.82, 1, 1)
+emission_enabled = true
+emission = Color(0.25, 0.45, 0.9, 1)
+emission_energy_multiplier = 0.35
+
+[sub_resource type="BoxMesh" id="BoxMesh_floor"]
+material = SubResource("StandardMaterial3D_floor_grey")
+size = Vector3(14, 0.2, 14)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_floor"]
+size = Vector3(14, 0.2, 14)
+
+[sub_resource type="BoxMesh" id="BoxMesh_wall_long"]
+material = SubResource("StandardMaterial3D_wall_grey")
+size = Vector3(14, 2.5, 0.3)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wall_long"]
+size = Vector3(14, 2.5, 0.3)
+
+[sub_resource type="BoxMesh" id="BoxMesh_wall_short"]
+material = SubResource("StandardMaterial3D_wall_grey")
+size = Vector3(0.3, 2.5, 14)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wall_short"]
+size = Vector3(0.3, 2.5, 14)
+
+[sub_resource type="BoxMesh" id="BoxMesh_pedestal_base"]
+material = SubResource("StandardMaterial3D_pedestal_grey")
+size = Vector3(1.4, 0.35, 1.4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_pedestal_base"]
+size = Vector3(1.4, 0.35, 1.4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_pedestal_top"]
+material = SubResource("StandardMaterial3D_pedestal_grey")
+size = Vector3(0.9, 0.9, 0.9)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_pedestal_top"]
+size = Vector3(0.9, 0.9, 0.9)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_interaction_zone"]
+size = Vector3(3.2, 2.2, 3.2)
+
+[sub_resource type="SphereMesh" id="SphereMesh_soul_sphere_placeholder"]
+material = SubResource("StandardMaterial3D_sphere_placeholder")
+radius = 0.35
+height = 0.7
+
+[node name="FinalScene" type="Node3D"]
+script = ExtResource("1_final_scene")
+
+[node name="Floor" type="StaticBody3D" parent="."]
+
+[node name="FloorMesh" type="MeshInstance3D" parent="Floor"]
+mesh = SubResource("BoxMesh_floor")
+
+[node name="FloorCollision" type="CollisionShape3D" parent="Floor"]
+shape = SubResource("BoxShape3D_floor")
+
+[node name="BackWall" type="StaticBody3D" parent="."]
+
+[node name="BackWallMesh" type="MeshInstance3D" parent="BackWall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, -7)
+mesh = SubResource("BoxMesh_wall_long")
+
+[node name="BackWallCollision" type="CollisionShape3D" parent="BackWall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, -7)
+shape = SubResource("BoxShape3D_wall_long")
+
+[node name="FrontWall" type="StaticBody3D" parent="."]
+
+[node name="FrontWallMesh" type="MeshInstance3D" parent="FrontWall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 7)
+mesh = SubResource("BoxMesh_wall_long")
+
+[node name="FrontWallCollision" type="CollisionShape3D" parent="FrontWall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 7)
+shape = SubResource("BoxShape3D_wall_long")
+
+[node name="LeftWall" type="StaticBody3D" parent="."]
+
+[node name="LeftWallMesh" type="MeshInstance3D" parent="LeftWall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 1.25, 0)
+mesh = SubResource("BoxMesh_wall_short")
+
+[node name="LeftWallCollision" type="CollisionShape3D" parent="LeftWall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 1.25, 0)
+shape = SubResource("BoxShape3D_wall_short")
+
+[node name="RightWall" type="StaticBody3D" parent="."]
+
+[node name="RightWallMesh" type="MeshInstance3D" parent="RightWall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 1.25, 0)
+mesh = SubResource("BoxMesh_wall_short")
+
+[node name="RightWallCollision" type="CollisionShape3D" parent="RightWall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 1.25, 0)
+shape = SubResource("BoxShape3D_wall_short")
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 4)
+
+[node name="FollowCamera" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.863779, -0.503871, 0, 0.503871, 0.863779, 0, 4, 11)
+current = true
+script = ExtResource("3_camera_controller")
+target_path = NodePath("../Player")
+
+[node name="SunLight" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.707107, -0.353553, 0.612372, 0, 0.866025, 0.5, -0.707107, -0.353553, 0.612372, 0, 6, 0)
+light_energy = 1.4
+
+[node name="Pedestal" type="StaticBody3D" parent="."]
+
+[node name="BaseMesh" type="MeshInstance3D" parent="Pedestal"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.175, 0)
+mesh = SubResource("BoxMesh_pedestal_base")
+
+[node name="BaseCollision" type="CollisionShape3D" parent="Pedestal"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.175, 0)
+shape = SubResource("BoxShape3D_pedestal_base")
+
+[node name="TopMesh" type="MeshInstance3D" parent="Pedestal"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("BoxMesh_pedestal_top")
+
+[node name="TopCollision" type="CollisionShape3D" parent="Pedestal"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+shape = SubResource("BoxShape3D_pedestal_top")
+
+[node name="PedestalInteractionZone" type="Area3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PedestalInteractionZone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
+shape = SubResource("BoxShape3D_interaction_zone")
+
+[node name="SoulSpherePlaceholder" type="MeshInstance3D" parent="."]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
+mesh = SubResource("SphereMesh_soul_sphere_placeholder")
+
+[node name="UILayer" type="CanvasLayer" parent="."]
+
+[node name="InteractionPrompt" type="Label" parent="UILayer"]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -170.0
+offset_top = 180.0
+offset_right = 170.0
+offset_bottom = 206.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Press Enter / Accept to place the sphere"
+horizontal_alignment = 1
+
+[node name="FinalVideoPlaceholder" type="Label" parent="UILayer"]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -140.0
+offset_top = -230.0
+offset_right = 140.0
+offset_bottom = -204.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Final cinematic placeholder"
+horizontal_alignment = 1
