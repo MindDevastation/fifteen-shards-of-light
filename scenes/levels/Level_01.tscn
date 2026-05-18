@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=16 format=3]
 
 [ext_resource type="Script" path="res://scripts/core/level_manager.gd" id="1_level_manager"]
 [ext_resource type="PackedScene" path="res://scenes/core/Player.tscn" id="2_player"]
@@ -7,56 +7,70 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/PoemRewardUI.tscn" id="5_poem_reward_ui"]
 [ext_resource type="PackedScene" path="res://scenes/core/LevelPortal.tscn" id="6_level_portal"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_floor_grey"]
-albedo_color = Color(0.35, 0.35, 0.35, 1)
-
-[sub_resource type="BoxMesh" id="BoxMesh_floor"]
-material = SubResource("StandardMaterial3D_floor_grey")
-size = Vector3(12, 0.2, 12)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_floor"]
-size = Vector3(12, 0.2, 12)
+[sub_resource type="StandardMaterial3D" id="m_ground"]
+albedo_color = Color(0.28, 0.33, 0.3, 1)
+[sub_resource type="StandardMaterial3D" id="m_warm"]
+albedo_color = Color(0.95, 0.72, 0.4, 1)
+[sub_resource type="BoxMesh" id="mesh_ground"]
+material = SubResource("m_ground")
+size = Vector3(22, 0.2, 18)
+[sub_resource type="BoxShape3D" id="shape_ground"]
+size = Vector3(22, 0.2, 18)
+[sub_resource type="BoxMesh" id="mesh_platform"]
+material = SubResource("m_ground")
+size = Vector3(2.8, 0.35, 2.8)
+[sub_resource type="BoxShape3D" id="shape_platform"]
+size = Vector3(2.8, 0.35, 2.8)
+[sub_resource type="CylinderMesh" id="mesh_beacon"]
+material = SubResource("m_warm")
+top_radius = 0.35
+bottom_radius = 0.55
+height = 4.0
 
 [node name="Level_01" type="Node3D"]
-
 [node name="LevelManager" type="Node" parent="."]
 script = ExtResource("1_level_manager")
 level_id = 1
+reward_text = "Ты появилась как тёплый первый свет"
 soul_shard_path = NodePath("../SoulShard")
 poem_reward_ui_path = NodePath("../UILayer/PoemRewardUI")
 level_portal_path = NodePath("../LevelPortal")
-
-[node name="Floor" type="StaticBody3D" parent="."]
-
-[node name="FloorMesh" type="MeshInstance3D" parent="Floor"]
-mesh = SubResource("BoxMesh_floor")
-
-[node name="FloorCollision" type="CollisionShape3D" parent="Floor"]
-shape = SubResource("BoxShape3D_floor")
-
+[node name="MainGround" type="StaticBody3D" parent="."]
+[node name="Mesh" type="MeshInstance3D" parent="MainGround"]
+mesh = SubResource("mesh_ground")
+[node name="Collision" type="CollisionShape3D" parent="MainGround"]
+shape = SubResource("shape_ground")
+[node name="StepA" type="StaticBody3D" parent="."]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,2.5,0.45,-0.5)
+[node name="Mesh" type="MeshInstance3D" parent="StepA"]
+mesh = SubResource("mesh_platform")
+[node name="Collision" type="CollisionShape3D" parent="StepA"]
+shape = SubResource("shape_platform")
+[node name="StepB" type="StaticBody3D" parent="."]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,5.4,0.9,0.7)
+[node name="Mesh" type="MeshInstance3D" parent="StepB"]
+mesh = SubResource("mesh_platform")
+[node name="Collision" type="CollisionShape3D" parent="StepB"]
+shape = SubResource("shape_platform")
+[node name="Beacon" type="MeshInstance3D" parent="."]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,7.8,2.0,0.8)
+mesh = SubResource("mesh_beacon")
 [node name="SpawnPoint" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-
-
+transform = Transform3D(1,0,0,0,1,0,0,0,1,-7,1,0)
 [node name="Player" parent="." instance=ExtResource("2_player")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-
+transform = Transform3D(1,0,0,0,1,0,0,0,1,-7,1,0)
 [node name="FollowCamera" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.863779, -0.503871, 0, 0.503871, 0.863779, 0, 4, 7)
+transform = Transform3D(1,0,0,0,0.906308,-0.422618,0,0.422618,0.906308,-6,7,10)
 current = true
 script = ExtResource("3_camera_controller")
 target_path = NodePath("../Player")
-
 [node name="SunLight" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.707107, -0.353553, 0.612372, 0, 0.866025, 0.5, -0.707107, -0.353553, 0.612372, 0, 6, 0)
-light_energy = 1.5
+transform = Transform3D(0.707107,-0.353553,0.612372,0,0.866025,0.5,-0.707107,-0.353553,0.612372,0,6,0)
+light_energy = 1.9
 [node name="SoulShard" parent="." instance=ExtResource("4_soul_shard")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1, 0)
-
+transform = Transform3D(1,0,0,0,1,0,0,0,1,8.3,2.1,0.8)
 [node name="LevelPortal" parent="." instance=ExtResource("6_level_portal")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -4)
+transform = Transform3D(1,0,0,0,1,0,0,0,1,11,0,0)
 target_scene_path = "res://scenes/levels/Level_02.tscn"
-
 [node name="UILayer" type="CanvasLayer" parent="."]
-
 [node name="PoemRewardUI" parent="UILayer" instance=ExtResource("5_poem_reward_ui")]

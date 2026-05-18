@@ -13,7 +13,7 @@ func _ready() -> void:
 
 
 func show_placeholder_reward(reward_text: String = DEFAULT_PLACEHOLDER_TEXT) -> void:
-	reward_text_label.text = reward_text
+	reward_text_label.text = reward_text if not reward_text.is_empty() else DEFAULT_PLACEHOLDER_TEXT
 	show()
 	continue_button.grab_focus()
 

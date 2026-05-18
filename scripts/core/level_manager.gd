@@ -4,6 +4,7 @@ extends Node
 @export var soul_shard_path: NodePath = ^"../SoulShard"
 @export var poem_reward_ui_path: NodePath = ^"../UILayer/PoemRewardUI"
 @export var level_portal_path: NodePath = ^"../LevelPortal"
+@export_multiline var reward_text: String = ""
 
 var _poem_reward_ui: Node
 var _level_portal: Node
@@ -39,7 +40,7 @@ func _on_soul_shard_collected() -> void:
 		return
 
 	if _poem_reward_ui.has_method("show_placeholder_reward"):
-		_poem_reward_ui.call("show_placeholder_reward")
+		_poem_reward_ui.call("show_placeholder_reward", reward_text)
 	else:
 		_poem_reward_ui.show()
 
