@@ -278,48 +278,6 @@ mesh = SubResource("mesh_blocker_large")
 [node name="Collision" type="CollisionShape3D" parent="RightBoundaryC"]
 shape = SubResource("shape_blocker_large")
 
-[node name="StartLeftCurb" type="StaticBody3D" parent="."]
-transform = Transform3D(1.5, 0, 0, 0, 0.25, 0, 0, 0, 7.2, -9.6, 0.85, -0.5)
-[node name="Mesh" type="MeshInstance3D" parent="StartLeftCurb"]
-mesh = SubResource("mesh_step")
-[node name="Collision" type="CollisionShape3D" parent="StartLeftCurb"]
-shape = SubResource("shape_step")
-
-[node name="StartRightCurb" type="StaticBody3D" parent="."]
-transform = Transform3D(1.5, 0, 0, 0, 0.25, 0, 0, 0, 7.2, 6.4, 0.85, -0.5)
-[node name="Mesh" type="MeshInstance3D" parent="StartRightCurb"]
-mesh = SubResource("mesh_step")
-[node name="Collision" type="CollisionShape3D" parent="StartRightCurb"]
-shape = SubResource("shape_step")
-
-[node name="MidLeftCurb" type="StaticBody3D" parent="."]
-transform = Transform3D(1.2, 0, 0, 0, 0.25, 0, 0, 0, 6.5, -8.9, 1.55, -17.0)
-[node name="Mesh" type="MeshInstance3D" parent="MidLeftCurb"]
-mesh = SubResource("mesh_step")
-[node name="Collision" type="CollisionShape3D" parent="MidLeftCurb"]
-shape = SubResource("shape_step")
-
-[node name="MidRightCurb" type="StaticBody3D" parent="."]
-transform = Transform3D(1.2, 0, 0, 0, 0.25, 0, 0, 0, 6.5, 8.6, 1.55, -17.0)
-[node name="Mesh" type="MeshInstance3D" parent="MidRightCurb"]
-mesh = SubResource("mesh_step")
-[node name="Collision" type="CollisionShape3D" parent="MidRightCurb"]
-shape = SubResource("shape_step")
-
-[node name="FinalLeftCurb" type="StaticBody3D" parent="."]
-transform = Transform3D(1.7, 0, 0, 0, 0.25, 0, 0, 0, 7.0, -10.0, 2.4, -30.0)
-[node name="Mesh" type="MeshInstance3D" parent="FinalLeftCurb"]
-mesh = SubResource("mesh_step")
-[node name="Collision" type="CollisionShape3D" parent="FinalLeftCurb"]
-shape = SubResource("shape_step")
-
-[node name="FinalRightCurb" type="StaticBody3D" parent="."]
-transform = Transform3D(1.7, 0, 0, 0, 0.25, 0, 0, 0, 7.0, 9.6, 2.4, -30.0)
-[node name="Mesh" type="MeshInstance3D" parent="FinalRightCurb"]
-mesh = SubResource("mesh_step")
-[node name="Collision" type="CollisionShape3D" parent="FinalRightCurb"]
-shape = SubResource("shape_step")
-
 [node name="RockA" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.5, 0.7, 14.0)
 mesh = SubResource("mesh_rock")
