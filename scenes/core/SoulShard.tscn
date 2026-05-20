@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/soul/soul_shard.gd" id="1_soul_shard"]
 
@@ -21,3 +21,8 @@ mesh = SubResource("SphereMesh_shard")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("SphereShape3D_shard")
+
+[node name="InteractPrompt" type="Label3D" parent="."]
+position = Vector3(0, 0.8, 0)
+billboard = 1
+text = "Press E"
