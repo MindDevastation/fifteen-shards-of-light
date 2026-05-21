@@ -57,6 +57,9 @@ func _process(_delta: float) -> void:
 
 
 func _update_mouse_mode() -> void:
+	if not current:
+		return
+
 	if _is_blocking_ui_open():
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	else:

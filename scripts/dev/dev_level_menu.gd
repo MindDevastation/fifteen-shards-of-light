@@ -74,5 +74,17 @@ func _change_scene_deferred(scene_path: String) -> void:
 func _update_mouse_mode() -> void:
 	if menu_panel.visible:
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	else:
+		return
+
+	if _is_gameplay_scene_active():
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	else:
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+
+
+func _is_gameplay_scene_active() -> bool:
+	var current_scene := get_tree().current_scene
+	if current_scene == null:
+		return false
+
+	return current_scene.scene_file_path.begins_with("res://scenes/levels/")
