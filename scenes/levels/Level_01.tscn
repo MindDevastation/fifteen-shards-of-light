@@ -1,29 +1,15 @@
-[gd_scene load_steps=47 format=3]
+[gd_scene format=3 uid="uid://dlnxbfldy6yg3"]
 
-[ext_resource type="Script" path="res://scripts/core/level_manager.gd" id="1_level_manager"]
+[ext_resource type="Script" uid="uid://c3dnc4tgsuwbs" path="res://scripts/core/level_manager.gd" id="1_level_manager"]
 [ext_resource type="PackedScene" path="res://scenes/core/Player.tscn" id="2_player"]
-[ext_resource type="Script" path="res://scripts/player/camera_controller.gd" id="3_camera_controller"]
+[ext_resource type="Script" uid="uid://b5fastfa3rppc" path="res://scripts/player/camera_controller.gd" id="3_camera_controller"]
 [ext_resource type="PackedScene" path="res://scenes/core/SoulShard.tscn" id="4_soul_shard"]
 [ext_resource type="PackedScene" path="res://scenes/ui/PoemRewardUI.tscn" id="5_poem_reward_ui"]
 [ext_resource type="PackedScene" path="res://scenes/core/LevelPortal.tscn" id="6_level_portal"]
+[ext_resource type="PackedScene" uid="uid://2ukw4b5piwo2" path="res://scenes/core/Landmark_01.tscn" id="7_10xc4"]
 
 [sub_resource type="StandardMaterial3D" id="m_ground"]
 albedo_color = Color(0.28, 0.33, 0.3, 1)
-
-[sub_resource type="StandardMaterial3D" id="m_blocker"]
-albedo_color = Color(0.24, 0.27, 0.29, 1)
-
-[sub_resource type="StandardMaterial3D" id="m_path"]
-albedo_color = Color(0.45, 0.48, 0.52, 1)
-
-[sub_resource type="StandardMaterial3D" id="m_warm"]
-albedo_color = Color(0.95, 0.72, 0.4, 1)
-
-[sub_resource type="StandardMaterial3D" id="m_tree"]
-albedo_color = Color(0.36, 0.42, 0.34, 1)
-
-[sub_resource type="StandardMaterial3D" id="m_rock"]
-albedo_color = Color(0.39, 0.4, 0.42, 1)
 
 [sub_resource type="BoxMesh" id="mesh_base"]
 material = SubResource("m_ground")
@@ -31,6 +17,9 @@ size = Vector3(44, 0.2, 104)
 
 [sub_resource type="BoxShape3D" id="shape_base"]
 size = Vector3(44, 0.2, 104)
+
+[sub_resource type="StandardMaterial3D" id="m_path"]
+albedo_color = Color(0.45, 0.48, 0.52, 1)
 
 [sub_resource type="BoxMesh" id="mesh_terrace_wide"]
 material = SubResource("m_path")
@@ -60,13 +49,6 @@ size = Vector3(8.2, 0.45, 6.2)
 [sub_resource type="BoxShape3D" id="shape_step"]
 size = Vector3(8.2, 0.45, 6.2)
 
-[sub_resource type="BoxMesh" id="mesh_blocker_large"]
-material = SubResource("m_blocker")
-size = Vector3(6.5, 4.6, 6.5)
-
-[sub_resource type="BoxShape3D" id="shape_blocker_large"]
-size = Vector3(6.5, 4.6, 6.5)
-
 [sub_resource type="BoxMesh" id="mesh_arch_post"]
 material = SubResource("m_path")
 size = Vector3(1.6, 4.8, 1.6)
@@ -83,297 +65,351 @@ size = Vector3(11.5, 1.1, 1.6)
 
 [sub_resource type="BoxMesh" id="mesh_arch_cap"]
 material = SubResource("m_path")
-size = Vector3(2.0, 1.0, 1.6)
+size = Vector3(2, 1, 1.6)
 
 [sub_resource type="BoxShape3D" id="shape_arch_cap"]
-size = Vector3(2.0, 1.0, 1.6)
+size = Vector3(2, 1, 1.6)
 
-[sub_resource type="CylinderMesh" id="mesh_landmark_column"]
-material = SubResource("m_warm")
-top_radius = 0.5
-bottom_radius = 0.9
-height = 6.2
+[sub_resource type="StandardMaterial3D" id="m_blocker"]
+albedo_color = Color(0.24, 0.27, 0.29, 1)
 
-[sub_resource type="BoxMesh" id="mesh_landmark_base"]
-material = SubResource("m_warm")
-size = Vector3(3.6, 0.6, 3.6)
+[sub_resource type="BoxMesh" id="mesh_blocker_large"]
+material = SubResource("m_blocker")
+size = Vector3(6.5, 4.6, 6.5)
+
+[sub_resource type="BoxShape3D" id="shape_blocker_large"]
+size = Vector3(6.5, 4.6, 6.5)
+
+[sub_resource type="StandardMaterial3D" id="m_rock"]
+albedo_color = Color(0.39, 0.4, 0.42, 1)
+
+[sub_resource type="BoxMesh" id="mesh_rock"]
+material = SubResource("m_rock")
+size = Vector3(2.4, 1.4, 2)
 
 [sub_resource type="BoxMesh" id="mesh_tree_trunk"]
 material = SubResource("m_blocker")
 size = Vector3(0.8, 2.4, 0.8)
 
+[sub_resource type="StandardMaterial3D" id="m_tree"]
+albedo_color = Color(0.36, 0.42, 0.34, 1)
+
 [sub_resource type="BoxMesh" id="mesh_tree_crown"]
 material = SubResource("m_tree")
 size = Vector3(2.8, 2.2, 2.8)
 
-[sub_resource type="BoxMesh" id="mesh_rock"]
-material = SubResource("m_rock")
-size = Vector3(2.4, 1.4, 2.0)
+[sub_resource type="StandardMaterial3D" id="m_warm"]
+albedo_color = Color(0.95, 0.72, 0.4, 1)
 
 [sub_resource type="CylinderMesh" id="mesh_guide_marker"]
 material = SubResource("m_warm")
 height = 1.8
-radius = 0.35
 
-[node name="Level_01" type="Node3D"]
+[node name="Level_01" type="Node3D" unique_id=1615051214]
 
-[node name="LevelManager" type="Node" parent="."]
+[node name="LevelManager" type="Node" parent="." unique_id=392610577]
 script = ExtResource("1_level_manager")
-level_id = 1
 reward_text = "Ты появилась как тёплый первый свет"
-soul_shard_path = NodePath("../SoulShard")
-poem_reward_ui_path = NodePath("../UILayer/PoemRewardUI")
-level_portal_path = NodePath("../LevelPortal")
 
-[node name="BaseGround" type="StaticBody3D" parent="."]
-[node name="Mesh" type="MeshInstance3D" parent="BaseGround"]
+[node name="BaseGround" type="StaticBody3D" parent="." unique_id=2042337418]
+
+[node name="Mesh" type="MeshInstance3D" parent="BaseGround" unique_id=1300246790]
 mesh = SubResource("mesh_base")
-[node name="Collision" type="CollisionShape3D" parent="BaseGround"]
+
+[node name="Collision" type="CollisionShape3D" parent="BaseGround" unique_id=571014388]
 shape = SubResource("shape_base")
 
-[node name="StartTerrace" type="StaticBody3D" parent="."]
+[node name="StartTerrace" type="StaticBody3D" parent="." unique_id=1019966825]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8, 0.55, 8.5)
-[node name="Mesh" type="MeshInstance3D" parent="StartTerrace"]
+
+[node name="Mesh" type="MeshInstance3D" parent="StartTerrace" unique_id=1925438279]
 mesh = SubResource("mesh_terrace_wide")
-[node name="Collision" type="CollisionShape3D" parent="StartTerrace"]
+
+[node name="Collision" type="CollisionShape3D" parent="StartTerrace" unique_id=1891467721]
 shape = SubResource("shape_terrace_wide")
 
-[node name="MidTerrace" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 1.25, -9.0)
-[node name="Mesh" type="MeshInstance3D" parent="MidTerrace"]
+[node name="MidTerrace" type="StaticBody3D" parent="." unique_id=497178563]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 1.25, -9)
+
+[node name="Mesh" type="MeshInstance3D" parent="MidTerrace" unique_id=1678592019]
 mesh = SubResource("mesh_terrace_mid")
-[node name="Collision" type="CollisionShape3D" parent="MidTerrace"]
+
+[node name="Collision" type="CollisionShape3D" parent="MidTerrace" unique_id=1051974918]
 shape = SubResource("shape_terrace_mid")
 
-[node name="FinalTerrace" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 2.1, -30.0)
-[node name="Mesh" type="MeshInstance3D" parent="FinalTerrace"]
+[node name="FinalTerrace" type="StaticBody3D" parent="." unique_id=1040632489]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 2.1, -30)
+
+[node name="Mesh" type="MeshInstance3D" parent="FinalTerrace" unique_id=947099274]
 mesh = SubResource("mesh_terrace_final")
-[node name="Collision" type="CollisionShape3D" parent="FinalTerrace"]
+
+[node name="Collision" type="CollisionShape3D" parent="FinalTerrace" unique_id=1815985663]
 shape = SubResource("shape_terrace_final")
 
-[node name="StepA" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6, 0.78, 1.0)
-[node name="Mesh" type="MeshInstance3D" parent="StepA"]
+[node name="StepA" type="StaticBody3D" parent="." unique_id=1227206378]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6, 0.78, 1)
+
+[node name="Mesh" type="MeshInstance3D" parent="StepA" unique_id=525831134]
 mesh = SubResource("mesh_step")
-[node name="Collision" type="CollisionShape3D" parent="StepA"]
+
+[node name="Collision" type="CollisionShape3D" parent="StepA" unique_id=1664796571]
 shape = SubResource("shape_step")
 
-[node name="StepB" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8, 1.56, -18.0)
-[node name="Mesh" type="MeshInstance3D" parent="StepB"]
+[node name="StepB" type="StaticBody3D" parent="." unique_id=297852679]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8, 1.56, -18)
+
+[node name="Mesh" type="MeshInstance3D" parent="StepB" unique_id=2066820571]
 mesh = SubResource("mesh_step")
-[node name="Collision" type="CollisionShape3D" parent="StepB"]
+
+[node name="Collision" type="CollisionShape3D" parent="StepB" unique_id=1760683938]
 shape = SubResource("shape_step")
 
-[node name="Arch1Right" type="StaticBody3D" parent="."]
+[node name="Arch1Right" type="StaticBody3D" parent="." unique_id=942685095]
 transform = Transform3D(1, 0, 0, 0, 1.2, 0, 0, 0, 1, 6.1, 2.6, -5.3)
-[node name="Mesh" type="MeshInstance3D" parent="Arch1Right"]
+
+[node name="Mesh" type="MeshInstance3D" parent="Arch1Right" unique_id=795878279]
 mesh = SubResource("mesh_arch_post")
-[node name="Collision" type="CollisionShape3D" parent="Arch1Right"]
+
+[node name="Collision" type="CollisionShape3D" parent="Arch1Right" unique_id=842505233]
 shape = SubResource("shape_arch_post")
 
-[node name="Arch1Top" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.62, 0, 0, 0, 1, 1.4, 6.0, -5.3)
-[node name="Mesh" type="MeshInstance3D" parent="Arch1Top"]
+[node name="Arch1Top" type="StaticBody3D" parent="." unique_id=906073286]
+transform = Transform3D(1, 0, 0, 0, 0.62, 0, 0, 0, 1, 1.4, 6, -5.3)
+
+[node name="Mesh" type="MeshInstance3D" parent="Arch1Top" unique_id=1979170263]
 mesh = SubResource("mesh_arch_top")
-[node name="Collision" type="CollisionShape3D" parent="Arch1Top"]
+
+[node name="Collision" type="CollisionShape3D" parent="Arch1Top" unique_id=243964072]
 shape = SubResource("shape_arch_top")
 
-[node name="Arch1CapL" type="StaticBody3D" parent="."]
+[node name="Arch1CapL" type="StaticBody3D" parent="." unique_id=48264238]
 transform = Transform3D(1, 0, 0, 0, 0.62, 0, 0, 0, 1, 0.6, 6.65, -5.3)
-[node name="Mesh" type="MeshInstance3D" parent="Arch1CapL"]
+
+[node name="Mesh" type="MeshInstance3D" parent="Arch1CapL" unique_id=1714941710]
 mesh = SubResource("mesh_arch_cap")
-[node name="Collision" type="CollisionShape3D" parent="Arch1CapL"]
+
+[node name="Collision" type="CollisionShape3D" parent="Arch1CapL" unique_id=2145650805]
 shape = SubResource("shape_arch_cap")
 
-[node name="Arch1CapR" type="StaticBody3D" parent="."]
+[node name="Arch1CapR" type="StaticBody3D" parent="." unique_id=982570305]
 transform = Transform3D(1, 0, 0, 0, 0.7, 0, 0, 0, 1, 4.1, 6.9, -5.3)
-[node name="Mesh" type="MeshInstance3D" parent="Arch1CapR"]
+
+[node name="Mesh" type="MeshInstance3D" parent="Arch1CapR" unique_id=1000655989]
 mesh = SubResource("mesh_arch_cap")
-[node name="Collision" type="CollisionShape3D" parent="Arch1CapR"]
+
+[node name="Collision" type="CollisionShape3D" parent="Arch1CapR" unique_id=1335628780]
 shape = SubResource("shape_arch_cap")
 
-[node name="Arch2Left" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1.2, 0, 0, 0, 1, -6.3, 3.35, -24.0)
-[node name="Mesh" type="MeshInstance3D" parent="Arch2Left"]
+[node name="Arch2Left" type="StaticBody3D" parent="." unique_id=1920370506]
+transform = Transform3D(1, 0, 0, 0, 1.2, 0, 0, 0, 1, -6.3, 3.35, -24)
+
+[node name="Mesh" type="MeshInstance3D" parent="Arch2Left" unique_id=2074136764]
 mesh = SubResource("mesh_arch_post")
-[node name="Collision" type="CollisionShape3D" parent="Arch2Left"]
+
+[node name="Collision" type="CollisionShape3D" parent="Arch2Left" unique_id=1459149023]
 shape = SubResource("shape_arch_post")
 
-[node name="Arch2Right" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1.2, 0, 0, 0, 1, 5.9, 3.35, -24.0)
-[node name="Mesh" type="MeshInstance3D" parent="Arch2Right"]
+[node name="Arch2Right" type="StaticBody3D" parent="." unique_id=134690688]
+transform = Transform3D(1, 0, 0, 0, 1.2, 0, 0, 0, 1, 5.9, 3.35, -24)
+
+[node name="Mesh" type="MeshInstance3D" parent="Arch2Right" unique_id=80120450]
 mesh = SubResource("mesh_arch_post")
-[node name="Collision" type="CollisionShape3D" parent="Arch2Right"]
+
+[node name="Collision" type="CollisionShape3D" parent="Arch2Right" unique_id=463325766]
 shape = SubResource("shape_arch_post")
 
-[node name="Arch2Top" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.74, 0, 0, 0, 1, -0.2, 6.72, -24.0)
-[node name="Mesh" type="MeshInstance3D" parent="Arch2Top"]
+[node name="Arch2Top" type="StaticBody3D" parent="." unique_id=1320361131]
+transform = Transform3D(1, 0, 0, 0, 0.74, 0, 0, 0, 1, -0.2, 6.72, -24)
+
+[node name="Mesh" type="MeshInstance3D" parent="Arch2Top" unique_id=611445216]
 mesh = SubResource("mesh_arch_top")
-[node name="Collision" type="CollisionShape3D" parent="Arch2Top"]
+
+[node name="Collision" type="CollisionShape3D" parent="Arch2Top" unique_id=748100863]
 shape = SubResource("shape_arch_top")
 
-[node name="Arch2CapL" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.82, 0, 0, 0, 1, -3.9, 7.52, -24.0)
-[node name="Mesh" type="MeshInstance3D" parent="Arch2CapL"]
+[node name="Arch2CapL" type="StaticBody3D" parent="." unique_id=712538803]
+transform = Transform3D(1, 0, 0, 0, 0.82, 0, 0, 0, 1, -3.9, 7.52, -24)
+
+[node name="Mesh" type="MeshInstance3D" parent="Arch2CapL" unique_id=221850694]
 mesh = SubResource("mesh_arch_cap")
-[node name="Collision" type="CollisionShape3D" parent="Arch2CapL"]
+
+[node name="Collision" type="CollisionShape3D" parent="Arch2CapL" unique_id=2008107465]
 shape = SubResource("shape_arch_cap")
 
-[node name="Arch2CapR" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.82, 0, 0, 0, 1, 3.5, 7.52, -24.0)
-[node name="Mesh" type="MeshInstance3D" parent="Arch2CapR"]
+[node name="Arch2CapR" type="StaticBody3D" parent="." unique_id=780726019]
+transform = Transform3D(1, 0, 0, 0, 0.82, 0, 0, 0, 1, 3.5, 7.52, -24)
+
+[node name="Mesh" type="MeshInstance3D" parent="Arch2CapR" unique_id=5926192]
 mesh = SubResource("mesh_arch_cap")
-[node name="Collision" type="CollisionShape3D" parent="Arch2CapR"]
+
+[node name="Collision" type="CollisionShape3D" parent="Arch2CapR" unique_id=751909560]
 shape = SubResource("shape_arch_cap")
 
-[node name="Arch1DebrisA" type="StaticBody3D" parent="."]
+[node name="Arch1DebrisA" type="StaticBody3D" parent="." unique_id=155089706]
 transform = Transform3D(0.85, 0, 0, 0, 0.28, 0, 0, 0, 0.8, -6.3, 0.35, -5.1)
-[node name="Mesh" type="MeshInstance3D" parent="Arch1DebrisA"]
+
+[node name="Mesh" type="MeshInstance3D" parent="Arch1DebrisA" unique_id=2074274140]
 mesh = SubResource("mesh_arch_post")
-[node name="Collision" type="CollisionShape3D" parent="Arch1DebrisA"]
+
+[node name="Collision" type="CollisionShape3D" parent="Arch1DebrisA" unique_id=1583207402]
 shape = SubResource("shape_arch_post")
 
-[node name="Arch1DebrisB" type="StaticBody3D" parent="."]
+[node name="Arch1DebrisB" type="StaticBody3D" parent="." unique_id=915837487]
 transform = Transform3D(0.62, 0, 0, 0, 0.22, 0, 0, 0, 0.62, -5.4, 0.2, -4.4)
-[node name="Mesh" type="MeshInstance3D" parent="Arch1DebrisB"]
+
+[node name="Mesh" type="MeshInstance3D" parent="Arch1DebrisB" unique_id=1604567640]
 mesh = SubResource("mesh_arch_post")
-[node name="Collision" type="CollisionShape3D" parent="Arch1DebrisB"]
+
+[node name="Collision" type="CollisionShape3D" parent="Arch1DebrisB" unique_id=53257961]
 shape = SubResource("shape_arch_post")
 
-[node name="Arch1DebrisC" type="StaticBody3D" parent="."]
+[node name="Arch1DebrisC" type="StaticBody3D" parent="." unique_id=1166116966]
 transform = Transform3D(0.7, 0, 0, 0, 0.2, 0, 0, 0, 0.58, -4.9, 0.15, -6.2)
-[node name="Mesh" type="MeshInstance3D" parent="Arch1DebrisC"]
+
+[node name="Mesh" type="MeshInstance3D" parent="Arch1DebrisC" unique_id=1624607600]
 mesh = SubResource("mesh_arch_cap")
-[node name="Collision" type="CollisionShape3D" parent="Arch1DebrisC"]
+
+[node name="Collision" type="CollisionShape3D" parent="Arch1DebrisC" unique_id=1630720420]
 shape = SubResource("shape_arch_cap")
 
-[node name="LeftBoundaryA" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.0, 2.3, 8.0)
-[node name="Mesh" type="MeshInstance3D" parent="LeftBoundaryA"]
+[node name="LeftBoundaryA" type="StaticBody3D" parent="." unique_id=1605406318]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 2.3, 8)
+
+[node name="Mesh" type="MeshInstance3D" parent="LeftBoundaryA" unique_id=274782552]
 mesh = SubResource("mesh_blocker_large")
-[node name="Collision" type="CollisionShape3D" parent="LeftBoundaryA"]
+
+[node name="Collision" type="CollisionShape3D" parent="LeftBoundaryA" unique_id=2143374128]
 shape = SubResource("shape_blocker_large")
 
-[node name="LeftBoundaryB" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.0, 2.3, -12.0)
-[node name="Mesh" type="MeshInstance3D" parent="LeftBoundaryB"]
+[node name="LeftBoundaryB" type="StaticBody3D" parent="." unique_id=1164565930]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 2.3, -12)
+
+[node name="Mesh" type="MeshInstance3D" parent="LeftBoundaryB" unique_id=488229308]
 mesh = SubResource("mesh_blocker_large")
-[node name="Collision" type="CollisionShape3D" parent="LeftBoundaryB"]
+
+[node name="Collision" type="CollisionShape3D" parent="LeftBoundaryB" unique_id=1959022401]
 shape = SubResource("shape_blocker_large")
 
-[node name="LeftBoundaryC" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.5, 2.3, -31.0)
-[node name="Mesh" type="MeshInstance3D" parent="LeftBoundaryC"]
+[node name="LeftBoundaryC" type="StaticBody3D" parent="." unique_id=2034343009]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.5, 2.3, -31)
+
+[node name="Mesh" type="MeshInstance3D" parent="LeftBoundaryC" unique_id=1351554321]
 mesh = SubResource("mesh_blocker_large")
-[node name="Collision" type="CollisionShape3D" parent="LeftBoundaryC"]
+
+[node name="Collision" type="CollisionShape3D" parent="LeftBoundaryC" unique_id=2122776492]
 shape = SubResource("shape_blocker_large")
 
-[node name="RightBoundaryA" type="StaticBody3D" parent="."]
+[node name="RightBoundaryA" type="StaticBody3D" parent="." unique_id=2109764046]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.6, 2.3, 3.5)
-[node name="Mesh" type="MeshInstance3D" parent="RightBoundaryA"]
+
+[node name="Mesh" type="MeshInstance3D" parent="RightBoundaryA" unique_id=699237591]
 mesh = SubResource("mesh_blocker_large")
-[node name="Collision" type="CollisionShape3D" parent="RightBoundaryA"]
+
+[node name="Collision" type="CollisionShape3D" parent="RightBoundaryA" unique_id=824282424]
 shape = SubResource("shape_blocker_large")
 
-[node name="RightBoundaryB" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.2, 2.3, -15.0)
-[node name="Mesh" type="MeshInstance3D" parent="RightBoundaryB"]
+[node name="RightBoundaryB" type="StaticBody3D" parent="." unique_id=896555036]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.2, 2.3, -15)
+
+[node name="Mesh" type="MeshInstance3D" parent="RightBoundaryB" unique_id=584954632]
 mesh = SubResource("mesh_blocker_large")
-[node name="Collision" type="CollisionShape3D" parent="RightBoundaryB"]
+
+[node name="Collision" type="CollisionShape3D" parent="RightBoundaryB" unique_id=1091784467]
 shape = SubResource("shape_blocker_large")
 
-[node name="RightBoundaryC" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.8, 2.3, -33.0)
-[node name="Mesh" type="MeshInstance3D" parent="RightBoundaryC"]
+[node name="RightBoundaryC" type="StaticBody3D" parent="." unique_id=153667431]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.8, 2.3, -33)
+
+[node name="Mesh" type="MeshInstance3D" parent="RightBoundaryC" unique_id=344843878]
 mesh = SubResource("mesh_blocker_large")
-[node name="Collision" type="CollisionShape3D" parent="RightBoundaryC"]
+
+[node name="Collision" type="CollisionShape3D" parent="RightBoundaryC" unique_id=1134748330]
 shape = SubResource("shape_blocker_large")
 
-[node name="RockA" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.5, 0.7, 14.0)
+[node name="RockA" type="MeshInstance3D" parent="." unique_id=274956506]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.5, 0.7, 14)
 mesh = SubResource("mesh_rock")
 
-[node name="StartHintStone" type="StaticBody3D" parent="."]
+[node name="StartHintStone" type="StaticBody3D" parent="." unique_id=522013036]
 transform = Transform3D(1.12, 0, 0, 0, 1.45, 0, 0, 0, 0.7, 2.8, 0.85, 27.4)
-[node name="Mesh" type="MeshInstance3D" parent="StartHintStone"]
+
+[node name="Mesh" type="MeshInstance3D" parent="StartHintStone" unique_id=1625649884]
 mesh = SubResource("mesh_rock")
-[node name="Collision" type="CollisionShape3D" parent="StartHintStone"]
+
+[node name="Collision" type="CollisionShape3D" parent="StartHintStone" unique_id=925286654]
 shape = SubResource("shape_arch_post")
 
-[node name="WASDHint" type="Label3D" parent="StartHintStone"]
+[node name="WASDHint" type="Label3D" parent="StartHintStone" unique_id=1676386916]
 transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 0, 1.1, 0.85)
-text = "WASD"
 billboard = 1
-font_size = 78
 modulate = Color(0.95, 0.95, 0.92, 1)
+text = "WASD"
+font_size = 78
 
-[node name="RockB" type="MeshInstance3D" parent="."]
-transform = Transform3D(1.2, 0, 0, 0, 1, 0, 0, 0, 1.1, 10.5, 0.7, -1.0)
+[node name="RockB" type="MeshInstance3D" parent="." unique_id=1027437440]
+transform = Transform3D(1.2, 0, 0, 0, 1, 0, 0, 0, 1.1, 10.5, 0.7, -1)
 mesh = SubResource("mesh_rock")
 
-[node name="RockC" type="MeshInstance3D" parent="."]
-transform = Transform3D(1.1, 0, 0, 0, 1, 0, 0, 0, 1.3, -10.5, 0.7, -22.0)
+[node name="RockC" type="MeshInstance3D" parent="." unique_id=109564496]
+transform = Transform3D(1.1, 0, 0, 0, 1, 0, 0, 0, 1.3, -10.5, 0.7, -22)
 mesh = SubResource("mesh_rock")
 
-[node name="TreeA" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.0, 0.0, 10.0)
-[node name="Trunk" type="MeshInstance3D" parent="TreeA"]
+[node name="TreeA" type="Node3D" parent="." unique_id=1824927149]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0, 10)
+
+[node name="Trunk" type="MeshInstance3D" parent="TreeA" unique_id=1237682215]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
 mesh = SubResource("mesh_tree_trunk")
-[node name="Crown" type="MeshInstance3D" parent="TreeA"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.0, 0)
+
+[node name="Crown" type="MeshInstance3D" parent="TreeA" unique_id=1092081303]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
 mesh = SubResource("mesh_tree_crown")
 
-[node name="TreeB" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.5, 0.0, -3.0)
-[node name="Trunk" type="MeshInstance3D" parent="TreeB"]
+[node name="TreeB" type="Node3D" parent="." unique_id=1995118121]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.5, 0, -3)
+
+[node name="Trunk" type="MeshInstance3D" parent="TreeB" unique_id=379456185]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
 mesh = SubResource("mesh_tree_trunk")
-[node name="Crown" type="MeshInstance3D" parent="TreeB"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.0, 0)
+
+[node name="Crown" type="MeshInstance3D" parent="TreeB" unique_id=1278172016]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
 mesh = SubResource("mesh_tree_crown")
 
-[node name="GuideMarkerA" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.8, 1.6, -14.0)
+[node name="GuideMarkerA" type="MeshInstance3D" parent="." unique_id=642685007]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.8, 1.6, -14)
 mesh = SubResource("mesh_guide_marker")
 
-[node name="GuideMarkerB" type="MeshInstance3D" parent="."]
+[node name="GuideMarkerB" type="MeshInstance3D" parent="." unique_id=1822593672]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.2, 2.35, -27.5)
 mesh = SubResource("mesh_guide_marker")
 
-[node name="LandmarkBase" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 2.6, -37.0)
-mesh = SubResource("mesh_landmark_base")
+[node name="SpawnPoint" type="Marker3D" parent="." unique_id=553430652]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6, 1, 32)
 
-[node name="LandmarkColumn" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 5.3, -37.0)
-mesh = SubResource("mesh_landmark_column")
+[node name="Player" parent="." unique_id=106353476 instance=ExtResource("2_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6, 1, 32)
 
-[node name="SpawnPoint" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6, 1.0, 32.0)
-
-[node name="Player" parent="." instance=ExtResource("2_player")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6, 1.0, 32.0)
-
-[node name="FollowCamera" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.906308, -0.422618, 0, 0.422618, 0.906308, -8.8, 9.3, 40.0)
+[node name="FollowCamera" type="Camera3D" parent="." unique_id=469609807]
+transform = Transform3D(1, 0, 0, 0, 0.906308, -0.422618, 0, 0.422618, 0.906308, -8.8, 9.3, 40)
 current = true
 script = ExtResource("3_camera_controller")
 target_path = NodePath("../Player")
 
-[node name="SunLight" type="DirectionalLight3D" parent="."]
+[node name="SunLight" type="DirectionalLight3D" parent="." unique_id=1940098545]
 transform = Transform3D(0.707107, -0.353553, 0.612372, 0, 0.866025, 0.5, -0.707107, -0.353553, 0.612372, 0, 7.5, 0)
 light_energy = 2.0
 
-[node name="SoulShard" parent="." instance=ExtResource("4_soul_shard")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 3.2, -34.2)
+[node name="SoulShard" parent="." unique_id=240983932 instance=ExtResource("4_soul_shard")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.098274, 6.754832, -44.677273)
 
-[node name="LevelPortal" parent="." instance=ExtResource("6_level_portal")]
+[node name="LevelPortal" parent="." unique_id=620587562 instance=ExtResource("6_level_portal")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.8, 2.7, -34.2)
 target_scene_path = "res://scenes/levels/Level_02.tscn"
 
-[node name="UILayer" type="CanvasLayer" parent="."]
-[node name="PoemRewardUI" parent="UILayer" instance=ExtResource("5_poem_reward_ui")]
+[node name="UILayer" type="CanvasLayer" parent="." unique_id=940584121]
+
+[node name="PoemRewardUI" parent="UILayer" unique_id=1306154697 instance=ExtResource("5_poem_reward_ui")]
+
+[node name="Landmark_01" parent="." unique_id=2129009549 instance=ExtResource("7_10xc4")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 8.620106, 3.478199, -37.451912)
