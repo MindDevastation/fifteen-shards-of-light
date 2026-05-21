@@ -1,0 +1,71 @@
+[gd_scene load_steps=7 format=3 uid="uid://c3ujhyl8kfxso"]
+
+[ext_resource type="PackedScene" path="res://assets/props/SoulOrb_Core/SoulOrb_Core.glb" id="1_core"]
+[ext_resource type="PackedScene" path="res://assets/props/SoulOrb_Ring_Inner/SoulOrb_Ring_Inner.glb" id="2_inner"]
+[ext_resource type="PackedScene" path="res://assets/props/SoulOrb_Ring_Outer/SoulOrb_Ring_Outer.glb" id="3_outer"]
+[ext_resource type="PackedScene" path="res://assets/props/SoulOrb_Petal/SoulOrb_Petal.glb" id="4_petal"]
+[ext_resource type="Script" path="res://scripts/soul/soul_orb_base.gd" id="5_script"]
+
+[node name="SoulOrb_Base" type="Node3D"]
+script = ExtResource("5_script")
+
+[node name="VisualRoot" type="Node3D" parent="."]
+
+[node name="CoreRoot" type="Node3D" parent="VisualRoot"]
+
+[node name="SoulOrb_Core_Model" parent="VisualRoot/CoreRoot" instance=ExtResource("1_core")]
+
+[node name="InnerRingRoot" type="Node3D" parent="VisualRoot"]
+
+[node name="SoulOrb_Ring_Inner_Model" parent="VisualRoot/InnerRingRoot" instance=ExtResource("2_inner")]
+
+[node name="OuterRingRoot" type="Node3D" parent="VisualRoot"]
+rotation = Vector3(0, 0, 0.3)
+
+[node name="SoulOrb_Ring_Outer_Model" parent="VisualRoot/OuterRingRoot" instance=ExtResource("3_outer")]
+
+[node name="PetalOrbitRoot" type="Node3D" parent="VisualRoot"]
+
+[node name="Petal_01" type="Node3D" parent="VisualRoot/PetalOrbitRoot"]
+position = Vector3(0.55, 0.08, 0)
+rotation = Vector3(0, 0.45, 0.2)
+
+[node name="SoulOrb_Petal_Model" parent="VisualRoot/PetalOrbitRoot/Petal_01" instance=ExtResource("4_petal")]
+
+[node name="Petal_02" type="Node3D" parent="VisualRoot/PetalOrbitRoot"]
+position = Vector3(0.17, 0.11, 0.52)
+rotation = Vector3(0.35, 1.15, -0.15)
+
+[node name="SoulOrb_Petal_Model" parent="VisualRoot/PetalOrbitRoot/Petal_02" instance=ExtResource("4_petal")]
+
+[node name="Petal_03" type="Node3D" parent="VisualRoot/PetalOrbitRoot"]
+position = Vector3(-0.43, 0.04, 0.31)
+rotation = Vector3(0.1, 2.1, 0.18)
+
+[node name="SoulOrb_Petal_Model" parent="VisualRoot/PetalOrbitRoot/Petal_03" instance=ExtResource("4_petal")]
+
+[node name="Petal_04" type="Node3D" parent="VisualRoot/PetalOrbitRoot"]
+position = Vector3(-0.52, -0.05, -0.16)
+rotation = Vector3(-0.2, -2.45, -0.2)
+
+[node name="SoulOrb_Petal_Model" parent="VisualRoot/PetalOrbitRoot/Petal_04" instance=ExtResource("4_petal")]
+
+[node name="Petal_05" type="Node3D" parent="VisualRoot/PetalOrbitRoot"]
+position = Vector3(-0.08, 0.07, -0.56)
+rotation = Vector3(0.24, -1.4, 0.12)
+
+[node name="SoulOrb_Petal_Model" parent="VisualRoot/PetalOrbitRoot/Petal_05" instance=ExtResource("4_petal")]
+
+[node name="Petal_06" type="Node3D" parent="VisualRoot/PetalOrbitRoot"]
+position = Vector3(0.46, -0.03, -0.31)
+rotation = Vector3(-0.15, -0.65, -0.22)
+
+[node name="SoulOrb_Petal_Model" parent="VisualRoot/PetalOrbitRoot/Petal_06" instance=ExtResource("4_petal")]
+
+[node name="GlowRoot" type="Node3D" parent="VisualRoot"]
+
+[node name="OmniLight3D" type="OmniLight3D" parent="VisualRoot/GlowRoot"]
+light_color = Color(1, 0.82, 0.62, 1)
+light_energy = 1.0
+omni_range = 5.0
+shadow_enabled = false
