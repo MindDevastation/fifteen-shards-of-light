@@ -1,16 +1,21 @@
 extends CharacterBody3D
 
-@export var movement_speed: float = 5.0
+@export var walk_speed: float = 5.0
+@export var run_speed: float = 8.5
 @export var jump_velocity: float = 4.5
 @export var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 
 func _physics_process(delta: float) -> void:
 	var input_direction := _get_input_direction()
-	var movement_direction := Vector3(input_direction.x, 0.0, input_direction.y).normalized()
+	var movement_direction := _get_camera_relative_direction(input_direction)
 
-	velocity.x = movement_direction.x * movement_speed
-	velocity.z = movement_direction.z * movement_speed
+	var current_speed := walk_speed
+	if Input.is_key_pressed(KEY_SHIFT):
+		current_speed = run_speed
+
+	velocity.x = movement_direction.x * current_speed
+	velocity.z = movement_direction.z * current_speed
 
 	if not is_on_floor():
 		velocity.y -= gravity * delta
@@ -20,6 +25,30 @@ func _physics_process(delta: float) -> void:
 		velocity.y = 0.0
 
 	move_and_slide()
+
+
+func _get_camera_relative_direction(input_direction: Vector2) -> Vector3:
+	if input_direction == Vector2.ZERO:
+		return Vector3.ZERO
+
+	var camera := get_viewport().get_camera_3d()
+	if camera == null:
+		return Vector3(input_direction.x, 0.0, input_direction.y).normalized()
+
+	var camera_basis := camera.global_transform.basis
+	var camera_forward := -camera_basis.z
+	var camera_right := camera_basis.x
+
+	camera_forward.y = 0.0
+	camera_right.y = 0.0
+
+	if camera_forward.length_squared() <= 0.000001 or camera_right.length_squared() <= 0.000001:
+		return Vector3(input_direction.x, 0.0, input_direction.y).normalized()
+
+	camera_forward = camera_forward.normalized()
+	camera_right = camera_right.normalized()
+
+	return (camera_right * input_direction.x + camera_forward * -input_direction.y).normalized()
 
 
 func _get_input_direction() -> Vector2:

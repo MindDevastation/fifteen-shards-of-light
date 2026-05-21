@@ -8,6 +8,7 @@ const LEVEL_01_PATH := "res://scenes/levels/Level_01.tscn"
 
 
 func _ready() -> void:
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	start_button.pressed.connect(_on_start_button_pressed)
 	quit_button.pressed.connect(_on_quit_button_pressed)
 
