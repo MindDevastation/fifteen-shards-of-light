@@ -1,6 +1,7 @@
 extends CanvasLayer
 
-const TOGGLE_KEY := KEY_F10
+const PRIMARY_TOGGLE_KEY := KEY_Q
+const LEGACY_TOGGLE_KEY := KEY_F10
 const DEV_LEVELS := [
 	{"button_name": "Level01Button", "label": "Level 01", "scene_path": "res://scenes/levels/Level_01.tscn"},
 	{"button_name": "Level02Button", "label": "Level 02", "scene_path": "res://scenes/levels/Level_02.tscn"},
@@ -26,6 +27,9 @@ var _is_loading := false
 
 
 func _ready() -> void:
+	menu_panel.visible = false
+	_update_mouse_mode()
+
 	for entry in DEV_LEVELS:
 		var button := menu_panel.find_child(entry.button_name, true, false) as Button
 		if button == null:
@@ -37,9 +41,11 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed and not event.echo and event.keycode == TOGGLE_KEY:
-		menu_panel.visible = not menu_panel.visible
-		get_viewport().set_input_as_handled()
+	if event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == PRIMARY_TOGGLE_KEY or event.keycode == LEGACY_TOGGLE_KEY:
+			menu_panel.visible = not menu_panel.visible
+			_update_mouse_mode()
+			get_viewport().set_input_as_handled()
 
 
 func _on_level_button_pressed(scene_path: String) -> void:
@@ -63,3 +69,10 @@ func _change_scene_deferred(scene_path: String) -> void:
 
 	await get_tree().process_frame
 	_is_loading = false
+
+
+func _update_mouse_mode() -> void:
+	if menu_panel.visible:
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	else:
+		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
