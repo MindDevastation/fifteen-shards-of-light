@@ -6,7 +6,7 @@
 [ext_resource type="PackedScene" path="res://scenes/core/SoulShard.tscn" id="4_soul_shard"]
 [ext_resource type="PackedScene" path="res://scenes/ui/PoemRewardUI.tscn" id="5_poem_reward_ui"]
 [ext_resource type="PackedScene" path="res://scenes/core/LevelPortal.tscn" id="6_level_portal"]
-[ext_resource type="PackedScene" uid="uid://2ukw4b5piwo2" path="res://scenes/core/Landmark_01.tscn" id="7_10xc4"]
+[ext_resource type="PackedScene" path="res://scenes/core/Landmark_02.tscn" id="7_10xc4"]
 
 [sub_resource type="StandardMaterial3D" id="m_ground"]
 albedo_color = Color(0.28, 0.33, 0.3, 1)
@@ -411,5 +411,5 @@ target_scene_path = "res://scenes/levels/Level_02.tscn"
 
 [node name="PoemRewardUI" parent="UILayer" unique_id=1306154697 instance=ExtResource("5_poem_reward_ui")]
 
-[node name="Landmark_01" parent="." unique_id=2129009549 instance=ExtResource("7_10xc4")]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 8.620106, 3.478199, -37.451912)
+[node name="Landmark_02" parent="." unique_id=513640426 instance=ExtResource("7_10xc4")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 6.5025578, 3.4792647, -35.472992)
