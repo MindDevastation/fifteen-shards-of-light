@@ -19,48 +19,74 @@ script = ExtResource("5_script")
 
 [node name="SoulOrb_Ring_Inner_Model" parent="VisualRoot/InnerRingRoot" instance=ExtResource("2_inner")]
 
-[node name="OuterRingRoot" type="Node3D" parent="VisualRoot"]
+[node name="OuterRingCenterRoot" type="Node3D" parent="VisualRoot"]
 rotation = Vector3(0, 0, 0.3)
 
-[node name="SoulOrb_Ring_Outer_Model" parent="VisualRoot/OuterRingRoot" instance=ExtResource("3_outer")]
+[node name="OuterRingVisualOffset" type="Node3D" parent="VisualRoot/OuterRingCenterRoot"]
 
-[node name="PetalOrbitRoot" type="Node3D" parent="VisualRoot"]
+[node name="SoulOrb_Ring_Outer_Model" parent="VisualRoot/OuterRingCenterRoot/OuterRingVisualOffset" instance=ExtResource("3_outer")]
 
-[node name="Petal_01" type="Node3D" parent="VisualRoot/PetalOrbitRoot"]
-position = Vector3(0.55, 0.08, 0)
-rotation = Vector3(0, 0.45, 0.2)
+[node name="PetalContainer" type="Node3D" parent="VisualRoot"]
 
-[node name="SoulOrb_Petal_Model" parent="VisualRoot/PetalOrbitRoot/Petal_01" instance=ExtResource("4_petal")]
+[node name="PetalRoot_01" type="Node3D" parent="VisualRoot/PetalContainer"]
+[node name="PetalModel_01" parent="VisualRoot/PetalContainer/PetalRoot_01" instance=ExtResource("4_petal")]
 
-[node name="Petal_02" type="Node3D" parent="VisualRoot/PetalOrbitRoot"]
-position = Vector3(0.17, 0.11, 0.52)
-rotation = Vector3(0.35, 1.15, -0.15)
+[node name="PetalRoot_02" type="Node3D" parent="VisualRoot/PetalContainer"]
+[node name="PetalModel_02" parent="VisualRoot/PetalContainer/PetalRoot_02" instance=ExtResource("4_petal")]
 
-[node name="SoulOrb_Petal_Model" parent="VisualRoot/PetalOrbitRoot/Petal_02" instance=ExtResource("4_petal")]
+[node name="PetalRoot_03" type="Node3D" parent="VisualRoot/PetalContainer"]
+[node name="PetalModel_03" parent="VisualRoot/PetalContainer/PetalRoot_03" instance=ExtResource("4_petal")]
 
-[node name="Petal_03" type="Node3D" parent="VisualRoot/PetalOrbitRoot"]
-position = Vector3(-0.43, 0.04, 0.31)
-rotation = Vector3(0.1, 2.1, 0.18)
+[node name="PetalRoot_04" type="Node3D" parent="VisualRoot/PetalContainer"]
+[node name="PetalModel_04" parent="VisualRoot/PetalContainer/PetalRoot_04" instance=ExtResource("4_petal")]
 
-[node name="SoulOrb_Petal_Model" parent="VisualRoot/PetalOrbitRoot/Petal_03" instance=ExtResource("4_petal")]
+[node name="PetalRoot_05" type="Node3D" parent="VisualRoot/PetalContainer"]
+[node name="PetalModel_05" parent="VisualRoot/PetalContainer/PetalRoot_05" instance=ExtResource("4_petal")]
 
-[node name="Petal_04" type="Node3D" parent="VisualRoot/PetalOrbitRoot"]
-position = Vector3(-0.52, -0.05, -0.16)
-rotation = Vector3(-0.2, -2.45, -0.2)
+[node name="PetalRoot_06" type="Node3D" parent="VisualRoot/PetalContainer"]
+[node name="PetalModel_06" parent="VisualRoot/PetalContainer/PetalRoot_06" instance=ExtResource("4_petal")]
 
-[node name="SoulOrb_Petal_Model" parent="VisualRoot/PetalOrbitRoot/Petal_04" instance=ExtResource("4_petal")]
+[node name="PetalRoot_07" type="Node3D" parent="VisualRoot/PetalContainer"]
+[node name="PetalModel_07" parent="VisualRoot/PetalContainer/PetalRoot_07" instance=ExtResource("4_petal")]
 
-[node name="Petal_05" type="Node3D" parent="VisualRoot/PetalOrbitRoot"]
-position = Vector3(-0.08, 0.07, -0.56)
-rotation = Vector3(0.24, -1.4, 0.12)
+[node name="PetalRoot_08" type="Node3D" parent="VisualRoot/PetalContainer"]
+[node name="PetalModel_08" parent="VisualRoot/PetalContainer/PetalRoot_08" instance=ExtResource("4_petal")]
 
-[node name="SoulOrb_Petal_Model" parent="VisualRoot/PetalOrbitRoot/Petal_05" instance=ExtResource("4_petal")]
+[node name="PetalRoot_09" type="Node3D" parent="VisualRoot/PetalContainer"]
+[node name="PetalModel_09" parent="VisualRoot/PetalContainer/PetalRoot_09" instance=ExtResource("4_petal")]
 
-[node name="Petal_06" type="Node3D" parent="VisualRoot/PetalOrbitRoot"]
-position = Vector3(0.46, -0.03, -0.31)
-rotation = Vector3(-0.15, -0.65, -0.22)
+[node name="PetalRoot_10" type="Node3D" parent="VisualRoot/PetalContainer"]
+[node name="PetalModel_10" parent="VisualRoot/PetalContainer/PetalRoot_10" instance=ExtResource("4_petal")]
 
-[node name="SoulOrb_Petal_Model" parent="VisualRoot/PetalOrbitRoot/Petal_06" instance=ExtResource("4_petal")]
+[node name="PetalRoot_11" type="Node3D" parent="VisualRoot/PetalContainer"]
+[node name="PetalModel_11" parent="VisualRoot/PetalContainer/PetalRoot_11" instance=ExtResource("4_petal")]
+
+[node name="PetalRoot_12" type="Node3D" parent="VisualRoot/PetalContainer"]
+[node name="PetalModel_12" parent="VisualRoot/PetalContainer/PetalRoot_12" instance=ExtResource("4_petal")]
+
+[node name="PetalRoot_13" type="Node3D" parent="VisualRoot/PetalContainer"]
+[node name="PetalModel_13" parent="VisualRoot/PetalContainer/PetalRoot_13" instance=ExtResource("4_petal")]
+
+[node name="PetalRoot_14" type="Node3D" parent="VisualRoot/PetalContainer"]
+[node name="PetalModel_14" parent="VisualRoot/PetalContainer/PetalRoot_14" instance=ExtResource("4_petal")]
+
+[node name="PetalRoot_15" type="Node3D" parent="VisualRoot/PetalContainer"]
+[node name="PetalModel_15" parent="VisualRoot/PetalContainer/PetalRoot_15" instance=ExtResource("4_petal")]
+
+[node name="PetalRoot_16" type="Node3D" parent="VisualRoot/PetalContainer"]
+[node name="PetalModel_16" parent="VisualRoot/PetalContainer/PetalRoot_16" instance=ExtResource("4_petal")]
+
+[node name="PetalRoot_17" type="Node3D" parent="VisualRoot/PetalContainer"]
+[node name="PetalModel_17" parent="VisualRoot/PetalContainer/PetalRoot_17" instance=ExtResource("4_petal")]
+
+[node name="PetalRoot_18" type="Node3D" parent="VisualRoot/PetalContainer"]
+[node name="PetalModel_18" parent="VisualRoot/PetalContainer/PetalRoot_18" instance=ExtResource("4_petal")]
+
+[node name="PetalRoot_19" type="Node3D" parent="VisualRoot/PetalContainer"]
+[node name="PetalModel_19" parent="VisualRoot/PetalContainer/PetalRoot_19" instance=ExtResource("4_petal")]
+
+[node name="PetalRoot_20" type="Node3D" parent="VisualRoot/PetalContainer"]
+[node name="PetalModel_20" parent="VisualRoot/PetalContainer/PetalRoot_20" instance=ExtResource("4_petal")]
 
 [node name="GlowRoot" type="Node3D" parent="VisualRoot"]
 
