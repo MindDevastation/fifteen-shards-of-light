@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3 uid="uid://csfl8x4m5vwdf"]
+
+[ext_resource type="PackedScene" path="res://scenes/core/SoulOrb_Base.tscn" id="1_base"]
+[ext_resource type="Script" path="res://scripts/soul/soul_orb_follow.gd" id="2_script"]
+
+[node name="SoulOrb_Follow" type="Node3D"]
+script = ExtResource("2_script")
+
+[node name="HoverRoot" type="Node3D" parent="."]
+
+[node name="SoulOrb_Base" parent="HoverRoot" instance=ExtResource("1_base")]
