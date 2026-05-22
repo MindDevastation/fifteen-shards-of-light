@@ -23,6 +23,7 @@ script = ExtResource("5_script")
 rotation = Vector3(0, 0, 0.3)
 
 [node name="OuterRingVisualOffset" type="Node3D" parent="VisualRoot/OuterRingCenterRoot"]
+position = Vector3(0, -0.5, 0)
 
 [node name="SoulOrb_Ring_Outer_Model" parent="VisualRoot/OuterRingCenterRoot/OuterRingVisualOffset" instance=ExtResource("3_outer")]
 
