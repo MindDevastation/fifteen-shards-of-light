@@ -55,16 +55,16 @@ func _build_petal_data() -> void:
 	_petal_data.clear()
 	_petal_roots.clear()
 
-	var petals := petal_container.get_children()
-	var active_count := min(petal_count, petals.size())
+	var petals: Array[Node] = petal_container.get_children()
+	var active_count: int = min(petal_count, petals.size())
 
-	for i in petals.size():
-		var node := petals[i]
+	for i in range(petals.size()):
+		var node: Node = petals[i]
 		if not node is Node3D:
 			continue
 
-		var petal_root := node as Node3D
-		var enabled := i < active_count
+		var petal_root: Node3D = node as Node3D
+		var enabled: bool = i < active_count
 		petal_root.visible = enabled
 		if not enabled:
 			continue
