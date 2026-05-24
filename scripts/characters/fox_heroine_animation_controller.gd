@@ -4,6 +4,12 @@ class_name FoxHeroineAnimationController
 const IDLE_SWITCH_INTERVAL := 15.0
 const IDLE_BASE_WEIGHT := 0.6
 const IDLE_PICKUP_WEIGHT := 0.4
+const ONE_SHOT_PRIORITY := {
+	"jump": 10,
+	"cast_1": 20,
+	"dance_test": 30,
+}
+const ONE_SHOT_UNLOCK_MARGIN_SECONDS := 0.2
 
 @export var animation_player_path: NodePath
 
@@ -11,6 +17,8 @@ var _animation_player: AnimationPlayer = null
 var _current_action: String = ""
 var _idle_elapsed: float = 0.0
 var _active_one_shot_action: String = ""
+var _active_one_shot_started_at_seconds: float = 0.0
+var _active_one_shot_max_duration_seconds: float = 0.0
 
 
 func _ready() -> void:
@@ -22,6 +30,7 @@ func _ready() -> void:
 
 
 func update_locomotion(action_name: String) -> void:
+	_update_one_shot_lock_state()
 	if _is_busy_with_one_shot():
 		return
 	play_action(action_name)
@@ -29,6 +38,7 @@ func update_locomotion(action_name: String) -> void:
 
 
 func update_idle(delta: float) -> void:
+	_update_one_shot_lock_state()
 	if _is_busy_with_one_shot():
 		return
 
@@ -51,20 +61,30 @@ func update_idle(delta: float) -> void:
 func play_one_shot(action_name: String) -> void:
 	if _animation_player == null:
 		return
+	_update_one_shot_lock_state()
+	if not _can_start_one_shot(action_name):
+		return
 
 	var source_animation_name := FoxHeroineAnimationMap.get_source_for_action(action_name)
 	if source_animation_name == "" or not _animation_player.has_animation(source_animation_name):
 		return
 
+	var animation := _animation_player.get_animation(source_animation_name)
+	if animation == null:
+		return
+
 	_active_one_shot_action = action_name
 	_current_action = action_name
 	_idle_elapsed = 0.0
+	_active_one_shot_started_at_seconds = Time.get_ticks_msec() / 1000.0
+	_active_one_shot_max_duration_seconds = max(animation.length, 0.0) + ONE_SHOT_UNLOCK_MARGIN_SECONDS
 	_animation_player.play(source_animation_name)
 
 
 func play_action(action_name: String) -> void:
 	if _animation_player == null:
 		return
+	_update_one_shot_lock_state()
 
 	var source_animation_name := FoxHeroineAnimationMap.get_source_for_action(action_name)
 	if source_animation_name == "" or not _animation_player.has_animation(source_animation_name):
@@ -78,6 +98,7 @@ func play_action(action_name: String) -> void:
 
 
 func is_busy() -> bool:
+	_update_one_shot_lock_state()
 	return _is_busy_with_one_shot()
 
 
@@ -89,13 +110,53 @@ func _on_animation_finished(animation_name: StringName) -> void:
 	if String(animation_name) != expected:
 		return
 
-	_active_one_shot_action = ""
-	_current_action = ""
-	_idle_elapsed = 0.0
+	_clear_active_one_shot()
 
 
 func _is_busy_with_one_shot() -> bool:
 	return _active_one_shot_action == "dance_test" or _active_one_shot_action == "cast_1" or _active_one_shot_action == "jump"
+
+
+func _can_start_one_shot(action_name: String) -> bool:
+	if _active_one_shot_action == "":
+		return true
+	if _active_one_shot_action == action_name:
+		return false
+	return _get_one_shot_priority(action_name) > _get_one_shot_priority(_active_one_shot_action)
+
+
+func _get_one_shot_priority(action_name: String) -> int:
+	return ONE_SHOT_PRIORITY.get(action_name, 0)
+
+
+func _update_one_shot_lock_state() -> void:
+	if _active_one_shot_action == "":
+		return
+
+	var expected := FoxHeroineAnimationMap.get_source_for_action(_active_one_shot_action)
+	if expected == "":
+		_clear_active_one_shot()
+		return
+
+	if _animation_player == null:
+		_clear_active_one_shot()
+		return
+
+	if _animation_player.current_animation != expected:
+		_clear_active_one_shot()
+		return
+
+	var elapsed_seconds := (Time.get_ticks_msec() / 1000.0) - _active_one_shot_started_at_seconds
+	if _active_one_shot_max_duration_seconds > 0.0 and elapsed_seconds > _active_one_shot_max_duration_seconds:
+		_clear_active_one_shot()
+
+
+func _clear_active_one_shot() -> void:
+	_active_one_shot_action = ""
+	_active_one_shot_started_at_seconds = 0.0
+	_active_one_shot_max_duration_seconds = 0.0
+	_current_action = ""
+	_idle_elapsed = 0.0
 
 
 func _reset_idle_timer() -> void:
