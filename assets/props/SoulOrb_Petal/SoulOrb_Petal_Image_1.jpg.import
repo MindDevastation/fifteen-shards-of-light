@@ -2,20 +2,20 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dt3ce6q6gcn3i"
-path.s3tc="res://.godot/imported/landmak_01_1.jpg-4fcb611604a89fd120b150af4d503700.s3tc.ctex"
+uid="uid://cw7ev6kfm4khl"
+path.s3tc="res://.godot/imported/SoulOrb_Petal_Image_1.jpg-c30f6cebbadcd3d6351b605fb2ccea1c.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
 generator_parameters={
-"md5": "6afbb4a81cbf70ed43af180281137040"
+"md5": "58db2c6b37be448a5dda506c640febab"
 }
 
 [deps]
 
-source_file="res://assets/architecture/landmark_01/landmak_01_1.jpg"
-dest_files=["res://.godot/imported/landmak_01_1.jpg-4fcb611604a89fd120b150af4d503700.s3tc.ctex"]
+source_file="res://assets/props/SoulOrb_Petal/SoulOrb_Petal_Image_1.jpg"
+dest_files=["res://.godot/imported/SoulOrb_Petal_Image_1.jpg-c30f6cebbadcd3d6351b605fb2ccea1c.s3tc.ctex"]
 
 [params]
 

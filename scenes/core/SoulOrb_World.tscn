@@ -1,22 +1,23 @@
-[gd_scene load_steps=4 format=3 uid="uid://bhde5k7ifgrfg"]
+[gd_scene format=3 uid="uid://bhde5k7ifgrfg"]
 
-[ext_resource type="PackedScene" path="res://scenes/core/SoulOrb_Base.tscn" id="1_base"]
-[ext_resource type="Script" path="res://scripts/soul/soul_orb_world.gd" id="2_script"]
+[ext_resource type="PackedScene" uid="uid://c3ujhyl8kfxso" path="res://scenes/core/SoulOrb_Base.tscn" id="1_base"]
+[ext_resource type="Script" uid="uid://dtjkncbt5wpr1" path="res://scripts/soul/soul_orb_world.gd" id="2_script"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_pickup"]
 radius = 1.0
 
-[node name="SoulOrb_World" type="Node3D"]
+[node name="SoulOrb_World" type="Node3D" unique_id=1820851300]
 script = ExtResource("2_script")
 
-[node name="HoverRoot" type="Node3D" parent="."]
+[node name="HoverRoot" type="Node3D" parent="." unique_id=1601152791]
 
-[node name="SoulOrb_Base" parent="HoverRoot" instance=ExtResource("1_base")]
+[node name="SoulOrb_Base" parent="HoverRoot" unique_id=839308962 instance=ExtResource("1_base")]
 
-[node name="PickupArea" type="Area3D" parent="."]
+[node name="PickupArea" type="Area3D" parent="." unique_id=714109326]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="PickupArea"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PickupArea" unique_id=1661194200]
 shape = SubResource("SphereShape3D_pickup")
 
-[node name="InteractionPromptAnchor" type="Marker3D" parent="."]
-position = Vector3(0, 1.8, 0)
+[node name="InteractionPromptAnchor" type="Marker3D" parent="." unique_id=472538372]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
