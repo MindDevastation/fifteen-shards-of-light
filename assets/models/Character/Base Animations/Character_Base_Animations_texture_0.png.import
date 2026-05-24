@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bfaoxeugumqd5"
-path.s3tc="res://.godot/imported/Character_output_texture_0.png-e8b61364cbd48e7fd1c92c6178b5a79a.s3tc.ctex"
+uid="uid://drjkg7ywodesi"
+path.s3tc="res://.godot/imported/Character_Base_Animations_texture_0.png-72d1aeb61b70e8ca4471ede90c10055d.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -14,8 +14,8 @@ generator_parameters={
 
 [deps]
 
-source_file="res://assets/models/Character/Character_output_texture_0.png"
-dest_files=["res://.godot/imported/Character_output_texture_0.png-e8b61364cbd48e7fd1c92c6178b5a79a.s3tc.ctex"]
+source_file="res://assets/models/Character/Base Animations/Character_Base_Animations_texture_0.png"
+dest_files=["res://.godot/imported/Character_Base_Animations_texture_0.png-72d1aeb61b70e8ca4471ede90c10055d.s3tc.ctex"]
 
 [params]
 
