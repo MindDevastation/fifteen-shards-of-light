@@ -8,14 +8,14 @@ extends Node3D
 @export var glow_energy_amplitude: float = 0.2
 @export var glow_pulse_speed: float = 1.1
 
-@export_range(20, 25, 1) var petal_count: int = 20
+@export_range(20, 25, 1) var petal_count: int = 25
 @export var petal_scale: Vector3 = Vector3(0.25, 0.25, 0.25)
-@export var petal_min_radius: float = 0.48
-@export var petal_max_radius: float = 0.74
-@export var petal_radial_amplitude: float = 0.08
-@export var petal_motion_speed: float = 0.9
-@export var petal_spin_speed_min: float = 0.35
-@export var petal_spin_speed_max: float = 1.4
+@export var petal_min_radius: float = 0.24
+@export var petal_max_radius: float = 0.38
+@export var petal_radial_amplitude: float = 0.04
+@export var petal_motion_speed: float = 2.25
+@export var petal_spin_speed_min: float = 0.9
+@export var petal_spin_speed_max: float = 3.5
 
 @onready var core_root: Node3D = $VisualRoot/CoreRoot
 @onready var inner_ring_root: Node3D = $VisualRoot/InnerRingRoot
