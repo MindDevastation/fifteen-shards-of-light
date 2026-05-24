@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/PoemRewardUI.tscn" id="5_poem_reward_ui"]
 [ext_resource type="PackedScene" path="res://scenes/core/LevelPortal.tscn" id="6_level_portal"]
 [ext_resource type="PackedScene" path="res://scenes/core/Landmark_02.tscn" id="7_10xc4"]
+[ext_resource type="PackedScene" uid="uid://dui4f0uog57jx" path="res://assets/nature/Tree_01/Tree_01.glb" id="9_5dpfh"]
 [ext_resource type="PackedScene" uid="uid://bhde5k7ifgrfg" path="res://scenes/core/SoulOrb_World.tscn" id="9_c83vx"]
 
 [sub_resource type="StandardMaterial3D" id="m_ground"]
@@ -417,3 +418,6 @@ transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 6.5025578, 3.4792647, -35.472
 
 [node name="SoulOrb_World" parent="." unique_id=958395737 instance=ExtResource("9_c83vx")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.83408, 1.0742869, 29.476934)
+
+[node name="Tree_01" parent="." unique_id=1261422225 instance=ExtResource("9_5dpfh")]
+transform = Transform3D(7, 0, 0, 0, 7, 0, 0, 0, 7, -13.115686, 0.099999905, 17.494322)
