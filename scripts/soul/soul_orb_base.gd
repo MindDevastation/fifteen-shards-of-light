@@ -41,11 +41,11 @@ func _process(delta: float) -> void:
 	outer_ring_center_root.rotate_x(outer_ring_speed * delta)
 	outer_ring_center_root.rotate_z(outer_ring_speed * 0.6 * delta)
 
-	var breathe_phase := sin(_time * core_breathe_speed)
-	var breathe_scale := 1.0 + (core_breathe_amplitude * breathe_phase)
+	var breathe_phase: float = sin(_time * core_breathe_speed)
+	var breathe_scale: float = 1.0 + (core_breathe_amplitude * breathe_phase)
 	core_root.scale = _core_base_scale * breathe_scale
 
-	var glow_phase := (sin(_time * glow_pulse_speed) + 1.0) * 0.5
+	var glow_phase: float = (sin(_time * glow_pulse_speed) + 1.0) * 0.5
 	orb_light.light_energy = glow_energy_base + (glow_energy_amplitude * glow_phase)
 
 	_update_petals(delta)
@@ -71,24 +71,24 @@ func _build_petal_data() -> void:
 
 		_petal_roots.append(petal_root)
 
-		var petal_model := petal_root.get_child(0) as Node3D
+		var petal_model: Node3D = petal_root.get_child(0) as Node3D
 		petal_model.scale = petal_scale
 
-		var t := float(i) / float(max(active_count, 1))
-		var theta := TAU * t
-		var phi := acos(clampf(1.0 - 2.0 * t, -1.0, 1.0))
-		var direction := Vector3(
+		var t: float = float(i) / float(max(active_count, 1))
+		var theta: float = TAU * t
+		var phi: float = acos(clampf(1.0 - 2.0 * t, -1.0, 1.0))
+		var direction: Vector3 = Vector3(
 			sin(phi) * cos(theta),
 			cos(phi),
 			sin(phi) * sin(theta)
 		).normalized()
 
-		var radius_lerp := _hash_01(i, 19)
-		var base_radius := lerpf(petal_min_radius, petal_max_radius, radius_lerp)
-		var radial_amp := petal_radial_amplitude * lerpf(0.45, 1.0, _hash_01(i, 43))
-		var radial_speed := petal_motion_speed * lerpf(0.65, 1.35, _hash_01(i, 67))
-		var orbit_speed := petal_motion_speed * lerpf(0.25, 0.75, _hash_01(i, 83))
-		var orbit_axis := Vector3(
+		var radius_lerp: float = _hash_01(i, 19)
+		var base_radius: float = lerpf(petal_min_radius, petal_max_radius, radius_lerp)
+		var radial_amp: float = petal_radial_amplitude * lerpf(0.45, 1.0, _hash_01(i, 43))
+		var radial_speed: float = petal_motion_speed * lerpf(0.65, 1.35, _hash_01(i, 67))
+		var orbit_speed: float = petal_motion_speed * lerpf(0.25, 0.75, _hash_01(i, 83))
+		var orbit_axis: Vector3 = Vector3(
 			_hash_signed(i, 97),
 			_hash_signed(i, 113),
 			_hash_signed(i, 131)
@@ -96,14 +96,14 @@ func _build_petal_data() -> void:
 		if orbit_axis.length_squared() < 0.001:
 			orbit_axis = Vector3.UP
 
-		var spin_speed := Vector3(
+		var spin_speed: Vector3 = Vector3(
 			lerpf(petal_spin_speed_min, petal_spin_speed_max, _hash_01(i, 151)) * _sign_from_hash(i, 163),
 			lerpf(petal_spin_speed_min, petal_spin_speed_max, _hash_01(i, 173)) * _sign_from_hash(i, 179),
 			lerpf(petal_spin_speed_min, petal_spin_speed_max, _hash_01(i, 191)) * _sign_from_hash(i, 197)
 		)
 
-		var base_phase := TAU * _hash_01(i, 211)
-		var orbit_phase := TAU * _hash_01(i, 223)
+		var base_phase: float = TAU * _hash_01(i, 211)
+		var orbit_phase: float = TAU * _hash_01(i, 223)
 
 		_petal_data.append({
 			"base_direction": direction,
@@ -146,10 +146,12 @@ func _update_petals(delta: float) -> void:
 
 
 func _hash_01(index: int, salt: int) -> float:
-	var v := int(index * 92821 + salt * 68917 + 1337)
+	var v: int = int(index * 92821 + salt * 68917 + 1337)
 	v = int((v ^ (v >> 13)) * 1274126177)
 	v = v ^ (v >> 16)
-	var positive := abs(v % 10000)
+	var positive: int = v % 10000
+	if positive < 0:
+		positive = -positive
 	return float(positive) / 10000.0
 
 
