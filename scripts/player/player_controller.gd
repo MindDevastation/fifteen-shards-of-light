@@ -1,20 +1,41 @@
 extends CharacterBody3D
 
+const JUMP_COOLDOWN_SECONDS := 2.3
+const INTERACT_COOLDOWN_SECONDS := 2.0
+
 @export var walk_speed: float = 5.0
 @export var run_speed: float = 8.5
 @export var jump_velocity: float = 4.5
 @export var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 @export_range(1.0, 20.0, 0.1) var visual_turn_speed: float = 10.0
 
-@onready var visual_root: Node3D = $PlaceholderMesh
+@onready var visual_root: Node3D = $CharacterVisualRoot
+@onready var animation_controller: FoxHeroineAnimationController = $FoxHeroineAnimationController
+
+var _jump_cooldown_remaining: float = 0.0
+var _interact_cooldown_remaining: float = 0.0
+var _pending_interactable: Node = null
+
+
+func _ready() -> void:
+	if animation_controller != null and not animation_controller.one_shot_finished.is_connected(_on_animation_one_shot_finished):
+		animation_controller.one_shot_finished.connect(_on_animation_one_shot_finished)
 
 
 func _physics_process(delta: float) -> void:
+	_jump_cooldown_remaining = max(_jump_cooldown_remaining - delta, 0.0)
+	_interact_cooldown_remaining = max(_interact_cooldown_remaining - delta, 0.0)
+
 	var input_direction := _get_input_direction()
 	var movement_direction := _get_camera_relative_direction(input_direction)
+	var is_shift_held := Input.is_key_pressed(KEY_SHIFT)
+	var is_moving := movement_direction.length_squared() > 0.000001
+
+	if is_moving:
+		animation_controller.stop_dance_loop()
 
 	var current_speed := walk_speed
-	if Input.is_key_pressed(KEY_SHIFT):
+	if is_shift_held:
 		current_speed = run_speed
 
 	velocity.x = movement_direction.x * current_speed
@@ -23,12 +44,79 @@ func _physics_process(delta: float) -> void:
 
 	if not is_on_floor():
 		velocity.y -= gravity * delta
-	elif Input.is_key_pressed(KEY_SPACE):
+	elif Input.is_key_pressed(KEY_SPACE) and _jump_cooldown_remaining <= 0.0:
 		velocity.y = jump_velocity
+		_jump_cooldown_remaining = JUMP_COOLDOWN_SECONDS
+		animation_controller.play_one_shot("jump", 1.5)
 	else:
 		velocity.y = 0.0
 
+	if Input.is_action_just_pressed("dance_test"):
+		animation_controller.start_dance_loop()
+	elif Input.is_action_just_pressed("interact"):
+		_try_start_interaction()
+	elif is_moving:
+		if is_shift_held:
+			animation_controller.update_locomotion("fast_run")
+		else:
+			animation_controller.update_locomotion("run")
+	elif not animation_controller.is_dancing():
+		animation_controller.update_idle(delta)
+
 	move_and_slide()
+
+
+func _try_start_interaction() -> void:
+	if _interact_cooldown_remaining > 0.0:
+		return
+
+	var interactable := _find_best_interactable()
+	if interactable == null:
+		return
+
+	if not animation_controller.play_one_shot("cast_1"):
+		return
+
+	_interact_cooldown_remaining = INTERACT_COOLDOWN_SECONDS
+	_pending_interactable = interactable
+
+
+func _find_best_interactable() -> Node:
+	var candidates := get_tree().get_nodes_in_group("player_interactable")
+	var best: Node = null
+	var best_distance_sq := INF
+	for candidate in candidates:
+		if not (candidate is Node3D):
+			continue
+		if not is_instance_valid(candidate):
+			continue
+		if not candidate.has_method("can_player_interact"):
+			continue
+		if not bool(candidate.call("can_player_interact", self)):
+			continue
+		var dist_sq := global_position.distance_squared_to((candidate as Node3D).global_position)
+		if dist_sq < best_distance_sq:
+			best_distance_sq = dist_sq
+			best = candidate
+	return best
+
+
+func _on_animation_one_shot_finished(action_name: String) -> void:
+	if action_name != "cast_1":
+		return
+
+	if _pending_interactable == null or not is_instance_valid(_pending_interactable):
+		_pending_interactable = null
+		return
+
+	if _pending_interactable.has_method("can_player_interact") and not bool(_pending_interactable.call("can_player_interact", self)):
+		_pending_interactable = null
+		return
+
+	if _pending_interactable.has_method("interact"):
+		_pending_interactable.call("interact", self)
+
+	_pending_interactable = null
 
 
 func _get_camera_relative_direction(input_direction: Vector2) -> Vector3:

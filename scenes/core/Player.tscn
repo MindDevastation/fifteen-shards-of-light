@@ -1,24 +1,23 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene format=3 uid="uid://buybh0c880w1y"]
 
-[ext_resource type="Script" path="res://scripts/player/player_controller.gd" id="1_player_controller"]
+[ext_resource type="Script" uid="uid://dbh2qcubwgvmr" path="res://scripts/player/player_controller.gd" id="1_player_controller"]
+[ext_resource type="PackedScene" uid="uid://ktrqonu6ix1g" path="res://assets/models/Character/Base Animations/Character_Base_Animations.glb" id="2_fox_heroine"]
+[ext_resource type="Script" uid="uid://qvabjphttk0h" path="res://scripts/characters/fox_heroine_animation_controller.gd" id="3_animation_controller"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_player_grey"]
-albedo_color = Color(0.55, 0.55, 0.55, 1)
+[sub_resource type="BoxShape3D" id="BoxShape3D_crf5v"]
+size = Vector3(0.7064209, 1.7283478, 0.5221176)
 
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_player"]
-material = SubResource("StandardMaterial3D_player_grey")
-radius = 0.35
-height = 1.8
-
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
-radius = 0.35
-height = 1.8
-
-[node name="Player" type="CharacterBody3D"]
+[node name="Player" type="CharacterBody3D" unique_id=1604948000]
 script = ExtResource("1_player_controller")
 
-[node name="PlaceholderMesh" type="MeshInstance3D" parent="."]
-mesh = SubResource("CapsuleMesh_player")
+[node name="CharacterVisualRoot" type="Node3D" parent="." unique_id=1156300805]
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-shape = SubResource("CapsuleShape3D_player")
+[node name="FoxHeroineModel" parent="CharacterVisualRoot" unique_id=1676426405 instance=ExtResource("2_fox_heroine")]
+
+[node name="FoxHeroineAnimationController" type="Node" parent="." unique_id=2084958688]
+script = ExtResource("3_animation_controller")
+animation_player_path = NodePath("../CharacterVisualRoot/FoxHeroineModel/AnimationPlayer")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=618185942]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.016418457, 0.85528576, 0.105648994)
+shape = SubResource("BoxShape3D_crf5v")

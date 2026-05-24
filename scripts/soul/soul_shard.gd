@@ -10,6 +10,7 @@ var _player_in_range := false
 
 
 func _ready() -> void:
+	add_to_group("player_interactable")
 	body_entered.connect(_on_body_entered)
 	body_exited.connect(_on_body_exited)
 	prompt_label.visible = false
@@ -19,13 +20,6 @@ func _process(_delta: float) -> void:
 	if _is_collected:
 		return
 
-	if not _player_in_range:
-		return
-
-	if not Input.is_action_just_pressed("interact"):
-		return
-
-	_collect()
 
 
 func _on_body_entered(body: Node3D) -> void:
@@ -66,3 +60,17 @@ func _collect() -> void:
 
 func _is_player_body(body: Node3D) -> bool:
 	return body is CharacterBody3D and body.name == "Player"
+
+
+func can_player_interact(player: Node3D) -> bool:
+	if _is_collected:
+		return false
+	if player == null:
+		return false
+	return _player_in_range and _is_player_body(player)
+
+
+func interact(player: Node3D) -> void:
+	if not can_player_interact(player):
+		return
+	_collect()

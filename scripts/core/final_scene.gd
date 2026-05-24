@@ -19,6 +19,7 @@ var _is_returning_to_menu := false
 
 
 func _ready() -> void:
+	add_to_group("player_interactable")
 	interaction_prompt.hide()
 	ending_overlay.hide()
 	soul_sphere.hide()
@@ -29,12 +30,6 @@ func _ready() -> void:
 	main_menu_button.pressed.connect(_on_main_menu_button_pressed)
 	quit_button.pressed.connect(_on_quit_button_pressed)
 
-
-func _unhandled_input(event: InputEvent) -> void:
-	if _is_player_near_pedestal and not _is_pedestal_activated and event is InputEventKey:
-		if event.pressed and not event.echo and event.keycode == KEY_E:
-			_activate_pedestal()
-			get_viewport().set_input_as_handled()
 
 
 func _process(delta: float) -> void:
@@ -88,3 +83,17 @@ func _change_to_main_menu_deferred() -> void:
 
 func _on_quit_button_pressed() -> void:
 	get_tree().quit()
+
+
+func can_player_interact(player: Node3D) -> bool:
+	if _is_pedestal_activated:
+		return false
+	if player == null:
+		return false
+	return _is_player_near_pedestal and _is_player_body(player)
+
+
+func interact(player: Node3D) -> void:
+	if not can_player_interact(player):
+		return
+	_activate_pedestal()
