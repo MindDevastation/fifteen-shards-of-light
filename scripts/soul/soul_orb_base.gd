@@ -48,7 +48,7 @@ func _process(delta: float) -> void:
 	var glow_phase := (sin(_time * glow_pulse_speed) + 1.0) * 0.5
 	orb_light.light_energy = glow_energy_base + (glow_energy_amplitude * glow_phase)
 
-	_update_petals()
+	_update_petals(delta)
 
 
 func _build_petal_data() -> void:
@@ -118,21 +118,31 @@ func _build_petal_data() -> void:
 		})
 
 
-func _update_petals() -> void:
-	for i in _petal_roots.size():
-		var petal_root := _petal_roots[i]
-		var data := _petal_data[i]
+func _update_petals(delta: float) -> void:
+	for i in range(_petal_roots.size()):
+		var petal_root: Node3D = _petal_roots[i]
+		var data: Dictionary = _petal_data[i]
 
-		var radial_phase := _time * data["radial_speed"] + data["base_phase"]
-		var radius := data["base_radius"] + sin(radial_phase) * data["radial_amp"]
+		var radial_speed: float = float(data["radial_speed"])
+		var base_phase: float = float(data["base_phase"])
+		var base_radius: float = float(data["base_radius"])
+		var radial_amp: float = float(data["radial_amp"])
+		var orbit_speed: float = float(data["orbit_speed"])
+		var orbit_phase: float = float(data["orbit_phase"])
+		var base_direction: Vector3 = data["base_direction"] as Vector3
+		var orbit_axis: Vector3 = data["orbit_axis"] as Vector3
+		var spin_speed: Vector3 = data["spin_speed"] as Vector3
 
-		var orbit_angle := _time * data["orbit_speed"] + data["orbit_phase"]
-		var direction := data["base_direction"].rotated(data["orbit_axis"], orbit_angle).normalized()
+		var radial_phase: float = _time * radial_speed + base_phase
+		var radius: float = base_radius + sin(radial_phase) * radial_amp
+
+		var orbit_angle: float = _time * orbit_speed + orbit_phase
+		var direction: Vector3 = base_direction.rotated(orbit_axis, orbit_angle).normalized()
 
 		petal_root.position = direction * radius
-		petal_root.rotate_x(data["spin_speed"].x * get_process_delta_time())
-		petal_root.rotate_y(data["spin_speed"].y * get_process_delta_time())
-		petal_root.rotate_z(data["spin_speed"].z * get_process_delta_time())
+		petal_root.rotate_x(spin_speed.x * delta)
+		petal_root.rotate_y(spin_speed.y * delta)
+		petal_root.rotate_z(spin_speed.z * delta)
 
 
 func _hash_01(index: int, salt: int) -> float:
