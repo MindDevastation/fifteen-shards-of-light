@@ -1,6 +1,8 @@
 extends Node
 class_name FoxHeroineAnimationController
 
+signal one_shot_finished(action_name: String)
+
 const IDLE_SWITCH_INTERVAL := 15.0
 const IDLE_BASE_WEIGHT := 0.6
 const IDLE_PICKUP_WEIGHT := 0.4
@@ -19,6 +21,7 @@ var _idle_elapsed: float = 0.0
 var _active_one_shot_action: String = ""
 var _active_one_shot_started_at_seconds: float = 0.0
 var _active_one_shot_max_duration_seconds: float = 0.0
+var _is_dance_loop_active: bool = false
 
 
 func _ready() -> void:
@@ -31,6 +34,8 @@ func _ready() -> void:
 
 func update_locomotion(action_name: String) -> void:
 	_update_one_shot_lock_state()
+	if _is_dance_loop_active:
+		return
 	if _is_busy_with_one_shot():
 		return
 	play_action(action_name)
@@ -39,6 +44,8 @@ func update_locomotion(action_name: String) -> void:
 
 func update_idle(delta: float) -> void:
 	_update_one_shot_lock_state()
+	if _is_dance_loop_active:
+		return
 	if _is_busy_with_one_shot():
 		return
 
@@ -58,27 +65,53 @@ func update_idle(delta: float) -> void:
 		play_action("idle_and_pick_up")
 
 
-func play_one_shot(action_name: String) -> void:
+func play_one_shot(action_name: String, playback_speed: float = 1.0) -> bool:
 	if _animation_player == null:
-		return
+		return false
 	_update_one_shot_lock_state()
 	if not _can_start_one_shot(action_name):
-		return
+		return false
 
 	var source_animation_name := FoxHeroineAnimationMap.get_source_for_action(action_name)
 	if source_animation_name == "" or not _animation_player.has_animation(source_animation_name):
-		return
+		return false
 
 	var animation := _animation_player.get_animation(source_animation_name)
 	if animation == null:
-		return
+		return false
 
+	_is_dance_loop_active = false
 	_active_one_shot_action = action_name
 	_current_action = action_name
 	_idle_elapsed = 0.0
 	_active_one_shot_started_at_seconds = Time.get_ticks_msec() / 1000.0
-	_active_one_shot_max_duration_seconds = max(animation.length, 0.0) + ONE_SHOT_UNLOCK_MARGIN_SECONDS
+	_active_one_shot_max_duration_seconds = max(animation.length / max(playback_speed, 0.001), 0.0) + ONE_SHOT_UNLOCK_MARGIN_SECONDS
+	_animation_player.speed_scale = playback_speed
 	_animation_player.play(source_animation_name)
+	return true
+
+
+func start_dance_loop() -> bool:
+	if _is_dance_loop_active:
+		return false
+	var started := play_one_shot("dance_test")
+	if not started:
+		return false
+	_is_dance_loop_active = true
+	return true
+
+
+func stop_dance_loop() -> void:
+	if not _is_dance_loop_active:
+		return
+	_is_dance_loop_active = false
+	if _active_one_shot_action == "dance_test":
+		_clear_active_one_shot()
+
+
+func is_dancing() -> bool:
+	_update_one_shot_lock_state()
+	return _is_dance_loop_active
 
 
 func play_action(action_name: String) -> void:
@@ -93,24 +126,34 @@ func play_action(action_name: String) -> void:
 	if _current_action == action_name and _animation_player.current_animation == source_animation_name and _animation_player.is_playing():
 		return
 
+	_animation_player.speed_scale = 1.0
 	_current_action = action_name
 	_animation_player.play(source_animation_name)
 
 
 func is_busy() -> bool:
 	_update_one_shot_lock_state()
-	return _is_busy_with_one_shot()
+	return _is_busy_with_one_shot() or _is_dance_loop_active
 
 
 func _on_animation_finished(animation_name: StringName) -> void:
+	if _is_dance_loop_active and _active_one_shot_action == "dance_test":
+		var dance_source := FoxHeroineAnimationMap.get_source_for_action("dance_test")
+		if String(animation_name) == dance_source and _animation_player != null:
+			_animation_player.speed_scale = 1.0
+			_animation_player.play(dance_source)
+			return
+
 	if _active_one_shot_action == "":
 		return
 
-	var expected := FoxHeroineAnimationMap.get_source_for_action(_active_one_shot_action)
+	var finished_action := _active_one_shot_action
+	var expected := FoxHeroineAnimationMap.get_source_for_action(finished_action)
 	if String(animation_name) != expected:
 		return
 
 	_clear_active_one_shot()
+	one_shot_finished.emit(finished_action)
 
 
 func _is_busy_with_one_shot() -> bool:
@@ -157,6 +200,8 @@ func _clear_active_one_shot() -> void:
 	_active_one_shot_max_duration_seconds = 0.0
 	_current_action = ""
 	_idle_elapsed = 0.0
+	if _animation_player != null:
+		_animation_player.speed_scale = 1.0
 
 
 func _reset_idle_timer() -> void:

@@ -16,6 +16,7 @@ var _player_ref: Node3D = null
 
 
 func _ready() -> void:
+	add_to_group("player_interactable")
 	hover_root.position.y = hover_base_height
 	pickup_area.body_entered.connect(_on_pickup_area_body_entered)
 	pickup_area.body_exited.connect(_on_pickup_area_body_exited)
@@ -28,13 +29,6 @@ func _process(delta: float) -> void:
 	_time += delta
 	hover_root.position.y = hover_base_height + sin(_time * hover_speed) * hover_amplitude
 
-	if not _player_in_range:
-		return
-
-	if not Input.is_action_just_pressed("interact"):
-		return
-
-	_collect_to_follow()
 
 
 func _on_pickup_area_body_entered(body: Node3D) -> void:
@@ -101,3 +95,17 @@ func _resolve_player_orientation_source(player: Node3D) -> Node3D:
 		return visual_root as Node3D
 
 	return null
+
+
+func can_player_interact(player: Node3D) -> bool:
+	if _is_collected:
+		return false
+	if player == null:
+		return false
+	return _player_in_range and _player_ref == player
+
+
+func interact(player: Node3D) -> void:
+	if not can_player_interact(player):
+		return
+	_collect_to_follow()
