@@ -94,7 +94,9 @@ func _resolve_player_orientation_source(player: Node3D) -> Node3D:
 	if player == null:
 		return null
 
-	var visual_root := player.get_node_or_null("PlaceholderMesh")
+	var visual_root := player.get_node_or_null("CharacterVisualRoot")
+	if not (visual_root is Node3D):
+		visual_root = player.get_node_or_null("PlaceholderMesh")
 	if visual_root is Node3D:
 		return visual_root as Node3D
 

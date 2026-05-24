@@ -6,16 +6,22 @@ extends CharacterBody3D
 @export var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 @export_range(1.0, 20.0, 0.1) var visual_turn_speed: float = 10.0
 
-@onready var visual_root: Node3D = $PlaceholderMesh
+@onready var visual_root: Node3D = $CharacterVisualRoot
+@onready var animation_controller: FoxHeroineAnimationController = $FoxHeroineAnimationController
 
 
 func _physics_process(delta: float) -> void:
 	var input_direction := _get_input_direction()
 	var movement_direction := _get_camera_relative_direction(input_direction)
+	var is_shift_held := Input.is_key_pressed(KEY_SHIFT)
+	var is_backward := Input.is_key_pressed(KEY_S)
+	var is_moving := movement_direction.length_squared() > 0.000001
 
 	var current_speed := walk_speed
-	if Input.is_key_pressed(KEY_SHIFT):
+	if is_shift_held:
 		current_speed = run_speed
+	if is_backward:
+		current_speed = walk_speed * 0.5
 
 	velocity.x = movement_direction.x * current_speed
 	velocity.z = movement_direction.z * current_speed
@@ -25,8 +31,25 @@ func _physics_process(delta: float) -> void:
 		velocity.y -= gravity * delta
 	elif Input.is_key_pressed(KEY_SPACE):
 		velocity.y = jump_velocity
+		animation_controller.play_one_shot("jump")
 	else:
 		velocity.y = 0.0
+
+	if Input.is_action_just_pressed("dance_test"):
+		animation_controller.play_one_shot("dance_test")
+	elif Input.is_action_just_pressed("interact"):
+		animation_controller.play_one_shot("cast_1")
+	elif not is_on_floor():
+		animation_controller.play_one_shot("jump")
+	elif is_moving:
+		if is_backward:
+			animation_controller.update_locomotion("move_back")
+		elif is_shift_held:
+			animation_controller.update_locomotion("fast_run")
+		else:
+			animation_controller.update_locomotion("run")
+	else:
+		animation_controller.update_idle(delta)
 
 	move_and_slide()
 

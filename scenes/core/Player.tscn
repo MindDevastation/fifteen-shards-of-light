@@ -1,14 +1,8 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/player/player_controller.gd" id="1_player_controller"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_player_grey"]
-albedo_color = Color(0.55, 0.55, 0.55, 1)
-
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_player"]
-material = SubResource("StandardMaterial3D_player_grey")
-radius = 0.35
-height = 1.8
+[ext_resource type="PackedScene" path="res://assets/models/Character/Base Animations/Character_Base_Animations.glb" id="2_fox_heroine"]
+[ext_resource type="Script" path="res://scripts/characters/fox_heroine_animation_controller.gd" id="3_animation_controller"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
 radius = 0.35
@@ -17,8 +11,13 @@ height = 1.8
 [node name="Player" type="CharacterBody3D"]
 script = ExtResource("1_player_controller")
 
-[node name="PlaceholderMesh" type="MeshInstance3D" parent="."]
-mesh = SubResource("CapsuleMesh_player")
+[node name="CharacterVisualRoot" type="Node3D" parent="."]
+
+[node name="FoxHeroineModel" parent="CharacterVisualRoot" instance=ExtResource("2_fox_heroine")]
+
+[node name="FoxHeroineAnimationController" type="Node" parent="."]
+script = ExtResource("3_animation_controller")
+animation_player_path = NodePath("../CharacterVisualRoot/FoxHeroineModel/AnimationPlayer")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("CapsuleShape3D_player")
