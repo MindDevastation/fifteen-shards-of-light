@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://ctvu6ssktglxe"
+path="res://.godot/imported/Ivy Archive.wav-db2288142198e24666c0e39db6e131ca.sample"
+
+[deps]
+
+source_file="res://assets/audio/Ivy Archive.wav"
+dest_files=["res://.godot/imported/Ivy Archive.wav-db2288142198e24666c0e39db6e131ca.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2
