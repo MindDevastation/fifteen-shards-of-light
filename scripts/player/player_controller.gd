@@ -1,6 +1,6 @@
 extends CharacterBody3D
 
-const JUMP_COOLDOWN_SECONDS := 3.0
+const JUMP_COOLDOWN_SECONDS := 2.3
 const INTERACT_COOLDOWN_SECONDS := 2.0
 
 @export var walk_speed: float = 5.0
@@ -55,8 +55,6 @@ func _physics_process(delta: float) -> void:
 		animation_controller.start_dance_loop()
 	elif Input.is_action_just_pressed("interact"):
 		_try_start_interaction()
-	elif not is_on_floor():
-		animation_controller.play_one_shot("jump", 1.5)
 	elif is_moving:
 		if is_shift_held:
 			animation_controller.update_locomotion("fast_run")

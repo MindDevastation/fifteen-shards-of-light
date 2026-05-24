@@ -4,7 +4,7 @@ extends Camera3D
 @export var mouse_sensitivity: float = 0.003
 @export_range(-89.0, 89.0, 0.1) var min_pitch_degrees: float = -35.0
 @export_range(-89.0, 89.0, 0.1) var max_pitch_degrees: float = 60.0
-@export var min_zoom_distance: float = 2.5
+@export var min_zoom_distance: float = 1.625
 @export var max_zoom_distance: float = 10.0
 @export var zoom_step: float = 0.75
 @export var camera_height: float = 1.8
