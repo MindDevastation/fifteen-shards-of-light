@@ -78,7 +78,8 @@ func _collect_to_follow() -> void:
 		get_parent().add_child(follow_orb)
 		follow_orb.global_position = global_position
 		if follow_orb.has_method("set_follow_target"):
-			follow_orb.call("set_follow_target", _player_ref)
+			var orientation_source := _resolve_player_orientation_source(_player_ref)
+			follow_orb.call("set_follow_target", _player_ref, orientation_source)
 		elif follow_orb.has_method("set"):
 			follow_orb.set("target_path", follow_orb.get_path_to(_player_ref))
 
@@ -87,3 +88,14 @@ func _collect_to_follow() -> void:
 
 func _is_player_body(body: Node3D) -> bool:
 	return body is CharacterBody3D and body.name == "Player"
+
+
+func _resolve_player_orientation_source(player: Node3D) -> Node3D:
+	if player == null:
+		return null
+
+	var visual_root := player.get_node_or_null("PlaceholderMesh")
+	if visual_root is Node3D:
+		return visual_root as Node3D
+
+	return null
