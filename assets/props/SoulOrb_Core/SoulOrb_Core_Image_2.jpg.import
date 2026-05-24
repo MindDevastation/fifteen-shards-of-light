@@ -2,20 +2,20 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dt3ce6q6gcn3i"
-path.s3tc="res://.godot/imported/landmak_01_1.jpg-4fcb611604a89fd120b150af4d503700.s3tc.ctex"
+uid="uid://b1h5kl0nvmfhu"
+path.s3tc="res://.godot/imported/SoulOrb_Core_Image_2.jpg-e004a064d61c54aefb34f8f760b49003.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
 generator_parameters={
-"md5": "6afbb4a81cbf70ed43af180281137040"
+"md5": "a055cbf5143bd00b5a5d284482c91625"
 }
 
 [deps]
 
-source_file="res://assets/architecture/landmark_01/landmak_01_1.jpg"
-dest_files=["res://.godot/imported/landmak_01_1.jpg-4fcb611604a89fd120b150af4d503700.s3tc.ctex"]
+source_file="res://assets/props/SoulOrb_Core/SoulOrb_Core_Image_2.jpg"
+dest_files=["res://.godot/imported/SoulOrb_Core_Image_2.jpg-e004a064d61c54aefb34f8f760b49003.s3tc.ctex"]
 
 [params]
 
@@ -25,12 +25,12 @@ compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
-compress/normal_map=0
+compress/normal_map=1
 compress/channel_pack=0
 mipmaps/generate=true
 mipmaps/limit=-1
-roughness/mode=0
-roughness/src_normal=""
+roughness/mode=1
+roughness/src_normal="res://assets/props/SoulOrb_Core/SoulOrb_Core_Image_2.jpg"
 process/channel_remap/red=0
 process/channel_remap/green=1
 process/channel_remap/blue=2

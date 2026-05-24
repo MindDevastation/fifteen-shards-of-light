@@ -2,20 +2,20 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dt3ce6q6gcn3i"
-path.s3tc="res://.godot/imported/landmak_01_1.jpg-4fcb611604a89fd120b150af4d503700.s3tc.ctex"
+uid="uid://ddsky1mcjbrw5"
+path.s3tc="res://.godot/imported/SoulOrb_Ring_Inner_Image_0.jpg-df42982fb397fdb6ac91d86e03b279ac.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
 generator_parameters={
-"md5": "6afbb4a81cbf70ed43af180281137040"
+"md5": "96f678c5c2e950c881ef12c0eef50a3e"
 }
 
 [deps]
 
-source_file="res://assets/architecture/landmark_01/landmak_01_1.jpg"
-dest_files=["res://.godot/imported/landmak_01_1.jpg-4fcb611604a89fd120b150af4d503700.s3tc.ctex"]
+source_file="res://assets/props/SoulOrb_Ring_Inner/SoulOrb_Ring_Inner_Image_0.jpg"
+dest_files=["res://.godot/imported/SoulOrb_Ring_Inner_Image_0.jpg-df42982fb397fdb6ac91d86e03b279ac.s3tc.ctex"]
 
 [params]
 

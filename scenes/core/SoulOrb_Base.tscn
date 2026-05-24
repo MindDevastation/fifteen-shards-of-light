@@ -1,114 +1,137 @@
-[gd_scene load_steps=7 format=3 uid="uid://c3ujhyl8kfxso"]
+[gd_scene format=3 uid="uid://c3ujhyl8kfxso"]
 
-[ext_resource type="PackedScene" path="res://assets/props/SoulOrb_Core/SoulOrb_Core.glb" id="1_core"]
-[ext_resource type="PackedScene" path="res://assets/props/SoulOrb_Ring_Inner/SoulOrb_Ring_Inner.glb" id="2_inner"]
-[ext_resource type="PackedScene" path="res://assets/props/SoulOrb_Ring_Outer/SoulOrb_Ring_Outer.glb" id="3_outer"]
-[ext_resource type="PackedScene" path="res://assets/props/SoulOrb_Petal/SoulOrb_Petal.glb" id="4_petal"]
-[ext_resource type="Script" path="res://scripts/soul/soul_orb_base.gd" id="5_script"]
+[ext_resource type="PackedScene" uid="uid://chg05aica7jm8" path="res://assets/props/SoulOrb_Core/SoulOrb_Core.glb" id="1_core"]
+[ext_resource type="PackedScene" uid="uid://egqwm6dqc65d" path="res://assets/props/SoulOrb_Ring_Inner/SoulOrb_Ring_Inner.glb" id="2_inner"]
+[ext_resource type="PackedScene" uid="uid://cmp8dm6ctvpmn" path="res://assets/props/SoulOrb_Ring_Outer/SoulOrb_Ring_Outer.glb" id="3_outer"]
+[ext_resource type="PackedScene" uid="uid://tiams3c8p2fy" path="res://assets/props/SoulOrb_Petal/SoulOrb_Petal.glb" id="4_petal"]
+[ext_resource type="Script" uid="uid://dudlrkedafdrr" path="res://scripts/soul/soul_orb_base.gd" id="5_script"]
 
-[node name="SoulOrb_Base" type="Node3D"]
+[node name="SoulOrb_Base" type="Node3D" unique_id=1159369621]
 script = ExtResource("5_script")
 
-[node name="VisualRoot" type="Node3D" parent="."]
+[node name="VisualRoot" type="Node3D" parent="." unique_id=1605380700]
 
-[node name="CoreRoot" type="Node3D" parent="VisualRoot"]
+[node name="CoreRoot" type="Node3D" parent="VisualRoot" unique_id=1132248400]
 
-[node name="SoulOrb_Core_Model" parent="VisualRoot/CoreRoot" instance=ExtResource("1_core")]
+[node name="SoulOrb_Core_Model" parent="VisualRoot/CoreRoot" unique_id=562400803 instance=ExtResource("1_core")]
 
-[node name="InnerRingRoot" type="Node3D" parent="VisualRoot"]
+[node name="InnerRingRoot" type="Node3D" parent="VisualRoot" unique_id=1186224706]
 
-[node name="SoulOrb_Ring_Inner_Model" parent="VisualRoot/InnerRingRoot" instance=ExtResource("2_inner")]
+[node name="SoulOrb_Ring_Inner_Model" parent="VisualRoot/InnerRingRoot" unique_id=1739052682 instance=ExtResource("2_inner")]
+transform = Transform3D(1.3, 0, 0, 0, 1.3, 0, 0, 0, 1.3, 0, -0.07622361, 0)
 
-[node name="OuterRingCenterRoot" type="Node3D" parent="VisualRoot"]
-rotation = Vector3(0, 0, 0.3)
+[node name="OuterRingCenterRoot" type="Node3D" parent="VisualRoot" unique_id=2103898696]
+transform = Transform3D(0.9553365, -0.2955202, 0, 0.2955202, 0.9553365, 0, 0, 0, 1, 0.011695385, 0.12558222, 0.004436508)
 
-[node name="OuterRingVisualOffset" type="Node3D" parent="VisualRoot/OuterRingCenterRoot"]
-position = Vector3(0.05, -0.38, -0.05)
+[node name="OuterRingVisualOffset" type="Node3D" parent="VisualRoot/OuterRingCenterRoot" unique_id=1236865191]
+transform = Transform3D(1, 2.9802322e-08, 0, -2.9802322e-08, 1, 0, 0, 0, 1, -0.019346017, -0.15586478, 0.0037939837)
 
-[node name="SoulOrb_Ring_Outer_Model" parent="VisualRoot/OuterRingCenterRoot/OuterRingVisualOffset" instance=ExtResource("3_outer")]
+[node name="SoulOrb_Ring_Outer_Model" parent="VisualRoot/OuterRingCenterRoot/OuterRingVisualOffset" unique_id=490218329 instance=ExtResource("3_outer")]
+transform = Transform3D(1.0999763, 0.0066299736, -0.002855845, -0.0066179335, 1.0999701, 0.0046842922, 0.0028840015, -0.0046670097, 1.0999863, -0.0031166691, -0.022972062, 0.008575156)
 
-[node name="PetalContainer" type="Node3D" parent="VisualRoot"]
+[node name="PetalContainer" type="Node3D" parent="VisualRoot" unique_id=2072183079]
 
-[node name="PetalRoot_01" type="Node3D" parent="VisualRoot/PetalContainer"]
-[node name="PetalModel_01" parent="VisualRoot/PetalContainer/PetalRoot_01" instance=ExtResource("4_petal")]
+[node name="PetalRoot_01" type="Node3D" parent="VisualRoot/PetalContainer" unique_id=1485500721]
 
-[node name="PetalRoot_02" type="Node3D" parent="VisualRoot/PetalContainer"]
-[node name="PetalModel_02" parent="VisualRoot/PetalContainer/PetalRoot_02" instance=ExtResource("4_petal")]
+[node name="PetalModel_01" parent="VisualRoot/PetalContainer/PetalRoot_01" unique_id=1087720544 instance=ExtResource("4_petal")]
 
-[node name="PetalRoot_03" type="Node3D" parent="VisualRoot/PetalContainer"]
-[node name="PetalModel_03" parent="VisualRoot/PetalContainer/PetalRoot_03" instance=ExtResource("4_petal")]
+[node name="PetalRoot_02" type="Node3D" parent="VisualRoot/PetalContainer" unique_id=1902434045]
 
-[node name="PetalRoot_04" type="Node3D" parent="VisualRoot/PetalContainer"]
-[node name="PetalModel_04" parent="VisualRoot/PetalContainer/PetalRoot_04" instance=ExtResource("4_petal")]
+[node name="PetalModel_02" parent="VisualRoot/PetalContainer/PetalRoot_02" unique_id=744299066 instance=ExtResource("4_petal")]
 
-[node name="PetalRoot_05" type="Node3D" parent="VisualRoot/PetalContainer"]
-[node name="PetalModel_05" parent="VisualRoot/PetalContainer/PetalRoot_05" instance=ExtResource("4_petal")]
+[node name="PetalRoot_03" type="Node3D" parent="VisualRoot/PetalContainer" unique_id=1282030928]
 
-[node name="PetalRoot_06" type="Node3D" parent="VisualRoot/PetalContainer"]
-[node name="PetalModel_06" parent="VisualRoot/PetalContainer/PetalRoot_06" instance=ExtResource("4_petal")]
+[node name="PetalModel_03" parent="VisualRoot/PetalContainer/PetalRoot_03" unique_id=975784537 instance=ExtResource("4_petal")]
 
-[node name="PetalRoot_07" type="Node3D" parent="VisualRoot/PetalContainer"]
-[node name="PetalModel_07" parent="VisualRoot/PetalContainer/PetalRoot_07" instance=ExtResource("4_petal")]
+[node name="PetalRoot_04" type="Node3D" parent="VisualRoot/PetalContainer" unique_id=579822813]
 
-[node name="PetalRoot_08" type="Node3D" parent="VisualRoot/PetalContainer"]
-[node name="PetalModel_08" parent="VisualRoot/PetalContainer/PetalRoot_08" instance=ExtResource("4_petal")]
+[node name="PetalModel_04" parent="VisualRoot/PetalContainer/PetalRoot_04" unique_id=1814045881 instance=ExtResource("4_petal")]
 
-[node name="PetalRoot_09" type="Node3D" parent="VisualRoot/PetalContainer"]
-[node name="PetalModel_09" parent="VisualRoot/PetalContainer/PetalRoot_09" instance=ExtResource("4_petal")]
+[node name="PetalRoot_05" type="Node3D" parent="VisualRoot/PetalContainer" unique_id=928410876]
 
-[node name="PetalRoot_10" type="Node3D" parent="VisualRoot/PetalContainer"]
-[node name="PetalModel_10" parent="VisualRoot/PetalContainer/PetalRoot_10" instance=ExtResource("4_petal")]
+[node name="PetalModel_05" parent="VisualRoot/PetalContainer/PetalRoot_05" unique_id=756505662 instance=ExtResource("4_petal")]
 
-[node name="PetalRoot_11" type="Node3D" parent="VisualRoot/PetalContainer"]
-[node name="PetalModel_11" parent="VisualRoot/PetalContainer/PetalRoot_11" instance=ExtResource("4_petal")]
+[node name="PetalRoot_06" type="Node3D" parent="VisualRoot/PetalContainer" unique_id=861405650]
 
-[node name="PetalRoot_12" type="Node3D" parent="VisualRoot/PetalContainer"]
-[node name="PetalModel_12" parent="VisualRoot/PetalContainer/PetalRoot_12" instance=ExtResource("4_petal")]
+[node name="PetalModel_06" parent="VisualRoot/PetalContainer/PetalRoot_06" unique_id=1718198071 instance=ExtResource("4_petal")]
 
-[node name="PetalRoot_13" type="Node3D" parent="VisualRoot/PetalContainer"]
-[node name="PetalModel_13" parent="VisualRoot/PetalContainer/PetalRoot_13" instance=ExtResource("4_petal")]
+[node name="PetalRoot_07" type="Node3D" parent="VisualRoot/PetalContainer" unique_id=1807152655]
 
-[node name="PetalRoot_14" type="Node3D" parent="VisualRoot/PetalContainer"]
-[node name="PetalModel_14" parent="VisualRoot/PetalContainer/PetalRoot_14" instance=ExtResource("4_petal")]
+[node name="PetalModel_07" parent="VisualRoot/PetalContainer/PetalRoot_07" unique_id=1743257310 instance=ExtResource("4_petal")]
 
-[node name="PetalRoot_15" type="Node3D" parent="VisualRoot/PetalContainer"]
-[node name="PetalModel_15" parent="VisualRoot/PetalContainer/PetalRoot_15" instance=ExtResource("4_petal")]
+[node name="PetalRoot_08" type="Node3D" parent="VisualRoot/PetalContainer" unique_id=60353724]
 
-[node name="PetalRoot_16" type="Node3D" parent="VisualRoot/PetalContainer"]
-[node name="PetalModel_16" parent="VisualRoot/PetalContainer/PetalRoot_16" instance=ExtResource("4_petal")]
+[node name="PetalModel_08" parent="VisualRoot/PetalContainer/PetalRoot_08" unique_id=453283792 instance=ExtResource("4_petal")]
 
-[node name="PetalRoot_17" type="Node3D" parent="VisualRoot/PetalContainer"]
-[node name="PetalModel_17" parent="VisualRoot/PetalContainer/PetalRoot_17" instance=ExtResource("4_petal")]
+[node name="PetalRoot_09" type="Node3D" parent="VisualRoot/PetalContainer" unique_id=351669243]
 
-[node name="PetalRoot_18" type="Node3D" parent="VisualRoot/PetalContainer"]
-[node name="PetalModel_18" parent="VisualRoot/PetalContainer/PetalRoot_18" instance=ExtResource("4_petal")]
+[node name="PetalModel_09" parent="VisualRoot/PetalContainer/PetalRoot_09" unique_id=178616745 instance=ExtResource("4_petal")]
 
-[node name="PetalRoot_19" type="Node3D" parent="VisualRoot/PetalContainer"]
-[node name="PetalModel_19" parent="VisualRoot/PetalContainer/PetalRoot_19" instance=ExtResource("4_petal")]
+[node name="PetalRoot_10" type="Node3D" parent="VisualRoot/PetalContainer" unique_id=111977199]
 
-[node name="PetalRoot_20" type="Node3D" parent="VisualRoot/PetalContainer"]
-[node name="PetalModel_20" parent="VisualRoot/PetalContainer/PetalRoot_20" instance=ExtResource("4_petal")]
+[node name="PetalModel_10" parent="VisualRoot/PetalContainer/PetalRoot_10" unique_id=1625559094 instance=ExtResource("4_petal")]
 
+[node name="PetalRoot_11" type="Node3D" parent="VisualRoot/PetalContainer" unique_id=1822633702]
 
-[node name="PetalRoot_21" type="Node3D" parent="VisualRoot/PetalContainer"]
-[node name="PetalModel_21" parent="VisualRoot/PetalContainer/PetalRoot_21" instance=ExtResource("4_petal")]
+[node name="PetalModel_11" parent="VisualRoot/PetalContainer/PetalRoot_11" unique_id=1894074024 instance=ExtResource("4_petal")]
 
-[node name="PetalRoot_22" type="Node3D" parent="VisualRoot/PetalContainer"]
-[node name="PetalModel_22" parent="VisualRoot/PetalContainer/PetalRoot_22" instance=ExtResource("4_petal")]
+[node name="PetalRoot_12" type="Node3D" parent="VisualRoot/PetalContainer" unique_id=1567766713]
 
-[node name="PetalRoot_23" type="Node3D" parent="VisualRoot/PetalContainer"]
-[node name="PetalModel_23" parent="VisualRoot/PetalContainer/PetalRoot_23" instance=ExtResource("4_petal")]
+[node name="PetalModel_12" parent="VisualRoot/PetalContainer/PetalRoot_12" unique_id=1607767577 instance=ExtResource("4_petal")]
 
-[node name="PetalRoot_24" type="Node3D" parent="VisualRoot/PetalContainer"]
-[node name="PetalModel_24" parent="VisualRoot/PetalContainer/PetalRoot_24" instance=ExtResource("4_petal")]
+[node name="PetalRoot_13" type="Node3D" parent="VisualRoot/PetalContainer" unique_id=135686065]
 
-[node name="PetalRoot_25" type="Node3D" parent="VisualRoot/PetalContainer"]
-[node name="PetalModel_25" parent="VisualRoot/PetalContainer/PetalRoot_25" instance=ExtResource("4_petal")]
+[node name="PetalModel_13" parent="VisualRoot/PetalContainer/PetalRoot_13" unique_id=573747760 instance=ExtResource("4_petal")]
 
-[node name="GlowRoot" type="Node3D" parent="VisualRoot"]
+[node name="PetalRoot_14" type="Node3D" parent="VisualRoot/PetalContainer" unique_id=558780782]
 
-[node name="OmniLight3D" type="OmniLight3D" parent="VisualRoot/GlowRoot"]
+[node name="PetalModel_14" parent="VisualRoot/PetalContainer/PetalRoot_14" unique_id=709899733 instance=ExtResource("4_petal")]
+
+[node name="PetalRoot_15" type="Node3D" parent="VisualRoot/PetalContainer" unique_id=1630488901]
+
+[node name="PetalModel_15" parent="VisualRoot/PetalContainer/PetalRoot_15" unique_id=1050325478 instance=ExtResource("4_petal")]
+
+[node name="PetalRoot_16" type="Node3D" parent="VisualRoot/PetalContainer" unique_id=1509679857]
+
+[node name="PetalModel_16" parent="VisualRoot/PetalContainer/PetalRoot_16" unique_id=1230743345 instance=ExtResource("4_petal")]
+
+[node name="PetalRoot_17" type="Node3D" parent="VisualRoot/PetalContainer" unique_id=1219715694]
+
+[node name="PetalModel_17" parent="VisualRoot/PetalContainer/PetalRoot_17" unique_id=1625623855 instance=ExtResource("4_petal")]
+
+[node name="PetalRoot_18" type="Node3D" parent="VisualRoot/PetalContainer" unique_id=2008067097]
+
+[node name="PetalModel_18" parent="VisualRoot/PetalContainer/PetalRoot_18" unique_id=2016195192 instance=ExtResource("4_petal")]
+
+[node name="PetalRoot_19" type="Node3D" parent="VisualRoot/PetalContainer" unique_id=1349530209]
+
+[node name="PetalModel_19" parent="VisualRoot/PetalContainer/PetalRoot_19" unique_id=1276777169 instance=ExtResource("4_petal")]
+
+[node name="PetalRoot_20" type="Node3D" parent="VisualRoot/PetalContainer" unique_id=537470167]
+
+[node name="PetalModel_20" parent="VisualRoot/PetalContainer/PetalRoot_20" unique_id=1868949691 instance=ExtResource("4_petal")]
+
+[node name="PetalRoot_21" type="Node3D" parent="VisualRoot/PetalContainer" unique_id=487600514]
+
+[node name="PetalModel_21" parent="VisualRoot/PetalContainer/PetalRoot_21" unique_id=1408610751 instance=ExtResource("4_petal")]
+
+[node name="PetalRoot_22" type="Node3D" parent="VisualRoot/PetalContainer" unique_id=1394851594]
+
+[node name="PetalModel_22" parent="VisualRoot/PetalContainer/PetalRoot_22" unique_id=423339593 instance=ExtResource("4_petal")]
+
+[node name="PetalRoot_23" type="Node3D" parent="VisualRoot/PetalContainer" unique_id=712558295]
+
+[node name="PetalModel_23" parent="VisualRoot/PetalContainer/PetalRoot_23" unique_id=1674146605 instance=ExtResource("4_petal")]
+
+[node name="PetalRoot_24" type="Node3D" parent="VisualRoot/PetalContainer" unique_id=1671210599]
+
+[node name="PetalModel_24" parent="VisualRoot/PetalContainer/PetalRoot_24" unique_id=930595847 instance=ExtResource("4_petal")]
+
+[node name="PetalRoot_25" type="Node3D" parent="VisualRoot/PetalContainer" unique_id=1588786384]
+
+[node name="PetalModel_25" parent="VisualRoot/PetalContainer/PetalRoot_25" unique_id=941027268 instance=ExtResource("4_petal")]
+
+[node name="GlowRoot" type="Node3D" parent="VisualRoot" unique_id=247918581]
+
+[node name="OmniLight3D" type="OmniLight3D" parent="VisualRoot/GlowRoot" unique_id=1946761132]
 light_color = Color(1, 0.82, 0.62, 1)
-light_energy = 1.0
-omni_range = 5.0
-shadow_enabled = false

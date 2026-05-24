@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://6ldv58pfw8ja"
-path="res://.godot/imported/landmak_01.glb-323aaf90e93fc6f5fe7cb39f853cecf0.scn"
+uid="uid://chg05aica7jm8"
+path="res://.godot/imported/SoulOrb_Core.glb-7a764ac564c3e7b0578d22061868befd.scn"
 
 [deps]
 
-source_file="res://assets/architecture/landmark_01/landmak_01.glb"
-dest_files=["res://.godot/imported/landmak_01.glb-323aaf90e93fc6f5fe7cb39f853cecf0.scn"]
+source_file="res://assets/props/SoulOrb_Core/SoulOrb_Core.glb"
+dest_files=["res://.godot/imported/SoulOrb_Core.glb-7a764ac564c3e7b0578d22061868befd.scn"]
 
 [params]
 
