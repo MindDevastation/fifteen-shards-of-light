@@ -1,0 +1,26 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="PackedScene" path="res://assets/architecture/Ruined_Gate_01/Ruined_Gate_01.glb" id="1_gate"]
+
+[sub_resource type="BoxShape3D" id="1_left"]
+size = Vector3(1.7, 3.8, 1.7)
+
+[sub_resource type="BoxShape3D" id="2_right"]
+size = Vector3(1.7, 3.8, 1.7)
+
+[sub_resource type="BoxShape3D" id="3_top"]
+size = Vector3(4.5, 1.0, 1.7)
+
+[node name="Ruined_Gate_01" type="Node3D"]
+[node name="VisualRoot" type="Node3D" parent="."]
+[node name="Asset" parent="VisualRoot" instance=ExtResource("1_gate")]
+[node name="StaticBody3D" type="StaticBody3D" parent="."]
+[node name="CollisionLeft" type="CollisionShape3D" parent="StaticBody3D"]
+position = Vector3(-1.45, 1.9, 0)
+shape = SubResource("1_left")
+[node name="CollisionRight" type="CollisionShape3D" parent="StaticBody3D"]
+position = Vector3(1.45, 1.9, 0)
+shape = SubResource("2_right")
+[node name="CollisionTop" type="CollisionShape3D" parent="StaticBody3D"]
+position = Vector3(0, 4.1, 0)
+shape = SubResource("3_top")

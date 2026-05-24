@@ -1,0 +1,5 @@
+[gd_scene load_steps=2 format=3]
+[ext_resource type="PackedScene" path="res://assets/nature/Bush_04/Bush_04.glb" id="1_bush"]
+[node name="Bush_04" type="Node3D"]
+[node name="VisualRoot" type="Node3D" parent="."]
+[node name="Asset" parent="VisualRoot" instance=ExtResource("1_bush")]

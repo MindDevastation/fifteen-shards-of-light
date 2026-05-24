@@ -1,0 +1,11 @@
+[gd_scene load_steps=4 format=3]
+[ext_resource type="PackedScene" path="res://assets/nature/Medium_Rock_01/Medium_Rock_01.glb" id="1_rock"]
+[sub_resource type="SphereShape3D" id="1_rock_shape"]
+radius = 1.4
+[node name="Medium_Rock_01" type="Node3D"]
+[node name="VisualRoot" type="Node3D" parent="."]
+[node name="Asset" parent="VisualRoot" instance=ExtResource("1_rock")]
+[node name="StaticBody3D" type="StaticBody3D" parent="."]
+[node name="BlockingCollision" type="CollisionShape3D" parent="StaticBody3D"]
+position = Vector3(0, 1.4, 0)
+shape = SubResource("1_rock_shape")
