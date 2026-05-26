@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://crain35iiuwdd"]
+
+[ext_resource type="PackedScene" uid="uid://c7c318hef1y1i" path="res://assets/nature/Tree_01/Tree_01.glb" id="1_tree"]
+
+[sub_resource type="CylinderShape3D" id="1_trunk"]
+height = 2.3392334
+radius = 1.1386719
+
+[node name="Tree_01" type="Node3D" unique_id=1302397434]
+
+[node name="VisualRoot" type="Node3D" parent="." unique_id=1774903584]
+transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 0, 0)
+
+[node name="Asset" parent="VisualRoot" unique_id=1091154573 instance=ExtResource("1_tree")]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=583463040]
+
+[node name="SoftBlockerCollision" type="CollisionShape3D" parent="StaticBody3D" unique_id=314389018]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.47658992, 1.004643, 0.025743008)
+shape = SubResource("1_trunk")

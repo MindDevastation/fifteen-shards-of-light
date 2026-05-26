@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://b827c50fcmv2g"]
+
+[ext_resource type="PackedScene" uid="uid://d1my67imwgfyg" path="res://assets/architecture/Stone_Block_01/Stone_Block_01.glb" id="1_block"]
+
+[sub_resource type="BoxShape3D" id="1_block_shape"]
+size = Vector3(1.9096985, 0.44158936, 1.843689)
+
+[node name="Stone_Block_01" type="Node3D" unique_id=2030852333]
+
+[node name="VisualRoot" type="Node3D" parent="." unique_id=1570439418]
+
+[node name="Asset" parent="VisualRoot" unique_id=382045413 instance=ExtResource("1_block")]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=674803597]
+
+[node name="WalkableCollision" type="CollisionShape3D" parent="StaticBody3D" unique_id=1285914378]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.009567261, -0.009674072, 0.022369385)
+shape = SubResource("1_block_shape")

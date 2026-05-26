@@ -7,8 +7,19 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/PoemRewardUI.tscn" id="5_poem_reward_ui"]
 [ext_resource type="PackedScene" path="res://scenes/core/LevelPortal.tscn" id="6_level_portal"]
 [ext_resource type="PackedScene" path="res://scenes/core/Landmark_02.tscn" id="7_10xc4"]
-[ext_resource type="PackedScene" uid="uid://dui4f0uog57jx" path="res://assets/nature/Tree_01/Tree_01.glb" id="9_5dpfh"]
 [ext_resource type="PackedScene" uid="uid://bhde5k7ifgrfg" path="res://scenes/core/SoulOrb_World.tscn" id="9_c83vx"]
+[ext_resource type="PackedScene" path="res://scenes/environment/assets/Stone_Steps.tscn" id="10_shv8k"]
+[ext_resource type="PackedScene" path="res://scenes/environment/assets/Bush_02.tscn" id="11_uj5uh"]
+[ext_resource type="PackedScene" path="res://scenes/environment/assets/Bush_03.tscn" id="12_tj285"]
+[ext_resource type="PackedScene" path="res://scenes/environment/assets/Bush_04.tscn" id="13_x6f5j"]
+[ext_resource type="PackedScene" path="res://scenes/environment/assets/Bush_05.tscn" id="14_fcgrt"]
+[ext_resource type="PackedScene" path="res://scenes/environment/assets/Bush_06.tscn" id="15_0rjyr"]
+[ext_resource type="PackedScene" uid="uid://30luoh2acg2n" path="res://scenes/environment/assets/landmak_01.tscn" id="16_0k37p"]
+[ext_resource type="PackedScene" uid="uid://dhnqwia0w125" path="res://scenes/environment/assets/Medium_Rock_01.tscn" id="17_4h14u"]
+[ext_resource type="PackedScene" uid="uid://b827c50fcmv2g" path="res://scenes/environment/assets/Stone_Block_01.tscn" id="18_bbars"]
+[ext_resource type="PackedScene" path="res://scenes/environment/assets/Stone_Cliff_01.tscn" id="19_0f20a"]
+[ext_resource type="PackedScene" path="res://scenes/environment/assets/Tree_01.tscn" id="19_tj285"]
+[ext_resource type="PackedScene" path="res://scenes/environment/assets/Tree_02.tscn" id="20_x6f5j"]
 
 [sub_resource type="StandardMaterial3D" id="m_ground"]
 albedo_color = Color(0.28, 0.33, 0.3, 1)
@@ -417,7 +428,43 @@ target_scene_path = "res://scenes/levels/Level_02.tscn"
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 6.5025578, 3.4792647, -35.472992)
 
 [node name="SoulOrb_World" parent="." unique_id=958395737 instance=ExtResource("9_c83vx")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.83408, 1.0742869, 29.476934)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.51878, 1.9732423, 22.314215)
 
-[node name="Tree_01" parent="." unique_id=1261422225 instance=ExtResource("9_5dpfh")]
-transform = Transform3D(7, 0, 0, 0, 7, 0, 0, 0, 7, -13.115686, 0.099999905, 17.494322)
+[node name="Stone_Steps" parent="." unique_id=1509808656 instance=ExtResource("10_shv8k")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.398934, 0.35141897, 26.878475)
+
+[node name="Bush_02" parent="." unique_id=1317725305 instance=ExtResource("11_uj5uh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.282436, 0.8851873, 30.778893)
+
+[node name="Bush_03" parent="." unique_id=1202992055 instance=ExtResource("12_tj285")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.025429, 1.0405464, 32.89328)
+
+[node name="Bush_04" parent="." unique_id=1595570411 instance=ExtResource("13_x6f5j")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.556404, 0.89760107, 35.38454)
+
+[node name="Bush_05" parent="." unique_id=70876762 instance=ExtResource("14_fcgrt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.315361, 0.8357838, 37.87427)
+
+[node name="Bush_06" parent="." unique_id=298116180 instance=ExtResource("15_0rjyr")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.762512, 0.6571182, 40.680847)
+
+[node name="landmak_01" parent="." unique_id=2011093240 instance=ExtResource("16_0k37p")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.517128, 0.045636415, 21.555294)
+
+[node name="Medium_Rock_01" parent="." unique_id=1381904612 instance=ExtResource("17_4h14u")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.657644, 0.099999905, 32.05521)
+
+[node name="Stone_Block_01" parent="." unique_id=340797826 instance=ExtResource("18_bbars")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.617455, 0.40163058, 39.618702)
+
+[node name="Stone_Cliff_01" parent="." unique_id=826278205 instance=ExtResource("19_0f20a")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.562125, 0.099999905, 45.573326)
+
+[node name="Stone_Block_02" parent="." unique_id=953511289 instance=ExtResource("18_bbars")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -0.41167164, 0.6822622, 36.644855)
+
+[node name="Tree_01" parent="." unique_id=1874429755 instance=ExtResource("19_tj285")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.825018, 0.099999905, 15.193382)
+
+[node name="Tree_02" parent="." unique_id=854928748 instance=ExtResource("20_x6f5j")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.7405872, 0.8499998, 15.503848)
