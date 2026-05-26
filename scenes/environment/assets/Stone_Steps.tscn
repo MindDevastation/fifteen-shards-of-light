@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://bsmh1re0vx1x1"]
+
+[ext_resource type="PackedScene" uid="uid://j54tv2dosh5p" path="res://assets/architecture/Stone_Steps/Stone_Steps.glb" id="1_steps"]
+
+[sub_resource type="BoxShape3D" id="1_walk"]
+size = Vector3(1.3852539, 0.5161133, 1.3185577)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_bfdrg"]
+size = Vector3(1.5975342, 0.48388672, 0.7814255)
+
+[node name="Stone_Steps" type="Node3D" unique_id=960756906]
+
+[node name="VisualRoot" type="Node3D" parent="." unique_id=1349141905]
+
+[node name="Asset" parent="VisualRoot" unique_id=1583241228 instance=ExtResource("1_steps")]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1725621688]
+
+[node name="WalkableCollision" type="CollisionShape3D" parent="StaticBody3D" unique_id=7769628]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.32348633, 0.0021972656, -0.31409454)
+shape = SubResource("1_walk")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=930785718]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.016052246, -0.25805664, 0.50982285)
+shape = SubResource("BoxShape3D_bfdrg")

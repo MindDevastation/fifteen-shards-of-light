@@ -1,0 +1,40 @@
+[gd_scene format=3 uid="uid://cgu341naqlhlj"]
+
+[ext_resource type="PackedScene" uid="uid://c3t0jyaxeem41" path="res://assets/architecture/Ruined_Gate_01/Ruined_Gate_01.glb" id="1_gate"]
+
+[sub_resource type="BoxShape3D" id="1_left"]
+size = Vector3(2.0757995, 5.4720335, 2.6885915)
+
+[sub_resource type="BoxShape3D" id="2_right"]
+size = Vector3(2.0908875, 5.372168, 2.5768554)
+
+[sub_resource type="BoxShape3D" id="3_top"]
+size = Vector3(4.8476563, 2.1749573, 1.7)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_jls6v"]
+size = Vector3(1.3472595, 1, 2.1887207)
+
+[node name="Ruined_Gate_01" type="Node3D" unique_id=222540403]
+
+[node name="VisualRoot" type="Node3D" parent="." unique_id=1190452545]
+
+[node name="Asset" parent="VisualRoot" unique_id=1225821064 instance=ExtResource("1_gate")]
+transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 0, 0)
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1361510047]
+
+[node name="CollisionLeft" type="CollisionShape3D" parent="StaticBody3D" unique_id=192688978]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.3653111, 2.7360168, -0.021403909)
+shape = SubResource("1_left")
+
+[node name="CollisionRight" type="CollisionShape3D" parent="StaticBody3D" unique_id=336694747]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5802155, 2.686084, 0.00063467026)
+shape = SubResource("2_right")
+
+[node name="CollisionTop" type="CollisionShape3D" parent="StaticBody3D" unique_id=631912304]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.296875, 5.915567, 0)
+shape = SubResource("3_top")
+
+[node name="CollisionRock" type="CollisionShape3D" parent="StaticBody3D" unique_id=1497186340]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2917328, 0.31656086, -0.14538574)
+shape = SubResource("BoxShape3D_jls6v")

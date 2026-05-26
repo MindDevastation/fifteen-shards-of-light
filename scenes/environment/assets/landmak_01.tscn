@@ -1,0 +1,70 @@
+[gd_scene format=3 uid="uid://30luoh2acg2n"]
+
+[ext_resource type="PackedScene" uid="uid://6ldv58pfw8ja" path="res://assets/architecture/landmark_01/landmak_01.glb" id="1_landmark"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_8jgxc"]
+height = 1.053772
+radius = 1.4145508
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_ijxrw"]
+height = 2.9550781
+radius = 2.7368164
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_rsyhx"]
+radius = 3.5932617
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_sr7jl"]
+radius = 4.265625
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_8jgxc"]
+size = Vector3(4.498596, 5.5737915, 1.635498)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ijxrw"]
+size = Vector3(1.3208008, 2.5512695, 1.3400879)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_rsyhx"]
+size = Vector3(1.6694336, 2.4743652, 1.3842773)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_sr7jl"]
+size = Vector3(3.9132538, 0.72314453, 1.7304688)
+
+[node name="landmak_01" type="Node3D" unique_id=1889160884]
+
+[node name="VisualRoot" type="Node3D" parent="." unique_id=976856701]
+
+[node name="Asset" parent="VisualRoot" unique_id=710909204 instance=ExtResource("1_landmark")]
+transform = Transform3D(5, 0, 0, 0, 5, 0, 0, 0, 5, 0, 3.4377058, 0)
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1287176056]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=293650646]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8788147, 0.44739103)
+shape = SubResource("CylinderShape3D_8jgxc")
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="StaticBody3D" unique_id=1644650588]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1551193, -0.22017515, 0.3973261)
+shape = SubResource("CylinderShape3D_ijxrw")
+
+[node name="CollisionShape3D3" type="CollisionShape3D" parent="StaticBody3D" unique_id=1341278130]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.120030046, -0.0472157)
+shape = SubResource("CylinderShape3D_rsyhx")
+
+[node name="CollisionShape3D4" type="CollisionShape3D" parent="StaticBody3D" unique_id=461153683]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5428616, -0.034255028)
+shape = SubResource("CylinderShape3D_sr7jl")
+
+[node name="CollisionShape3D5" type="CollisionShape3D" parent="StaticBody3D" unique_id=1849222526]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.26187134, 3.947629, -0.7572212)
+shape = SubResource("BoxShape3D_8jgxc")
+
+[node name="CollisionShape3D6" type="CollisionShape3D" parent="StaticBody3D" unique_id=137213884]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.4957697, 1.0562346, -0.59020996)
+shape = SubResource("BoxShape3D_ijxrw")
+
+[node name="CollisionShape3D7" type="CollisionShape3D" parent="StaticBody3D" unique_id=332923144]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.798684, 1.3986131, -0.5109863)
+shape = SubResource("BoxShape3D_rsyhx")
+
+[node name="CollisionShape3D8" type="CollisionShape3D" parent="StaticBody3D" unique_id=683620708]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.17267609, 0.97988415, -2.9012918)
+shape = SubResource("BoxShape3D_sr7jl")

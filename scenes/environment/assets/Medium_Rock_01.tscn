@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://dhnqwia0w125"]
+
+[ext_resource type="PackedScene" uid="uid://cn8mw5k5ipd1d" path="res://assets/nature/Medium_Rock_01/Medium_Rock_01.glb" id="1_rock"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_xu0t1"]
+height = 1.4243164
+radius = 1.6542969
+
+[node name="Medium_Rock_01" type="Node3D" unique_id=2064208800]
+
+[node name="VisualRoot" type="Node3D" parent="." unique_id=908356953]
+transform = Transform3D(5, 0, 0, 0, 5, 0, 0, 0, 5, 0, 0, 0)
+
+[node name="Asset" parent="VisualRoot" unique_id=168557693 instance=ExtResource("1_rock")]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1398839395]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1881978571]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.049613237, 0.6749352, 0.00081151724)
+shape = SubResource("CylinderShape3D_xu0t1")
