@@ -1,9 +1,7 @@
 [gd_scene format=3 uid="uid://sqpwvxehf3t7"]
 
-[ext_resource type="PackedScene" uid="uid://c5g5nhng3pn77" path="res://scenes/environment/assets/Awakening_Platform_01.tscn" id="1"]
 [ext_resource type="PackedScene" uid="uid://6ba47lcb32sk" path="res://scenes/environment/terrain/block_01_01.tscn" id="4_p8thb"]
 [ext_resource type="PackedScene" uid="uid://bus15thti2c2s" path="res://scenes/environment/assets/Ancient_Stone_Barrier_01.tscn" id="5"]
-[ext_resource type="PackedScene" uid="uid://buybh0c880w1y" path="res://scenes/core/Player.tscn" id="5_ft7ev"]
 [ext_resource type="Script" uid="uid://dws1fn2ci1dil" path="res://scripts/levels/barrier_open_controller.gd" id="19"]
 
 [node name="Block_01_01_StartClearing" type="Node3D" unique_id=1456202776]
@@ -50,27 +48,18 @@ script = ExtResource("19")
 soul_orb_path = NodePath("../../SoulOrb_World")
 barrier_path = NodePath("../AncientStoneBarrier")
 
-[node name="Awakening_Platform_01" parent="GameplayRoot" unique_id=270913481 instance=ExtResource("1")]
-transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, -11.993298, 0.16967463, -36.929554)
-
 [node name="Markers" type="Node3D" parent="." unique_id=550847272]
 
 [node name="EntryMarker" type="Marker3D" parent="Markers" unique_id=1675272966]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 2.2, 9)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -74.216225, 6.8325224, 41.028336)
 
 [node name="ExitMarker" type="Marker3D" parent="Markers" unique_id=698891243]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.5, 0, 6.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.5, 0, -57.75016)
 
 [node name="CameraPreviewMarker" type="Marker3D" parent="Markers" unique_id=1131447972]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 5.2, 13)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -83.6509, 5.2, 45.88913)
 
 [node name="BlockBounds" type="Area3D" parent="." unique_id=2032381282]
 
 [node name="Block0101" parent="." unique_id=694278763 instance=ExtResource("4_p8thb")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -27.366104, -8.8121395, -80.22327)
-
-[node name="Player" parent="." unique_id=1604948000 instance=ExtResource("5_ft7ev")]
-transform = Transform3D(-3.9931774, 0, 3.0090756, 0, 5, 0, -3.0090756, 0, -3.9931774, -80.95513, 1.5146039, 29.121471)
-
-[node name="Camera3D" type="Camera3D" parent="." unique_id=1781107735]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -86.77825, 10.821342, 47.90191)
