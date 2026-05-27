@@ -203,3 +203,22 @@ Codex should implement only the logic connection:
 ```text
 SoulOrb_World picked up / SoulOrb_Follow becomes active
 → Ancient_Stone_Barrier_01 opens downward
+
+Do not create:
+
+inventory system;
+dialogue system;
+quest system;
+combat;
+enemies;
+cinematic;
+full Level_01 assembly.
+Source of Truth
+
+For implementation, use this priority:
+
+block_01_layout_notes.md
+Existing project architecture.
+Existing wrapper .tscn scenes.
+Existing Soul Orb / interaction systems.
+Concept images as visual references only.
