@@ -203,6 +203,7 @@ Codex should implement only the logic connection:
 ```text
 SoulOrb_World picked up / SoulOrb_Follow becomes active
 → Ancient_Stone_Barrier_01 opens downward
+```
 
 ## Do not create:
 
