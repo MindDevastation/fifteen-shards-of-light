@@ -1,17 +1,19 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://bus15thti2c2s"]
 
-[ext_resource type="PackedScene" path="res://assets/architecture/Ancient_Stone_Barrier_01/Ancient_Stone_Barrier_01.glb" id="1_asset"]
+[ext_resource type="PackedScene" uid="uid://dnor7s7i0vyth" path="res://assets/architecture/Ancient_Stone_Barrier_01/Ancient_Stone_Barrier_01.glb" id="1_asset"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_block"]
-size = Vector3(2, 2, 2)
+size = Vector3(3.5771484, 5.2011414, 0.74586487)
 
-[node name="Ancient_Stone_Barrier_01" type="Node3D"]
+[node name="Ancient_Stone_Barrier_01" type="Node3D" unique_id=538048969]
 
-[node name="VisualRoot" type="Node3D" parent="."]
+[node name="VisualRoot" type="Node3D" parent="." unique_id=77059822]
+transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 0, 0)
 
-[node name="Asset" parent="VisualRoot" instance=ExtResource("1_asset")]
+[node name="Asset" parent="VisualRoot" unique_id=2082329401 instance=ExtResource("1_asset")]
 
-[node name="StaticBody3D" type="StaticBody3D" parent="."]
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=291880309]
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1797514654]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0073242188, 2.5136566, -0.0071640015)
 shape = SubResource("BoxShape3D_block")

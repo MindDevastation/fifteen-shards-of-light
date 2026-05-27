@@ -1,106 +1,76 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://sqpwvxehf3t7"]
 
-[ext_resource type="PackedScene" path="res://scenes/environment/assets/Awakening_Platform_01.tscn" id="1"]
-[ext_resource type="PackedScene" path="res://scenes/environment/assets/Stone_Steps.tscn" id="2"]
-[ext_resource type="PackedScene" path="res://scenes/environment/assets/SoulOrb_Pedestal_01.tscn" id="3"]
-[ext_resource type="PackedScene" path="res://scenes/environment/assets/Ruined_Gate_01.tscn" id="4"]
-[ext_resource type="PackedScene" path="res://scenes/environment/assets/Ancient_Stone_Barrier_01.tscn" id="5"]
-[ext_resource type="PackedScene" path="res://scenes/environment/assets/Stone_Cliff_01.tscn" id="6"]
-[ext_resource type="PackedScene" path="res://scenes/environment/assets/Medium_Rock_01.tscn" id="7"]
-[ext_resource type="PackedScene" path="res://scenes/environment/assets/CliffBoundary_Module_01.tscn" id="8"]
-[ext_resource type="PackedScene" path="res://scenes/environment/assets/Tree_01.tscn" id="9"]
-[ext_resource type="PackedScene" path="res://scenes/environment/assets/Tree_02.tscn" id="10"]
-[ext_resource type="PackedScene" path="res://scenes/environment/assets/Bush_01.tscn" id="11"]
-[ext_resource type="PackedScene" path="res://scenes/environment/assets/moss_01.tscn" id="12"]
-[ext_resource type="PackedScene" path="res://scenes/environment/assets/Flower_Moss_01.tscn" id="13"]
-[ext_resource type="PackedScene" path="res://scenes/environment/assets/debris_01.tscn" id="14"]
-[ext_resource type="PackedScene" path="res://scenes/environment/assets/Ruin_Pillar_01.tscn" id="15"]
-[ext_resource type="PackedScene" path="res://scenes/environment/assets/lantern_01.tscn" id="16"]
-[ext_resource type="PackedScene" path="res://scenes/environment/assets/help_stone_01.tscn" id="17"]
-[ext_resource type="PackedScene" path="res://scenes/environment/assets/help_stone_02.tscn" id="18"]
-[ext_resource type="Script" path="res://scripts/levels/barrier_open_controller.gd" id="19"]
+[ext_resource type="PackedScene" uid="uid://c5g5nhng3pn77" path="res://scenes/environment/assets/Awakening_Platform_01.tscn" id="1"]
+[ext_resource type="PackedScene" uid="uid://6ba47lcb32sk" path="res://scenes/environment/terrain/block_01_01.tscn" id="4_p8thb"]
+[ext_resource type="PackedScene" uid="uid://bus15thti2c2s" path="res://scenes/environment/assets/Ancient_Stone_Barrier_01.tscn" id="5"]
+[ext_resource type="PackedScene" uid="uid://buybh0c880w1y" path="res://scenes/core/Player.tscn" id="5_ft7ev"]
+[ext_resource type="Script" uid="uid://dws1fn2ci1dil" path="res://scripts/levels/barrier_open_controller.gd" id="19"]
 
-[sub_resource type="StandardMaterial3D" id="1"]
-albedo_color = Color(0.24, 0.30, 0.24, 1)
-[sub_resource type="BoxMesh" id="2"]
-size = Vector3(28, 0.2, 24)
-material = SubResource("1")
-[sub_resource type="BoxShape3D" id="3"]
-size = Vector3(28, 0.2, 24)
+[node name="Block_01_01_StartClearing" type="Node3D" unique_id=1456202776]
 
-[node name="Block_01_01_StartClearing" type="Node3D"]
-[node name="EnvironmentRoot" type="Node3D" parent="."]
-[node name="GroundRoot" type="Node3D" parent="EnvironmentRoot"]
-[node name="Ground" type="StaticBody3D" parent="EnvironmentRoot/GroundRoot"]
-[node name="GroundMesh" type="MeshInstance3D" parent="EnvironmentRoot/GroundRoot/Ground"]
-mesh = SubResource("2")
-[node name="GroundCollision" type="CollisionShape3D" parent="EnvironmentRoot/GroundRoot/Ground"]
-shape = SubResource("3")
-[node name="StartTerraceRoot" type="Node3D" parent="EnvironmentRoot"]
-[node name="Awakening_Platform_01" parent="EnvironmentRoot/StartTerraceRoot" instance=ExtResource("1")]
-transform = Transform3D(1,0,0,0,1,0,0,0,1,-6,2,8)
-[node name="TerraceStair1" parent="EnvironmentRoot/StartTerraceRoot" instance=ExtResource("2")]
-transform = Transform3D(0.9,0,0,0,0.9,0,0,0,0.9,-4.4,1.6,6.4)
-[node name="TerraceStair2" parent="EnvironmentRoot/StartTerraceRoot" instance=ExtResource("2")]
-transform = Transform3D(0.9,0,0,0,0.9,0,0,0,0.9,-3.8,1.2,5.6)
-[node name="TerraceStair3" parent="EnvironmentRoot/StartTerraceRoot" instance=ExtResource("2")]
-transform = Transform3D(0.9,0,0,0,0.9,0,0,0,0.9,-3.1,0.8,4.8)
-[node name="PathRoot" type="Node3D" parent="EnvironmentRoot"]
-[node name="PathStep" parent="EnvironmentRoot/PathRoot" instance=ExtResource("2")]
-transform = Transform3D(1.2,0,0,0,0.45,0,0,0,1.2,1.2,0.02,2.4)
-[node name="RuinsRoot" type="Node3D" parent="EnvironmentRoot"]
-[node name="RuinedArch" parent="EnvironmentRoot/RuinsRoot" instance=ExtResource("4")]
-transform = Transform3D(1,0,0,0,1,0,0,0,1,8,0,6.5)
-[node name="SoulOrb_Pedestal_01" parent="EnvironmentRoot/RuinsRoot" instance=ExtResource("3")]
-transform = Transform3D(1,0,0,0,1,0,0,0,1,5.5,0.3,3.8)
-[node name="CliffBoundaryRoot" type="Node3D" parent="EnvironmentRoot"]
-[node name="CliffL" parent="EnvironmentRoot/CliffBoundaryRoot" instance=ExtResource("6")]
-transform = Transform3D(1,0,0,0,1,0,0,0,1,-12,0,2)
-[node name="CliffR" parent="EnvironmentRoot/CliffBoundaryRoot" instance=ExtResource("8")]
-transform = Transform3D(1.2,0,0,0,1,0,0,0,1,12,0,4)
-[node name="CliffBack" parent="EnvironmentRoot/CliffBoundaryRoot" instance=ExtResource("6")]
-transform = Transform3D(1,0,0,0,1,0,0,0,1,-1,0,12)
-[node name="FoliageRoot" type="Node3D" parent="EnvironmentRoot"]
-[node name="TreeA" parent="EnvironmentRoot/FoliageRoot" instance=ExtResource("9")]
-transform = Transform3D(1,0,0,0,1,0,0,0,1,-10,0,10)
-[node name="TreeB" parent="EnvironmentRoot/FoliageRoot" instance=ExtResource("10")]
-transform = Transform3D(1,0,0,0,1,0,0,0,1,10,0,10)
-[node name="BushA" parent="EnvironmentRoot/FoliageRoot" instance=ExtResource("11")]
-transform = Transform3D(1,0,0,0,1,0,0,0,1,-8,0,6)
-[node name="MossA" parent="EnvironmentRoot/FoliageRoot" instance=ExtResource("12")]
-transform = Transform3D(1,0,0,0,1,0,0,0,1,-3,0.02,1)
-[node name="FlowerA" parent="EnvironmentRoot/FoliageRoot" instance=ExtResource("13")]
-transform = Transform3D(1,0,0,0,1,0,0,0,1,4,0.02,2)
-[node name="DebrisRoot" type="Node3D" parent="EnvironmentRoot"]
-[node name="DebrisA" parent="EnvironmentRoot/DebrisRoot" instance=ExtResource("14")]
-transform = Transform3D(1,0,0,0,1,0,0,0,1,6,0.0,5.2)
-[node name="RuinPillarA" parent="EnvironmentRoot/DebrisRoot" instance=ExtResource("15")]
-transform = Transform3D(1,0,0,0,1,0,0,0,1,7.8,0,5)
-[node name="RockA" parent="EnvironmentRoot/DebrisRoot" instance=ExtResource("7")]
-transform = Transform3D(1,0,0,0,1,0,0,0,1,-10,0,-6)
-[node name="LightingPropsRoot" type="Node3D" parent="EnvironmentRoot"]
-[node name="LanternA" parent="EnvironmentRoot/LightingPropsRoot" instance=ExtResource("16")]
-transform = Transform3D(1,0,0,0,1,0,0,0,1,-5,0,7)
-[node name="HelpStoneMovement" parent="EnvironmentRoot/LightingPropsRoot" instance=ExtResource("17")]
-transform = Transform3D(1,0,0,0,1,0,0,0,1,-6.5,2.1,7)
-[node name="HelpStoneInteraction" parent="EnvironmentRoot/LightingPropsRoot" instance=ExtResource("18")]
-transform = Transform3D(1,0,0,0,1,0,0,0,1,4.2,0.1,3.1)
-[node name="GameplayRoot" type="Node3D" parent="."]
-[node name="AwakeningMarker" type="Marker3D" parent="GameplayRoot"]
-transform = Transform3D(1,0,0,0,1,0,0,0,1,-6,2.1,8)
-[node name="SoulOrbPlacementMarker" type="Marker3D" parent="GameplayRoot"]
-transform = Transform3D(1,0,0,0,1,0,0,0,1,5.5,1.2,3.8)
-[node name="AncientStoneBarrier" parent="GameplayRoot" instance=ExtResource("5")]
-transform = Transform3D(1,0,0,0,1,0,0,0,1,8,0,6.5)
-[node name="BarrierOpenController" type="Node" parent="GameplayRoot"]
+[node name="EnvironmentRoot" type="Node3D" parent="." unique_id=2039762541]
+
+[node name="GroundRoot" type="Node3D" parent="EnvironmentRoot" unique_id=1132188721]
+
+[node name="Ground" type="StaticBody3D" parent="EnvironmentRoot/GroundRoot" unique_id=2104179053]
+
+[node name="Ground2" type="StaticBody3D" parent="EnvironmentRoot/GroundRoot" unique_id=765134836]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="EnvironmentRoot/GroundRoot/Ground2" unique_id=1972966550]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="EnvironmentRoot/GroundRoot/Ground2" unique_id=1044143828]
+
+[node name="StartTerraceRoot" type="Node3D" parent="EnvironmentRoot" unique_id=981743608]
+
+[node name="PathRoot" type="Node3D" parent="EnvironmentRoot" unique_id=451694391]
+
+[node name="RuinsRoot" type="Node3D" parent="EnvironmentRoot" unique_id=847904343]
+
+[node name="CliffBoundaryRoot" type="Node3D" parent="EnvironmentRoot" unique_id=890230124]
+
+[node name="FoliageRoot" type="Node3D" parent="EnvironmentRoot" unique_id=888847195]
+
+[node name="DebrisRoot" type="Node3D" parent="EnvironmentRoot" unique_id=538422460]
+
+[node name="LightingPropsRoot" type="Node3D" parent="EnvironmentRoot" unique_id=612213551]
+
+[node name="GameplayRoot" type="Node3D" parent="." unique_id=1349719453]
+
+[node name="AwakeningMarker" type="Marker3D" parent="GameplayRoot" unique_id=1240552606]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.559444, 0.47054672, -40.793583)
+
+[node name="SoulOrbPlacementMarker" type="Marker3D" parent="GameplayRoot" unique_id=579005048]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 1.2, 3.8)
+
+[node name="AncientStoneBarrier" parent="GameplayRoot" unique_id=536553868 instance=ExtResource("5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 6.5)
+
+[node name="BarrierOpenController" type="Node" parent="GameplayRoot" unique_id=2083150767]
 script = ExtResource("19")
 soul_orb_path = NodePath("../../SoulOrb_World")
 barrier_path = NodePath("../AncientStoneBarrier")
-[node name="Markers" type="Node3D" parent="."]
-[node name="EntryMarker" type="Marker3D" parent="Markers"]
-transform = Transform3D(1,0,0,0,1,0,0,0,1,-6,2.2,9)
-[node name="ExitMarker" type="Marker3D" parent="Markers"]
-transform = Transform3D(1,0,0,0,1,0,0,0,1,9.5,0,6.5)
-[node name="CameraPreviewMarker" type="Marker3D" parent="Markers"]
-transform = Transform3D(1,0,0,0,1,0,0,0,1,1.2,5.2,13.0)
-[node name="BlockBounds" type="Area3D" parent="."]
+
+[node name="Awakening_Platform_01" parent="GameplayRoot" unique_id=270913481 instance=ExtResource("1")]
+transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, -11.993298, 0.16967463, -36.929554)
+
+[node name="Markers" type="Node3D" parent="." unique_id=550847272]
+
+[node name="EntryMarker" type="Marker3D" parent="Markers" unique_id=1675272966]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 2.2, 9)
+
+[node name="ExitMarker" type="Marker3D" parent="Markers" unique_id=698891243]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.5, 0, 6.5)
+
+[node name="CameraPreviewMarker" type="Marker3D" parent="Markers" unique_id=1131447972]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 5.2, 13)
+
+[node name="BlockBounds" type="Area3D" parent="." unique_id=2032381282]
+
+[node name="Block0101" parent="." unique_id=694278763 instance=ExtResource("4_p8thb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -27.366104, -8.8121395, -80.22327)
+
+[node name="Player" parent="." unique_id=1604948000 instance=ExtResource("5_ft7ev")]
+transform = Transform3D(-3.9931774, 0, 3.0090756, 0, 5, 0, -3.0090756, 0, -3.9931774, -80.95513, 1.5146039, 29.121471)
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1781107735]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -86.77825, 10.821342, 47.90191)

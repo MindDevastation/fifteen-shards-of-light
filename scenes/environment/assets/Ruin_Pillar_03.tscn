@@ -1,17 +1,18 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://bvnwq51fth8y1"]
 
-[ext_resource type="PackedScene" path="res://assets/architecture/Ruin_Pillar_03/Ruin_Pillar_03.glb" id="1_asset"]
+[ext_resource type="PackedScene" uid="uid://bwad3c73i5mji" path="res://assets/architecture/Ruin_Pillar_03/Ruin_Pillar_03.glb" id="1_asset"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_block"]
-size = Vector3(2, 2, 2)
+size = Vector3(1.8430786, 1.4820557, 0.35876465)
 
-[node name="Ruin_Pillar_03" type="Node3D"]
+[node name="Ruin_Pillar_03" type="Node3D" unique_id=1047669497]
 
-[node name="VisualRoot" type="Node3D" parent="."]
+[node name="VisualRoot" type="Node3D" parent="." unique_id=174119251]
 
-[node name="Asset" parent="VisualRoot" instance=ExtResource("1_asset")]
+[node name="Asset" parent="VisualRoot" unique_id=985411458 instance=ExtResource("1_asset")]
 
-[node name="StaticBody3D" type="StaticBody3D" parent="."]
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=833158531]
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1107665687]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.051424026, -0.030343413, -0.0048455)
 shape = SubResource("BoxShape3D_block")

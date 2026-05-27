@@ -1,17 +1,19 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://camirrsu37xpx"]
 
-[ext_resource type="PackedScene" path="res://assets/architecture/Ruin_Pillar_01/Ruin_Pillar_01.glb" id="1_asset"]
+[ext_resource type="PackedScene" uid="uid://brxgw56q5t6qr" path="res://assets/architecture/Ruin_Pillar_01/Ruin_Pillar_01.glb" id="1_asset"]
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_block"]
-size = Vector3(2, 2, 2)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_m7781"]
+height = 2.0273438
+radius = 0.57373047
 
-[node name="Ruin_Pillar_01" type="Node3D"]
+[node name="Ruin_Pillar_01" type="Node3D" unique_id=1242851081]
 
-[node name="VisualRoot" type="Node3D" parent="."]
+[node name="VisualRoot" type="Node3D" parent="." unique_id=1827992421]
 
-[node name="Asset" parent="VisualRoot" instance=ExtResource("1_asset")]
+[node name="Asset" parent="VisualRoot" unique_id=88212041 instance=ExtResource("1_asset")]
 
-[node name="StaticBody3D" type="StaticBody3D" parent="."]
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=592626483]
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
-shape = SubResource("BoxShape3D_block")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1317332510]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.013671875, 0)
+shape = SubResource("CylinderShape3D_m7781")

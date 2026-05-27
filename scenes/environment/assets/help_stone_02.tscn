@@ -1,10 +1,18 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://bn2bgg4k0mn14"]
 
-[ext_resource type="PackedScene" path="res://assets/props/help_stone_02/help_stone_02.glb" id="1_asset"]
+[ext_resource type="PackedScene" uid="uid://d1vewq7yo8ovt" path="res://assets/props/help_stone_02/help_stone_02.glb" id="1_asset"]
 
-[node name="help_stone_02" type="Node3D"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_0bpfh"]
+size = Vector3(1.8946381, 1.9587402, 0.89501953)
 
-[node name="VisualRoot" type="Node3D" parent="."]
+[node name="help_stone_02" type="Node3D" unique_id=2086334335]
 
-[node name="Asset" parent="VisualRoot" instance=ExtResource("1_asset")]
+[node name="VisualRoot" type="Node3D" parent="." unique_id=279365142]
 
+[node name="Asset" parent="VisualRoot" unique_id=1953740346 instance=ExtResource("1_asset")]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=21618750]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1372934361]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0068740845, -0.022827148, -0.049072266)
+shape = SubResource("BoxShape3D_0bpfh")
