@@ -2,6 +2,10 @@
 
 [ext_resource type="PackedScene" uid="uid://6ba47lcb32sk" path="res://scenes/environment/terrain/block_01_01.tscn" id="4_p8thb"]
 [ext_resource type="PackedScene" uid="uid://bus15thti2c2s" path="res://scenes/environment/assets/Ancient_Stone_Barrier_01.tscn" id="5"]
+[ext_resource type="PackedScene" path="res://scenes/environment/assets/Bush_02.tscn" id="5_ft7ev"]
+[ext_resource type="PackedScene" uid="uid://bvnwq51fth8y1" path="res://scenes/environment/assets/Ruin_Pillar_03.tscn" id="7_3da85"]
+[ext_resource type="PackedScene" uid="uid://crain35iiuwdd" path="res://scenes/environment/assets/Tree_01.tscn" id="9"]
+[ext_resource type="PackedScene" path="res://scenes/environment/assets/Bush_01.tscn" id="11"]
 [ext_resource type="Script" uid="uid://dws1fn2ci1dil" path="res://scripts/levels/barrier_open_controller.gd" id="19"]
 
 [node name="Block_01_01_StartClearing" type="Node3D" unique_id=1456202776]
@@ -62,4 +66,16 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -83.6509, 5.2, 45.88913)
 [node name="BlockBounds" type="Area3D" parent="." unique_id=2032381282]
 
 [node name="Block0101" parent="." unique_id=694278763 instance=ExtResource("4_p8thb")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -27.366104, -8.8121395, -80.22327)
+transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, -110.03642, -1.4559813, -1.8681984)
+
+[node name="Bush_01" parent="." unique_id=969152885 instance=ExtResource("11")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -119.76637, 1.0744245, 11.891581)
+
+[node name="Bush_02" parent="." unique_id=1739629025 instance=ExtResource("5_ft7ev")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -118.91988, 1.3724616, 9.5566025)
+
+[node name="Tree_01" parent="." unique_id=1302397434 instance=ExtResource("9")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -106.07892, 0.4239006, 2.7863407)
+
+[node name="Ruin_Pillar_03" parent="." unique_id=1047669497 instance=ExtResource("7_3da85")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -125.25936, 1.1578829, -7.6721573)
