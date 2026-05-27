@@ -1,0 +1,17 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/architecture/Ancient_Stone_Barrier_01/Ancient_Stone_Barrier_01.glb" id="1_asset"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_block"]
+size = Vector3(2, 2, 2)
+
+[node name="Ancient_Stone_Barrier_01" type="Node3D"]
+
+[node name="VisualRoot" type="Node3D" parent="."]
+
+[node name="Asset" parent="VisualRoot" instance=ExtResource("1_asset")]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+shape = SubResource("BoxShape3D_block")

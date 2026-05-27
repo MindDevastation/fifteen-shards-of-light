@@ -1,0 +1,11 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/props/Awakening_Platform_01/Awakening_Platform_01.glb" id="1_asset"]
+
+[node name="Awakening_Platform_01" type="Node3D"]
+
+[node name="VisualRoot" type="Node3D" parent="."]
+transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 0, 0)
+
+[node name="Asset" parent="VisualRoot" instance=ExtResource("1_asset")]
+
