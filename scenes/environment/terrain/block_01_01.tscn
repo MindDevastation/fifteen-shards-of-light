@@ -1,18 +1,14 @@
-[gd_scene format=3 uid="uid://6ba47lcb32sk"]
+[gd_scene format=3 uid="uid://7ivefy04fn2v"]
 
 [ext_resource type="PackedScene" uid="uid://bk36xoah6sl03" path="res://assets/terrain/block_01_01.glb" id="1_lxq1p"]
+[ext_resource type="Shape3D" uid="uid://ow8k17uth2cy" path="res://assets/collisions/terrain/block_01_01_trimesh_collision.res" id="2_egfgr"]
 
-[sub_resource type="CylinderShape3D" id="CylinderShape3D_lxq1p"]
-height = 0.16418457
-radius = 1.4238281
+[node name="block_01_01" unique_id=244534989 instance=ExtResource("1_lxq1p")]
 
-[node name="Block0101" type="Node3D" unique_id=694278763]
+[node name="Mesh_0_001" parent="." index="0" unique_id=1575723241]
+transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0, 0, -15.758896)
 
-[node name="block_01_01" parent="." unique_id=244534989 instance=ExtResource("1_lxq1p")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8162476, 0, -0.47760844)
+[node name="StaticBody3D" type="StaticBody3D" parent="Mesh_0_001" index="0" unique_id=442254584]
 
-[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1263538265]
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1541755801]
-transform = Transform3D(100, 0, 0, 0, 100, 0, 0, 0, 100, -7.924614, 1.1901855, -0.5453949)
-shape = SubResource("CylinderShape3D_lxq1p")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Mesh_0_001/StaticBody3D" index="0" unique_id=1204689561]
+shape = ExtResource("2_egfgr")

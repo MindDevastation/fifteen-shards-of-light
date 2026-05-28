@@ -6,6 +6,22 @@
 [ext_resource type="Script" uid="uid://b5fastfa3rppc" path="res://scripts/player/camera_controller.gd" id="4_camera_controller"]
 [ext_resource type="PackedScene" uid="uid://bhde5k7ifgrfg" path="res://scenes/core/SoulOrb_World.tscn" id="5_soul_orb_world"]
 
+[sub_resource type="Sky" id="Sky_hhyrm"]
+
+[sub_resource type="Environment" id="Environment_5mpa8"]
+background_mode = 1
+background_color = Color(0.76862746, 0.8156863, 0.84705883, 1)
+sky = SubResource("Sky_hhyrm")
+ambient_light_source = 2
+ambient_light_color = Color(0.7882353, 0.7607843, 0.7058824, 1)
+ambient_light_energy = 0.28
+ssao_enabled = true
+glow_enabled = true
+fog_enabled = true
+fog_mode = 1
+fog_light_color = Color(0.7607843, 0.80784315, 0.8392157, 1)
+fog_density = 0.012
+
 [node name="Level_01" type="Node3D" unique_id=389746896]
 
 [node name="LevelManager" type="Node" parent="." unique_id=682181116]
@@ -15,27 +31,33 @@ reward_text = "Ты появилась как тёплый первый свет
 [node name="BlockRoot" type="Node3D" parent="." unique_id=1489238210]
 
 [node name="SoulOrb_World" parent="BlockRoot" unique_id=237478893 instance=ExtResource("5_soul_orb_world")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27.5, 6, 19)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.477822, 2.512011, -23.541904)
 
 [node name="Block_01_01_StartClearing" parent="BlockRoot" unique_id=1456202776 instance=ExtResource("2_block")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 105.56427, 295.64587)
 
 [node name="PlayerRoot" type="Node3D" parent="." unique_id=180644196]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5145416, 2.663548, 5.9080434)
 
 [node name="Player" parent="PlayerRoot" unique_id=1506782510 instance=ExtResource("3_player")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -120.17853, 110.17932, 316.86337)
-up_direction = Vector3(0.9992326, 0.039169915, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.956233, 1.8961711, -42.159256)
 
 [node name="CameraRoot" type="Node3D" parent="." unique_id=197258052]
 
 [node name="FollowCamera" type="Camera3D" parent="CameraRoot" unique_id=654015539]
-transform = Transform3D(1, 0, 0, 0, 0.90630794, -0.42261797, 0, 0.42261797, 0.90630794, -116.12643, 112.50339, 314.84976)
+transform = Transform3D(1, 0, 0, 0, 0.90630794, -0.42261797, 0, 0.42261797, 0.90630794, -14.642174, 6.219734, -35.577923)
 current = true
+fov = 72.613495
 script = ExtResource("4_camera_controller")
 target_path = NodePath("../../PlayerRoot/Player")
+max_zoom_distance = 5.0
 
 [node name="LevelRuntimeRoot" type="Node3D" parent="." unique_id=385295927]
 
-[node name="SunLight" type="DirectionalLight3D" parent="." unique_id=23464175]
-transform = Transform3D(0.707107, -0.353553, 0.612372, 0, 0.866025, 0.5, -0.707107, -0.353553, 0.612372, 0, 7.5, 0)
-light_energy = 2.0
+[node name="WorldEnvironment_Block01" type="WorldEnvironment" parent="." unique_id=305389988]
+environment = SubResource("Environment_5mpa8")
+
+[node name="SunLight_Block01" type="DirectionalLight3D" parent="." unique_id=765903744]
+transform = Transform3D(0.90630776, 0.14454395, -0.39713126, 0, 0.9396926, 0.34202012, 0.42261827, -0.3099755, 0.8516507, -85.86464, 80.632065, -138.37738)
+light_color = Color(0.9607843, 0.7921569, 0.14901961, 1)
+light_energy = 1.5
+shadow_enabled = true
