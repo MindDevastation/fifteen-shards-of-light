@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://buybh0c880w1y" path="res://scenes/core/Player.tscn" id="3_player"]
 [ext_resource type="Script" uid="uid://b5fastfa3rppc" path="res://scripts/player/camera_controller.gd" id="4_camera_controller"]
 [ext_resource type="PackedScene" uid="uid://bhde5k7ifgrfg" path="res://scenes/core/SoulOrb_World.tscn" id="5_soul_orb_world"]
+[ext_resource type="PackedScene" uid="uid://bct6x8p6mogub" path="res://scenes/vfx/FireflyCluster3D.tscn" id="6_5mpa8"]
 
 [sub_resource type="Sky" id="Sky_hhyrm"]
 
@@ -61,3 +62,7 @@ transform = Transform3D(0.90630776, 0.14454395, -0.39713126, 0, 0.9396926, 0.342
 light_color = Color(0.9607843, 0.7921569, 0.14901961, 1)
 light_energy = 1.5
 shadow_enabled = true
+
+[node name="FireflyCluster3D" parent="." unique_id=1584394222 instance=ExtResource("6_5mpa8")]
+transform = Transform3D(0.5835695, -0.81206316, 0, 0.6814006, 0.48967203, -0.5439802, 0.44174626, 0.31745026, 0.83909804, -11.282, 5, -31.199)
+cluster_radius = 2.3000000000000003
