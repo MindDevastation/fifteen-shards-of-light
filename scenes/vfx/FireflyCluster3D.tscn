@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://bct6x8p6mogub"]
+
+[ext_resource type="Script" uid="uid://c8nnrrnmjmy4h" path="res://scripts/vfx/firefly_cluster_3d.gd" id="1_11u84"]
+
+[node name="FireflyCluster3D" type="Node3D" unique_id=1584394222]
+script = ExtResource("1_11u84")
+
+[node name="FireflyRoot" type="Node3D" parent="."]
+
+[node name="OptionalClusterLight" type="OmniLight3D" parent="."]
+light_color = Color(1, 0.8901961, 0.7019608, 1)
+light_energy = 0.08
+omni_range = 2.5
+shadow_enabled = false
+visible = false

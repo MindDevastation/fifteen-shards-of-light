@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://cvl86ti42gtxl"]
+
+[ext_resource type="PackedScene" uid="uid://cqgdmcg37i7tb" path="res://assets/architecture/debris_01/debris_01.glb" id="1_asset"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_7w3mv"]
+size = Vector3(1.6960449, 0.3178711, 1.6174316)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_32s6u"]
+size = Vector3(0.9995117, 0.9506836, 0.30340576)
+
+[node name="debris_01" type="Node3D" unique_id=1383909219]
+
+[node name="VisualRoot" type="Node3D" parent="." unique_id=1929946229]
+
+[node name="Asset" parent="VisualRoot" unique_id=670075809 instance=ExtResource("1_asset")]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=219023162]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1870978569]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.049926758, -0.34106445, -0.15002441)
+shape = SubResource("BoxShape3D_7w3mv")
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="StaticBody3D" unique_id=722062685]
+transform = Transform3D(1, 0, 0, 0, 0.7660444, 0.6427875, 0, -0.6427875, 0.7660444, 0.00024414063, 0.019410353, -0.4938578)
+shape = SubResource("BoxShape3D_32s6u")

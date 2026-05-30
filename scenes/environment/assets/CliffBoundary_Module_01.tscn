@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://bmiok8tpuvbf5"]
+
+[ext_resource type="PackedScene" uid="uid://nnkri0ye24nn" path="res://assets/nature/CliffBoundary_Module_01/CliffBoundary_Module_01.glb" id="1_asset"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_block"]
+size = Vector3(9.741081, 3.5444336, 4.34095)
+
+[node name="CliffBoundary_Module_01" type="Node3D" unique_id=1780448178]
+
+[node name="VisualRoot" type="Node3D" parent="." unique_id=753332695]
+transform = Transform3D(5, 0, 0, 0, 5, 0, 0, 0, 5, 0, 0, 0)
+
+[node name="Asset" parent="VisualRoot" unique_id=693730934 instance=ExtResource("1_asset")]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1006060827]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1840844043]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0028953552, -0.19213867, 0.22874069)
+shape = SubResource("BoxShape3D_block")

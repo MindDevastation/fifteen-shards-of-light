@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://bbshbmlep0e44"]
+
+[ext_resource type="PackedScene" uid="uid://c7hs3fiibjing" path="res://assets/architecture/lantern_02/lantern_02.glb" id="1_asset"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_qq2fp"]
+size = Vector3(0.84155273, 1.5155029, 1.0488281)
+
+[node name="lantern_02" type="Node3D" unique_id=663829287]
+
+[node name="VisualRoot" type="Node3D" parent="." unique_id=1108762692]
+
+[node name="Asset" parent="VisualRoot" unique_id=1598273015 instance=ExtResource("1_asset")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.89058256, 0)
+
+[node name="SpotLight3D" type="SpotLight3D" parent="." unique_id=1712196946]
+transform = Transform3D(1, 0, 0, 0, -1, 8.742278e-08, 0, -8.742278e-08, -1, 0, 0.9866314, 0.2279383)
+spot_range = 2.376
+spot_attenuation = 0.84
+spot_angle = 119.54
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=158477684]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1778664591]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.033813477, 0.873291, 0.024414063)
+shape = SubResource("BoxShape3D_qq2fp")
