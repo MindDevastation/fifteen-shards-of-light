@@ -74,8 +74,6 @@ func _try_start_interaction() -> void:
 		return
 
 	_interact_cooldown_remaining = INTERACT_COOLDOWN_SECONDS
-	if animation_controller != null:
-		animation_controller.play_one_shot("cast_1")
 	if interactable.has_method("interact"):
 		interactable.call("interact", self)
 
