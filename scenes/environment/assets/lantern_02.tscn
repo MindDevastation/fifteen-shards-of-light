@@ -13,10 +13,16 @@ size = Vector3(0.84155273, 1.5155029, 1.0488281)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.89058256, 0)
 
 [node name="SpotLight3D" type="SpotLight3D" parent="." unique_id=1712196946]
-transform = Transform3D(1, 0, 0, 0, -1, 8.742278e-08, 0, -8.742278e-08, -1, 0, 0.9866314, 0.2279383)
-spot_range = 2.376
-spot_attenuation = 0.84
-spot_angle = 119.54
+transform = Transform3D(1, 0, 0, 0, -1, 8.742278e-08, 0, -8.742278e-08, -1, 0, 1.1326143, 0.32098073)
+light_color = Color(1, 0.8392157, 0.23921569, 1)
+light_energy = 8.0
+light_indirect_energy = 11.0
+light_volumetric_fog_energy = 7.667
+light_size = 0.687
+distance_fade_enabled = true
+spot_range = 7.061
+spot_attenuation = -0.51
+spot_angle = 124.54
 
 [node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=158477684]
 
