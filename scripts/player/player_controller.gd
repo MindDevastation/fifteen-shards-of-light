@@ -3,8 +3,8 @@ extends CharacterBody3D
 const JUMP_COOLDOWN_SECONDS := 0.1
 const INTERACT_COOLDOWN_SECONDS := 0.1
 
-@export var walk_speed: float = 3.0
-@export var run_speed: float = 5.0
+@export var walk_speed: float = 4.25
+@export var run_speed: float = 6.25
 @export var jump_velocity: float = 4.025
 @export var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 @export_range(1.0, 20.0, 0.1) var visual_turn_speed: float = 5.0
@@ -53,10 +53,7 @@ func _physics_process(delta: float) -> void:
 	elif Input.is_action_just_pressed("interact"):
 		_try_start_interaction()
 	elif is_moving:
-		if is_shift_held:
-			animation_controller.update_locomotion("run")
-		else:
-			animation_controller.update_locomotion("walk")
+		animation_controller.update_locomotion("run")
 	elif not animation_controller.is_dancing():
 		animation_controller.update_idle(delta)
 
