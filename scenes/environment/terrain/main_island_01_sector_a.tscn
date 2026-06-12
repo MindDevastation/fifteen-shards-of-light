@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://ca7siv2t15rmf"]
+
+[ext_resource type="PackedScene" uid="uid://cj7u8ybwvyvcv" path="res://assets/terrain/main_island_01_sector_a/main_island_01_sector_a.glb" id="1_px08y"]
+[ext_resource type="Shape3D" uid="uid://bmrpcdiqm2rdr" path="res://assets/collisions/terrain/main_island_01_sector_a.res" id="2_5prm6"]
+
+[node name="main_island_01_sector_a" unique_id=1951542908 instance=ExtResource("1_px08y")]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Mesh1_0" parent_id_path=PackedInt32Array(824783342) index="0" unique_id=2014740172]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Mesh1_0/StaticBody3D" index="0" unique_id=1169716795]
+shape = ExtResource("2_5prm6")

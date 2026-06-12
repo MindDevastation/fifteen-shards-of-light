@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://7ivefy04fn2v"]
+
+[ext_resource type="PackedScene" uid="uid://bk36xoah6sl03" path="res://assets/terrain/block_01_01.glb" id="1_lxq1p"]
+[ext_resource type="Shape3D" uid="uid://ow8k17uth2cy" path="res://assets/collisions/terrain/block_01_01_trimesh_collision.res" id="2_egfgr"]
+
+[node name="block_01_01" unique_id=244534989 instance=ExtResource("1_lxq1p")]
+
+[node name="Mesh_0_001" parent="." index="0" unique_id=1575723241]
+transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0, 0, -15.758896)
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Mesh_0_001" index="0" unique_id=442254584]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Mesh_0_001/StaticBody3D" index="0" unique_id=1204689561]
+shape = ExtResource("2_egfgr")

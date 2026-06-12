@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://bp88kquoycyhj"]
+
+[ext_resource type="PackedScene" uid="uid://babgqa7nq67wf" path="res://assets/architecture/bridge_sector_arc_01/bridge_sector_arc_01.glb" id="1_7cwbr"]
+[ext_resource type="Shape3D" uid="uid://c2le1jyx6tl8o" path="res://assets/collisions/architecture/bridge_sector_arc_01.res" id="2_wjc6y"]
+
+[node name="bridge_sector_arc_01" unique_id=2143190454 instance=ExtResource("1_7cwbr")]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Mesh_0_001" parent_id_path=PackedInt32Array(1093767361) index="0" unique_id=12715553]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Mesh_0_001/StaticBody3D" index="0" unique_id=513412082]
+shape = ExtResource("2_wjc6y")

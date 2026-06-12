@@ -1,25 +1,187 @@
-# Stage 2 Level Matrix — Unique Spacious Greybox Micro-Levels
+# Stage 2 Level Matrix — Revised 6 Emotional Chapters / 15 Shards
 
-This matrix is the source-of-truth level design reference for Stage 2 implementation slices.
+## 1. Superseded / revised-by note
 
-## Stage 2A note
-- This is documentation only.
-- Recommended first implementation slice after approval: Level_01–Level_03.
+This matrix is revised by **Stage 2A-R1 — Revised Stage 2 Narrative / Route / Matrix Docs**.
 
-| Level ID | Reward-screen phrase / Emotional goal (exact) | Emotional idea | Symbol / scene motif | Main mechanic | Spacious layout direction | Player action | Shard placement concept | Portal placement concept | Safety guardrail | Acceptance check | Notes / risks |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| Level_01 | Ты появилась как тёплый первый свет | First warm light and gentle beginning. | Dawn clearing with warm beacon landmark. | Reveal path | Spacious dawn clearing with clear forward silhouette and optional side glade. | Approach warm landmark and follow revealed route. | First shard visible early near warm-lit focal point. | Portal appears on calm forward rise after shard/reward. | Keep onboarding simple and non-punitive. | Route is readable, short, and calm; reward phrase exact. | Risk: overcomplicating onboarding with extra mechanics. |
-| Level_02 | Не обязательно продолжать хрупкий путь, если рядом есть безопасный | Safety can mean choosing a softer way. | Cracked ice path beside stable bypass ledge. | Soft bypass path | Wide split view showing fragile center and safe side route simultaneously. | Notice fragile path, choose safe bypass, continue calmly. | Shard placed beyond bypass confirmation point. | Portal beyond shard on stable terrain, clearly visible. | Must not require breaking cracked ice; safe bypass is intended meaning. | Player can finish without stepping onto break-required path; phrase exact. | Risk: bypass too hidden could force wrong meaning. |
-| Level_03 | Не нужно видеть весь путь сразу — достаточно следующего шага | Trust next step without needing full visibility. | Misty stepping-stone field with near-step highlights. | Reveal path | Spacious mist basin where only nearby safe step reveals at a time. | Move to next visible safe step iteratively. | Shard at far but visible silhouette endpoint. | Portal appears in final visible clearing after shard/reward. | Do not require seeing full route upfront. | Completion works by short next-step reveals; phrase exact. | Risk: reveal cadence too slow may feel punitive. |
-| Level_04 | Я бережен к тому, что для тебя хрупко | Careful approach around fragile life. | Bird nest meadow with gentle route markers. | Soft bypass path | Broad nest-field lanes with generous safe spacing and soft visual cues. | Navigate around nests via indicated gentle path. | Shard set in protected clearing reached without nest penalty. | Portal on outer ring where safe route converges. | No punitive failure around nests; only soft correction/reset/hints. | Crossing remains forgiving; no harsh fail state; phrase exact. | Risk: accidental fail triggers could feel punishing. |
-| Level_05 | То, что кажется большим, не всегда угрожает | Large presence can be calm and safe. | Large bird shadow/silhouette gliding over open space. | Presence zone | Open terrace with long sightlines and non-threatening moving shadow landmark. | Stay present in calm zone as shadow passes harmlessly. | Shard appears/activates after calm presence moment. | Portal opens near shadow-cast arch landmark. | Shadow must not feel like enemy or pursuer. | Player reads shadow as neutral/helpful, not threat; phrase exact. | Risk: motion/audio cues could accidentally imply chase. |
-| Level_06 | Я рядом, но не ограничиваю тебя | Support without control. | Soul sphere helper light in open forked path. | Simple follow companion (simplified/risky) | Wide fork space with multiple valid short lanes and helper hints. | Follow optional helper hints while retaining route choice. | Shard in shared destination reachable from multiple lanes. | Portal centered after lane reconvergence. | Companion must not feel like leash/control mechanic. | Player can choose path while feeling supported; phrase exact. | Risk: over-binding helper to player movement. |
-| Level_07 | Тишина рядом тоже может быть тёплой | Quiet proximity can be comforting. | Quiet resting hollow with warm ambient zone. | Presence zone | Spacious low-noise area with one calm focal shelter and optional side sit-space. | Enter and remain in calm zone briefly to activate route. | Shard appears in warmed quiet alcove. | Portal opens at exit edge of quiet zone. | Presence must feel warm, not forced closeness. | Activation is gentle and optional-feeling in tone; phrase exact. | Risk: timer pressure can undermine calm intent. |
-| Level_08 | Я хочу, чтобы рядом со мной было легче, а не тяжелее | Nearness should reduce burden. | Heavy-looking stones lighten after small activations. | Activate 3 points | Broad plaza with three readable activation points around central weight motif. | Activate 3 simple points to lighten/open route. | Shard in center unlocked by completed trio. | Portal on now-lightened outbound ramp. | Avoid guilt/burden tone; keep task simple. | Three-point loop is brief/readable/non-punitive; phrase exact. | Risk: point spacing too large may bloat level time. |
-| Level_09 | Даже старый мост можно отстроить заново | Old paths can be restored gently. | Broken bridge crossing in open ravine. | Simple light bridge | Spacious ravine with clear start/end anchors and visible restoration arc. | Activate bridge elements and cross restored path. | Shard placed just after completed bridge crossing. | Portal beyond shard on stable far bank. | Use bridge/path language only; no inner-state fixing implication. | Bridge restore reads as route repair, not person-fixing; phrase exact. | Risk: metaphor wording drift in UI copy. |
-| Level_10 | Я умею идти рядом, не торопя | Walking beside without rushing. | Parallel paths with synchronized gentle pacing. | Presence zone | Wide dual-lane walkway converging near endpoint landmark. | Move in parallel with companion cue at gentle pace. | Shard at calm convergence point. | Portal immediately beyond convergence in plain sight. | No pulling/control framing; preserve no-rush meaning. | Player never feels dragged or timed harshly; phrase exact. | Risk: speed-gating could imply pressure. |
-| Level_11 | Даже в непогоде можно найти тёплое место | Warm shelter exists even in rough weather. | Rain/snow field with warm shelter beacon. | Presence zone | Open weather-exposed area plus clearly readable shelter landmark. | Reach shelter zone and stabilize warmth state. | Shard appears in or just beyond shelter glow. | Portal at sheltered exit corridor. | No danger chase framing. | Weather supports mood without threat mechanics; phrase exact. | Risk: weather effects could obscure readability. |
-| Level_12 | Тепло не торопит | Warmth allows patience. | Slow-warming circle that opens path quietly. | Presence zone | Spacious circular area designed for calm waiting without clutter. | Stand calmly in warm zone until route opens. | Shard beyond newly opened short path. | Portal at end of short revealed path. | No hurry mechanic or pressure timer messaging. | Wait loop feels calm and brief; phrase exact. | Risk: delay too long can feel like forced idle. |
-| Level_13 | Магия есть в простом | Wonder appears in ordinary things. | Simple objects subtly glowing in sequence. | Activate 3 points | Open everyday courtyard with small magical accents as landmarks. | Activate 3 small ordinary objects. | Shard appears where mundane props align softly. | Portal framed by subtly transformed simple props. | Avoid spectacle overload; keep magic subtle. | Simple-object interaction remains readable and short; phrase exact. | Risk: overdecorating could break greybox simplicity. |
-| Level_14 | Тебе не нужно становиться другой, чтобы к тебе относились тепло | Warmth without demanding change. | Closed inner light/flower/crystal with surrounding warmth. | Presence zone | Spacious sanctuary ring around a closed core that remains closed. | Approach and hold warm presence around closed core. | Shard revealed nearby without opening core. | Portal appears on perimeter path, not through forced core opening. | Do not force open/melt/heal/unlock/change her inner light. | Closed core remains respected and unchanged; phrase exact. | Risk: visuals might imply forced unlocking if staged poorly. |
-| Level_15 | Я восхищаюсь тобой — тихо и бережно | Quiet admiration and respectful completion. | Spacious blue rose garden with gentle final reveal. | Presence zone | Broad rose-garden paths with calm central locus and optional side loops. | Move through responsive garden presence to final shard reveal. | Final shard is found/entrusted/revealed softly in garden core. | Portal leads to FinalScene after shard/reward. | No boss fight, guardian defeat, proving love, or breaking protection. | Garden completion is non-combat, soft, and routes to FinalScene; phrase exact. | Risk: dramatic framing could accidentally imply final trial. |
+The old Stage 2 matrix described 15 unique playable micro-levels. That model is superseded. This matrix is now the active Stage 2 source of truth for the 6 emotional playable chapters and 15 soul shards.
+
+## 2. Active MVP route
+
+`StartScene -> Level_01 -> Level_02 -> Level_03 -> Level_04 -> Level_05 -> Level_06 -> FinalScene -> EndingOverlay`
+
+`Level_07` through `Level_15` are legacy/dev-only placeholders for now. They are not active MVP route levels and receive no active Stage 2A-R1 shard assignments.
+
+## 3. Shard distribution summary
+
+| Level ID | Title | Shard count | Assigned shards |
+|---|---|---:|---|
+| `Level_01` | First Warmth | 2 | `Shard_01`, `Shard_02` |
+| `Level_02` | Her Light / Aliveness | 2 | `Shard_03`, `Shard_04` |
+| `Level_03` | Voice, Laughter, Ease | 3 | `Shard_05`, `Shard_06`, `Shard_07` |
+| `Level_04` | Her Real Self | 2 | `Shard_08`, `Shard_09` |
+| `Level_05` | Small Details | 3 | `Shard_10`, `Shard_11`, `Shard_12` |
+| `Level_06` | Quiet Admiration | 3 | `Shard_13`, `Shard_14`, `Shard_15` |
+
+Total: 15 shards.
+
+## 4. Active level matrix
+
+### Level_01 — First Warmth
+
+| Field | Direction |
+|---|---|
+| `level_id` | `Level_01` |
+| Title | First Warmth |
+| Core feeling | First gentle warmth after someone appears in life quietly and brightly. |
+| Shard count | 2 |
+| Assigned shard numbers | `Shard_01`, `Shard_02` |
+| Small shard phrases | `Shard_01`: С тобой в моем мире стало теплее<br>`Shard_02`: Ты появилась не громко - но светло |
+| Main shard monologue | Когда ты появилась в моей жизни, мир не стал громче - он стал теплее. В этом не было драмы или резкого поворота, просто рядом с мыслью о тебе стало светлее. Мне дорого это первое тепло, потому что с него все и началось. |
+| Level gameplay/narrative intent | Introduce the revised Stage 2 emotional language with two simple shard pickups that feel like discovering warmth, not completing a trial. The player should understand that multiple shards can belong to one chapter. |
+| Spatial/mood direction | Soft greybox dawn/warmth space; clear short route; visible safe landmarks; warm light accents around shard locations; no maze or pressure. |
+| Risks | Active PR #47 or existing Level_01 work may assume the old one-shard-per-level model. The level could become too tutorial-heavy if it tries to explain the full revised structure at once. |
+| Fallback/simplification | Keep a mostly linear path with two readable shard alcoves and one placeholder completion message after both shards are collected. |
+| Out-of-scope notes | Do not implement final UI polish, final art, voiceover, route rewrite, save/progress, acrostic reveal, or Level_07–Level_15 cleanup in this level slice. |
+
+### Level_02 — Her Light / Aliveness
+
+| Field | Direction |
+|---|---|
+| `level_id` | `Level_02` |
+| Title | Her Light / Aliveness |
+| Core feeling | Her light exists on its own; thinking of her brings more life without demanding that she shine for anyone. |
+| Shard count | 2 |
+| Assigned shard numbers | `Shard_03`, `Shard_04` |
+| Small shard phrases | `Shard_03`: В тебе есть свет, который не нужно делать громче<br>`Shard_04`: Рядом с мыслью о тебе во мне больше жизни |
+| Main shard monologue | Мне дорого, что в тебе есть свой свет - иногда яркий, иногда совсем тихий. Я не хочу просить тебя светить для меня или быть чьим-то смыслом. Мне просто важно, что ты есть, и что рядом с мыслью о тебе во мне становится больше жизни. |
+| Level gameplay/narrative intent | Show light as respected presence, not something extracted, amplified, or forced open. Two shards can sit along a gentle path where light is noticed rather than activated aggressively. |
+| Spatial/mood direction | Open greybox space with quiet light sources, optional dim/bright contrast, and a clearly readable forward path. Mood should feel alive but calm. |
+| Risks | Light mechanics can accidentally imply forcing her to shine or making her brighter for the player. The phrase “смысл” appears in approved monologue as a rejection of that framing; do not turn it into a dependency message. |
+| Fallback/simplification | Use passive light landmarks and two simple pickups instead of any system that changes or opens an inner light. |
+| Out-of-scope notes | Do not add polished lighting, complex reveal shaders, save/progress, final acrostic logic, or any mechanic about unlocking her. |
+
+### Level_03 — Voice, Laughter, Ease
+
+| Field | Direction |
+|---|---|
+| `level_id` | `Level_03` |
+| Title | Voice, Laughter, Ease |
+| Core feeling | Voice, laughter, and ease make ordinary time softer without becoming an obligation or performance. |
+| Shard count | 3 |
+| Assigned shard numbers | `Shard_05`, `Shard_06`, `Shard_07` |
+| Small shard phrases | `Shard_05`: Твой голос делает день мягче<br>`Shard_06`: Твой смех оживляет обычные минуты<br>`Shard_07`: С тобой мне легче дышать |
+| Main shard monologue | Я люблю, как твой голос меняет настроение дня. Твой смех для меня не обязанность и не роль - он просто очень дорог, когда появляется сам. Рядом с тобой даже обычные минуты становятся легче и теплее. |
+| Level gameplay/narrative intent | Build a gentle rhythm around three small discoveries. The level should suggest sound/laughter/ease through placeholder spatial beats, not actual final audio production. |
+| Spatial/mood direction | Airier greybox route with three small rhythm-like landmarks, soft spacing, and no timing pressure. The final route beat should feel lighter after all three shards. |
+| Risks | Rhythm or sound-inspired design can become timing-based pressure. Laughter can be framed as something demanded if the interaction is too performative. |
+| Fallback/simplification | Use three visible shard points along a breezy path with placeholder labels; avoid timed inputs or required performance loops. |
+| Out-of-scope notes | Do not add final sound design, voiceover, music sync, dialogue system, cinematic text, or complex audio triggers. |
+
+### Level_04 — Her Real Self
+
+| Field | Direction |
+|---|---|
+| `level_id` | `Level_04` |
+| Title | Her Real Self |
+| Core feeling | She matters as a whole real person: joyful, quiet, tired, funny, alive, and not required to become different. |
+| Shard count | 2 |
+| Assigned shard numbers | `Shard_08`, `Shard_09` |
+| Small shard phrases | `Shard_08`: Мне дорога ты настоящая<br>`Shard_09`: В тебе важны и свет, и тишина |
+| Main shard monologue | Мне дорога не только твоя радость. Мне дорога ты разная - смешная, тихая, уставшая, живая, настоящая. Я не хочу просить тебя становиться другой, чтобы быть для меня важной. |
+| Level gameplay/narrative intent | Let the player move through two complementary spaces or moods without ranking one above the other. The level should validate both light and quiet. |
+| Spatial/mood direction | Split but connected greybox composition: one warmer/lighter side and one quieter/softer side, both safe and equally respected. |
+| Risks | Contrast can accidentally imply that quiet/tired states must be corrected. Avoid any “fix the dark side” structure. |
+| Fallback/simplification | Place one shard in each mood zone, then open a simple forward portal after both are collected without transforming either zone. |
+| Out-of-scope notes | Do not add healing, unlocking, forced transformation, polished emotional cinematics, final poem text, or complex branching. |
+
+### Level_05 — Small Details
+
+| Field | Direction |
+|---|---|
+| `level_id` | `Level_05` |
+| Title | Small Details |
+| Core feeling | Affection lives in small details, ordinary moments, intonations, and warm accidental things. |
+| Shard count | 3 |
+| Assigned shard numbers | `Shard_10`, `Shard_11`, `Shard_12` |
+| Small shard phrases | `Shard_10`: Я замечаю в тебе маленькие теплые вещи<br>`Shard_11`: Мне дороги твои интонации и смешные случайности<br>`Shard_12`: В простом с тобой появляется волшебство |
+| Main shard monologue | Мне дороги не только большие слова и красивые моменты. Я люблю маленькое - интонации, случайные смешные фразы, привычки, теплые детали, которые делают тебя тобой. Наверное, именно из таких мелочей чувство становится настоящим. |
+| Level gameplay/narrative intent | Encourage noticing three small, readable details in the space. The gameplay should be simple observation and movement, not hidden-object frustration. |
+| Spatial/mood direction | Cozy greybox vignette with small landmark props represented by placeholders; warm side details should be visible from the main path. |
+| Risks | Small-detail gameplay can become pixel-hunting or collectible clutter. Too many props can break greybox readability. |
+| Fallback/simplification | Use three clearly marked detail stations on a short route, each with one shard and phrase. |
+| Out-of-scope notes | Do not add polished props, inventory, inspection UI, dialogue, hidden required objects, final art pass, or audio polish. |
+
+### Level_06 — Quiet Admiration
+
+| Field | Direction |
+|---|---|
+| `level_id` | `Level_06` |
+| Title | Quiet Admiration |
+| Core feeling | Quiet, respectful admiration for a real person, held carefully and without pressure for an immediate response. |
+| Shard count | 3 |
+| Assigned shard numbers | `Shard_13`, `Shard_14`, `Shard_15` |
+| Small shard phrases | `Shard_13`: Я восхищаюсь тобой - тихо и бережно<br>`Shard_14`: Мое чувство не просит тебя спешить<br>`Shard_15`: Я хотел показать это тепло без давления |
+| Main shard monologue | Я правда восхищаюсь тобой. Не как образом и не как идеалом, а как живым человеком, который стал для меня очень важным. Мне хочется относиться к этому чувству по-взрослому и бережно - без давления и без просьбы отвечать прямо сейчас. |
+| Level gameplay/narrative intent | Conclude the active playable chapter route with three calm shards that prepare for FinalScene without creating a final trial or demand. |
+| Spatial/mood direction | Spacious, quiet, gently elevated greybox space; calm path to three visible shard moments; final portal direction should feel like a soft handoff to `FinalScene` once route rewrite is explicitly scoped. |
+| Risks | Final active level can accidentally become a proof-of-worth challenge or dramatic climax. Route work may conflict with legacy `Level_07`–`Level_15` skeleton if not scoped carefully. |
+| Fallback/simplification | Keep a simple calm route with three visible shard stops and a placeholder completion beat. Defer `Level_06 -> FinalScene` portal change to the route-rewrite slice if not explicitly included. |
+| Out-of-scope notes | Do not add boss fight, guardian defeat, proof mechanic, final video, final voiceover, final poem, final acrostic implementation, or legacy-level deletion in this level slice. |
+
+## 5. FinalScene emotional direction
+
+Collected light reveals the acrostic confession:
+
+**“Алена, я люблю тебя”**
+
+Final meaning direction:
+
+- These are real feelings.
+- They are shown carefully.
+- No answer is requested immediately.
+- The purpose is simply that she knows.
+
+This is emotional direction only. Do not write final poem, final acrostic poem rewrite, final confession text, final voiceover, cinematic shot text, Veo prompts, or final video in this matrix.
+
+## 6. Global narrative guardrails
+
+Do not frame the heroine as broken, saved, fixed, healed, unlocked, owned, pressured, or obligated.
+
+Do not use:
+
+- proof-of-love mechanics;
+- boss fights;
+- combat;
+- defeat-guardian structures;
+- forced inner-light opening;
+- pressure timers tied to emotional response;
+- final confession copy before approval.
+
+Forbidden wording patterns may appear only in guardrail documentation, not player-facing text:
+
+- “ты спасла меня”
+- “ты мой смысл”
+- “без тебя я не живу”
+- “я доказал”
+- “я заслужил ответ”
+- “я буду ждать вечно”
+- “я всегда буду рядом”
+- “я никогда не отпущу”
+- “ты моя навсегда”
+- “я исцелю тебя”
+- “я раскрою тебя”
+- “я растоплю твой лед”
+- “теперь ты должна ответить”
+
+## 7. Matrix acceptance checks
+
+Producer/Narrative review should confirm:
+
+- The active route uses 6 playable emotional chapters.
+- All 15 shards are assigned across `Level_01` through `Level_06`.
+- Shard phrases match approved text exactly.
+- Main monologues match approved text exactly.
+- `FinalScene` acrostic direction is present but final content is not written.
+- `Level_07` through `Level_15` remain legacy/dev-only placeholders for now.
+- The matrix does not require runtime, art, audio, route, or project settings changes in this docs-only slice.

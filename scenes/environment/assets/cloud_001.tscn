@@ -1,0 +1,5 @@
+[gd_scene format=3 uid="uid://bcw506sqv56hv"]
+
+[ext_resource type="PackedScene" uid="uid://de3fy88xee7hd" path="res://assets/nature/cloud_01/cloud_001.glb" id="1_gsfyy"]
+
+[node name="cloud_001" unique_id=2009177077 instance=ExtResource("1_gsfyy")]

@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://c5g5nhng3pn77"]
+
+[ext_resource type="PackedScene" uid="uid://bt3jtywt0umvs" path="res://assets/props/Awakening_Platform_01/Awakening_Platform_01.glb" id="1_asset"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_he4sw"]
+height = 2.9013672
+radius = 9.851074
+
+[node name="Awakening_Platform_01" type="Node3D" unique_id=270913481]
+
+[node name="VisualRoot" type="Node3D" parent="." unique_id=742069874]
+transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 0, 0)
+
+[node name="Asset" parent="VisualRoot" unique_id=1947316132 instance=ExtResource("1_asset")]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1368062411]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=2043175768]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.112116575, 0.115234375, -0.08170891)
+shape = SubResource("CylinderShape3D_he4sw")

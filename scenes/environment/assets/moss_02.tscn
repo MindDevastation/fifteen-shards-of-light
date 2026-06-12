@@ -1,0 +1,10 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/nature/moss_02/moss_02.glb" id="1_asset"]
+
+[node name="moss_02" type="Node3D"]
+
+[node name="VisualRoot" type="Node3D" parent="."]
+
+[node name="Asset" parent="VisualRoot" instance=ExtResource("1_asset")]
+

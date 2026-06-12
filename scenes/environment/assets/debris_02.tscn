@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://7us3ipwpggc2"]
+
+[ext_resource type="PackedScene" uid="uid://1klm5qikhkjw" path="res://assets/architecture/debris_02/debris_02.glb" id="1_asset"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_oyd05"]
+size = Vector3(1.5915527, 0.5925293, 1.6960449)
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_wnknj"]
+height = 1.2185059
+radius = 0.3798828
+
+[node name="debris_02" type="Node3D" unique_id=1289775974]
+
+[node name="VisualRoot" type="Node3D" parent="." unique_id=13130604]
+
+[node name="Asset" parent="VisualRoot" unique_id=1760621013 instance=ExtResource("1_asset")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6478471, 0)
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=31065625]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1918154359]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.107543945, 0.20373535, -0.09460449)
+shape = SubResource("BoxShape3D_oyd05")
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="StaticBody3D" unique_id=255137530]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.13607028, 0.4925537, -0.42293918)
+shape = SubResource("CylinderShape3D_wnknj")

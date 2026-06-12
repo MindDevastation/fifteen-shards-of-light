@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://bhc65uunv3u80"]
+
+[ext_resource type="PackedScene" uid="uid://boi0m1r3w313h" path="res://assets/architecture/bridge_sector_with_pylon_01/bridge_sector_with_pylon_01.glb" id="1_16chs"]
+[ext_resource type="Shape3D" uid="uid://bpkwxhfgtl3n7" path="res://assets/collisions/architecture/bridge_sector_with_pylon_01.res" id="2_85aq0"]
+
+[node name="bridge_sector_with_pylon_01" unique_id=119572496 instance=ExtResource("1_16chs")]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Mesh_0_001" parent_id_path=PackedInt32Array(653841322) index="0" unique_id=99137388]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Mesh_0_001/StaticBody3D" index="0" unique_id=983453577]
+shape = ExtResource("2_85aq0")

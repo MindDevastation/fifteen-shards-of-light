@@ -1,5 +1,7 @@
 extends Node3D
 
+signal collected
+
 const SOUL_ORB_FOLLOW_SCENE := preload("res://scenes/core/SoulOrb_Follow.tscn")
 
 @export var hover_base_height: float = 1.25
@@ -78,6 +80,7 @@ func _collect_to_follow() -> void:
 			follow_orb.set("target_path", follow_orb.get_path_to(_player_ref))
 
 	hide()
+	collected.emit()
 
 
 func _is_player_body(body: Node3D) -> bool:
