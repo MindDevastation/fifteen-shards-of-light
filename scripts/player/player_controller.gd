@@ -13,6 +13,7 @@ const INTERACT_COOLDOWN_SECONDS := 0.1
 @export_range(0.05, 0.5, 0.01) var step_forward_distance: float = 0.38
 @export_range(0.0, 0.1, 0.005) var step_body_clearance_margin: float = 0.03
 @export_range(0.2, 1.2, 0.01) var step_down_probe_distance: float = 0.75
+@export_range(0.0, 0.2, 0.01) var step_climb_duration: float = 0.1
 @export var step_debug_enabled: bool = false
 
 @onready var visual_root: Node3D = $CharacterVisualRoot
@@ -22,12 +23,21 @@ var _jump_cooldown_remaining: float = 0.0
 var _interact_cooldown_remaining: float = 0.0
 var _last_step_debug_reason := ""
 var _last_step_debug_time_msec := 0
+var _step_climb_active := false
+var _step_climb_start_position := Vector3.ZERO
+var _step_climb_target_position := Vector3.ZERO
+var _step_climb_elapsed := 0.0
+var _step_climb_target_transform := Transform3D.IDENTITY
 
 
 
 func _physics_process(delta: float) -> void:
 	_jump_cooldown_remaining = max(_jump_cooldown_remaining - delta, 0.0)
 	_interact_cooldown_remaining = max(_interact_cooldown_remaining - delta, 0.0)
+
+	if _step_climb_active:
+		_update_step_climb(delta)
+		return
 
 	var input_direction := _get_input_direction()
 	var movement_direction := _get_camera_relative_direction(input_direction)
@@ -160,12 +170,59 @@ func _try_step_up(
 		if placement_result == "accepted_without_recovery":
 			_step_debug("final placement accepted with offset")
 
-		global_transform = target_transform
-		velocity.y = 0.0
+		_start_step_climb(target_transform)
 		_step_debug("candidate accepted")
 		return
 
 	_step_debug(last_failure_reason)
+
+func _start_step_climb(target_transform: Transform3D) -> void:
+	if step_climb_duration <= 0.0:
+		global_transform = target_transform
+		velocity.y = 0.0
+		return
+
+	_step_climb_active = true
+	_step_climb_start_position = global_position
+	_step_climb_target_position = target_transform.origin
+	_step_climb_elapsed = 0.0
+	_step_climb_target_transform = target_transform
+	velocity.y = 0.0
+
+
+func _update_step_climb(delta: float) -> void:
+	_step_climb_elapsed += delta
+	var progress := clampf(_step_climb_elapsed / step_climb_duration, 0.0, 1.0)
+	var eased_progress := smoothstep(0.0, 1.0, progress)
+	var next_transform := _step_climb_target_transform
+	next_transform.origin = _step_climb_start_position.lerp(_step_climb_target_position, eased_progress)
+
+	if _is_step_climb_placement_usable(next_transform):
+		global_transform = next_transform
+	elif _is_step_climb_placement_usable(_step_climb_target_transform):
+		global_transform = _step_climb_target_transform
+		_step_debug("step climb intermediate blocked; snapped to validated target")
+		_finish_step_climb()
+		return
+	else:
+		_step_debug("step climb target became blocked")
+		_finish_step_climb()
+		return
+
+	velocity.y = 0.0
+	if progress >= 1.0:
+		global_transform = _step_climb_target_transform
+		_finish_step_climb()
+
+
+func _finish_step_climb() -> void:
+	_step_climb_active = false
+	_step_climb_elapsed = 0.0
+	velocity.y = 0.0
+
+
+func _is_step_climb_placement_usable(body_transform: Transform3D) -> bool:
+	return _get_final_placement_result(body_transform) != "blocked"
 
 
 func _was_horizontal_motion_blocked(
