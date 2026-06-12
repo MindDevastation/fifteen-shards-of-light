@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://bgelwrtnyjpib"]
+
+[ext_resource type="PackedScene" uid="uid://ca7siv2t15rmf" path="res://scenes/environment/terrain/main_island_01_sector_a.tscn" id="1_vsjcc"]
+[ext_resource type="PackedScene" uid="uid://mct0txnhc140" path="res://scenes/environment/terrain/main_island_01_sector_b.tscn" id="2_opfxw"]
+[ext_resource type="PackedScene" uid="uid://ch4thayhbpfla" path="res://scenes/environment/terrain/main_island_01_sector_c.tscn" id="3_ml47t"]
+[ext_resource type="PackedScene" uid="uid://bexpas6sxa12r" path="res://scenes/environment/terrain/main_island_01_sector_d.tscn" id="4_sqplp"]
+[ext_resource type="PackedScene" uid="uid://bp88kquoycyhj" path="res://scenes/environment/assets/bridge_sector_arc_01.tscn" id="5_opfxw"]
+
+[node name="MainIsland01" type="Node3D" unique_id=976978053]
+
+[node name="main_island_01_sector_a" parent="." unique_id=1951542908 instance=ExtResource("1_vsjcc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9208064, -0.02215314, 9.87419)
+
+[node name="main_island_01_sector_b" parent="." unique_id=1132912296 instance=ExtResource("2_opfxw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.7031226, 0, -42.333557)
+
+[node name="main_island_01_sector_c" parent="." unique_id=1962688407 instance=ExtResource("3_ml47t")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2782574, 0.8236356, -84.27025)
+
+[node name="main_island_01_sector_d" parent="." unique_id=528156 instance=ExtResource("4_sqplp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.2294855, 1.6479869, -121.023506)
+
+[node name="bridge_sector_arc_01" parent="." unique_id=2143190454 instance=ExtResource("5_opfxw")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.71635056, 0.9066572, -9.896274)

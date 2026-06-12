@@ -5,7 +5,12 @@
 [ext_resource type="PackedScene" uid="uid://buybh0c880w1y" path="res://scenes/core/Player.tscn" id="3_player"]
 [ext_resource type="Script" uid="uid://b5fastfa3rppc" path="res://scripts/player/camera_controller.gd" id="4_camera_controller"]
 [ext_resource type="PackedScene" uid="uid://bhde5k7ifgrfg" path="res://scenes/core/SoulOrb_World.tscn" id="5_soul_orb_world"]
-[ext_resource type="PackedScene" uid="uid://bct6x8p6mogub" path="res://scenes/vfx/FireflyCluster3D.tscn" id="6_5mpa8"]
+[ext_resource type="PackedScene" uid="uid://bgelwrtnyjpib" path="res://scenes/levels/level_01/blocks/Main_Island_01.tscn" id="6_10xc4"]
+[ext_resource type="PackedScene" uid="uid://drk14cdu82fdd" path="res://scenes/environment/assets/bridge_sector_01.tscn" id="7_dwcxj"]
+[ext_resource type="PackedScene" uid="uid://bhc65uunv3u80" path="res://scenes/environment/assets/bridge_sector_with_pylon_01.tscn" id="8_c83vx"]
+[ext_resource type="PackedScene" uid="uid://cvpylsb4dxhpm" path="res://scenes/environment/assets/bridge_sector_with_pylon_02.tscn" id="9_5dpfh"]
+[ext_resource type="PackedScene" uid="uid://bcw506sqv56hv" path="res://scenes/environment/assets/cloud_001.tscn" id="10_vlkw4"]
+[ext_resource type="PackedScene" uid="uid://1mmrgt43swb" path="res://scenes/levels/level_01/blocks/Landmark_Island_01.tscn" id="11_xpxa0"]
 
 [sub_resource type="Sky" id="Sky_hhyrm"]
 
@@ -41,6 +46,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5145416, 2.663548, 5.90804
 
 [node name="Player" parent="PlayerRoot" unique_id=1506782510 instance=ExtResource("3_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.956233, 1.8961711, -42.159256)
+up_direction = Vector3(0.009999501, 0.99995005, 0)
+floor_snap_length = 0.3
+safe_margin = 0.01
 
 [node name="CameraRoot" type="Node3D" parent="." unique_id=197258052]
 
@@ -63,6 +71,35 @@ light_color = Color(0.9607843, 0.7921569, 0.14901961, 1)
 light_energy = 1.5
 shadow_enabled = true
 
-[node name="FireflyCluster3D" parent="." unique_id=1584394222 instance=ExtResource("6_5mpa8")]
-transform = Transform3D(0.5835695, -0.81206316, 0, 0.6814006, 0.48967203, -0.5439802, 0.44174626, 0.31745026, 0.83909804, -11.282, 5, -31.199)
-cluster_radius = 2.3000000000000003
+[node name="MainIsland01" parent="." unique_id=976978053 instance=ExtResource("6_10xc4")]
+transform = Transform3D(-0.98480767, 0, 0.17364828, 0, 1, 0, -0.17364828, 0, -0.98480767, -28.209251, -1.8146482, 130.00186)
+
+[node name="bridge_sector_01" parent="." unique_id=540562438 instance=ExtResource("7_dwcxj")]
+transform = Transform3D(0.17364821, 0, 0.98480767, 0, 1, 0, -0.98480767, 0, 0.17364821, -9.02519, -0.98695564, 18.707882)
+
+[node name="bridge_sector_02" parent="." unique_id=1890055037 instance=ExtResource("7_dwcxj")]
+transform = Transform3D(0.17364821, 0, 0.98480767, 0, 1, 0, -0.98480767, 0, 0.17364821, -12.42577, -1.0727258, 36.673473)
+
+[node name="bridge_sector_03" parent="." unique_id=1270743742 instance=ExtResource("7_dwcxj")]
+transform = Transform3D(0.17364821, 0, 0.98480767, 0, 1, 0, -0.98480767, 0, 0.17364821, -21.251682, -2.0640254, 84.081406)
+
+[node name="bridge_sector_04" parent="." unique_id=1710161470 instance=ExtResource("7_dwcxj")]
+transform = Transform3D(0.17364821, 0, 0.98480767, 0, 1, 0, -0.98480767, 0, 0.17364821, -24.58358, -2.215898, 102.0799)
+
+[node name="bridge_sector_with_pylon_01" parent="." unique_id=119572496 instance=ExtResource("8_c83vx")]
+transform = Transform3D(0.34729645, 0, 1.9696155, 0, 2, 0, -1.9696155, 0, 0.34729645, -15.59842, -16.715942, 55.586784)
+
+[node name="bridge_sector_with_pylon_02" parent="." unique_id=625383378 instance=ExtResource("9_5dpfh")]
+transform = Transform3D(1.9696155, 0, -0.34729636, 0, 2, 0, 0.34729636, 0, 1.9696155, -18.449724, -7.8391094, 70.18244)
+
+[node name="cloud_001" parent="." unique_id=2009177077 instance=ExtResource("10_vlkw4")]
+transform = Transform3D(0.7489557, 0, -0.66262007, 0, 1, 0, 0.66262007, 0, 0.7489557, -31.99489, -22.605297, 70.25153)
+
+[node name="LandmarkIsland01" parent="." unique_id=641082797 instance=ExtResource("11_xpxa0")]
+transform = Transform3D(-0.9925461, 0, 0.12186927, 0, 1, 0, -0.12186927, 0, -0.9925461, -47.918728, -1.9413855, 306.05453)
+
+[node name="bridge_sector_with_pylon_03" parent="." unique_id=1117299550 instance=ExtResource("9_5dpfh")]
+transform = Transform3D(1.9696155, 0, -0.34729636, 0, 2, 0, 0.34729636, 0, 1.9696155, -41.769783, -6.285463, 271.14294)
+
+[node name="bridge_sector_05" parent="." unique_id=877969918 instance=ExtResource("7_dwcxj")]
+transform = Transform3D(0.17364822, 0, 0.9848077, 0, 1, 0, -0.9848077, 0, 0.17364822, -44.38642, -0.48727608, 284.359)

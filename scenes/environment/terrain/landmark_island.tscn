@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://t4vdbv3x7wks"]
+
+[ext_resource type="PackedScene" uid="uid://42shwfg6h7x8" path="res://assets/terrain/landmark_island_01/landmark_island.glb" id="1_ptxov"]
+[ext_resource type="Shape3D" uid="uid://bjkvb7qtf1k27" path="res://assets/collisions/terrain/landmark_island.res" id="2_e2re5"]
+
+[node name="landmark_island" unique_id=495935398 instance=ExtResource("1_ptxov")]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Mesh_0" parent_id_path=PackedInt32Array(1626474111) index="0" unique_id=2015725932]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Mesh_0/StaticBody3D" index="0" unique_id=483754084]
+shape = ExtResource("2_e2re5")

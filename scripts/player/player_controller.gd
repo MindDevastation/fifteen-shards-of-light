@@ -1,13 +1,13 @@
 extends CharacterBody3D
 
-const JUMP_COOLDOWN_SECONDS := 2.3
-const INTERACT_COOLDOWN_SECONDS := 2.0
+const JUMP_COOLDOWN_SECONDS := 0.1
+const INTERACT_COOLDOWN_SECONDS := 0.1
 
-@export var walk_speed: float = 5.0
-@export var run_speed: float = 8.5
+@export var walk_speed: float = 3.0
+@export var run_speed: float = 5.0
 @export var jump_velocity: float = 4.5
 @export var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
-@export_range(1.0, 20.0, 0.1) var visual_turn_speed: float = 10.0
+@export_range(1.0, 20.0, 0.1) var visual_turn_speed: float = 5.0
 
 @onready var visual_root: Node3D = $CharacterVisualRoot
 @onready var animation_controller: FoxHeroineAnimationController = $FoxHeroineAnimationController
@@ -47,7 +47,6 @@ func _physics_process(delta: float) -> void:
 	elif Input.is_key_pressed(KEY_SPACE) and _jump_cooldown_remaining <= 0.0:
 		velocity.y = jump_velocity
 		_jump_cooldown_remaining = JUMP_COOLDOWN_SECONDS
-		animation_controller.play_one_shot("jump", 1.5)
 	else:
 		velocity.y = 0.0
 
@@ -57,9 +56,9 @@ func _physics_process(delta: float) -> void:
 		_try_start_interaction()
 	elif is_moving:
 		if is_shift_held:
-			animation_controller.update_locomotion("fast_run")
-		else:
 			animation_controller.update_locomotion("run")
+		else:
+			animation_controller.update_locomotion("walk")
 	elif not animation_controller.is_dancing():
 		animation_controller.update_idle(delta)
 

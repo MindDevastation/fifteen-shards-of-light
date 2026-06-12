@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://1mmrgt43swb"]
+
+[ext_resource type="PackedScene" uid="uid://t4vdbv3x7wks" path="res://scenes/environment/terrain/landmark_island.tscn" id="1_t0k2s"]
+[ext_resource type="PackedScene" uid="uid://30luoh2acg2n" path="res://scenes/environment/assets/landmak_01.tscn" id="2_cjh57"]
+
+[node name="LandmarkIsland01" type="Node3D" unique_id=641082797]
+
+[node name="landmark_island" parent="." unique_id=495935398 instance=ExtResource("1_t0k2s")]
+
+[node name="landmak_01" parent="." unique_id=1889160884 instance=ExtResource("2_cjh57")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6453351, 7.303753, -9.302357)
