@@ -3,14 +3,16 @@ extends CharacterBody3D
 const JUMP_COOLDOWN_SECONDS := 0.1
 const INTERACT_COOLDOWN_SECONDS := 0.1
 
-@export var walk_speed: float = 3.0
-@export var run_speed: float = 5.0
+@export var walk_speed: float = 4.25
+@export var run_speed: float = 6.25
 @export var jump_velocity: float = 4.025
 @export var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 @export_range(1.0, 20.0, 0.1) var visual_turn_speed: float = 5.0
-@export_range(0.1, 0.6, 0.01) var max_step_height: float = 0.35
-@export_range(0.1, 0.8, 0.01) var step_check_distance: float = 0.35
-@export_range(1.0, 40.0, 0.5) var step_smoothness: float = 18.0
+@export_range(0.1, 0.7, 0.01) var max_step_height: float = 0.55
+@export_range(0.1, 0.8, 0.01) var step_check_distance: float = 0.5
+@export_range(0.05, 0.5, 0.01) var step_forward_distance: float = 0.22
+@export_range(0.0, 0.1, 0.005) var step_body_clearance_margin: float = 0.03
+@export_range(0.2, 1.2, 0.01) var step_down_probe_distance: float = 0.75
 
 @onready var visual_root: Node3D = $CharacterVisualRoot
 @onready var animation_controller: FoxHeroineAnimationController = $FoxHeroineAnimationController
@@ -53,10 +55,7 @@ func _physics_process(delta: float) -> void:
 	elif Input.is_action_just_pressed("interact"):
 		_try_start_interaction()
 	elif is_moving:
-		if is_shift_held:
-			animation_controller.update_locomotion("run")
-		else:
-			animation_controller.update_locomotion("walk")
+		animation_controller.update_locomotion("run")
 	elif not animation_controller.is_dancing():
 		animation_controller.update_idle(delta)
 
@@ -100,12 +99,12 @@ func _find_best_interactable() -> Node:
 
 
 
-func _try_step_up(delta: float, movement_direction: Vector3, was_on_floor: bool) -> void:
+func _try_step_up(_delta: float, movement_direction: Vector3, was_on_floor: bool) -> void:
 	if not was_on_floor or not is_on_floor():
 		return
 	if movement_direction.length_squared() <= 0.000001:
 		return
-	if max_step_height <= 0.0 or step_check_distance <= 0.0:
+	if max_step_height <= 0.0 or step_check_distance <= 0.0 or step_forward_distance <= 0.0:
 		return
 
 	var space_state := get_world_3d().direct_space_state
@@ -114,51 +113,78 @@ func _try_step_up(delta: float, movement_direction: Vector3, was_on_floor: bool)
 	var floor_y := global_position.y
 	var exclude := [get_rid()]
 
-	var low_start := global_position + up * 0.08
-	var low_end := low_start + direction * step_check_distance
-	var low_query := PhysicsRayQueryParameters3D.create(low_start, low_end)
-	low_query.exclude = exclude
-	low_query.collide_with_areas = false
-	var low_hit := space_state.intersect_ray(low_query)
-	if low_hit.is_empty():
+	if not _has_low_step_obstacle(space_state, direction, exclude):
 		return
 
-	var high_start := global_position + up * (max_step_height + 0.12)
-	var high_end := high_start + direction * step_check_distance
-	var high_query := PhysicsRayQueryParameters3D.create(high_start, high_end)
-	high_query.exclude = exclude
-	high_query.collide_with_areas = false
-	if not space_state.intersect_ray(high_query).is_empty():
+	var step_floor_hit := _find_step_floor(space_state, direction, exclude)
+	if step_floor_hit.is_empty():
 		return
 
-	var top_probe_origin := global_position + direction * step_check_distance + up * (max_step_height + 0.25)
-	var top_probe_end := global_position + direction * step_check_distance + up * 0.02
-	var top_query := PhysicsRayQueryParameters3D.create(top_probe_origin, top_probe_end)
-	top_query.exclude = exclude
-	top_query.collide_with_areas = false
-	var top_hit := space_state.intersect_ray(top_query)
-	if top_hit.is_empty():
-		return
-
-	var top_position := top_hit["position"] as Vector3
+	var top_position := step_floor_hit["position"] as Vector3
 	var step_height := top_position.y - floor_y
-	if step_height <= 0.01 or step_height > max_step_height:
+	if step_height <= 0.02 or step_height > max_step_height:
 		return
 
-	var top_normal := top_hit["normal"] as Vector3
+	var top_normal := step_floor_hit["normal"] as Vector3
 	if top_normal.dot(up) < cos(floor_max_angle):
 		return
 
-	var clearance_start := global_position + up * (max_step_height + 0.9)
-	var clearance_end := clearance_start + direction * step_check_distance
-	var clearance_query := PhysicsRayQueryParameters3D.create(clearance_start, clearance_end)
-	clearance_query.exclude = exclude
-	clearance_query.collide_with_areas = false
-	if not space_state.intersect_ray(clearance_query).is_empty():
+	var target_position := global_position + direction * step_forward_distance
+	target_position.y = top_position.y
+	if not _can_step_body_to(target_position, step_height):
 		return
 
-	var step_lerp := clampf(step_smoothness * delta, 0.0, 1.0)
-	global_position.y += lerpf(0.0, step_height, step_lerp)
+	global_position = target_position
+	velocity.y = 0.0
+
+
+func _has_low_step_obstacle(space_state: PhysicsDirectSpaceState3D, direction: Vector3, exclude: Array[RID]) -> bool:
+	var up := Vector3.UP
+	var right := direction.cross(up).normalized()
+	var side_offsets: Array[float] = [-0.22, 0.0, 0.22]
+	for side_offset: float in side_offsets:
+		var low_start := global_position + right * side_offset + up * 0.16
+		var low_end := low_start + direction * step_check_distance
+		var low_query := PhysicsRayQueryParameters3D.create(low_start, low_end)
+		low_query.exclude = exclude
+		low_query.collide_with_areas = false
+		if not space_state.intersect_ray(low_query).is_empty():
+			return true
+	return false
+
+
+func _find_step_floor(space_state: PhysicsDirectSpaceState3D, direction: Vector3, exclude: Array[RID]) -> Dictionary:
+	var up := Vector3.UP
+	var probe_position := global_position + direction * step_check_distance
+	var top_probe_origin := probe_position + up * (max_step_height + step_body_clearance_margin)
+	var top_probe_end := probe_position - up * step_down_probe_distance
+	var top_query := PhysicsRayQueryParameters3D.create(top_probe_origin, top_probe_end)
+	top_query.exclude = exclude
+	top_query.collide_with_areas = false
+	return space_state.intersect_ray(top_query)
+
+
+func _can_step_body_to(target_position: Vector3, step_height: float) -> bool:
+	var raised_motion := Vector3.UP * (step_height + step_body_clearance_margin)
+	if not _is_body_motion_clear(global_transform, raised_motion):
+		return false
+
+	var raised_transform := global_transform
+	raised_transform.origin += raised_motion
+	var horizontal_motion := target_position - raised_transform.origin
+	horizontal_motion.y = 0.0
+	if horizontal_motion.length_squared() > 0.000001 and not _is_body_motion_clear(raised_transform, horizontal_motion):
+		return false
+
+	return true
+
+
+func _is_body_motion_clear(from_transform: Transform3D, motion: Vector3) -> bool:
+	var motion_parameters := PhysicsTestMotionParameters3D.new()
+	motion_parameters.from = from_transform
+	motion_parameters.motion = motion
+	motion_parameters.margin = step_body_clearance_margin
+	return not PhysicsServer3D.body_test_motion(get_rid(), motion_parameters)
 
 
 func _get_camera_relative_direction(input_direction: Vector2) -> Vector3:
