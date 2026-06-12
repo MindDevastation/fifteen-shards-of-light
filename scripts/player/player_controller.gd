@@ -147,32 +147,16 @@ func _try_step_up(
 			last_failure_reason = "body motion forward blocked"
 			continue
 
-		var target_horizontal_position := global_position + direction * step_forward_distance
-		var forward_raised_position := target_horizontal_position
-		forward_raised_position.y = pre_move_floor_y + candidate_height + step_body_clearance_margin
-		var top_floor_hit := _find_step_floor(space_state, forward_raised_position, pre_move_floor_y, exclude)
-		if top_floor_hit.is_empty():
+		var floor_result := _find_best_step_floor(space_state, direction, pre_move_floor_y, exclude)
+		if floor_result.is_empty():
 			last_failure_reason = "no top floor found"
 			continue
-
-		var top_position := top_floor_hit["position"] as Vector3
-		var step_height := top_position.y - pre_move_floor_y
-		if step_height <= 0.02 or step_height > max_step_height:
-			last_failure_reason = "step height too low/high"
+		if not bool(floor_result["is_valid"]):
+			last_failure_reason = floor_result["reason"] as String
 			continue
 
-		var top_normal := top_floor_hit["normal"] as Vector3
-		if top_normal.dot(Vector3.UP) < cos(floor_max_angle):
-			last_failure_reason = "top surface not walkable"
-			continue
-
-		var target_transform := global_transform
-		target_transform.origin = target_horizontal_position
-		target_transform.origin.y = top_position.y + step_body_clearance_margin
-		var placement_result := _get_final_placement_result(target_transform)
-		if placement_result == "blocked":
-			last_failure_reason = "final body placement blocked"
-			continue
+		var target_transform := floor_result["target_transform"] as Transform3D
+		var placement_result := floor_result["placement_result"] as String
 		if placement_result == "accepted_without_recovery":
 			_step_debug("final placement accepted with offset")
 
@@ -253,23 +237,96 @@ func _get_step_candidate_heights() -> Array[float]:
 	return heights
 
 
-func _find_step_floor(
-	space_state: PhysicsDirectSpaceState3D, forward_raised_position: Vector3, pre_move_floor_y: float, exclude: Array[RID]
+func _find_best_step_floor(
+	space_state: PhysicsDirectSpaceState3D, direction: Vector3, pre_move_floor_y: float, exclude: Array[RID]
 ) -> Dictionary:
-	var top_probe_origin := forward_raised_position + Vector3.UP * step_body_clearance_margin
-	var top_probe_end := forward_raised_position - Vector3.UP * step_down_probe_distance
-	var top_query := PhysicsRayQueryParameters3D.create(top_probe_origin, top_probe_end)
-	top_query.exclude = exclude
-	top_query.collide_with_areas = false
-	var hit := space_state.intersect_ray(top_query)
-	if hit.is_empty():
-		return hit
+	var side_direction := Vector3.UP.cross(direction)
+	if side_direction.length_squared() <= 0.000001:
+		side_direction = Vector3.RIGHT
+	else:
+		side_direction = side_direction.normalized()
 
-	var hit_position := hit["position"] as Vector3
-	var step_height := hit_position.y - pre_move_floor_y
-	if step_height <= 0.02 or step_height > max_step_height:
-		return {}
-	return hit
+	var forward_distances: Array[float] = [
+		step_forward_distance * 0.5,
+		step_forward_distance * 0.75,
+		step_forward_distance,
+		min(step_check_distance, step_forward_distance * 1.25),
+	]
+	var side_offsets: Array[float] = [0.0, -0.16, 0.16]
+	var top_probe_start_y := pre_move_floor_y + max_step_height + step_body_clearance_margin + 0.05
+	var top_probe_end_y := pre_move_floor_y - 0.08
+	var best_result: Dictionary = {}
+	var best_distance := INF
+	var saw_hit := false
+	var saw_current_floor := false
+	var saw_too_high := false
+	var saw_non_walkable := false
+	var saw_placement_blocked := false
+
+	for forward_distance: float in forward_distances:
+		for side_offset: float in side_offsets:
+			var target_horizontal_position := global_position + direction * forward_distance + side_direction * side_offset
+			var top_probe_origin := target_horizontal_position
+			top_probe_origin.y = top_probe_start_y
+			var top_probe_end := target_horizontal_position
+			top_probe_end.y = top_probe_end_y
+
+			var top_query := PhysicsRayQueryParameters3D.create(top_probe_origin, top_probe_end)
+			top_query.exclude = exclude
+			top_query.collide_with_areas = false
+			var hit := space_state.intersect_ray(top_query)
+			if hit.is_empty():
+				continue
+
+			saw_hit = true
+			var hit_position := hit["position"] as Vector3
+			var step_height := hit_position.y - pre_move_floor_y
+			if step_height <= 0.02:
+				saw_current_floor = true
+				continue
+			if step_height > max_step_height:
+				saw_too_high = true
+				continue
+
+			var top_normal := hit["normal"] as Vector3
+			if top_normal.dot(Vector3.UP) < cos(floor_max_angle):
+				saw_non_walkable = true
+				continue
+
+			var target_transform := global_transform
+			target_transform.origin = target_horizontal_position
+			target_transform.origin.y = hit_position.y + step_body_clearance_margin
+			var placement_result := _get_final_placement_result(target_transform)
+			if placement_result == "blocked":
+				saw_placement_blocked = true
+				continue
+
+			var horizontal_distance := target_horizontal_position.distance_to(global_position)
+			if horizontal_distance < best_distance:
+				best_distance = horizontal_distance
+				best_result = {
+					"is_valid": true,
+					"reason": "top floor candidate found",
+					"hit": hit,
+					"target_position": target_horizontal_position,
+					"target_transform": target_transform,
+					"placement_result": placement_result,
+				}
+
+	if not best_result.is_empty():
+		_step_debug("top floor candidate found")
+		return best_result
+	if saw_placement_blocked:
+		return {"is_valid": false, "reason": "top floor candidate placement blocked"}
+	if saw_non_walkable:
+		return {"is_valid": false, "reason": "top probe hit non-walkable"}
+	if saw_too_high:
+		return {"is_valid": false, "reason": "top probe hit too high"}
+	if saw_current_floor:
+		return {"is_valid": false, "reason": "top probe hit current floor"}
+	if saw_hit:
+		return {"is_valid": false, "reason": "no valid top floor found"}
+	return {"is_valid": false, "reason": "top probe sampled but no hit"}
 
 
 func _get_final_placement_result(body_transform: Transform3D) -> String:
