@@ -28,6 +28,12 @@ fog_mode = 1
 fog_light_color = Color(0.7607843, 0.80784315, 0.8392157, 1)
 fog_density = 0.012
 
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_step_assist_ramp"]
+points = PackedVector3Array(-1.5, -0.02, -0.6, 1.5, -0.02, -0.6, -1.5, -0.02, 0.6, 1.5, -0.02, 0.6, -1.5, 0.32, 0.6, 1.5, 0.32, 0.6)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_step_assist_cap"]
+size = Vector3(3, 0.08, 0.35)
+
 [node name="Level_01" type="Node3D" unique_id=389746896]
 
 [node name="LevelManager" type="Node" parent="." unique_id=682181116]
@@ -61,6 +67,48 @@ target_path = NodePath("../../PlayerRoot/Player")
 max_zoom_distance = 5.0
 
 [node name="LevelRuntimeRoot" type="Node3D" parent="." unique_id=385295927]
+
+[node name="StepAssistRoot" type="Node3D" parent="."]
+
+[node name="StepAssistRamp_01" type="StaticBody3D" parent="StepAssistRoot"]
+transform = Transform3D(0.5547002, 0, 0.8320503, 0, 1, 0, -0.8320503, 0, 0.5547002, -9.9, 4.45, -35.15)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StepAssistRoot/StepAssistRamp_01"]
+shape = SubResource("ConvexPolygonShape3D_step_assist_ramp")
+
+[node name="StepAssistCapShape_01" type="CollisionShape3D" parent="StepAssistRoot/StepAssistRamp_01"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.32, 0.77)
+shape = SubResource("BoxShape3D_step_assist_cap")
+
+[node name="StepAssistRamp_02" type="StaticBody3D" parent="StepAssistRoot"]
+transform = Transform3D(0.9635179, 0, -0.2676439, 0, 1, 0, 0.2676439, 0, 0.9635179, -2.9, 2.0, -26.25)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StepAssistRoot/StepAssistRamp_02"]
+shape = SubResource("ConvexPolygonShape3D_step_assist_ramp")
+
+[node name="StepAssistCapShape_02" type="CollisionShape3D" parent="StepAssistRoot/StepAssistRamp_02"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.32, 0.77)
+shape = SubResource("BoxShape3D_step_assist_cap")
+
+[node name="StepAssistRamp_03" type="StaticBody3D" parent="StepAssistRoot"]
+transform = Transform3D(0.7071068, 0, -0.7071068, 0, 1, 0, 0.7071068, 0, 0.7071068, 8.25, 2.08, -25.1)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StepAssistRoot/StepAssistRamp_03"]
+shape = SubResource("ConvexPolygonShape3D_step_assist_ramp")
+
+[node name="StepAssistCapShape_03" type="CollisionShape3D" parent="StepAssistRoot/StepAssistRamp_03"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.32, 0.77)
+shape = SubResource("BoxShape3D_step_assist_cap")
+
+[node name="StepAssistRamp_04" type="StaticBody3D" parent="StepAssistRoot"]
+transform = Transform3D(0.190809, 0, 0.9816272, 0, 1, 0, -0.9816272, 0, 0.190809, -7.25, 1.9, 6.15)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StepAssistRoot/StepAssistRamp_04"]
+shape = SubResource("ConvexPolygonShape3D_step_assist_ramp")
+
+[node name="StepAssistCapShape_04" type="CollisionShape3D" parent="StepAssistRoot/StepAssistRamp_04"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.32, 0.77)
+shape = SubResource("BoxShape3D_step_assist_cap")
 
 [node name="WorldEnvironment_Block01" type="WorldEnvironment" parent="." unique_id=305389988]
 environment = SubResource("Environment_5mpa8")

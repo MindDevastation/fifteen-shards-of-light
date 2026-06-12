@@ -14,6 +14,7 @@ const INTERACT_COOLDOWN_SECONDS := 0.1
 @export_range(0.0, 0.1, 0.005) var step_body_clearance_margin: float = 0.03
 @export_range(0.2, 1.2, 0.01) var step_down_probe_distance: float = 0.75
 @export_range(0.0, 0.2, 0.01) var step_climb_duration: float = 0.1
+@export var step_climb_enabled: bool = true
 @export var step_debug_enabled: bool = false
 
 @onready var visual_root: Node3D = $CharacterVisualRoot
@@ -177,7 +178,7 @@ func _try_step_up(
 	_step_debug(last_failure_reason)
 
 func _start_step_climb(target_transform: Transform3D) -> void:
-	if step_climb_duration <= 0.0:
+	if not step_climb_enabled or step_climb_duration <= 0.0:
 		global_transform = target_transform
 		velocity.y = 0.0
 		return
@@ -188,6 +189,7 @@ func _start_step_climb(target_transform: Transform3D) -> void:
 	_step_climb_elapsed = 0.0
 	_step_climb_target_transform = target_transform
 	velocity.y = 0.0
+	_step_debug("step climb started")
 
 
 func _update_step_climb(delta: float) -> void:
@@ -219,6 +221,7 @@ func _finish_step_climb() -> void:
 	_step_climb_active = false
 	_step_climb_elapsed = 0.0
 	velocity.y = 0.0
+	_step_debug("step climb completed")
 
 
 func _is_step_climb_placement_usable(body_transform: Transform3D) -> bool:
