@@ -114,14 +114,24 @@ func _try_step_up(
 		return
 
 	var direction := movement_direction.normalized()
-	if not _has_blocking_step_collision(direction):
+	var pre_move_floor_y := position_before_move.y
+	var space_state := get_world_3d().direct_space_state
+	var exclude: Array[RID] = []
+	exclude.append(get_rid())
+
+	var has_slide_step_collision := _has_blocking_step_collision(direction)
+	var has_fallback_low_obstacle := false
+	if not has_slide_step_collision:
+		has_fallback_low_obstacle = _has_fallback_low_obstacle(space_state, direction, position_before_move, pre_move_floor_y, exclude)
+
+	if not has_slide_step_collision and not has_fallback_low_obstacle:
 		if _was_horizontal_motion_blocked(delta, direction, position_before_move, current_speed):
 			_step_debug("no low obstacle detected")
 		return
 
-	var space_state := get_world_3d().direct_space_state
-	var exclude: Array[RID] = []
-	exclude.append(get_rid())
+	if has_fallback_low_obstacle:
+		_step_debug("fallback low obstacle accepted")
+
 	var candidate_heights := _get_step_candidate_heights()
 	var last_failure_reason := "no top floor found"
 	for candidate_height: float in candidate_heights:
@@ -137,14 +147,16 @@ func _try_step_up(
 			last_failure_reason = "body motion forward blocked"
 			continue
 
-		var forward_raised_position := raised_transform.origin + forward_motion
-		var top_floor_hit := _find_step_floor(space_state, forward_raised_position, exclude)
+		var target_horizontal_position := global_position + direction * step_forward_distance
+		var forward_raised_position := target_horizontal_position
+		forward_raised_position.y = pre_move_floor_y + candidate_height + step_body_clearance_margin
+		var top_floor_hit := _find_step_floor(space_state, forward_raised_position, pre_move_floor_y, exclude)
 		if top_floor_hit.is_empty():
 			last_failure_reason = "no top floor found"
 			continue
 
 		var top_position := top_floor_hit["position"] as Vector3
-		var step_height := top_position.y - global_position.y
+		var step_height := top_position.y - pre_move_floor_y
 		if step_height <= 0.02 or step_height > max_step_height:
 			last_failure_reason = "step height too low/high"
 			continue
@@ -155,11 +167,14 @@ func _try_step_up(
 			continue
 
 		var target_transform := global_transform
-		target_transform.origin = global_position + direction * step_forward_distance
-		target_transform.origin.y = top_position.y
-		if not _is_body_transform_clear(target_transform):
+		target_transform.origin = target_horizontal_position
+		target_transform.origin.y = top_position.y + step_body_clearance_margin
+		var placement_result := _get_final_placement_result(target_transform)
+		if placement_result == "blocked":
 			last_failure_reason = "final body placement blocked"
 			continue
+		if placement_result == "accepted_without_recovery":
+			_step_debug("final placement accepted with offset")
 
 		global_transform = target_transform
 		velocity.y = 0.0
@@ -192,6 +207,43 @@ func _has_blocking_step_collision(direction: Vector3) -> bool:
 	return false
 
 
+func _has_fallback_low_obstacle(
+	space_state: PhysicsDirectSpaceState3D,
+	direction: Vector3,
+	base_position: Vector3,
+	pre_move_floor_y: float,
+	exclude: Array[RID]
+) -> bool:
+	var side_direction := Vector3.UP.cross(direction)
+	if side_direction.length_squared() <= 0.000001:
+		return false
+	side_direction = side_direction.normalized()
+
+	var side_offsets: Array[float] = [0.0, -0.22, 0.22]
+	var low_probe_heights: Array[float] = [0.10, 0.26, 0.42]
+	for side_offset: float in side_offsets:
+		for probe_height: float in low_probe_heights:
+			var ray_start := base_position + side_direction * side_offset + Vector3.UP * probe_height - direction * 0.05
+			var ray_end := ray_start + direction * step_check_distance
+			var low_query := PhysicsRayQueryParameters3D.create(ray_start, ray_end)
+			low_query.exclude = exclude
+			low_query.collide_with_areas = false
+			var hit := space_state.intersect_ray(low_query)
+			if hit.is_empty():
+				continue
+
+			var hit_position := hit["position"] as Vector3
+			var hit_height := hit_position.y - pre_move_floor_y
+			if hit_height < -0.03 or hit_height > max_step_height + step_body_clearance_margin:
+				continue
+
+			var normal := hit["normal"] as Vector3
+			var block_dot := -normal.dot(direction)
+			if block_dot >= 0.15 and normal.dot(Vector3.UP) < cos(floor_max_angle):
+				return true
+	return false
+
+
 func _get_step_candidate_heights() -> Array[float]:
 	var heights: Array[float] = []
 	var candidate_count := 5
@@ -201,22 +253,44 @@ func _get_step_candidate_heights() -> Array[float]:
 	return heights
 
 
-func _find_step_floor(space_state: PhysicsDirectSpaceState3D, forward_raised_position: Vector3, exclude: Array[RID]) -> Dictionary:
+func _find_step_floor(
+	space_state: PhysicsDirectSpaceState3D, forward_raised_position: Vector3, pre_move_floor_y: float, exclude: Array[RID]
+) -> Dictionary:
 	var top_probe_origin := forward_raised_position + Vector3.UP * step_body_clearance_margin
 	var top_probe_end := forward_raised_position - Vector3.UP * step_down_probe_distance
 	var top_query := PhysicsRayQueryParameters3D.create(top_probe_origin, top_probe_end)
 	top_query.exclude = exclude
 	top_query.collide_with_areas = false
-	return space_state.intersect_ray(top_query)
+	var hit := space_state.intersect_ray(top_query)
+	if hit.is_empty():
+		return hit
+
+	var hit_position := hit["position"] as Vector3
+	var step_height := hit_position.y - pre_move_floor_y
+	if step_height <= 0.02 or step_height > max_step_height:
+		return {}
+	return hit
 
 
-func _is_body_transform_clear(body_transform: Transform3D) -> bool:
-	var motion_parameters := PhysicsTestMotionParameters3D.new()
-	motion_parameters.from = body_transform
-	motion_parameters.motion = Vector3.ZERO
-	motion_parameters.margin = safe_margin
-	motion_parameters.recovery_as_collision = true
-	return not PhysicsServer3D.body_test_motion(get_rid(), motion_parameters)
+func _get_final_placement_result(body_transform: Transform3D) -> String:
+	var strict_parameters := PhysicsTestMotionParameters3D.new()
+	strict_parameters.from = body_transform
+	strict_parameters.motion = Vector3.ZERO
+	strict_parameters.margin = safe_margin
+	strict_parameters.recovery_as_collision = true
+	if not PhysicsServer3D.body_test_motion(get_rid(), strict_parameters):
+		return "clear"
+
+	var relaxed_parameters := PhysicsTestMotionParameters3D.new()
+	relaxed_parameters.from = body_transform
+	relaxed_parameters.motion = Vector3.ZERO
+	relaxed_parameters.margin = safe_margin
+	relaxed_parameters.recovery_as_collision = false
+	if not PhysicsServer3D.body_test_motion(get_rid(), relaxed_parameters):
+		_step_debug("final placement blocked by recovery")
+		return "accepted_without_recovery"
+
+	return "blocked"
 
 
 func _step_debug(reason: String) -> void:
