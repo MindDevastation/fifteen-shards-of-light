@@ -111,7 +111,8 @@ func _try_step_up(_delta: float, movement_direction: Vector3, was_on_floor: bool
 	var direction := movement_direction.normalized()
 	var up := Vector3.UP
 	var floor_y := global_position.y
-	var exclude := [get_rid()]
+	var exclude: Array[RID] = []
+	exclude.append(get_rid())
 
 	if not _has_low_step_obstacle(space_state, direction, exclude):
 		return
