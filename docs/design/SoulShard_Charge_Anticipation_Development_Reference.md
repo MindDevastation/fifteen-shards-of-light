@@ -1813,6 +1813,8 @@ Charge слишком яркий и масштабный.
 @export_range(0.50, 2.50, 0.05)
 var charge_duration: float = 1.20
 
+Accepted after Video Review Round 1: `charge_duration: 1.2 seconds`.
+
 @export_range(0.20, 0.50, 0.01)
 var charge_hover_end_multiplier: float = 0.32
 
@@ -2213,6 +2215,20 @@ idle без изменений
 - visual evidence;
 - two sequential shard test;
 - no Godot errors.
+
+---
+
+
+## Video Review Round 1
+
+- Idle preservation: PASS
+- Charge continuity: PASS
+- Gathering inward: PASS
+- Heart response at 0.6 sec: NOT READABLE
+- Compression at 0.6 sec: NOT READABLE
+- Burst handoff: PASS
+- Decision: increase charge_duration from 0.6 to 1.2 without changing phase ranges or visual multipliers
+- Prompt bug: tracked as corrective fix in scripts/ui/world_interaction_prompt.gd
 
 ---
 
