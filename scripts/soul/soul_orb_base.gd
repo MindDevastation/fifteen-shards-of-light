@@ -17,43 +17,67 @@ extends Node3D
 @export var petal_spin_speed_min: float = 0.9
 @export var petal_spin_speed_max: float = 3.5
 
-@onready var core_root: Node3D = $VisualRoot/CoreRoot
-@onready var inner_ring_root: Node3D = $VisualRoot/InnerRingRoot
-@onready var outer_ring_center_root: Node3D = $VisualRoot/OuterRingCenterRoot
-@onready var petal_container: Node3D = $VisualRoot/PetalContainer
-@onready var orb_light: OmniLight3D = $VisualRoot/GlowRoot/OmniLight3D
+@onready var core_root: Node3D = get_node_or_null("VisualRoot/CoreRoot") as Node3D
+@onready var inner_ring_root: Node3D = get_node_or_null("VisualRoot/InnerRingRoot") as Node3D
+@onready var outer_ring_center_root: Node3D = get_node_or_null("VisualRoot/OuterRingCenterRoot") as Node3D
+@onready var petal_container: Node3D = get_node_or_null("VisualRoot/PetalContainer") as Node3D
+@onready var orb_light: OmniLight3D = get_node_or_null("VisualRoot/GlowRoot/OmniLight3D") as OmniLight3D
 
 var _time: float = 0.0
+var _absorb_pulse_boost: float = 0.0
+var _core_absorb_scale: float = 1.0
+var _absorb_pulse_tween: Tween = null
 var _core_base_scale: Vector3 = Vector3.ONE
 var _petal_data: Array[Dictionary] = []
 var _petal_roots: Array[Node3D] = []
 
 
 func _ready() -> void:
-	_core_base_scale = core_root.scale
+	add_to_group("soul_orb_visual")
+	if core_root != null:
+		_core_base_scale = core_root.scale
 	_build_petal_data()
 
 
 func _process(delta: float) -> void:
 	_time += delta
 
-	inner_ring_root.rotate_y(inner_ring_speed * delta)
-	outer_ring_center_root.rotate_x(outer_ring_speed * delta)
-	outer_ring_center_root.rotate_z(outer_ring_speed * 0.6 * delta)
+	if inner_ring_root != null:
+		inner_ring_root.rotate_y(inner_ring_speed * delta)
+	if outer_ring_center_root != null:
+		outer_ring_center_root.rotate_x(outer_ring_speed * delta)
+		outer_ring_center_root.rotate_z(outer_ring_speed * 0.6 * delta)
 
 	var breathe_phase: float = sin(_time * core_breathe_speed)
 	var breathe_scale: float = 1.0 + (core_breathe_amplitude * breathe_phase)
-	core_root.scale = _core_base_scale * breathe_scale
+	if core_root != null:
+		core_root.scale = _core_base_scale * breathe_scale * _core_absorb_scale
 
 	var glow_phase: float = (sin(_time * glow_pulse_speed) + 1.0) * 0.5
-	orb_light.light_energy = glow_energy_base + (glow_energy_amplitude * glow_phase)
+	if orb_light != null:
+		orb_light.light_energy = glow_energy_base + (glow_energy_amplitude * glow_phase) + _absorb_pulse_boost
 
 	_update_petals(delta)
+
+
+func play_absorb_pulse() -> void:
+	if _absorb_pulse_tween != null and _absorb_pulse_tween.is_valid():
+		_absorb_pulse_tween.kill()
+	_absorb_pulse_boost = 0.0
+	_core_absorb_scale = 1.0
+	_absorb_pulse_tween = create_tween()
+	_absorb_pulse_tween.set_parallel(true)
+	_absorb_pulse_tween.tween_property(self, "_absorb_pulse_boost", 0.85, 0.18).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	_absorb_pulse_tween.tween_property(self, "_core_absorb_scale", 1.12, 0.18).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	_absorb_pulse_tween.chain().tween_property(self, "_absorb_pulse_boost", 0.0, 0.38).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_absorb_pulse_tween.parallel().tween_property(self, "_core_absorb_scale", 1.0, 0.38).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 
 
 func _build_petal_data() -> void:
 	_petal_data.clear()
 	_petal_roots.clear()
+	if petal_container == null:
+		return
 
 	var petals: Array[Node] = petal_container.get_children()
 	var active_count: int = min(petal_count, petals.size())
@@ -69,10 +93,13 @@ func _build_petal_data() -> void:
 		if not enabled:
 			continue
 
-		_petal_roots.append(petal_root)
-
+		if petal_root.get_child_count() <= 0:
+			continue
 		var petal_model: Node3D = petal_root.get_child(0) as Node3D
+		if petal_model == null:
+			continue
 		petal_model.scale = petal_scale
+		_petal_roots.append(petal_root)
 
 		var t: float = float(i) / float(max(active_count, 1))
 		var theta: float = TAU * t
@@ -119,7 +146,8 @@ func _build_petal_data() -> void:
 
 
 func _update_petals(delta: float) -> void:
-	for i in range(_petal_roots.size()):
+	var update_count: int = mini(_petal_roots.size(), _petal_data.size())
+	for i in range(update_count):
 		var petal_root: Node3D = _petal_roots[i]
 		var data: Dictionary = _petal_data[i]
 

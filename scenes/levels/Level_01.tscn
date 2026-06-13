@@ -11,8 +11,10 @@
 [ext_resource type="PackedScene" uid="uid://cvpylsb4dxhpm" path="res://scenes/environment/assets/bridge_sector_with_pylon_02.tscn" id="9_5dpfh"]
 [ext_resource type="PackedScene" uid="uid://bcw506sqv56hv" path="res://scenes/environment/assets/cloud_001.tscn" id="10_vlkw4"]
 [ext_resource type="PackedScene" uid="uid://1mmrgt43swb" path="res://scenes/levels/level_01/blocks/Landmark_Island_01.tscn" id="11_xpxa0"]
-[ext_resource type="PackedScene" uid="uid://cy6w5ig2hpebf" path="res://scenes/environment/assets/shoul_shard.tscn" id="12_shv8k"]
 [ext_resource type="PackedScene" uid="uid://bus15thti2c2s" path="res://scenes/environment/assets/Ancient_Stone_Barrier_01.tscn" id="13_xg7sb"]
+[ext_resource type="PackedScene" path="res://scenes/core/SoulShard.tscn" id="14_soul_shard"]
+[ext_resource type="PackedScene" path="res://scenes/core/ShardRewardSequenceController.tscn" id="15_sequence_controller"]
+[ext_resource type="PackedScene" path="res://scenes/ui/ShardRewardOverlay.tscn" id="16_reward_overlay"]
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_step_assist_ramp"]
 points = PackedVector3Array(-1.5, -0.02, -0.6, 1.5, -0.02, -0.6, -1.5, -0.02, 0.6, 1.5, -0.02, 0.6, -1.5, 0.32, 0.6, 1.5, 0.32, 0.6)
@@ -70,6 +72,21 @@ target_path = NodePath("../../PlayerRoot/Player")
 max_zoom_distance = 5.0
 
 [node name="LevelRuntimeRoot" type="Node3D" parent="." unique_id=385295927]
+
+[node name="ShardRewardSequenceController" parent="LevelRuntimeRoot" instance=ExtResource("15_sequence_controller")]
+overlay_path = NodePath("../../UILayer/ShardRewardOverlay")
+player_path = NodePath("../../PlayerRoot/Player")
+shard_search_root_path = NodePath("../..")
+
+[node name="UILayer" type="CanvasLayer" parent="."]
+
+[node name="ShardRewardOverlay" parent="UILayer" instance=ExtResource("16_reward_overlay")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="StepAssistRoot" type="Node3D" parent="." unique_id=1562224144]
 
@@ -212,11 +229,15 @@ transform = Transform3D(1.9696155, 0, -0.34729636, 0, 2, 0, 0.34729636, 0, 1.969
 [node name="bridge_sector_05" parent="." unique_id=877969918 instance=ExtResource("7_dwcxj")]
 transform = Transform3D(0.17364822, 0, 0.9848077, 0, 1, 0, -0.9848077, 0, 0.17364822, -44.38642, -0.48727608, 284.359)
 
-[node name="Shoul_Shard" parent="." unique_id=2126617160 instance=ExtResource("12_shv8k")]
+[node name="Shard_01" parent="." instance=ExtResource("14_soul_shard")]
 transform = Transform3D(-0.6197755, 0, -0.32538947, 0, 0.7, 0, 0.32538947, 0, -0.6197755, -25.009495, 2.3859854, 118.55172)
+shard_id = &"Shard_01"
+reward_text = "Test_1"
 
-[node name="Shoul_Shard2" parent="." unique_id=2147468501 instance=ExtResource("12_shv8k")]
+[node name="Shard_02" parent="." instance=ExtResource("14_soul_shard")]
 transform = Transform3D(-0.6977452, 0, -0.056139253, 0, 0.7, 0, 0.056139253, 0, -0.6977452, -40.980263, 3.5240073, 254.95113)
+shard_id = &"Shard_02"
+reward_text = "Test_2"
 
 [node name="Ancient_Stone_Barrier_01" parent="." unique_id=538048969 instance=ExtResource("13_xg7sb")]
 transform = Transform3D(1.2226845, 0, -0.25988963, 0, 1.25, 0, 0.25988963, 0, 1.2226845, -40.65623, 2.2720172, 264.2825)

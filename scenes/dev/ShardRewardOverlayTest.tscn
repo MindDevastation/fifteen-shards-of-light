@@ -1,0 +1,42 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/dev/shard_reward_overlay_test.gd" id="1_test_script"]
+[ext_resource type="PackedScene" path="res://scenes/ui/ShardRewardOverlay.tscn" id="2_overlay"]
+
+[node name="ShardRewardOverlayTest" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_test_script")
+
+[node name="LauncherPanel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 32.0
+offset_top = 32.0
+offset_right = 292.0
+offset_bottom = 154.0
+
+[node name="MarginContainer" type="MarginContainer" parent="LauncherPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="VBoxContainer" type="VBoxContainer" parent="LauncherPanel/MarginContainer"]
+layout_mode = 2
+
+[node name="Test1Button" type="Button" parent="LauncherPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Play Test_1"
+
+[node name="Test2Button" type="Button" parent="LauncherPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Play Test_2"
+
+[node name="ShardRewardOverlay" parent="." instance=ExtResource("2_overlay")]
+layout_mode = 1
