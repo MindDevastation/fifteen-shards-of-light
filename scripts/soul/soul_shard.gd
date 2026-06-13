@@ -29,6 +29,12 @@ const SPIRAL_BASE_RADIUS := 0.34
 const SPIRAL_ANGULAR_DRIFT := 0.16
 const PRIMARY_ARC_CAMERA_BLEND := 0.58
 const SECONDARY_ARC_CAMERA_BLEND := 0.42
+const HEART_HALO_CYCLE_SECONDS := 1.55
+const HEART_HALO_CAMERA_OFFSET := 0.03
+const HEART_HALO_BASE_ALPHA := 0.14
+const HEART_HALO_ALPHA_BOOST := 0.14
+const HEART_HALO_BASE_EMISSION := 0.42
+const HEART_HALO_EMISSION_BOOST := 0.34
 
 enum CollectionState {
 	IDLE,
@@ -46,6 +52,8 @@ var _visual_base_scale := Vector3.ONE
 var _ground_vfx_base_scale := Vector3.ONE
 var _halo_primary_base_scale := Vector3.ONE
 var _halo_inner_base_scale := Vector3.ONE
+var _halo_inner_base_position := Vector3.ZERO
+var _halo_inner_material: StandardMaterial3D
 var _core_base_scale := Vector3.ONE
 var _idle_phase := 0.0
 var _collection_completed := false
@@ -85,10 +93,12 @@ func _ready() -> void:
 	_ground_vfx_base_scale = ground_vfx_root.scale
 	_halo_primary_base_scale = halo_primary.scale
 	_halo_inner_base_scale = halo_inner.scale
+	_halo_inner_base_position = halo_inner.position
 	_core_base_scale = core_glow.scale
 	_orbit_warm_base_scale = orbit_arc_warm.scale
 	_orbit_rose_base_scale = orbit_arc_rose.scale
 	_idle_phase = _get_idle_phase()
+	_setup_heart_halo_material()
 	_setup_spiral_motes()
 	glow_light.light_energy = glow_energy_base
 
@@ -200,8 +210,7 @@ func _update_idle_presentation(delta: float) -> void:
 	var slow_pulse := sin(_idle_time * 0.82 + _idle_phase)
 	var core_pulse := sin(_idle_time * 1.35 + _idle_phase * 0.7)
 	halo_primary.scale = _halo_primary_base_scale * (1.0 + slow_pulse * aura_pulse_amplitude)
-	var heart_halo_pulse := sin(_idle_time * 1.75 + _idle_phase * 0.45)
-	halo_inner.scale = _halo_inner_base_scale * (1.0 + heart_halo_pulse * aura_pulse_amplitude * 1.55)
+	_update_heart_halo_pulse()
 	core_glow.scale = _core_base_scale * (1.0 + core_pulse * core_pulse_amplitude)
 	ground_vfx_root.scale = _ground_vfx_base_scale * (1.0 + slow_pulse * 0.025)
 	orbit_accents.rotate_y(orbit_rotation_speed * delta)
@@ -210,6 +219,46 @@ func _update_idle_presentation(delta: float) -> void:
 	orbit_arc_rose.scale = _orbit_rose_base_scale * (1.0 + sin(_idle_time * 0.47 + _idle_phase * 1.3) * 0.018)
 	_update_orbit_arc_facing()
 	_update_spiral_motes()
+
+
+func _setup_heart_halo_material() -> void:
+	_halo_inner_material = halo_inner.mesh.surface_get_material(0).duplicate() as StandardMaterial3D
+	halo_inner.material_override = _halo_inner_material
+
+
+func _update_heart_halo_pulse() -> void:
+	var cycle_position := fposmod((_idle_time + _idle_phase * 0.05) / HEART_HALO_CYCLE_SECONDS, 1.0)
+	var primary_pulse := _heartbeat_peak(cycle_position, 0.13, 0.055)
+	var secondary_pulse := _heartbeat_peak(cycle_position, 0.33, 0.065) * 0.58
+	var pulse: float = clampf(primary_pulse + secondary_pulse, 0.0, 1.0)
+
+	halo_inner.scale = _halo_inner_base_scale * (1.0 + pulse * 0.13)
+	_update_heart_halo_camera_offset()
+
+	if _halo_inner_material == null:
+		return
+
+	var pulse_alpha := HEART_HALO_BASE_ALPHA + pulse * HEART_HALO_ALPHA_BOOST
+	_halo_inner_material.albedo_color = Color(1.0, 0.9, 0.78, pulse_alpha)
+	_halo_inner_material.emission_energy_multiplier = HEART_HALO_BASE_EMISSION + pulse * HEART_HALO_EMISSION_BOOST
+
+
+func _heartbeat_peak(cycle_position: float, center: float, width: float) -> float:
+	var distance: float = abs(cycle_position - center)
+	distance = minf(distance, 1.0 - distance)
+	var normalized_distance: float = clampf(distance / width, 0.0, 1.0)
+	return 1.0 - smoothstep(0.0, 1.0, normalized_distance)
+
+
+func _update_heart_halo_camera_offset() -> void:
+	var camera := get_viewport().get_camera_3d()
+	if camera == null:
+		halo_inner.position = _halo_inner_base_position
+		return
+
+	var base_global_position := visual_root.to_global(_halo_inner_base_position)
+	var to_camera := base_global_position.direction_to(camera.global_position)
+	halo_inner.global_position = base_global_position + to_camera * HEART_HALO_CAMERA_OFFSET
 
 
 func _setup_spiral_motes() -> void:
