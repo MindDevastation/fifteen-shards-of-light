@@ -9,11 +9,11 @@ signal reward_sequence_requested(shard: Node, shard_id: StringName, reward_text:
 @export var hover_amplitude: float = 0.14
 @export var hover_speed: float = 0.95
 @export var rotation_speed: float = 0.24
-@export var glow_energy_base: float = 0.82
-@export var glow_energy_amplitude: float = 0.16
+@export var glow_energy_base: float = 0.9
+@export var glow_energy_amplitude: float = 0.12
 @export var glow_pulse_speed: float = 0.72
-@export var aura_pulse_amplitude: float = 0.035
-@export var core_pulse_amplitude: float = 0.055
+@export var aura_pulse_amplitude: float = 0.022
+@export var core_pulse_amplitude: float = 0.085
 @export var orbit_rotation_speed: float = 0.18
 @export var charge_duration: float = 0.6
 @export var charge_scale_multiplier: float = 1.16
@@ -172,17 +172,17 @@ func _update_idle_presentation(delta: float) -> void:
 
 	var glow_wave := sin(_idle_time * glow_pulse_speed + _idle_phase)
 	glow_light.light_energy = max(0.0, glow_energy_base + glow_wave * glow_energy_amplitude)
-	under_glow_light.light_energy = max(0.0, 0.32 + glow_wave * 0.05)
+	under_glow_light.light_energy = max(0.0, 0.18 + glow_wave * 0.025)
 
 	var slow_pulse := sin(_idle_time * 0.82 + _idle_phase)
 	var core_pulse := sin(_idle_time * 1.35 + _idle_phase * 0.7)
 	halo.scale = _halo_base_scale * (1.0 + slow_pulse * aura_pulse_amplitude)
-	aura_outer.scale = _aura_outer_base_scale * (1.0 + slow_pulse * aura_pulse_amplitude * 1.4)
-	aura_inner.scale = _aura_inner_base_scale * (1.0 + core_pulse * aura_pulse_amplitude)
+	aura_outer.scale = _aura_outer_base_scale * (1.0 + slow_pulse * aura_pulse_amplitude * 0.7)
+	aura_inner.scale = _aura_inner_base_scale * (1.0 + core_pulse * aura_pulse_amplitude * 1.15)
 	core_glow.scale = _core_base_scale * (1.0 + core_pulse * core_pulse_amplitude)
-	base_glow.scale = _base_glow_base_scale * (1.0 + slow_pulse * 0.04)
+	base_glow.scale = _base_glow_base_scale * (1.0 + slow_pulse * 0.025)
 	orbit_accents.rotate_y(orbit_rotation_speed * delta)
-	orbit_accents.rotation.z = sin(_idle_time * 0.5 + _idle_phase) * 0.08
+	orbit_accents.rotation.z = sin(_idle_time * 0.5 + _idle_phase) * 0.055
 
 
 func _get_idle_phase() -> float:
