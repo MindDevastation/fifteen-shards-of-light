@@ -9,8 +9,8 @@ signal reward_sequence_requested(shard: Node, shard_id: StringName, reward_text:
 @export var hover_amplitude: float = 0.14
 @export var hover_speed: float = 0.95
 @export var rotation_speed: float = 0.24
-@export var glow_energy_base: float = 0.9
-@export var glow_energy_amplitude: float = 0.12
+@export var glow_energy_base: float = 0.48
+@export var glow_energy_amplitude: float = 0.055
 @export var glow_pulse_speed: float = 0.72
 @export var aura_pulse_amplitude: float = 0.022
 @export var core_pulse_amplitude: float = 0.085
@@ -171,7 +171,7 @@ func _update_idle_presentation(delta: float) -> void:
 
 	var glow_wave := sin(_idle_time * glow_pulse_speed + _idle_phase)
 	glow_light.light_energy = max(0.0, glow_energy_base + glow_wave * glow_energy_amplitude)
-	under_glow_light.light_energy = max(0.0, 0.18 + glow_wave * 0.025)
+	under_glow_light.light_energy = max(0.0, 0.1 + glow_wave * 0.015)
 
 	var slow_pulse := sin(_idle_time * 0.82 + _idle_phase)
 	var core_pulse := sin(_idle_time * 1.35 + _idle_phase * 0.7)
