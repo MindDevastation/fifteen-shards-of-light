@@ -38,6 +38,7 @@ const HEART_HALO_BASE_ALPHA := 0.14
 const HEART_HALO_ALPHA_BOOST := 0.14
 const HEART_HALO_BASE_EMISSION := 0.42
 const HEART_HALO_EMISSION_BOOST := 0.34
+const CHARGE_TERMINAL_HOLD_SECONDS := 0.06
 
 enum CollectionState {
 	IDLE,
@@ -50,6 +51,7 @@ enum CollectionState {
 var _state := CollectionState.IDLE
 var _player_in_range := false
 var _idle_time := 0.0
+var _spiral_time := 0.0
 var _visual_base_position := Vector3.ZERO
 var _visual_base_scale := Vector3.ONE
 var _ground_vfx_base_scale := Vector3.ONE
@@ -71,6 +73,26 @@ var _spiral_brightness_offsets: Array[float] = []
 var _orbit_arc_base_scales: Array[Vector3] = []
 var _orbit_arc_base_positions: Array[Vector3] = []
 var _orbit_arc_materials: Array[StandardMaterial3D] = []
+var _charge_progress: float = 0.0
+var _charge_tween: Tween
+var _charge_burst_handed_off := false
+var _charge_hover_multiplier := 1.0
+var _charge_rotation_multiplier := 1.0
+var _charge_spiral_speed_multiplier := 1.0
+var _charge_spiral_radius_multiplier := 1.0
+var _charge_spiral_vertical_multiplier := 1.0
+var _charge_visual_scale_multiplier := 1.0
+var _charge_core_scale_multiplier := 1.0
+var _charge_crystal_halo_scale_multiplier := 1.0
+var _charge_crystal_halo_alpha_multiplier := 1.0
+var _charge_crystal_halo_emission_multiplier := 1.0
+var _charge_heart_halo_scale_multiplier := 1.0
+var _charge_heart_alpha_multiplier := 1.0
+var _charge_heart_emission_multiplier := 1.0
+var _charge_heart_pulse := 0.0
+var _charge_core_pulse_multiplier := 1.0
+var _charge_light_pulse_multiplier := 1.0
+var _charge_light_multiplier := 1.0
 
 @onready var ground_vfx_root: Node3D = $GroundVFXRoot
 @onready var visual_root: Node3D = $VisualRoot
@@ -114,10 +136,12 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	if _state != CollectionState.IDLE:
+	if _state == CollectionState.CHARGING:
+		_update_charge_presentation(delta)
 		return
 
-	_update_idle_presentation(delta)
+	if _state == CollectionState.IDLE:
+		_update_idle_presentation(delta)
 
 
 func _on_body_entered(body: Node3D) -> void:
@@ -153,18 +177,91 @@ func _begin_collection_sequence() -> void:
 	set_deferred("monitorable", false)
 	collision_shape.set_deferred("disabled", true)
 
-	var charge_tween := create_tween()
-	charge_tween.set_parallel(true)
-	charge_tween.tween_property(visual_root, "scale", _visual_base_scale * charge_scale_multiplier, charge_duration * 0.55).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	charge_tween.tween_property(glow_light, "light_energy", glow_energy_base * charge_glow_multiplier, charge_duration * 0.55).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	charge_tween.chain().tween_property(visual_root, "scale", _visual_base_scale * 0.92, charge_duration * 0.45).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	await charge_tween.finished
+	_start_charge_anticipation()
 
+
+func _start_charge_anticipation() -> void:
+	_kill_charge_tween()
+	_charge_burst_handed_off = false
+	_set_charge_progress(0.0)
+	_charge_tween = create_tween()
+	_charge_tween.tween_method(Callable(self, "_set_charge_progress"), 0.0, 1.0, charge_duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_charge_tween.tween_interval(CHARGE_TERMINAL_HOLD_SECONDS)
+	_charge_tween.finished.connect(_on_charge_finished)
+
+
+func _kill_charge_tween() -> void:
+	if _charge_tween != null and _charge_tween.is_valid():
+		_charge_tween.kill()
+
+	_charge_tween = null
+
+
+func _set_charge_progress(value: float) -> void:
+	_charge_progress = clampf(value, 0.0, 1.0)
+	_apply_charge_visuals(_charge_progress)
+
+
+func _apply_charge_visuals(progress: float) -> void:
+	var settle_progress := _remap_clamped(progress, 0.0, 0.15)
+	var gather_progress := _remap_clamped(progress, 0.15, 0.70)
+	var heart_progress := _remap_clamped(progress, 0.70, 0.88)
+	var compression_progress := _remap_clamped(progress, 0.88, 1.0)
+	var settle_eased := smoothstep(0.0, 1.0, settle_progress)
+	var gather_eased := smoothstep(0.0, 1.0, gather_progress)
+	var heart_wave := sin(heart_progress * PI)
+	heart_wave = smoothstep(0.0, 1.0, heart_wave)
+	var compression_eased := smoothstep(0.0, 1.0, compression_progress)
+
+	_charge_hover_multiplier = lerpf(1.0, 0.32, settle_eased)
+	_charge_rotation_multiplier = lerpf(1.0, 0.75, settle_eased)
+	_charge_spiral_speed_multiplier = lerpf(1.0, 2.0, gather_eased)
+	_charge_spiral_radius_multiplier = lerpf(1.0, 0.34, gather_eased)
+	_charge_spiral_vertical_multiplier = lerpf(1.0, 0.55, gather_eased)
+	_charge_visual_scale_multiplier = lerpf(1.0, 1.05, gather_eased)
+	_charge_core_scale_multiplier = lerpf(1.0, 1.07, gather_eased)
+	_charge_crystal_halo_scale_multiplier = lerpf(1.0, 0.95, gather_eased)
+	_charge_crystal_halo_alpha_multiplier = 1.0
+	_charge_crystal_halo_emission_multiplier = 1.0
+	_charge_heart_halo_scale_multiplier = lerpf(1.0, 1.04, gather_eased)
+	_charge_heart_alpha_multiplier = lerpf(1.0, 1.18, gather_eased)
+	_charge_heart_emission_multiplier = lerpf(1.0, 1.18, gather_eased)
+	_charge_heart_pulse = heart_wave
+	_charge_core_pulse_multiplier = 1.0 + heart_wave * 0.18
+	_charge_light_pulse_multiplier = 1.0 + heart_wave * 0.1
+	_charge_light_multiplier = lerpf(1.0, 1.18, gather_eased)
+
+	_charge_spiral_speed_multiplier = lerpf(_charge_spiral_speed_multiplier, 1.7, compression_eased)
+	_charge_spiral_radius_multiplier = lerpf(_charge_spiral_radius_multiplier, 0.18, compression_eased)
+	_charge_spiral_vertical_multiplier = lerpf(_charge_spiral_vertical_multiplier, 0.32, compression_eased)
+	_charge_visual_scale_multiplier = lerpf(_charge_visual_scale_multiplier, 0.94, compression_eased)
+	_charge_core_scale_multiplier = lerpf(_charge_core_scale_multiplier, 1.08, compression_eased)
+	_charge_crystal_halo_scale_multiplier = lerpf(_charge_crystal_halo_scale_multiplier, 0.92, compression_eased)
+	_charge_crystal_halo_alpha_multiplier = lerpf(1.0, 0.82, compression_eased)
+	_charge_crystal_halo_emission_multiplier = lerpf(1.0, 0.82, compression_eased)
+	_charge_light_multiplier = lerpf(_charge_light_multiplier, 1.12, compression_eased)
+
+	visual_root.scale = _visual_base_scale * _charge_visual_scale_multiplier
+	glow_light.light_energy = glow_energy_base * _charge_light_multiplier
+
+
+func _on_charge_finished() -> void:
+	_charge_tween = null
 	if _state != CollectionState.CHARGING:
 		return
+	if _charge_burst_handed_off:
+		return
 
+	_charge_burst_handed_off = true
 	_play_world_burst()
 	_request_or_complete_collection()
+
+
+func _remap_clamped(value: float, input_min: float, input_max: float) -> float:
+	if is_equal_approx(input_min, input_max):
+		return 1.0
+
+	return clampf((value - input_min) / (input_max - input_min), 0.0, 1.0)
 
 
 func _play_world_burst() -> void:
@@ -209,6 +306,7 @@ func complete_collection_sequence() -> void:
 
 func _update_idle_presentation(delta: float) -> void:
 	_idle_time += delta
+	_spiral_time += delta
 	var wave_time := _idle_time * hover_speed + _idle_phase
 	visual_root.position = _visual_base_position + Vector3.UP * (sin(wave_time) * hover_amplitude)
 	visual_root.rotate_y(rotation_speed * delta)
@@ -229,6 +327,32 @@ func _update_idle_presentation(delta: float) -> void:
 	_update_spiral_motes()
 
 
+func _update_charge_presentation(delta: float) -> void:
+	_idle_time += delta
+	_spiral_time += delta * _charge_spiral_speed_multiplier
+	var wave_time := _idle_time * hover_speed + _idle_phase
+	visual_root.position = _visual_base_position + Vector3.UP * (sin(wave_time) * hover_amplitude * _charge_hover_multiplier)
+	visual_root.rotate_y(rotation_speed * _charge_rotation_multiplier * delta)
+	visual_root.scale = _visual_base_scale * _charge_visual_scale_multiplier
+
+	var glow_wave := sin(_idle_time * glow_pulse_speed + _idle_phase)
+	glow_light.light_energy = max(0.0, (glow_energy_base + glow_wave * glow_energy_amplitude) * _charge_light_multiplier * _charge_light_pulse_multiplier)
+	under_glow_light.light_energy = max(0.0, (0.1 + glow_wave * 0.015) * _charge_light_multiplier * _charge_light_pulse_multiplier)
+
+	var slow_pulse := sin(_idle_time * 0.82 + _idle_phase)
+	var core_pulse := sin(_idle_time * 1.35 + _idle_phase * 0.7)
+	_update_crystal_halo(slow_pulse)
+	crystal_halo.scale *= _charge_crystal_halo_scale_multiplier
+	_apply_charge_crystal_halo_softening()
+	_update_charge_heart_halo()
+	core_glow.scale = _core_base_scale * (1.0 + core_pulse * core_pulse_amplitude) * _charge_core_scale_multiplier * _charge_core_pulse_multiplier
+	ground_vfx_root.scale = _ground_vfx_base_scale * (1.0 + slow_pulse * 0.025)
+	orbit_accents.rotate_y(orbit_rotation_speed * _charge_rotation_multiplier * delta)
+	orbit_accents.rotation.z = sin(_idle_time * 0.5 + _idle_phase) * 0.055 * _charge_rotation_multiplier
+	_update_orbit_arcs()
+	_update_spiral_motes()
+
+
 func _setup_crystal_halo_material() -> void:
 	_crystal_halo_material = crystal_halo.mesh.surface_get_material(0).duplicate() as StandardMaterial3D
 	crystal_halo.material_override = _crystal_halo_material
@@ -237,6 +361,30 @@ func _setup_crystal_halo_material() -> void:
 func _setup_heart_halo_material() -> void:
 	_heart_pulse_halo_material = heart_pulse_halo.mesh.surface_get_material(0).duplicate() as StandardMaterial3D
 	heart_pulse_halo.material_override = _heart_pulse_halo_material
+
+
+func _update_charge_heart_halo() -> void:
+	var heart_scale_multiplier := lerpf(_charge_heart_halo_scale_multiplier, 1.12, _charge_heart_pulse)
+	heart_pulse_halo.scale = _heart_pulse_halo_base_scale * heart_scale_multiplier
+	_update_heart_halo_camera_offset()
+
+	if _heart_pulse_halo_material == null:
+		return
+
+	var alpha_multiplier := _charge_heart_alpha_multiplier * lerpf(1.0, 1.5, _charge_heart_pulse)
+	var emission_multiplier := _charge_heart_emission_multiplier * lerpf(1.0, 1.5, _charge_heart_pulse)
+	_heart_pulse_halo_material.albedo_color = Color(1.0, 0.9, 0.78, clampf(HEART_HALO_BASE_ALPHA * alpha_multiplier, 0.0, 0.36))
+	_heart_pulse_halo_material.emission_energy_multiplier = HEART_HALO_BASE_EMISSION * emission_multiplier
+
+
+func _apply_charge_crystal_halo_softening() -> void:
+	if _crystal_halo_material == null:
+		return
+
+	var halo_color := _crystal_halo_material.albedo_color
+	halo_color.a = clampf(halo_color.a * _charge_crystal_halo_alpha_multiplier, 0.0, 0.13)
+	_crystal_halo_material.albedo_color = halo_color
+	_crystal_halo_material.emission_energy_multiplier *= _charge_crystal_halo_emission_multiplier
 
 
 
@@ -327,12 +475,14 @@ func _update_spiral_motes() -> void:
 	for index in _spiral_motes.size():
 		var mote := _spiral_motes[index]
 		var material := _spiral_materials[index]
-		var cycle_progress := fposmod((_idle_time / SPIRAL_CYCLE_SECONDS) + _spiral_phase_offsets[index], 1.0)
+		var cycle_progress := fposmod((_spiral_time / SPIRAL_CYCLE_SECONDS) + _spiral_phase_offsets[index], 1.0)
 		var eased_rise := smoothstep(0.0, 1.0, cycle_progress)
 		var organic_wobble := sin(_idle_time * 0.74 + float(index) * 1.91) * 0.018
-		var radius := SPIRAL_BASE_RADIUS + _spiral_radius_offsets[index] + organic_wobble
-		var angle := cycle_progress * TAU * SPIRAL_TURNS + _idle_phase + float(index) * 0.37 + _idle_time * SPIRAL_ANGULAR_DRIFT
-		var height := SPIRAL_BOTTOM + eased_rise * SPIRAL_HEIGHT
+		var radius := (SPIRAL_BASE_RADIUS + _spiral_radius_offsets[index] + organic_wobble) * _charge_spiral_radius_multiplier
+		var angle := cycle_progress * TAU * SPIRAL_TURNS + _idle_phase + float(index) * 0.37 + _spiral_time * SPIRAL_ANGULAR_DRIFT
+		var vertical_height := SPIRAL_HEIGHT * _charge_spiral_vertical_multiplier
+		var vertical_offset := (SPIRAL_HEIGHT - vertical_height) * 0.5
+		var height := SPIRAL_BOTTOM + vertical_offset + eased_rise * vertical_height
 
 		mote.position = Vector3(cos(angle) * radius, height, sin(angle) * radius)
 		mote.scale = Vector3.ONE * _spiral_scale_offsets[index] * (0.86 + sin(_idle_time * 1.1 + float(index)) * 0.08)
