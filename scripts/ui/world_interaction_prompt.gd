@@ -150,7 +150,7 @@ func _get_anchor_position() -> Vector3:
 func _hide_after_animation() -> void:
 	if not _requested_visible:
 		visible = false
-		animation_root.modulate = Color.WHITE
+		animation_root.modulate = Color(1.0, 1.0, 1.0, 0.0)
 		animation_root.position = Vector2.ZERO
 
 

@@ -15,7 +15,7 @@ signal reward_sequence_requested(shard: Node, shard_id: StringName, reward_text:
 @export var aura_pulse_amplitude: float = 0.022
 @export var core_pulse_amplitude: float = 0.16
 @export var orbit_rotation_speed: float = 0.18
-@export var charge_duration: float = 0.6
+@export var charge_duration: float = 1.2
 @export var legacy_completion_delay: float = 0.9
 
 const SPIRAL_MOTE_COUNT := 15

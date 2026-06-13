@@ -159,7 +159,7 @@ Validation was limited to automated/static/headless checks in this environment. 
 Charge progress/tween:
 
 - `_charge_progress`: `0.0` to `1.0`
-- `charge_duration`: existing export, still `0.6`
+- `charge_duration`: existing export, now `1.2` after Video Review Round 1 follow-up
 - `CHARGE_TERMINAL_HOLD_SECONDS`: `0.06`
 
 Phase A:
@@ -307,7 +307,7 @@ Commits:
 
 GitHub head SHA before corrective edits: `2f8e276ec140034e5973fc48f10ec02063d47677`
 
-GitHub head SHA after corrective edits: `NOT VERIFIED` - push/fetch is blocked in this environment.
+GitHub head SHA after PR #74 corrective edits: `60e04ef240960769ce4c496ca63e33ee8db30355`
 
 Push proof: `NOT VERIFIED` - GitHub push/fetch is blocked in this environment.
 
@@ -343,7 +343,9 @@ PR URL: https://github.com/MindDevastation/fifteen-shards-of-light/pull/74
 Base branch: main
 Actual head branch: feature/perform-preflight-for-soulshard-charge-anticipation
 Previous GitHub head SHA observed before corrective edits: 2f8e276ec140034e5973fc48f10ec02063d47677
-Actual GitHub head SHA after corrective edits: NOT VERIFIED - Git network access is blocked in this environment (`CONNECT tunnel failed, response 403`), so the corrective commit could not be pushed or re-read from GitHub here.
+PR #74: MERGED
+Final head SHA: 60e04ef240960769ce4c496ca63e33ee8db30355
+Merge commit: d6bb134aad3630aff33cdb045214c770ead7bc52
 
 These were local Codex development commits. The GitHub PR may contain a squashed or rewritten commit history. GitHub PR metadata is the authoritative final record once push/update is available.
 
@@ -371,4 +373,50 @@ Corrective scope confirmation:
 - Public interaction API unchanged.
 - Existing signals unchanged.
 - No new particles, lights, assets, tweens, framework, autoload, or singleton added.
-- `charge_duration`, phase ranges, gathering targets, pulse strength, compression targets, and terminal hold unchanged.
+- Phase ranges, gathering targets, pulse strength, compression targets, and terminal hold unchanged.
+- `charge_duration` later changed from `0.6` to `1.2` in the new corrective follow-up branch after Video Review Round 1.
+
+
+## Video Review Round 1 and Follow-up Fixes
+
+Reviewed video: `2026-06-14 00-36-34.mp4`
+
+Manual review results:
+
+- Idle preservation: PASS
+- Gathering inward: PASS
+- Heart response at `0.6`: NOT READABLE
+- Compression at `0.6`: NOT READABLE
+- Prompt reappearance after confirm/hide: FAIL
+
+Follow-up changes in new corrective branch:
+
+- Changed `charge_duration` from `0.6` to `1.2` in `scripts/soul/soul_shard.gd`.
+- Did not change phase ranges, visual multipliers, terminal hold, stored tween lifecycle, or burst handoff.
+- Fixed `WorldInteractionPrompt` terminal hidden state by keeping `animation_root.modulate.a` at `0.0` after hide/confirm completion.
+- Confirmed by code review that `show_prompt()` still sets `_requested_visible = true`, can start from alpha `0.0`, and can show again for a future valid interaction.
+
+PR #74 metadata:
+
+- PR #74: MERGED
+- Final head SHA: `60e04ef240960769ce4c496ca63e33ee8db30355`
+- Merge commit: `d6bb134aad3630aff33cdb045214c770ead7bc52`
+
+New corrective PR metadata:
+
+- Branch: `fix/charge-anticipation-timing-and-prompt-hide`
+- Actual base SHA used in this environment: `d6bb134aad3630aff33cdb045214c770ead7bc52`
+- Actual GitHub base SHA: NOT VERIFIED - no `origin` remote is configured in this checkout, so live GitHub `main` could not be fetched.
+- Commit 1: `18ae47bd5693c4bca57e04dce084c3c9cf312a61` - `Tune SoulShard charge timing for visual readability`
+- Commit 2: `02049b433c750ff947a729cd1b8bf6a93e23720a` - `Fix interaction prompt terminal hidden state`
+- Documentation commit: pending at the time this section was written; final commit SHA is recorded in the handoff after commit creation.
+- Actual head SHA before documentation commit: `02049b433c750ff947a729cd1b8bf6a93e23720a`
+- New PR number: pending until PR creation.
+- New PR URL: pending until PR creation.
+
+Manual verification still required:
+
+- Record a new frontal/three-quarter clip and a side-angle clip with the full `1.2` second charge.
+- Verify one readable heart response and restrained compression after the timing change.
+- Verify the prompt stays hidden after confirm/hide and does not cover the reward overlay.
+- Verify two sequential SoulShards so the second prompt, second charge, single burst handoff, and repeated reward flow are covered.
