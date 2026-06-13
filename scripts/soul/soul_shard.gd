@@ -27,8 +27,11 @@ const SPIRAL_CYCLE_SECONDS := 5.8
 const SPIRAL_TURNS := 1.32
 const SPIRAL_BASE_RADIUS := 0.34
 const SPIRAL_ANGULAR_DRIFT := 0.16
-const PRIMARY_ARC_CAMERA_BLEND := 0.58
-const SECONDARY_ARC_CAMERA_BLEND := 0.42
+const CRYSTAL_HALO_CAMERA_OFFSET := 0.045
+const CRYSTAL_HALO_BASE_ALPHA := 0.1
+const CRYSTAL_HALO_ALPHA_AMPLITUDE := 0.025
+const CRYSTAL_HALO_BASE_EMISSION := 0.3
+const CRYSTAL_HALO_EMISSION_AMPLITUDE := 0.05
 const HEART_HALO_CYCLE_SECONDS := 1.55
 const HEART_HALO_CAMERA_OFFSET := 0.03
 const HEART_HALO_BASE_ALPHA := 0.14
@@ -50,10 +53,12 @@ var _idle_time := 0.0
 var _visual_base_position := Vector3.ZERO
 var _visual_base_scale := Vector3.ONE
 var _ground_vfx_base_scale := Vector3.ONE
-var _halo_primary_base_scale := Vector3.ONE
-var _halo_inner_base_scale := Vector3.ONE
-var _halo_inner_base_position := Vector3.ZERO
-var _halo_inner_material: StandardMaterial3D
+var _crystal_halo_base_scale := Vector3.ONE
+var _crystal_halo_base_position := Vector3.ZERO
+var _crystal_halo_material: StandardMaterial3D
+var _heart_pulse_halo_base_scale := Vector3.ONE
+var _heart_pulse_halo_base_position := Vector3.ZERO
+var _heart_pulse_halo_material: StandardMaterial3D
 var _core_base_scale := Vector3.ONE
 var _idle_phase := 0.0
 var _collection_completed := false
@@ -63,19 +68,21 @@ var _spiral_phase_offsets: Array[float] = []
 var _spiral_radius_offsets: Array[float] = []
 var _spiral_scale_offsets: Array[float] = []
 var _spiral_brightness_offsets: Array[float] = []
-var _orbit_warm_base_scale := Vector3.ONE
-var _orbit_rose_base_scale := Vector3.ONE
+var _orbit_arc_base_scales: Array[Vector3] = []
+var _orbit_arc_base_positions: Array[Vector3] = []
+var _orbit_arc_materials: Array[StandardMaterial3D] = []
 
 @onready var ground_vfx_root: Node3D = $GroundVFXRoot
 @onready var visual_root: Node3D = $VisualRoot
 @onready var glow_light: OmniLight3D = $VisualRoot/GlowLight
 @onready var under_glow_light: OmniLight3D = $GroundVFXRoot/UnderGlowLight
-@onready var halo_primary: MeshInstance3D = $VisualRoot/HaloPrimary
-@onready var halo_inner: MeshInstance3D = $VisualRoot/HaloInner
+@onready var crystal_halo: MeshInstance3D = $VisualRoot/CrystalHalo
+@onready var heart_pulse_halo: MeshInstance3D = $VisualRoot/HeartPulseHalo
 @onready var core_glow: MeshInstance3D = $VisualRoot/CoreGlow
 @onready var orbit_accents: Node3D = $VisualRoot/OrbitAccents
-@onready var orbit_arc_warm: MeshInstance3D = $VisualRoot/OrbitAccents/OrbitArcWarm
-@onready var orbit_arc_rose: MeshInstance3D = $VisualRoot/OrbitAccents/OrbitArcRose
+@onready var primary_arc: MeshInstance3D = $VisualRoot/OrbitAccents/PrimaryArc
+@onready var secondary_arc: MeshInstance3D = $VisualRoot/OrbitAccents/SecondaryArc
+@onready var tertiary_arc: MeshInstance3D = $VisualRoot/OrbitAccents/TertiaryArc
 @onready var spiral_motes: Node3D = $VisualRoot/SpiralMotes
 @onready var collision_shape: CollisionShape3D = $CollisionShape3D
 @onready var prompt_label: Label3D = $InteractPrompt
@@ -91,12 +98,13 @@ func _ready() -> void:
 	_visual_base_position = visual_root.position
 	_visual_base_scale = visual_root.scale
 	_ground_vfx_base_scale = ground_vfx_root.scale
-	_halo_primary_base_scale = halo_primary.scale
-	_halo_inner_base_scale = halo_inner.scale
-	_halo_inner_base_position = halo_inner.position
+	_crystal_halo_base_scale = crystal_halo.scale
+	_crystal_halo_base_position = crystal_halo.position
+	_heart_pulse_halo_base_scale = heart_pulse_halo.scale
+	_heart_pulse_halo_base_position = heart_pulse_halo.position
 	_core_base_scale = core_glow.scale
-	_orbit_warm_base_scale = orbit_arc_warm.scale
-	_orbit_rose_base_scale = orbit_arc_rose.scale
+	_setup_crystal_halo_material()
+	_setup_orbit_arc_materials()
 	_idle_phase = _get_idle_phase()
 	_setup_heart_halo_material()
 	_setup_spiral_motes()
@@ -209,21 +217,48 @@ func _update_idle_presentation(delta: float) -> void:
 
 	var slow_pulse := sin(_idle_time * 0.82 + _idle_phase)
 	var core_pulse := sin(_idle_time * 1.35 + _idle_phase * 0.7)
-	halo_primary.scale = _halo_primary_base_scale * (1.0 + slow_pulse * aura_pulse_amplitude)
+	_update_crystal_halo(slow_pulse)
 	_update_heart_halo_pulse()
 	core_glow.scale = _core_base_scale * (1.0 + core_pulse * core_pulse_amplitude)
 	ground_vfx_root.scale = _ground_vfx_base_scale * (1.0 + slow_pulse * 0.025)
 	orbit_accents.rotate_y(orbit_rotation_speed * delta)
 	orbit_accents.rotation.z = sin(_idle_time * 0.5 + _idle_phase) * 0.055
-	orbit_arc_warm.scale = _orbit_warm_base_scale * (1.0 + sin(_idle_time * 0.62 + _idle_phase) * 0.025)
-	orbit_arc_rose.scale = _orbit_rose_base_scale * (1.0 + sin(_idle_time * 0.47 + _idle_phase * 1.3) * 0.018)
-	_update_orbit_arc_facing()
+	_update_orbit_arcs()
 	_update_spiral_motes()
 
 
+func _setup_crystal_halo_material() -> void:
+	_crystal_halo_material = crystal_halo.mesh.surface_get_material(0).duplicate() as StandardMaterial3D
+	crystal_halo.material_override = _crystal_halo_material
+
+
 func _setup_heart_halo_material() -> void:
-	_halo_inner_material = halo_inner.mesh.surface_get_material(0).duplicate() as StandardMaterial3D
-	halo_inner.material_override = _halo_inner_material
+	_heart_pulse_halo_material = heart_pulse_halo.mesh.surface_get_material(0).duplicate() as StandardMaterial3D
+	heart_pulse_halo.material_override = _heart_pulse_halo_material
+
+
+
+func _update_crystal_halo(slow_pulse: float) -> void:
+	crystal_halo.scale = _crystal_halo_base_scale * (1.0 + slow_pulse * aura_pulse_amplitude)
+	_update_crystal_halo_camera_offset()
+
+	if _crystal_halo_material == null:
+		return
+
+	var halo_alpha: float = CRYSTAL_HALO_BASE_ALPHA + slow_pulse * CRYSTAL_HALO_ALPHA_AMPLITUDE
+	_crystal_halo_material.albedo_color = Color(1.0, 0.72, 0.55, clampf(halo_alpha, 0.075, 0.13))
+	_crystal_halo_material.emission_energy_multiplier = CRYSTAL_HALO_BASE_EMISSION + slow_pulse * CRYSTAL_HALO_EMISSION_AMPLITUDE
+
+
+func _update_crystal_halo_camera_offset() -> void:
+	var camera := get_viewport().get_camera_3d()
+	if camera == null:
+		crystal_halo.position = _crystal_halo_base_position
+		return
+
+	var base_global_position := visual_root.to_global(_crystal_halo_base_position)
+	var to_camera := base_global_position.direction_to(camera.global_position)
+	crystal_halo.global_position = base_global_position - to_camera * CRYSTAL_HALO_CAMERA_OFFSET
 
 
 func _update_heart_halo_pulse() -> void:
@@ -232,15 +267,15 @@ func _update_heart_halo_pulse() -> void:
 	var secondary_pulse := _heartbeat_peak(cycle_position, 0.33, 0.065) * 0.58
 	var pulse: float = clampf(primary_pulse + secondary_pulse, 0.0, 1.0)
 
-	halo_inner.scale = _halo_inner_base_scale * (1.0 + pulse * 0.13)
+	heart_pulse_halo.scale = _heart_pulse_halo_base_scale * (1.0 + pulse * 0.13)
 	_update_heart_halo_camera_offset()
 
-	if _halo_inner_material == null:
+	if _heart_pulse_halo_material == null:
 		return
 
 	var pulse_alpha := HEART_HALO_BASE_ALPHA + pulse * HEART_HALO_ALPHA_BOOST
-	_halo_inner_material.albedo_color = Color(1.0, 0.9, 0.78, pulse_alpha)
-	_halo_inner_material.emission_energy_multiplier = HEART_HALO_BASE_EMISSION + pulse * HEART_HALO_EMISSION_BOOST
+	_heart_pulse_halo_material.albedo_color = Color(1.0, 0.9, 0.78, pulse_alpha)
+	_heart_pulse_halo_material.emission_energy_multiplier = HEART_HALO_BASE_EMISSION + pulse * HEART_HALO_EMISSION_BOOST
 
 
 func _heartbeat_peak(cycle_position: float, center: float, width: float) -> float:
@@ -253,12 +288,12 @@ func _heartbeat_peak(cycle_position: float, center: float, width: float) -> floa
 func _update_heart_halo_camera_offset() -> void:
 	var camera := get_viewport().get_camera_3d()
 	if camera == null:
-		halo_inner.position = _halo_inner_base_position
+		heart_pulse_halo.position = _heart_pulse_halo_base_position
 		return
 
-	var base_global_position := visual_root.to_global(_halo_inner_base_position)
+	var base_global_position := visual_root.to_global(_heart_pulse_halo_base_position)
 	var to_camera := base_global_position.direction_to(camera.global_position)
-	halo_inner.global_position = base_global_position + to_camera * HEART_HALO_CAMERA_OFFSET
+	heart_pulse_halo.global_position = base_global_position + to_camera * HEART_HALO_CAMERA_OFFSET
 
 
 func _setup_spiral_motes() -> void:
@@ -307,29 +342,70 @@ func _update_spiral_motes() -> void:
 		material.emission_energy_multiplier = 0.86 + alpha * 0.68
 
 
-func _update_orbit_arc_facing() -> void:
+func _setup_orbit_arc_materials() -> void:
+	_orbit_arc_base_scales = [primary_arc.scale, secondary_arc.scale, tertiary_arc.scale]
+	_orbit_arc_base_positions = [primary_arc.position, secondary_arc.position, tertiary_arc.position]
+	_orbit_arc_materials.clear()
+	for arc in [primary_arc, secondary_arc, tertiary_arc]:
+		var material := arc.mesh.surface_get_material(0).duplicate() as StandardMaterial3D
+		arc.material_override = material
+		_orbit_arc_materials.append(material)
+
+
+func _update_orbit_arcs() -> void:
+	_update_orbit_arc(primary_arc, 0, 0.5, 1.45, 0.65, 1.0, 0.82, 1.62, 0.24, 0.025, _idle_time * 0.22)
+	_update_orbit_arc(secondary_arc, 1, 0.42, 1.08, 0.58, 1.25, 0.46, 0.42, -0.18, 0.018, _idle_time * -0.16 + 0.9)
+	_update_orbit_arc(tertiary_arc, 2, 0.56, 0.78, 0.66, 1.4, 0.28, 0.28, 0.14, 0.014, _idle_time * 0.11 + 1.8)
+
+
+func _update_orbit_arc(
+	arc: MeshInstance3D,
+	index: int,
+	fade_in_seconds: float,
+	visible_seconds: float,
+	fade_out_seconds: float,
+	rest_seconds: float,
+	peak_alpha: float,
+	peak_emission: float,
+	motion_speed: float,
+	scale_amplitude: float,
+	roll: float
+) -> void:
+	var cycle_duration := fade_in_seconds + visible_seconds + fade_out_seconds + rest_seconds
+	var phase_offset := float(index) * 0.37 + _idle_phase * (0.03 + float(index) * 0.01)
+	var cycle_time := fposmod(_idle_time + phase_offset, cycle_duration)
+	var envelope := 0.0
+
+	if cycle_time < fade_in_seconds:
+		envelope = smoothstep(0.0, 1.0, cycle_time / fade_in_seconds)
+	elif cycle_time < fade_in_seconds + visible_seconds:
+		envelope = 1.0
+	elif cycle_time < fade_in_seconds + visible_seconds + fade_out_seconds:
+		var fade_out_progress := (cycle_time - fade_in_seconds - visible_seconds) / fade_out_seconds
+		envelope = 1.0 - smoothstep(0.0, 1.0, fade_out_progress)
+
+	var gentle_motion := sin(_idle_time * (0.55 + abs(motion_speed)) + float(index) * 1.7)
+	arc.position = _orbit_arc_base_positions[index] + Vector3(cos(_idle_time * motion_speed + float(index)) * 0.012, gentle_motion * 0.012, sin(_idle_time * motion_speed + float(index)) * 0.01) * envelope
+	arc.scale = _orbit_arc_base_scales[index] * (1.0 + gentle_motion * scale_amplitude * envelope)
+	_set_arc_camera_facing(arc, roll + gentle_motion * 0.08 * envelope)
+
+	var material := _orbit_arc_materials[index]
+	var arc_color := material.albedo_color
+	arc_color.a = peak_alpha * envelope
+	material.albedo_color = arc_color
+	material.emission_energy_multiplier = peak_emission * envelope
+
+
+func _set_arc_camera_facing(arc: MeshInstance3D, roll: float) -> void:
 	var camera := get_viewport().get_camera_3d()
 	if camera == null:
 		return
 
-	_blend_arc_toward_camera(orbit_arc_warm, PRIMARY_ARC_CAMERA_BLEND, _idle_time * 0.24)
-	_blend_arc_toward_camera(orbit_arc_rose, SECONDARY_ARC_CAMERA_BLEND, -_idle_time * 0.15 + 0.8)
-
-
-func _blend_arc_toward_camera(arc: MeshInstance3D, blend: float, roll: float) -> void:
-	var camera := get_viewport().get_camera_3d()
-	var to_camera := arc.global_position.direction_to(camera.global_position)
-	var current_forward := -arc.global_transform.basis.z.normalized()
-	var target_forward := current_forward.slerp(to_camera, blend).normalized()
-	var up_hint := Vector3.UP
-	if abs(target_forward.dot(up_hint)) > 0.92:
-		up_hint = camera.global_transform.basis.x.normalized()
-
-	var right := up_hint.cross(target_forward).normalized()
-	var up := target_forward.cross(right).normalized()
-	var faced_basis := Basis(right, up, -target_forward).rotated(target_forward, roll).orthonormalized()
-	arc.global_transform.basis = faced_basis.scaled(arc.scale)
-
+	var to_camera := arc.global_position.direction_to(camera.global_position).normalized()
+	var up_hint := camera.global_transform.basis.y.normalized()
+	var right := up_hint.cross(to_camera).normalized()
+	var up := to_camera.cross(right).normalized()
+	arc.global_transform.basis = Basis(right, up, -to_camera).rotated(to_camera, roll).orthonormalized().scaled(arc.scale)
 
 func _get_idle_phase() -> float:
 	var phase_seed: int = abs(int(hash(str(get_path())))) % 10000
