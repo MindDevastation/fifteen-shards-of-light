@@ -33,22 +33,20 @@ var _player_in_range := false
 var _idle_time := 0.0
 var _visual_base_position := Vector3.ZERO
 var _visual_base_scale := Vector3.ONE
-var _halo_base_scale := Vector3.ONE
-var _aura_outer_base_scale := Vector3.ONE
-var _aura_inner_base_scale := Vector3.ONE
+var _ground_vfx_base_scale := Vector3.ONE
+var _halo_primary_base_scale := Vector3.ONE
+var _halo_inner_base_scale := Vector3.ONE
 var _core_base_scale := Vector3.ONE
-var _base_glow_base_scale := Vector3.ONE
 var _idle_phase := 0.0
 var _collection_completed := false
 
+@onready var ground_vfx_root: Node3D = $GroundVFXRoot
 @onready var visual_root: Node3D = $VisualRoot
 @onready var glow_light: OmniLight3D = $VisualRoot/GlowLight
-@onready var under_glow_light: OmniLight3D = $VisualRoot/UnderGlowLight
-@onready var halo: MeshInstance3D = $VisualRoot/Halo
-@onready var aura_outer: MeshInstance3D = $VisualRoot/AuraOuter
-@onready var aura_inner: MeshInstance3D = $VisualRoot/AuraInner
+@onready var under_glow_light: OmniLight3D = $GroundVFXRoot/UnderGlowLight
+@onready var halo_primary: MeshInstance3D = $VisualRoot/HaloPrimary
+@onready var halo_inner: MeshInstance3D = $VisualRoot/HaloInner
 @onready var core_glow: MeshInstance3D = $VisualRoot/CoreGlow
-@onready var base_glow: MeshInstance3D = $VisualRoot/BaseGlow
 @onready var orbit_accents: Node3D = $VisualRoot/OrbitAccents
 @onready var collision_shape: CollisionShape3D = $CollisionShape3D
 @onready var prompt_label: Label3D = $InteractPrompt
@@ -63,11 +61,10 @@ func _ready() -> void:
 	collection_burst.emitting = false
 	_visual_base_position = visual_root.position
 	_visual_base_scale = visual_root.scale
-	_halo_base_scale = halo.scale
-	_aura_outer_base_scale = aura_outer.scale
-	_aura_inner_base_scale = aura_inner.scale
+	_ground_vfx_base_scale = ground_vfx_root.scale
+	_halo_primary_base_scale = halo_primary.scale
+	_halo_inner_base_scale = halo_inner.scale
 	_core_base_scale = core_glow.scale
-	_base_glow_base_scale = base_glow.scale
 	_idle_phase = _get_idle_phase()
 	glow_light.light_energy = glow_energy_base
 
@@ -129,6 +126,7 @@ func _begin_collection_sequence() -> void:
 func _play_world_burst() -> void:
 	_state = CollectionState.BURSTING
 	visual_root.visible = false
+	ground_vfx_root.visible = false
 	collection_burst.global_position = global_position
 	collection_burst.restart()
 	collection_burst.emitting = true
@@ -157,6 +155,7 @@ func complete_collection_sequence() -> void:
 	_player_in_range = false
 	prompt_label.visible = false
 	visual_root.visible = false
+	ground_vfx_root.visible = false
 	collected.emit()
 	hide()
 	set_deferred("monitoring", false)
@@ -176,11 +175,10 @@ func _update_idle_presentation(delta: float) -> void:
 
 	var slow_pulse := sin(_idle_time * 0.82 + _idle_phase)
 	var core_pulse := sin(_idle_time * 1.35 + _idle_phase * 0.7)
-	halo.scale = _halo_base_scale * (1.0 + slow_pulse * aura_pulse_amplitude)
-	aura_outer.scale = _aura_outer_base_scale * (1.0 + slow_pulse * aura_pulse_amplitude * 0.7)
-	aura_inner.scale = _aura_inner_base_scale * (1.0 + core_pulse * aura_pulse_amplitude * 1.15)
+	halo_primary.scale = _halo_primary_base_scale * (1.0 + slow_pulse * aura_pulse_amplitude)
+	halo_inner.scale = _halo_inner_base_scale * (1.0 + core_pulse * aura_pulse_amplitude * 1.15)
 	core_glow.scale = _core_base_scale * (1.0 + core_pulse * core_pulse_amplitude)
-	base_glow.scale = _base_glow_base_scale * (1.0 + slow_pulse * 0.025)
+	ground_vfx_root.scale = _ground_vfx_base_scale * (1.0 + slow_pulse * 0.025)
 	orbit_accents.rotate_y(orbit_rotation_speed * delta)
 	orbit_accents.rotation.z = sin(_idle_time * 0.5 + _idle_phase) * 0.055
 
