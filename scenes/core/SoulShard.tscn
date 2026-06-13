@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3]
+[gd_scene load_steps=34 format=3]
 
 [ext_resource type="Script" path="res://scripts/soul/soul_shard.gd" id="1_soul_shard"]
 [ext_resource type="PackedScene" uid="uid://d0h76q11rel0g" path="res://scenes/environment/assets/shoul_shard.tscn" id="2_shoul_shard"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" path="res://assets/vfx/soul_shard_light_arc.png" id="4_light_arc"]
 [ext_resource type="Texture2D" path="res://assets/vfx/soul_shard_spark.png" id="5_spark"]
 [ext_resource type="Texture2D" path="res://assets/vfx/soul_shard_light_petal.png" id="6_light_petal"]
+[ext_resource type="PackedScene" path="res://scenes/ui/WorldInteractionPrompt.tscn" id="7_interaction_prompt"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_halo_primary"]
 transparency = 1
@@ -388,10 +389,10 @@ draw_pass_1 = SubResource("QuadMesh_accent_petal")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("SphereShape3D_shard")
 
-[node name="InteractPrompt" type="Label3D" parent="."]
-position = Vector3(0, 0.8, 0)
-billboard = 1
-text = "Press E"
+[node name="PromptAnchor" type="Marker3D" parent="."]
+position = Vector3(0, 1.08, 0)
+
+[node name="WorldInteractionPrompt" parent="." instance=ExtResource("7_interaction_prompt")]
 
 [node name="CollectionBurst" type="GPUParticles3D" parent="."]
 cast_shadow = 0

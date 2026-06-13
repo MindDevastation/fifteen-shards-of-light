@@ -85,7 +85,8 @@ var _orbit_arc_materials: Array[StandardMaterial3D] = []
 @onready var tertiary_arc: MeshInstance3D = $VisualRoot/OrbitAccents/TertiaryArc
 @onready var spiral_motes: Node3D = $VisualRoot/SpiralMotes
 @onready var collision_shape: CollisionShape3D = $CollisionShape3D
-@onready var prompt_label: Label3D = $InteractPrompt
+@onready var prompt_anchor: Marker3D = $PromptAnchor
+@onready var interaction_prompt = $WorldInteractionPrompt
 @onready var collection_burst: GPUParticles3D = $CollectionBurst
 
 
@@ -93,7 +94,8 @@ func _ready() -> void:
 	add_to_group("player_interactable")
 	body_entered.connect(_on_body_entered)
 	body_exited.connect(_on_body_exited)
-	prompt_label.visible = false
+	interaction_prompt.set_target(prompt_anchor)
+	interaction_prompt.hide_prompt()
 	collection_burst.emitting = false
 	_visual_base_position = visual_root.position
 	_visual_base_scale = visual_root.scale
@@ -126,7 +128,7 @@ func _on_body_entered(body: Node3D) -> void:
 		return
 
 	_player_in_range = true
-	prompt_label.visible = true
+	interaction_prompt.show_prompt()
 
 
 func _on_body_exited(body: Node3D) -> void:
@@ -137,7 +139,7 @@ func _on_body_exited(body: Node3D) -> void:
 		return
 
 	_player_in_range = false
-	prompt_label.visible = false
+	interaction_prompt.hide_prompt()
 
 
 func _begin_collection_sequence() -> void:
@@ -146,7 +148,7 @@ func _begin_collection_sequence() -> void:
 
 	_state = CollectionState.CHARGING
 	_player_in_range = false
-	prompt_label.visible = false
+	interaction_prompt.play_confirm_and_hide()
 	set_deferred("monitoring", false)
 	set_deferred("monitorable", false)
 	collision_shape.set_deferred("disabled", true)
@@ -195,7 +197,7 @@ func complete_collection_sequence() -> void:
 	_collection_completed = true
 	_state = CollectionState.COLLECTED
 	_player_in_range = false
-	prompt_label.visible = false
+	interaction_prompt.hide_prompt()
 	visual_root.visible = false
 	ground_vfx_root.visible = false
 	collected.emit()
