@@ -16,8 +16,6 @@ signal reward_sequence_requested(shard: Node, shard_id: StringName, reward_text:
 @export var core_pulse_amplitude: float = 0.16
 @export var orbit_rotation_speed: float = 0.18
 @export var charge_duration: float = 0.6
-@export var charge_scale_multiplier: float = 1.16
-@export var charge_glow_multiplier: float = 2.1
 @export var legacy_completion_delay: float = 0.9
 
 const SPIRAL_MOTE_COUNT := 15
@@ -90,6 +88,10 @@ var _charge_heart_halo_scale_multiplier := 1.0
 var _charge_heart_alpha_multiplier := 1.0
 var _charge_heart_emission_multiplier := 1.0
 var _charge_heart_pulse := 0.0
+var _charge_heart_start_scale := Vector3.ONE
+var _charge_heart_start_alpha := HEART_HALO_BASE_ALPHA
+var _charge_heart_start_emission := HEART_HALO_BASE_EMISSION
+var _charge_settle_eased := 1.0
 var _charge_core_pulse_multiplier := 1.0
 var _charge_light_pulse_multiplier := 1.0
 var _charge_light_multiplier := 1.0
@@ -183,11 +185,23 @@ func _begin_collection_sequence() -> void:
 func _start_charge_anticipation() -> void:
 	_kill_charge_tween()
 	_charge_burst_handed_off = false
+	_capture_charge_heart_start_state()
 	_set_charge_progress(0.0)
 	_charge_tween = create_tween()
 	_charge_tween.tween_method(Callable(self, "_set_charge_progress"), 0.0, 1.0, charge_duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	_charge_tween.tween_interval(CHARGE_TERMINAL_HOLD_SECONDS)
 	_charge_tween.finished.connect(_on_charge_finished)
+
+
+func _capture_charge_heart_start_state() -> void:
+	_charge_heart_start_scale = heart_pulse_halo.scale
+	if _heart_pulse_halo_material == null:
+		_charge_heart_start_alpha = HEART_HALO_BASE_ALPHA
+		_charge_heart_start_emission = HEART_HALO_BASE_EMISSION
+		return
+
+	_charge_heart_start_alpha = _heart_pulse_halo_material.albedo_color.a
+	_charge_heart_start_emission = _heart_pulse_halo_material.emission_energy_multiplier
 
 
 func _kill_charge_tween() -> void:
@@ -213,6 +227,7 @@ func _apply_charge_visuals(progress: float) -> void:
 	heart_wave = smoothstep(0.0, 1.0, heart_wave)
 	var compression_eased := smoothstep(0.0, 1.0, compression_progress)
 
+	_charge_settle_eased = settle_eased
 	_charge_hover_multiplier = lerpf(1.0, 0.32, settle_eased)
 	_charge_rotation_multiplier = lerpf(1.0, 0.75, settle_eased)
 	_charge_spiral_speed_multiplier = lerpf(1.0, 2.0, gather_eased)
@@ -240,9 +255,6 @@ func _apply_charge_visuals(progress: float) -> void:
 	_charge_crystal_halo_alpha_multiplier = lerpf(1.0, 0.82, compression_eased)
 	_charge_crystal_halo_emission_multiplier = lerpf(1.0, 0.82, compression_eased)
 	_charge_light_multiplier = lerpf(_charge_light_multiplier, 1.12, compression_eased)
-
-	visual_root.scale = _visual_base_scale * _charge_visual_scale_multiplier
-	glow_light.light_energy = glow_energy_base * _charge_light_multiplier
 
 
 func _on_charge_finished() -> void:
@@ -365,16 +377,22 @@ func _setup_heart_halo_material() -> void:
 
 func _update_charge_heart_halo() -> void:
 	var heart_scale_multiplier := lerpf(_charge_heart_halo_scale_multiplier, 1.12, _charge_heart_pulse)
-	heart_pulse_halo.scale = _heart_pulse_halo_base_scale * heart_scale_multiplier
+	var desired_scale := _heart_pulse_halo_base_scale * heart_scale_multiplier
+	var alpha_multiplier := _charge_heart_alpha_multiplier * lerpf(1.0, 1.5, _charge_heart_pulse)
+	var emission_multiplier := _charge_heart_emission_multiplier * lerpf(1.0, 1.5, _charge_heart_pulse)
+	var desired_alpha := clampf(HEART_HALO_BASE_ALPHA * alpha_multiplier, 0.0, 0.36)
+	var desired_emission := HEART_HALO_BASE_EMISSION * emission_multiplier
+
+	heart_pulse_halo.scale = _charge_heart_start_scale.lerp(desired_scale, _charge_settle_eased)
 	_update_heart_halo_camera_offset()
 
 	if _heart_pulse_halo_material == null:
 		return
 
-	var alpha_multiplier := _charge_heart_alpha_multiplier * lerpf(1.0, 1.5, _charge_heart_pulse)
-	var emission_multiplier := _charge_heart_emission_multiplier * lerpf(1.0, 1.5, _charge_heart_pulse)
-	_heart_pulse_halo_material.albedo_color = Color(1.0, 0.9, 0.78, clampf(HEART_HALO_BASE_ALPHA * alpha_multiplier, 0.0, 0.36))
-	_heart_pulse_halo_material.emission_energy_multiplier = HEART_HALO_BASE_EMISSION * emission_multiplier
+	var blended_alpha := lerpf(_charge_heart_start_alpha, desired_alpha, _charge_settle_eased)
+	var blended_emission := lerpf(_charge_heart_start_emission, desired_emission, _charge_settle_eased)
+	_heart_pulse_halo_material.albedo_color = Color(1.0, 0.9, 0.78, blended_alpha)
+	_heart_pulse_halo_material.emission_energy_multiplier = blended_emission
 
 
 func _apply_charge_crystal_halo_softening() -> void:

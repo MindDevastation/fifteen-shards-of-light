@@ -286,13 +286,13 @@ Do not mark visual quality as passed until this video is reviewed.
 ## 21. Known limitations
 
 - Visual quality is not verified without manual video.
-- GitHub head SHA is not verified because `origin` is unavailable in this checkout.
-- Push proof is not verified because `origin` is unavailable in this checkout.
-- PR link is not a real GitHub link unless external tooling records one without remote access.
+- Post-corrective GitHub head SHA is not verified because Git network access is blocked in this environment.
+- Push proof is not verified because Git network access is blocked in this environment.
+- PR #74 exists and was readable at https://github.com/MindDevastation/fifteen-shards-of-light/pull/74; updating it from this environment was not verified.
 
 ## 22. Git branch and commits
 
-Branch: `feature/soul-shard-charge-anticipation`
+Branch: `feature/perform-preflight-for-soulshard-charge-anticipation` (actual GitHub PR #74 head branch observed from GitHub)
 
 Local base SHA: `c195bddeabad7bbb0f589b9ef8167c50b7491525`
 
@@ -305,11 +305,13 @@ Commits:
 
 5. `05ce7b7b8c5ef5bd98f037415550640192be9b77` - `Document SoulShard charge anticipation validation`
 
-GitHub head SHA: `NOT VERIFIED`
+GitHub head SHA before corrective edits: `2f8e276ec140034e5973fc48f10ec02063d47677`
 
-Push proof: `NOT VERIFIED`
+GitHub head SHA after corrective edits: `NOT VERIFIED` - push/fetch is blocked in this environment.
 
-PR link: `NOT VERIFIED`
+Push proof: `NOT VERIFIED` - GitHub push/fetch is blocked in this environment.
+
+PR link: https://github.com/MindDevastation/fifteen-shards-of-light/pull/74
 
 ## 23. Scope confirmation
 
@@ -333,3 +335,40 @@ Confirmed:
 - No global VFX framework, autoload, singleton, SubViewport, or post-processing pipeline was created.
 - Accepted idle VFX was not redesigned; only necessary charge-continuity logic was added.
 - Gameplay systems beyond SoulShard charge anticipation were not implemented.
+
+## Corrective review fixes
+
+PR: #74
+PR URL: https://github.com/MindDevastation/fifteen-shards-of-light/pull/74
+Base branch: main
+Actual head branch: feature/perform-preflight-for-soulshard-charge-anticipation
+Previous GitHub head SHA observed before corrective edits: 2f8e276ec140034e5973fc48f10ec02063d47677
+Actual GitHub head SHA after corrective edits: NOT VERIFIED - Git network access is blocked in this environment (`CONNECT tunnel failed, response 403`), so the corrective commit could not be pushed or re-read from GitHub here.
+
+These were local Codex development commits. The GitHub PR may contain a squashed or rewritten commit history. GitHub PR metadata is the authoritative final record once push/update is available.
+
+Corrective changes:
+
+1. Removed duplicate runtime visual writes from `_apply_charge_visuals()`. That function now computes only progress-derived charge multipliers/state.
+2. Preserved single runtime ownership through `_update_charge_presentation(delta)`, which remains the centralized charge-time application path for `VisualRoot.scale`, `GlowLight.light_energy`, `UnderGlowLight.light_energy`, halos, CoreGlow, orbit accents, and spiral motes.
+3. Added HeartPulseHalo continuity capture at charge start. `_start_charge_anticipation()` captures current `HeartPulseHalo` scale, alpha, and emission before the first `_set_charge_progress(0.0)` charge write. Phase A blends from the captured idle heartbeat state to the desired charge preparation state.
+4. Removed stale production inspector exports `charge_scale_multiplier` and `charge_glow_multiplier` from `scripts/soul/soul_shard.gd`. Production code no longer exposes nonfunctional charge controls. Repository-wide search still finds the terms in the design reference as illustrative reference text, not as production script usage or serialized scene overrides.
+5. Checks performed for the corrective slice:
+   - `git diff --check`
+   - `godot --headless --path . --check-only --quit`
+   - `timeout 20s godot --headless --path . --quit`
+   - `rg -n "charge_scale_multiplier|charge_glow_multiplier" .`
+   - `rg -n "_play_world_burst\\(" scripts/soul/soul_shard.gd`
+   - `rg -n "create_tween|tween_method|tween_interval" scripts/soul/soul_shard.gd`
+   - `rg -n "glow_light\\.light_energy|visual_root\\.scale" scripts/soul/soul_shard.gd`
+6. Visual quality still requires manual video. Do not mark visual quality, idle preservation, or two sequential shard behavior as PASS without interactive evidence.
+
+Corrective scope confirmation:
+
+- Collection Burst unchanged.
+- Reward Overlay unchanged.
+- Interaction Prompt unchanged.
+- Public interaction API unchanged.
+- Existing signals unchanged.
+- No new particles, lights, assets, tweens, framework, autoload, or singleton added.
+- `charge_duration`, phase ranges, gathering targets, pulse strength, compression targets, and terminal hold unchanged.
