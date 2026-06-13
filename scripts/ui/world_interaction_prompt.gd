@@ -6,8 +6,6 @@ extends CanvasLayer
 @export var screen_offset := Vector2(0.0, -18.0)
 @export var follow_lerp_speed := 18.0
 
-const KEY_FONT_PATH := "res://assets/fonts/cormorant_garamond/CormorantGaramond-SemiBold.otf"
-const ACTION_FONT_PATH := "res://assets/fonts/cormorant_garamond/CormorantGaramond-SemiBoldItalic.otf"
 const SHOW_DURATION := 0.22
 const HIDE_DURATION := 0.18
 const CONFIRM_DURATION := 0.16
@@ -17,23 +15,26 @@ const IDLE_BREATHE_SPEED := 1.4
 var _requested_visible := false
 var _has_screen_position := false
 var _idle_time := 0.0
-var _base_prompt_position := Vector2.ZERO
 var _animation_tween: Tween
 var _confirm_tween: Tween
 
 @onready var root: Control = $Root
-@onready var prompt_root: Control = $Root/PromptRoot
-@onready var prompt_box: HBoxContainer = $Root/PromptRoot/PromptBox
-@onready var keycap_panel: PanelContainer = $Root/PromptRoot/PromptBox/KeycapPanel
-@onready var key_label: Label = $Root/PromptRoot/PromptBox/KeycapPanel/KeyLabel
-@onready var action_label: Label = $Root/PromptRoot/PromptBox/ActionLabel
-@onready var left_decor_line: ColorRect = $Root/PromptRoot/PromptBox/LeftDecorLine
-@onready var right_decor_line: ColorRect = $Root/PromptRoot/PromptBox/RightDecorLine
+@onready var tracking_root: Control = $Root/TrackingRoot
+@onready var animation_root: Control = $Root/TrackingRoot/AnimationRoot
+@onready var prompt_root: Control = $Root/TrackingRoot/AnimationRoot/PromptRoot
+@onready var prompt_box: HBoxContainer = $Root/TrackingRoot/AnimationRoot/PromptRoot/PromptBox
+@onready var keycap_panel: PanelContainer = $Root/TrackingRoot/AnimationRoot/PromptRoot/PromptBox/KeycapPanel
+@onready var key_label: Label = $Root/TrackingRoot/AnimationRoot/PromptRoot/PromptBox/KeycapPanel/KeyLabel
+@onready var action_label: Label = $Root/TrackingRoot/AnimationRoot/PromptRoot/PromptBox/ActionLabel
+@onready var left_decor_line: ColorRect = $Root/TrackingRoot/AnimationRoot/PromptRoot/PromptBox/LeftDecorLine
+@onready var right_decor_line: ColorRect = $Root/TrackingRoot/AnimationRoot/PromptRoot/PromptBox/RightDecorLine
 
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tracking_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	animation_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	prompt_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	prompt_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	keycap_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -41,10 +42,10 @@ func _ready() -> void:
 	action_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	left_decor_line.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	right_decor_line.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_apply_fonts()
 	visible = false
-	root.modulate.a = 0.0
-	prompt_root.scale = Vector2.ONE * 0.88
+	animation_root.modulate.a = 0.0
+	animation_root.position = Vector2.ZERO
+	animation_root.scale = Vector2.ONE * 0.88
 
 
 func _process(delta: float) -> void:
@@ -68,39 +69,37 @@ func show_prompt() -> void:
 
 	_requested_visible = true
 	visible = _has_screen_position
-	_kill_animation_tween()
+	_kill_prompt_tweens()
+	animation_root.modulate = Color(1.0, 1.0, 1.0, animation_root.modulate.a)
 	_animation_tween = create_tween()
 	_animation_tween.set_parallel(true)
-	_animation_tween.tween_property(root, "modulate:a", 1.0, SHOW_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	_animation_tween.tween_property(prompt_root, "scale", Vector2.ONE, SHOW_DURATION).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	_animation_tween.tween_property(prompt_root, "position", _base_prompt_position + Vector2(0.0, -4.0), SHOW_DURATION).from(_base_prompt_position + Vector2(0.0, 6.0)).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	_animation_tween.tween_property(animation_root, "modulate:a", 1.0, SHOW_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	_animation_tween.tween_property(animation_root, "scale", Vector2.ONE, SHOW_DURATION).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_animation_tween.tween_property(animation_root, "position", Vector2(0.0, -4.0), SHOW_DURATION).from(Vector2(0.0, 6.0)).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 
 
 func hide_prompt() -> void:
-	if not _requested_visible and root.modulate.a <= 0.0:
+	if not _requested_visible and animation_root.modulate.a <= 0.0:
 		return
 
 	_requested_visible = false
-	_kill_animation_tween()
+	_kill_prompt_tweens()
 	_animation_tween = create_tween()
 	_animation_tween.set_parallel(true)
-	_animation_tween.tween_property(root, "modulate:a", 0.0, HIDE_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	_animation_tween.tween_property(prompt_root, "scale", Vector2.ONE * 0.92, HIDE_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_animation_tween.tween_property(animation_root, "modulate:a", 0.0, HIDE_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_animation_tween.tween_property(animation_root, "scale", Vector2.ONE * 0.92, HIDE_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	_animation_tween.finished.connect(_hide_after_animation)
 
 
 func play_confirm_and_hide() -> void:
 	_requested_visible = false
 	visible = _has_screen_position
-	_kill_animation_tween()
-	if _confirm_tween != null:
-		_confirm_tween.kill()
-
+	_kill_prompt_tweens()
 	_confirm_tween = create_tween()
 	_confirm_tween.set_parallel(true)
-	_confirm_tween.tween_property(root, "modulate", Color(1.18, 1.08, 0.82, 1.0), CONFIRM_DURATION * 0.45).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	_confirm_tween.tween_property(prompt_root, "scale", Vector2.ONE * 0.94, CONFIRM_DURATION * 0.45).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	_confirm_tween.chain().tween_property(root, "modulate:a", 0.0, CONFIRM_DURATION * 0.55).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+	_confirm_tween.tween_property(animation_root, "modulate", Color(1.18, 1.08, 0.82, 1.0), CONFIRM_DURATION * 0.45).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	_confirm_tween.tween_property(animation_root, "scale", Vector2.ONE * 0.94, CONFIRM_DURATION * 0.45).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	_confirm_tween.chain().tween_property(animation_root, "modulate:a", 0.0, CONFIRM_DURATION * 0.55).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
 	_confirm_tween.finished.connect(_hide_after_animation)
 
 
@@ -113,21 +112,17 @@ func _update_screen_position(delta: float) -> void:
 		visible = false
 		return
 
-	var viewport_position := camera.unproject_position(anchor_position) + screen_offset
-	var prompt_size := prompt_root.size
-	if prompt_size == Vector2.ZERO:
-		prompt_size = prompt_root.get_combined_minimum_size()
-	var centered_position := viewport_position - prompt_size * 0.5
+	var prompt_size := _get_prompt_size()
+	var centered_position := camera.unproject_position(anchor_position) + screen_offset - prompt_size * 0.5
 
 	if not visible and _requested_visible:
-		prompt_root.position = centered_position
+		tracking_root.position = centered_position
 		visible = true
 	elif _requested_visible:
 		var weight := clampf(delta * follow_lerp_speed, 0.0, 1.0)
-		prompt_root.position = prompt_root.position.lerp(centered_position, weight)
+		tracking_root.position = tracking_root.position.lerp(centered_position, weight)
 
-	_base_prompt_position = centered_position
-	visible = _requested_visible or root.modulate.a > 0.0
+	visible = _requested_visible or animation_root.modulate.a > 0.0
 
 
 func _update_idle_breathe(delta: float) -> void:
@@ -137,7 +132,13 @@ func _update_idle_breathe(delta: float) -> void:
 	_idle_time += delta
 	var breathe := 1.0 + sin(_idle_time * IDLE_BREATHE_SPEED) * IDLE_BREATHE_SCALE
 	if _animation_tween == null or not _animation_tween.is_running():
-		prompt_root.scale = Vector2.ONE * breathe
+		animation_root.scale = Vector2.ONE * breathe
+
+
+func _get_prompt_size() -> Vector2:
+	var prompt_size := prompt_root.size
+	var minimum_size := prompt_root.get_combined_minimum_size()
+	return Vector2(maxf(prompt_size.x, minimum_size.x), maxf(prompt_size.y, minimum_size.y))
 
 
 func _get_anchor_position() -> Vector3:
@@ -149,19 +150,12 @@ func _get_anchor_position() -> Vector3:
 func _hide_after_animation() -> void:
 	if not _requested_visible:
 		visible = false
-		root.modulate = Color.WHITE
+		animation_root.modulate = Color.WHITE
+		animation_root.position = Vector2.ZERO
 
 
-func _kill_animation_tween() -> void:
+func _kill_prompt_tweens() -> void:
 	if _animation_tween != null:
 		_animation_tween.kill()
-
-
-func _apply_fonts() -> void:
-	var key_font := FontFile.new()
-	if key_font.load_dynamic_font(KEY_FONT_PATH) == OK:
-		key_label.label_settings.font = key_font
-
-	var action_font := FontFile.new()
-	if action_font.load_dynamic_font(ACTION_FONT_PATH) == OK:
-		action_label.label_settings.font = action_font
+	if _confirm_tween != null:
+		_confirm_tween.kill()
