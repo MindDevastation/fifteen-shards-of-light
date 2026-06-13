@@ -13,16 +13,16 @@ signal reward_sequence_requested(shard: Node, shard_id: StringName, reward_text:
 @export var glow_energy_amplitude: float = 0.055
 @export var glow_pulse_speed: float = 0.72
 @export var aura_pulse_amplitude: float = 0.022
-@export var core_pulse_amplitude: float = 0.13
+@export var core_pulse_amplitude: float = 0.16
 @export var orbit_rotation_speed: float = 0.18
 @export var charge_duration: float = 0.6
 @export var charge_scale_multiplier: float = 1.16
 @export var charge_glow_multiplier: float = 2.1
 @export var legacy_completion_delay: float = 0.9
 
-const SPIRAL_MOTE_COUNT := 10
-const SPIRAL_HEIGHT := 1.18
-const SPIRAL_BOTTOM := -0.12
+const SPIRAL_MOTE_COUNT := 15
+const SPIRAL_HEIGHT := 1.2
+const SPIRAL_BOTTOM := -0.17
 const SPIRAL_CYCLE_SECONDS := 5.8
 const SPIRAL_TURNS := 1.32
 const SPIRAL_BASE_RADIUS := 0.34
@@ -200,7 +200,8 @@ func _update_idle_presentation(delta: float) -> void:
 	var slow_pulse := sin(_idle_time * 0.82 + _idle_phase)
 	var core_pulse := sin(_idle_time * 1.35 + _idle_phase * 0.7)
 	halo_primary.scale = _halo_primary_base_scale * (1.0 + slow_pulse * aura_pulse_amplitude)
-	halo_inner.scale = _halo_inner_base_scale * (1.0 + core_pulse * aura_pulse_amplitude * 1.15)
+	var heart_halo_pulse := sin(_idle_time * 1.75 + _idle_phase * 0.45)
+	halo_inner.scale = _halo_inner_base_scale * (1.0 + heart_halo_pulse * aura_pulse_amplitude * 1.55)
 	core_glow.scale = _core_base_scale * (1.0 + core_pulse * core_pulse_amplitude)
 	ground_vfx_root.scale = _ground_vfx_base_scale * (1.0 + slow_pulse * 0.025)
 	orbit_accents.rotate_y(orbit_rotation_speed * delta)
@@ -232,8 +233,8 @@ func _setup_spiral_motes() -> void:
 		var normalized_index := float(index) / float(SPIRAL_MOTE_COUNT)
 		_spiral_phase_offsets.append(normalized_index + sin(float(index) * 1.73) * 0.035)
 		_spiral_radius_offsets.append(sin(float(index) * 2.41) * 0.045 + cos(float(index) * 0.83) * 0.025)
-		_spiral_scale_offsets.append(0.032 + fposmod(float(index) * 0.017, 0.034))
-		_spiral_brightness_offsets.append(0.78 + fposmod(float(index) * 0.137, 0.26))
+		_spiral_scale_offsets.append(0.026 + fposmod(float(index) * 0.013, 0.025))
+		_spiral_brightness_offsets.append(0.84 + fposmod(float(index) * 0.137, 0.22))
 
 
 func _update_spiral_motes() -> void:
@@ -252,9 +253,9 @@ func _update_spiral_motes() -> void:
 
 		var fade_in := smoothstep(0.02, 0.18, cycle_progress)
 		var fade_out := 1.0 - smoothstep(0.76, 0.98, cycle_progress)
-		var alpha: float = clampf(fade_in * fade_out * _spiral_brightness_offsets[index], 0.0, 0.82)
-		material.albedo_color = Color(1.0, 0.82, 0.46, alpha)
-		material.emission_energy_multiplier = 0.72 + alpha * 0.62
+		var alpha: float = clampf(fade_in * fade_out * _spiral_brightness_offsets[index], 0.0, 0.88)
+		material.albedo_color = Color(1.0, 0.86, 0.5, alpha)
+		material.emission_energy_multiplier = 0.86 + alpha * 0.68
 
 
 func _update_orbit_arc_facing() -> void:
