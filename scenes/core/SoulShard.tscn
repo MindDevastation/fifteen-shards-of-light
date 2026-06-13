@@ -28,16 +28,16 @@ transparency = 1
 blend_mode = 1
 cull_mode = 2
 shading_mode = 0
-albedo_color = Color(1, 0.82, 0.62, 0.06)
+albedo_color = Color(1, 0.82, 0.62, 0.085)
 albedo_texture = ExtResource("3_halo")
 emission_enabled = true
 emission = Color(1, 0.7, 0.48, 1)
-emission_energy_multiplier = 0.18
+emission_energy_multiplier = 0.24
 billboard_mode = 1
 
 [sub_resource type="QuadMesh" id="QuadMesh_halo_inner"]
 material = SubResource("StandardMaterial3D_halo_inner")
-size = Vector2(0.36, 0.36)
+size = Vector2(0.42, 0.42)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_core_glow"]
 transparency = 1
@@ -106,11 +106,11 @@ transparency = 1
 blend_mode = 1
 cull_mode = 2
 shading_mode = 0
-albedo_color = Color(1, 0.84, 0.48, 0.72)
+albedo_color = Color(1, 0.88, 0.52, 0.84)
 albedo_texture = ExtResource("5_spark")
 emission_enabled = true
 emission = Color(1, 0.6, 0.26, 1)
-emission_energy_multiplier = 1.05
+emission_energy_multiplier = 1.18
 billboard_mode = 1
 
 [sub_resource type="QuadMesh" id="QuadMesh_spiral_mote"]
@@ -129,20 +129,20 @@ angular_velocity_max = 0.45
 gravity = Vector3(0, 0.012, 0)
 damping_min = 0.07
 damping_max = 0.2
-scale_min = 0.018
-scale_max = 0.042
-color = Color(1, 0.78, 0.5, 0.42)
+scale_min = 0.014
+scale_max = 0.034
+color = Color(1, 0.82, 0.54, 0.48)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_idle_spark"]
 transparency = 1
 blend_mode = 1
 cull_mode = 2
 shading_mode = 0
-albedo_color = Color(1, 0.82, 0.54, 0.42)
+albedo_color = Color(1, 0.86, 0.58, 0.48)
 albedo_texture = ExtResource("5_spark")
 emission_enabled = true
 emission = Color(1, 0.56, 0.28, 1)
-emission_energy_multiplier = 0.72
+emission_energy_multiplier = 0.82
 billboard_mode = 1
 
 [sub_resource type="QuadMesh" id="QuadMesh_idle_spark"]
@@ -278,7 +278,7 @@ shadow_enabled = false
 omni_range = 1.55
 
 [node name="SpiralMotes" type="Node3D" parent="VisualRoot"]
-position = Vector3(0, -0.18, 0)
+position = Vector3(0, -0.2, 0)
 
 [node name="Mote01" type="MeshInstance3D" parent="VisualRoot/SpiralMotes"]
 cast_shadow = 0
@@ -320,10 +320,30 @@ mesh = SubResource("QuadMesh_spiral_mote")
 cast_shadow = 0
 mesh = SubResource("QuadMesh_spiral_mote")
 
+[node name="Mote11" type="MeshInstance3D" parent="VisualRoot/SpiralMotes"]
+cast_shadow = 0
+mesh = SubResource("QuadMesh_spiral_mote")
+
+[node name="Mote12" type="MeshInstance3D" parent="VisualRoot/SpiralMotes"]
+cast_shadow = 0
+mesh = SubResource("QuadMesh_spiral_mote")
+
+[node name="Mote13" type="MeshInstance3D" parent="VisualRoot/SpiralMotes"]
+cast_shadow = 0
+mesh = SubResource("QuadMesh_spiral_mote")
+
+[node name="Mote14" type="MeshInstance3D" parent="VisualRoot/SpiralMotes"]
+cast_shadow = 0
+mesh = SubResource("QuadMesh_spiral_mote")
+
+[node name="Mote15" type="MeshInstance3D" parent="VisualRoot/SpiralMotes"]
+cast_shadow = 0
+mesh = SubResource("QuadMesh_spiral_mote")
+
 [node name="IdleParticles" type="GPUParticles3D" parent="VisualRoot"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.12, 0)
 cast_shadow = 0
-amount = 7
+amount = 11
 lifetime = 4.4
 preprocess = 3.8
 randomness = 0.92
