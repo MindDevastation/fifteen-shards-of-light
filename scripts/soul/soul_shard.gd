@@ -7,11 +7,14 @@ signal reward_sequence_requested(shard: Node, shard_id: StringName, reward_text:
 @export_multiline var reward_text: String = ""
 
 @export var hover_amplitude: float = 0.14
-@export var hover_speed: float = 1.1
-@export var rotation_speed: float = 0.3
-@export var glow_energy_base: float = 0.65
-@export var glow_energy_amplitude: float = 0.12
-@export var glow_pulse_speed: float = 0.9
+@export var hover_speed: float = 0.95
+@export var rotation_speed: float = 0.24
+@export var glow_energy_base: float = 0.82
+@export var glow_energy_amplitude: float = 0.16
+@export var glow_pulse_speed: float = 0.72
+@export var aura_pulse_amplitude: float = 0.035
+@export var core_pulse_amplitude: float = 0.055
+@export var orbit_rotation_speed: float = 0.18
 @export var charge_duration: float = 0.6
 @export var charge_scale_multiplier: float = 1.16
 @export var charge_glow_multiplier: float = 2.1
@@ -30,11 +33,23 @@ var _player_in_range := false
 var _idle_time := 0.0
 var _visual_base_position := Vector3.ZERO
 var _visual_base_scale := Vector3.ONE
+var _halo_base_scale := Vector3.ONE
+var _aura_outer_base_scale := Vector3.ONE
+var _aura_inner_base_scale := Vector3.ONE
+var _core_base_scale := Vector3.ONE
+var _base_glow_base_scale := Vector3.ONE
 var _idle_phase := 0.0
 var _collection_completed := false
 
 @onready var visual_root: Node3D = $VisualRoot
 @onready var glow_light: OmniLight3D = $VisualRoot/GlowLight
+@onready var under_glow_light: OmniLight3D = $VisualRoot/UnderGlowLight
+@onready var halo: MeshInstance3D = $VisualRoot/Halo
+@onready var aura_outer: MeshInstance3D = $VisualRoot/AuraOuter
+@onready var aura_inner: MeshInstance3D = $VisualRoot/AuraInner
+@onready var core_glow: MeshInstance3D = $VisualRoot/CoreGlow
+@onready var base_glow: MeshInstance3D = $VisualRoot/BaseGlow
+@onready var orbit_accents: Node3D = $VisualRoot/OrbitAccents
 @onready var collision_shape: CollisionShape3D = $CollisionShape3D
 @onready var prompt_label: Label3D = $InteractPrompt
 @onready var collection_burst: GPUParticles3D = $CollectionBurst
@@ -48,6 +63,11 @@ func _ready() -> void:
 	collection_burst.emitting = false
 	_visual_base_position = visual_root.position
 	_visual_base_scale = visual_root.scale
+	_halo_base_scale = halo.scale
+	_aura_outer_base_scale = aura_outer.scale
+	_aura_inner_base_scale = aura_inner.scale
+	_core_base_scale = core_glow.scale
+	_base_glow_base_scale = base_glow.scale
 	_idle_phase = _get_idle_phase()
 	glow_light.light_energy = glow_energy_base
 
@@ -152,6 +172,17 @@ func _update_idle_presentation(delta: float) -> void:
 
 	var glow_wave := sin(_idle_time * glow_pulse_speed + _idle_phase)
 	glow_light.light_energy = max(0.0, glow_energy_base + glow_wave * glow_energy_amplitude)
+	under_glow_light.light_energy = max(0.0, 0.32 + glow_wave * 0.05)
+
+	var slow_pulse := sin(_idle_time * 0.82 + _idle_phase)
+	var core_pulse := sin(_idle_time * 1.35 + _idle_phase * 0.7)
+	halo.scale = _halo_base_scale * (1.0 + slow_pulse * aura_pulse_amplitude)
+	aura_outer.scale = _aura_outer_base_scale * (1.0 + slow_pulse * aura_pulse_amplitude * 1.4)
+	aura_inner.scale = _aura_inner_base_scale * (1.0 + core_pulse * aura_pulse_amplitude)
+	core_glow.scale = _core_base_scale * (1.0 + core_pulse * core_pulse_amplitude)
+	base_glow.scale = _base_glow_base_scale * (1.0 + slow_pulse * 0.04)
+	orbit_accents.rotate_y(orbit_rotation_speed * delta)
+	orbit_accents.rotation.z = sin(_idle_time * 0.5 + _idle_phase) * 0.08
 
 
 func _get_idle_phase() -> float:

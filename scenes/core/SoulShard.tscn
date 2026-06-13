@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=22 format=3]
 
 [ext_resource type="Script" path="res://scripts/soul/soul_shard.gd" id="1_soul_shard"]
 [ext_resource type="PackedScene" uid="uid://d0h76q11rel0g" path="res://scenes/environment/assets/shoul_shard.tscn" id="2_shoul_shard"]
@@ -8,46 +8,142 @@ transparency = 1
 blend_mode = 1
 cull_mode = 2
 shading_mode = 0
-albedo_color = Color(0.78, 1, 0.92, 0.18)
+albedo_color = Color(1, 0.62, 0.28, 0.13)
 emission_enabled = true
-emission = Color(0.62, 1, 0.86, 1)
-emission_energy_multiplier = 0.45
-billboard_mode = 1
+emission = Color(1, 0.55, 0.2, 1)
+emission_energy_multiplier = 0.75
 
-[sub_resource type="QuadMesh" id="QuadMesh_halo_soft"]
+[sub_resource type="SphereMesh" id="SphereMesh_halo_soft"]
 material = SubResource("StandardMaterial3D_halo_soft")
-size = Vector2(1.25, 1.25)
+radius = 0.7
+height = 1.05
+radial_segments = 32
+rings = 16
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_aura_outer"]
+transparency = 1
+blend_mode = 1
+cull_mode = 2
+shading_mode = 0
+albedo_color = Color(1, 0.44, 0.2, 0.07)
+emission_enabled = true
+emission = Color(1, 0.46, 0.18, 1)
+emission_energy_multiplier = 0.42
+
+[sub_resource type="SphereMesh" id="SphereMesh_aura_outer"]
+material = SubResource("StandardMaterial3D_aura_outer")
+radius = 0.95
+height = 1.35
+radial_segments = 32
+rings = 16
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_aura_inner"]
+transparency = 1
+blend_mode = 1
+cull_mode = 2
+shading_mode = 0
+albedo_color = Color(1, 0.78, 0.38, 0.16)
+emission_enabled = true
+emission = Color(1, 0.7, 0.3, 1)
+emission_energy_multiplier = 0.62
+
+[sub_resource type="SphereMesh" id="SphereMesh_aura_inner"]
+material = SubResource("StandardMaterial3D_aura_inner")
+radius = 0.45
+height = 0.72
+radial_segments = 24
+rings = 12
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_core_glow"]
+transparency = 1
+blend_mode = 1
+cull_mode = 2
+shading_mode = 0
+albedo_color = Color(1, 0.68, 0.36, 0.44)
+emission_enabled = true
+emission = Color(1, 0.48, 0.22, 1)
+emission_energy_multiplier = 1.45
+
+[sub_resource type="SphereMesh" id="SphereMesh_core_glow"]
+material = SubResource("StandardMaterial3D_core_glow")
+radius = 0.16
+height = 0.22
+radial_segments = 24
+rings = 12
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_base_glow"]
+transparency = 1
+blend_mode = 1
+cull_mode = 2
+shading_mode = 0
+albedo_color = Color(1, 0.56, 0.2, 0.18)
+emission_enabled = true
+emission = Color(1, 0.45, 0.16, 1)
+emission_energy_multiplier = 0.7
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_base_glow"]
+material = SubResource("StandardMaterial3D_base_glow")
+top_radius = 0.52
+bottom_radius = 0.52
+height = 0.012
+radial_segments = 48
+rings = 1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_orbit_accent"]
+transparency = 1
+blend_mode = 1
+cull_mode = 2
+shading_mode = 0
+albedo_color = Color(1, 0.74, 0.36, 0.28)
+emission_enabled = true
+emission = Color(1, 0.57, 0.24, 1)
+emission_energy_multiplier = 0.95
+
+[sub_resource type="TorusMesh" id="TorusMesh_orbit_wide"]
+material = SubResource("StandardMaterial3D_orbit_accent")
+inner_radius = 0.36
+outer_radius = 0.39
+rings = 48
+ring_segments = 8
+
+[sub_resource type="TorusMesh" id="TorusMesh_orbit_tall"]
+material = SubResource("StandardMaterial3D_orbit_accent")
+inner_radius = 0.24
+outer_radius = 0.265
+rings = 40
+ring_segments = 8
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_idle_motes"]
 emission_shape = 1
-emission_sphere_radius = 0.42
+emission_sphere_radius = 0.58
 direction = Vector3(0, 1, 0)
-spread = 180.0
-initial_velocity_min = 0.03
-initial_velocity_max = 0.12
-angular_velocity_min = -0.2
-angular_velocity_max = 0.2
-gravity = Vector3(0, 0.015, 0)
-scale_min = 0.55
-scale_max = 1.25
-color = Color(0.78, 1, 0.92, 0.42)
+spread = 165.0
+initial_velocity_min = 0.025
+initial_velocity_max = 0.18
+angular_velocity_min = -0.45
+angular_velocity_max = 0.45
+gravity = Vector3(0, 0.024, 0)
+damping_min = 0.03
+damping_max = 0.12
+scale_min = 0.4
+scale_max = 1.55
+color = Color(1, 0.72, 0.38, 0.5)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_idle_mote"]
 transparency = 1
 blend_mode = 1
 shading_mode = 0
-albedo_color = Color(0.8, 1, 0.93, 0.42)
+albedo_color = Color(1, 0.78, 0.48, 0.5)
 emission_enabled = true
-emission = Color(0.62, 1, 0.84, 1)
-emission_energy_multiplier = 0.7
+emission = Color(1, 0.58, 0.26, 1)
+emission_energy_multiplier = 1.05
 
 [sub_resource type="SphereMesh" id="SphereMesh_idle_mote"]
 material = SubResource("StandardMaterial3D_idle_mote")
-radius = 0.025
-height = 0.05
+radius = 0.024
+height = 0.048
 radial_segments = 8
 rings = 4
-
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_collection_burst"]
 emission_shape = 1
@@ -89,33 +185,72 @@ script = ExtResource("1_soul_shard")
 
 [node name="VisualRoot" type="Node3D" parent="."]
 
+[node name="BaseGlow" type="MeshInstance3D" parent="VisualRoot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.54, 0)
+cast_shadow = 0
+mesh = SubResource("CylinderMesh_base_glow")
+
+[node name="UnderGlowLight" type="OmniLight3D" parent="VisualRoot"]
+position = Vector3(0, -0.42, 0)
+light_color = Color(1, 0.58, 0.28, 1)
+light_energy = 0.36
+shadow_enabled = false
+omni_range = 1.8
+
 [node name="ModelOffset" type="Node3D" parent="VisualRoot"]
 position = Vector3(0, -0.18, 0)
 scale = Vector3(0.55, 0.55, 0.55)
 
-[node name="ShoulShardModel" parent="VisualRoot/ModelOffset" instance=ExtResource("2_shoul_shard")]
+[node name="CoreGlow" type="MeshInstance3D" parent="VisualRoot"]
+position = Vector3(0, 0.08, 0)
+cast_shadow = 0
+mesh = SubResource("SphereMesh_core_glow")
 
 [node name="Halo" type="MeshInstance3D" parent="VisualRoot"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.12, -0.04)
+position = Vector3(0, 0.08, 0)
 cast_shadow = 0
-mesh = SubResource("QuadMesh_halo_soft")
+mesh = SubResource("SphereMesh_halo_soft")
+
+[node name="AuraOuter" type="MeshInstance3D" parent="VisualRoot"]
+position = Vector3(0, 0.05, 0)
+cast_shadow = 0
+mesh = SubResource("SphereMesh_aura_outer")
+
+[node name="AuraInner" type="MeshInstance3D" parent="VisualRoot"]
+position = Vector3(0, 0.07, 0)
+cast_shadow = 0
+mesh = SubResource("SphereMesh_aura_inner")
+
+[node name="OrbitAccents" type="Node3D" parent="VisualRoot"]
+position = Vector3(0, 0.05, 0)
+
+[node name="OrbitRingWide" type="MeshInstance3D" parent="VisualRoot/OrbitAccents"]
+rotation = Vector3(0.42, 0, 0.22)
+cast_shadow = 0
+mesh = SubResource("TorusMesh_orbit_wide")
+
+[node name="OrbitRingTall" type="MeshInstance3D" parent="VisualRoot/OrbitAccents"]
+rotation = Vector3(1.08, 0.15, -0.5)
+scale = Vector3(0.82, 1.18, 0.82)
+cast_shadow = 0
+mesh = SubResource("TorusMesh_orbit_tall")
 
 [node name="GlowLight" type="OmniLight3D" parent="VisualRoot"]
 position = Vector3(0, 0.12, 0)
-light_color = Color(0.78, 1, 0.92, 1)
-light_energy = 0.65
+light_color = Color(1, 0.55, 0.26, 1)
+light_energy = 0.82
 shadow_enabled = false
-omni_range = 2.4
+omni_range = 2.7
 
 [node name="IdleParticles" type="GPUParticles3D" parent="VisualRoot"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.12, 0)
 cast_shadow = 0
-amount = 12
-lifetime = 2.8
-preprocess = 2.8
-randomness = 0.65
-fixed_fps = 20
-visibility_aabb = AABB(-0.8, -0.8, -0.8, 1.6, 1.6, 1.6)
+amount = 18
+lifetime = 3.2
+preprocess = 3.2
+randomness = 0.8
+fixed_fps = 24
+visibility_aabb = AABB(-1.1, -0.9, -1.1, 2.2, 2.0, 2.2)
 process_material = SubResource("ParticleProcessMaterial_idle_motes")
 draw_pass_1 = SubResource("SphereMesh_idle_mote")
 
@@ -139,3 +274,5 @@ fixed_fps = 30
 visibility_aabb = AABB(-1.8, -1.8, -1.8, 3.6, 3.6, 3.6)
 process_material = SubResource("ParticleProcessMaterial_collection_burst")
 draw_pass_1 = SubResource("SphereMesh_collection_burst_mote")
+
+[node name="ShoulShardModel" parent="VisualRoot/ModelOffset" instance=ExtResource("2_shoul_shard")]
