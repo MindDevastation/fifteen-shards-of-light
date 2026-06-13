@@ -5,12 +5,12 @@
 [ext_resource type="FontFile" path="res://assets/fonts/cormorant_garamond/CormorantGaramond-SemiBoldItalic.otf" id="3_action_font"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_keycap"]
-bg_color = Color(0.16, 0.09, 0.04, 0.26)
+bg_color = Color(0.24, 0.22, 0.28, 0.92)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(1, 0.78, 0.38, 0.9)
+border_color = Color(0.95, 0.82, 0.55, 0.95)
 corner_radius_top_left = 7
 corner_radius_top_right = 7
 corner_radius_bottom_right = 7
@@ -19,12 +19,12 @@ content_margin_left = 8.0
 content_margin_top = 1.0
 content_margin_right = 8.0
 content_margin_bottom = 2.0
-shadow_color = Color(0.08, 0.045, 0.025, 0.28)
+shadow_color = Color(0.04, 0.035, 0.055, 0.34)
 shadow_size = 6
 shadow_offset = Vector2(0, 0)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_prompt_backing"]
-bg_color = Color(0.10, 0.06, 0.03, 0.56)
+bg_color = Color(0.16, 0.15, 0.20, 0.82)
 corner_radius_top_left = 14
 corner_radius_top_right = 14
 corner_radius_bottom_right = 14
@@ -33,12 +33,12 @@ border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(1, 0.80, 0.40, 0.96)
+border_color = Color(0.95, 0.82, 0.55, 0.95)
 content_margin_left = 10.0
 content_margin_top = 4.0
 content_margin_right = 10.0
 content_margin_bottom = 5.0
-shadow_color = Color(0.04, 0.022, 0.012, 0.34)
+shadow_color = Color(0.035, 0.03, 0.055, 0.42)
 shadow_size = 10
 shadow_offset = Vector2(0, 0)
 
@@ -47,18 +47,18 @@ font = ExtResource("2_key_font")
 font_size = 27
 font_color = Color(1, 0.94902, 0.847059, 1)
 outline_size = 3
-outline_color = Color(0.12, 0.065, 0.03, 0.92)
+outline_color = Color(0.07, 0.06, 0.09, 0.92)
 shadow_size = 2
-shadow_color = Color(0.16, 0.08, 0.03, 0.5)
+shadow_color = Color(0.04, 0.035, 0.055, 0.52)
 
 [sub_resource type="LabelSettings" id="LabelSettings_action"]
 font = ExtResource("3_action_font")
 font_size = 37
 font_color = Color(1, 0.94902, 0.847059, 1)
 outline_size = 3
-outline_color = Color(0.12, 0.065, 0.03, 0.92)
+outline_color = Color(0.07, 0.06, 0.09, 0.92)
 shadow_size = 2
-shadow_color = Color(0.16, 0.08, 0.03, 0.42)
+shadow_color = Color(0.04, 0.035, 0.055, 0.46)
 
 [node name="WorldInteractionPrompt" type="CanvasLayer"]
 layer = 20
