@@ -1,0 +1,2 @@
+# This folder contains concept/reference images only.
+# Godot should ignore this folder and not import these files as game resources.
