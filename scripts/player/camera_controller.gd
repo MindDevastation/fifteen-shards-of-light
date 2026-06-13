@@ -145,6 +145,8 @@ func _is_blocking_ui_open() -> bool:
 		return true
 	if _is_ending_overlay_visible():
 		return true
+	if _is_shard_reward_overlay_visible():
+		return true
 	return false
 
 
@@ -166,6 +168,10 @@ func _is_ending_overlay_visible() -> bool:
 	var overlay := get_tree().current_scene.get_node_or_null("UILayer/EndingOverlay") as Control
 	return overlay != null and overlay.visible
 
+
+
+func _is_shard_reward_overlay_visible() -> bool:
+	return _has_visible_control_named(get_tree().current_scene, "ShardRewardOverlay")
 
 func _has_visible_control_named(node: Node, target_name: String) -> bool:
 	if node == null:

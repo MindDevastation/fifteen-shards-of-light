@@ -399,31 +399,59 @@ Level_01
 
 ## 10. Commits and PR
 
-Branch:
+GitHub PR:
 
 ```text
-feature/implement-soul-shard-slices-2-5
+#61 — https://github.com/MindDevastation/fifteen-shards-of-light/pull/61
 ```
 
-Commits at documentation time:
+Base branch:
 
 ```text
-1741100203e5af400c4a50d9c202ac3124c66c1f — Implement SoulShard Slice 2 charge and world burst
-1263acd0b08ea414ce8de8626d00c9ec825e69fb — Implement SoulShard Slice 3 reward overlay
-24bac0c17dd24665f9080287c7f1e7c996af162f — Implement SoulShard Slice 4 reward sequence controller
-773aea179b713aaed5251e73e09b86a7d34ae58c — Implement SoulShard Slice 5 Level_01 integration
+main
 ```
 
-Summary commit SHA:
+GitHub head branch:
 
 ```text
-To be assigned by the documentation commit.
+feature/perform-preflight-for-soulshard-slices-2-5
 ```
 
-PR status:
+Reviewed GitHub head before this review-fix commit:
 
 ```text
-Not created yet at documentation commit time.
+a6ab3267f99c1bcbaa9ca95b87c575bbc8ea554e
+```
+
+GitHub PR history note:
+
+```text
+The Slice 2–5 implementation reached GitHub PR #61 as one consolidated implementation commit before this review-fix commit. The local slice SHAs used during development are not claimed here as separate commits in the remote GitHub PR history.
+```
+
+Implementation contents represented by the consolidated GitHub PR commit:
+
+- Slice 2 — SoulShard charge and world collection burst.
+- Slice 3 — reusable ShardRewardOverlay and dev preview scene.
+- Slice 4 — reward sequence controller, overlay return, SoulOrb pulse, and player control lock.
+- Slice 5 — Level_01 integration with two gameplay SoulShards.
+- Final implementation summary documentation.
+
+This review-fix commit addresses only:
+
+- ShardRewardOverlay camera/mouse blocking behavior;
+- factual PR/branch/commit-history corrections in this summary.
+
+Authoritative final head SHA:
+
+```text
+Returned in the final PR handoff after the review-fix commit is created. Do not infer it from this document before commit time.
+```
+
+PR status at the time of this documentation correction:
+
+```text
+PR #61 is open against main from feature/perform-preflight-for-soulshard-slices-2-5.
 ```
 
 ## 11. Verification matrix
