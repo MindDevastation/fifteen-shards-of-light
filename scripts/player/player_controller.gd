@@ -16,6 +16,7 @@ const INTERACT_COOLDOWN_SECONDS := 0.1
 @export_range(0.0, 0.2, 0.01) var step_climb_duration: float = 0.1
 @export var step_climb_enabled: bool = true
 @export var step_debug_enabled: bool = false
+@export var controls_enabled: bool = true
 
 @onready var visual_root: Node3D = $CharacterVisualRoot
 @onready var animation_controller: FoxHeroineAnimationController = $FoxHeroineAnimationController
@@ -35,6 +36,10 @@ var _step_climb_target_transform := Transform3D.IDENTITY
 func _physics_process(delta: float) -> void:
 	_jump_cooldown_remaining = max(_jump_cooldown_remaining - delta, 0.0)
 	_interact_cooldown_remaining = max(_interact_cooldown_remaining - delta, 0.0)
+
+	if not controls_enabled:
+		_update_control_locked_physics(delta)
+		return
 
 	if _step_climb_active:
 		_update_step_climb(delta)
@@ -77,6 +82,27 @@ func _physics_process(delta: float) -> void:
 	var position_before_move := global_position
 	move_and_slide()
 	_try_step_up(delta, movement_direction, was_on_floor, position_before_move, current_speed)
+
+
+func set_controls_enabled(enabled: bool) -> void:
+	controls_enabled = enabled
+	if controls_enabled:
+		return
+	_interact_cooldown_remaining = INTERACT_COOLDOWN_SECONDS
+	velocity.x = 0.0
+	velocity.z = 0.0
+	if animation_controller != null and not animation_controller.is_dancing():
+		animation_controller.update_idle(0.0)
+
+
+func _update_control_locked_physics(delta: float) -> void:
+	velocity.x = 0.0
+	velocity.z = 0.0
+	if not is_on_floor():
+		velocity.y -= gravity * delta
+	else:
+		velocity.y = 0.0
+	move_and_slide()
 
 
 func _try_start_interaction() -> void:
