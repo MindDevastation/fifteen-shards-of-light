@@ -1,11 +1,9 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/shard_reward_overlay.gd" id="1_overlay_script"]
 [ext_resource type="Texture2D" path="res://assets/ui/shard_reward_overlay/button_idle.png" id="2_button_idle"]
 [ext_resource type="Texture2D" path="res://assets/ui/shard_reward_overlay/button_hovered.png" id="3_button_hovered"]
 [ext_resource type="Texture2D" path="res://assets/ui/shard_reward_overlay/button_pressed.png" id="4_button_pressed"]
-[ext_resource type="Texture2D" path="res://assets/ui/shard_reward_overlay/vine_leaf.png" id="5_vine_leaf"]
-
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_text_haze"]
 bg_color = Color(0.42, 0.22, 0.1, 0.18)
 corner_radius_top_left = 96

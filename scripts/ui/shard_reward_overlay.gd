@@ -33,6 +33,10 @@ const LEAF_THRESHOLDS := [0.28, 0.52, 0.74]
 const VINE_OUTER_COLOR := Color(1.0, 0.62, 0.18, 0.24)
 const VINE_MAIN_COLOR := Color(1.0, 0.67, 0.26, 0.90)
 const VINE_INNER_COLOR := Color(1.0, 0.92, 0.70, 0.98)
+const MAIN_VINE_WIDTHS := Vector3(20.0, 9.0, 3.0)
+const BRANCH_VINE_WIDTHS := Vector3(10.0, 4.5, 1.5)
+const TIP_ACTIVE_ALPHA := 0.72
+const TIP_FADE_START := 0.92
 
 var _confirmation_emitted := false
 var _return_emitted := false
@@ -76,6 +80,7 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	set_process(false)
 	confirm_button.pressed.connect(_on_confirm_button_pressed)
+	_configure_vine_line_styles()
 	_apply_responsive_layout()
 	_button_base_position = confirm_button.position
 	_reset_visual_state(false)
@@ -139,17 +144,10 @@ func _play_return_to_async(target_screen_position: Vector2, generation: int) -> 
 		return
 	confirm_button.disabled = true
 	set_process(false)
-	await get_tree().create_timer(0.14).timeout
+	await get_tree().create_timer(0.10).timeout
 	if generation != _sequence_generation:
 		return
-	_animate_text_and_haze_out()
-	await _animate_vine_progress(0.0, 0.58)
-	if generation != _sequence_generation:
-		return
-	await _animate_frame_return(target_screen_position)
-	if generation != _sequence_generation:
-		return
-	await _animate_atmosphere_out()
+	await _animate_return_sequence(target_screen_position, generation)
 	if generation != _sequence_generation:
 		return
 	_reset_visual_state(false)
@@ -205,20 +203,6 @@ func _animate_atmosphere_in() -> void:
 	var tween := _track_tween(create_tween())
 	tween.set_parallel(true)
 	tween.tween_property(atmosphere, "modulate:a", 1.0, 0.42).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-
-
-func _animate_atmosphere_out() -> void:
-	var tween := _track_tween(create_tween())
-	tween.tween_property(atmosphere, "modulate:a", 0.0, 0.32).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	await tween.finished
-
-
-func _animate_text_and_haze_out() -> void:
-	var tween := _track_tween(create_tween())
-	tween.set_parallel(true)
-	tween.tween_property(text_root, "modulate:a", 0.0, 0.22).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
-	tween.tween_property(text_haze, "modulate:a", 0.0, 0.26).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
-	tween.tween_property(button_root, "modulate:a", 0.0, 0.18).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
 
 
 func _start_frame_after_delay(generation: int) -> void:
@@ -282,6 +266,31 @@ func _try_enable_button(generation: int) -> void:
 	confirm_button.grab_focus()
 
 
+func _animate_return_sequence(target_screen_position: Vector2, generation: int) -> void:
+	var viewport_size := _get_viewport_size()
+	var target := target_screen_position.clamp(Vector2.ZERO, viewport_size)
+	var tween := _track_tween(create_tween())
+	tween.set_parallel(true)
+	tween.tween_property(text_root, "modulate:a", 0.0, 0.22).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+	tween.tween_property(text_haze, "modulate:a", 0.0, 0.26).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+	tween.tween_property(button_root, "modulate:a", 0.0, 0.18).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+	tween.tween_property(atmosphere, "modulate:a", 0.0, 0.42).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_method(_update_vine_visuals, _vine_progress, 0.0, 0.58).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	for i in range(_frame_particles.size()):
+		var data := _frame_particles[i]
+		var particle := data["node"] as Polygon2D
+		if particle == null:
+			continue
+		var delay := float(i % 8) * 0.018 + _hash_01(i, 211) * 0.05
+		var duration := 0.52 + _hash_01(i, 223) * 0.18
+		tween.tween_property(particle, "position", target + _hash_vector(i, 227) * 7.0, duration).set_delay(delay).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+		tween.tween_property(particle, "scale", Vector2.ZERO, duration * 0.82).set_delay(delay + duration * 0.12).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+		tween.tween_property(particle, "modulate:a", 0.0, duration * 0.6).set_delay(delay + duration * 0.3).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+	await tween.finished
+	if generation != _sequence_generation:
+		return
+
+
 func _build_frame_particles(origin_screen_position: Vector2) -> void:
 	for child in light_frame_layer.get_children():
 		child.queue_free()
@@ -318,10 +327,10 @@ func _build_frame_targets(viewport_size: Vector2) -> Array[Vector2]:
 		var t := float(i) / float(FRAME_BOTTOM_COUNT - 1)
 		targets.append(Vector2(lerpf(rect.end.x, rect.position.x, t), rect.end.y) + _hash_vector(i, 5) * 5.0)
 	for i in range(FRAME_LEFT_COUNT):
-		var t := float(i) / float(FRAME_LEFT_COUNT - 1)
+		var t := float(i + 1) / float(FRAME_LEFT_COUNT + 1)
 		targets.append(Vector2(rect.position.x, lerpf(rect.position.y, rect.end.y, t)) + _hash_vector(i, 7) * 5.0)
 	for i in range(FRAME_RIGHT_COUNT):
-		var t := float(i) / float(FRAME_RIGHT_COUNT - 1)
+		var t := float(i + 1) / float(FRAME_RIGHT_COUNT + 1)
 		targets.append(Vector2(rect.end.x, lerpf(rect.end.y, rect.position.y, t)) + _hash_vector(i, 11) * 5.0)
 	return targets
 
@@ -343,22 +352,6 @@ func _animate_frame_formation() -> void:
 		tween.tween_property(particle, "rotation", data["base_rotation"], FRAME_FORMATION_DURATION).set_delay(delay).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		tween.tween_property(particle, "scale", Vector2.ONE, FRAME_FORMATION_DURATION * 0.68).set_delay(delay).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		tween.tween_property(particle, "modulate:a", 1.0, FRAME_FORMATION_DURATION * 0.55).set_delay(delay).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	await tween.finished
-
-
-func _animate_frame_return(target_screen_position: Vector2) -> void:
-	var viewport_size := _get_viewport_size()
-	var target := target_screen_position.clamp(Vector2.ZERO, viewport_size)
-	var tween := _track_tween(create_tween())
-	tween.set_parallel(true)
-	for i in range(_frame_particles.size()):
-		var data := _frame_particles[i]
-		var particle := data["node"] as Polygon2D
-		var delay := float(i % 8) * 0.018 + _hash_01(i, 211) * 0.05
-		var duration := 0.52 + _hash_01(i, 223) * 0.18
-		tween.tween_property(particle, "position", target + _hash_vector(i, 227) * 7.0, duration).set_delay(delay).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
-		tween.tween_property(particle, "scale", Vector2.ZERO, duration * 0.82).set_delay(delay + duration * 0.12).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
-		tween.tween_property(particle, "modulate:a", 0.0, duration * 0.6).set_delay(delay + duration * 0.3).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
 	await tween.finished
 
 
@@ -436,20 +429,37 @@ func _add_branch_pair(branch: Dictionary, viewport_size: Vector2, center_x: floa
 		curve.add_point(start, Vector2.ZERO, Vector2(viewport_size.x * 0.035 * side, -viewport_size.y * 0.035))
 		curve.add_point((start + end) * 0.5 + Vector2(viewport_size.x * 0.035 * side, viewport_size.y * 0.025), Vector2(-viewport_size.x * 0.035 * side, 0.0), Vector2(viewport_size.x * 0.045 * side, 0.0))
 		curve.add_point(end, Vector2(-viewport_size.x * 0.035 * side, viewport_size.y * 0.025), Vector2.ZERO)
-		var line := Line2D.new()
-		line.name = "Branch_%s_%02d" % ["Left" if side < 0 else "Right", _branch_data.size()]
-		line.width = 4.0
-		line.default_color = Color(1.0, 0.72, 0.30, 0.75)
-		line.antialiased = true
-		branch_layer.add_child(line)
-		_branch_data.append({"line": line, "points": curve.get_baked_points(), "threshold": float(branch["threshold"])})
+		var branch_index := _branch_data.size()
+		var outer_line := _create_branch_line("BranchOuter_%s_%02d" % ["Left" if side < 0 else "Right", branch_index], BRANCH_VINE_WIDTHS.x, VINE_OUTER_COLOR)
+		var main_line := _create_branch_line("BranchMain_%s_%02d" % ["Left" if side < 0 else "Right", branch_index], BRANCH_VINE_WIDTHS.y, VINE_MAIN_COLOR)
+		var inner_line := _create_branch_line("BranchInner_%s_%02d" % ["Left" if side < 0 else "Right", branch_index], BRANCH_VINE_WIDTHS.z, VINE_INNER_COLOR)
+		branch_layer.add_child(outer_line)
+		branch_layer.add_child(main_line)
+		branch_layer.add_child(inner_line)
+		_branch_data.append({
+			"points": curve.get_baked_points(),
+			"threshold": float(branch["threshold"]),
+			"outer_line": outer_line,
+			"main_line": main_line,
+			"inner_line": inner_line,
+			"lines": [outer_line, main_line, inner_line],
+		})
+
+
+func _create_branch_line(line_name: String, width: float, color: Color) -> Line2D:
+	var line := Line2D.new()
+	line.name = line_name
+	line.width = width
+	line.default_color = color
+	line.antialiased = true
+	return line
 
 
 func _build_leaf_geometry(viewport_size: Vector2, center_x: float) -> void:
 	var leaf_ratios := [
-		{"threshold": 0.28, "left": Vector2(0.39, 0.58), "rotation": -0.55, "scale": 0.080},
-		{"threshold": 0.52, "left": Vector2(0.29, 0.38), "rotation": 0.28, "scale": 0.068},
-		{"threshold": 0.74, "left": Vector2(0.36, 0.22), "rotation": -0.18, "scale": 0.092},
+		{"threshold": LEAF_THRESHOLDS[0], "left": Vector2(0.39, 0.58), "rotation": -0.55, "scale": 0.080},
+		{"threshold": LEAF_THRESHOLDS[1], "left": Vector2(0.29, 0.38), "rotation": 0.28, "scale": 0.068},
+		{"threshold": LEAF_THRESHOLDS[2], "left": Vector2(0.36, 0.22), "rotation": -0.18, "scale": 0.092},
 	]
 	for leaf in leaf_ratios:
 		for side in [-1, 1]:
@@ -482,8 +492,8 @@ func _update_vine_visuals(progress: float) -> void:
 		line.points = left_visible
 	for line in [right_outer_glow, right_main_gold, right_inner_ivory]:
 		line.points = right_visible
-	_update_tip_from_points(left_tip_glow, left_visible)
-	_update_tip_from_points(right_tip_glow, right_visible)
+	_update_tip_from_points(left_tip_glow, left_visible, _vine_progress)
+	_update_tip_from_points(right_tip_glow, right_visible, _vine_progress)
 	_update_branches(_vine_progress)
 	_update_leaves(_vine_progress)
 
@@ -498,19 +508,28 @@ func _truncate_points(points: PackedVector2Array, progress: float) -> PackedVect
 	return visible
 
 
-func _update_tip_from_points(tip: Polygon2D, points: PackedVector2Array) -> void:
-	if points.is_empty():
+func _update_tip_from_points(tip: Polygon2D, points: PackedVector2Array, progress: float) -> void:
+	var tip_alpha := _get_tip_alpha(progress)
+	if points.is_empty() or tip_alpha <= 0.0:
 		_set_tip_glow(tip, Vector2.ZERO, 0.0)
 	else:
-		_set_tip_glow(tip, points[points.size() - 1], 0.72)
+		_set_tip_glow(tip, points[points.size() - 1], tip_alpha)
+
+
+func _get_tip_alpha(progress: float) -> float:
+	if progress <= 0.0:
+		return 0.0
+	var completion_fade := clampf(inverse_lerp(TIP_FADE_START, 1.0, progress), 0.0, 1.0)
+	return lerpf(TIP_ACTIVE_ALPHA, 0.0, completion_fade)
 
 
 func _update_branches(progress: float) -> void:
 	for data in _branch_data:
-		var line := data["line"] as Line2D
 		var threshold := float(data["threshold"])
 		var local_progress := clampf((progress - threshold) / 0.16, 0.0, 1.0)
-		line.points = _truncate_points(data["points"], local_progress)
+		var visible_points := _truncate_points(data["points"], local_progress)
+		for line in data["lines"]:
+			(line as Line2D).points = visible_points
 
 
 func _update_leaves(progress: float) -> void:
@@ -567,6 +586,21 @@ func _play_button_press_feedback() -> void:
 	tween.tween_property(confirm_button, "scale", Vector2.ONE, 0.14).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	tween.parallel().tween_property(confirm_button, "position", _button_base_position, 0.14).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	tween.parallel().tween_property(confirm_button, "modulate:a", 1.0, 0.14).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+
+
+func _configure_vine_line_styles() -> void:
+	left_outer_glow.width = MAIN_VINE_WIDTHS.x
+	left_main_gold.width = MAIN_VINE_WIDTHS.y
+	left_inner_ivory.width = MAIN_VINE_WIDTHS.z
+	right_outer_glow.width = MAIN_VINE_WIDTHS.x
+	right_main_gold.width = MAIN_VINE_WIDTHS.y
+	right_inner_ivory.width = MAIN_VINE_WIDTHS.z
+	for line in [left_outer_glow, right_outer_glow]:
+		line.default_color = VINE_OUTER_COLOR
+	for line in [left_main_gold, right_main_gold]:
+		line.default_color = VINE_MAIN_COLOR
+	for line in [left_inner_ivory, right_inner_ivory]:
+		line.default_color = VINE_INNER_COLOR
 
 
 func _apply_responsive_layout() -> void:

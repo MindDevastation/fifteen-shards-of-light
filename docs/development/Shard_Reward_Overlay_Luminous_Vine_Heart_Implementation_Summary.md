@@ -302,3 +302,34 @@ Video/manual validation is still required for:
 ```text
 Merge: WAIT FOR VIDEO
 ```
+
+## Corrective Review Round 1
+
+PR metadata for this corrective pass:
+
+```text
+PR number: #77
+PR URL: https://github.com/MindDevastation/fifteen-shards-of-light/pull/77
+Base branch: main
+Base SHA: 581338125954ac2894027e08ad04dccce5ec0c40
+Current GitHub branch: feature/develop-luminous-vine-heart-overlay
+Previous GitHub head SHA: 9194a885b4223a1a6b6f48b55ab8a4d5f1d1ad53
+Corrective commit SHA: this corrective commit; exact local SHA is reported in final handoff
+Final GitHub head SHA after update: NOT VERIFIED in this local environment unless push tooling confirms it
+```
+
+Corrective fixes applied before video review:
+
+- Return choreography was parallelized into a single central return presentation sequence so text, TextHaze, button, atmosphere, vine retraction, and frame-particle return start together and share one synchronization await.
+- Decorative branch curves were upgraded from a single flat `Line2D` to triple-line glow data using outer, main, and inner branch lines.
+- Tip glows now fade during the final growth range and reach alpha `0.0` at complete vine progress.
+- Procedural frame side targets now avoid corner duplication by placing left/right-side particles between top/bottom corner particles.
+- Tuning constants/resources were cleaned by using leaf threshold constants, using vine color constants as runtime tuning source, and removing the unused scene leaf ext_resource while keeping the script preload.
+
+Corrective validation status:
+
+```text
+Code review: PASS AFTER CORRECTIVE UPDATE
+Visual quality: NOT VERIFIED
+Merge: WAIT FOR VIDEO
+```
