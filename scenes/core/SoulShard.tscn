@@ -1,4 +1,4 @@
-[gd_scene load_steps=34 format=3]
+[gd_scene load_steps=42 format=3]
 
 [ext_resource type="Script" path="res://scripts/soul/soul_shard.gd" id="1_soul_shard"]
 [ext_resource type="PackedScene" uid="uid://d0h76q11rel0g" path="res://scenes/environment/assets/shoul_shard.tscn" id="2_shoul_shard"]
@@ -198,35 +198,100 @@ size = Vector2(1, 1)
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_collection_burst"]
 emission_shape = 1
-emission_sphere_radius = 0.12
+emission_sphere_radius = 0.08
 direction = Vector3(0, 1, 0)
 spread = 180.0
-initial_velocity_min = 0.85
-initial_velocity_max = 1.45
-angular_velocity_min = -2.0
-angular_velocity_max = 2.0
+initial_velocity_min = 0.48
+initial_velocity_max = 0.88
+angular_velocity_min = -1.4
+angular_velocity_max = 1.4
 gravity = Vector3(0, 0.04, 0)
-damping_min = 0.15
-damping_max = 0.35
-scale_min = 0.1
-scale_max = 0.22
-color = Color(0.84, 1, 0.92, 0.78)
+damping_min = 0.48
+damping_max = 0.85
+scale_min = 0.045
+scale_max = 0.11
+color = Color(1, 0.84, 0.58, 0.7)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_collection_burst_spark"]
 transparency = 1
 blend_mode = 1
 cull_mode = 2
 shading_mode = 0
-albedo_color = Color(0.86, 1, 0.94, 0.72)
+albedo_color = Color(1, 0.84, 0.58, 0.7)
 albedo_texture = ExtResource("5_spark")
 emission_enabled = true
-emission = Color(0.68, 1, 0.86, 1)
-emission_energy_multiplier = 1.35
+emission = Color(1, 0.62, 0.28, 1)
+emission_energy_multiplier = 1.05
 billboard_mode = 1
 
 [sub_resource type="QuadMesh" id="QuadMesh_collection_burst_spark"]
 material = SubResource("StandardMaterial3D_collection_burst_spark")
 size = Vector2(1, 1)
+
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_collection_petals"]
+emission_shape = 1
+emission_sphere_radius = 0.1
+direction = Vector3(0, 1, 0)
+spread = 145.0
+initial_velocity_min = 0.18
+initial_velocity_max = 0.42
+angular_velocity_min = -1.2
+angular_velocity_max = 1.2
+gravity = Vector3(0, 0.035, 0)
+damping_min = 0.24
+damping_max = 0.52
+scale_min = 0.035
+scale_max = 0.075
+color = Color(1, 0.48, 0.36, 0.34)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_collection_petal"]
+transparency = 1
+blend_mode = 1
+cull_mode = 2
+shading_mode = 0
+albedo_color = Color(1, 0.48, 0.36, 0.34)
+albedo_texture = ExtResource("6_light_petal")
+emission_enabled = true
+emission = Color(1, 0.38, 0.24, 1)
+emission_energy_multiplier = 0.58
+billboard_mode = 1
+
+[sub_resource type="QuadMesh" id="QuadMesh_collection_petal"]
+material = SubResource("StandardMaterial3D_collection_petal")
+size = Vector2(1, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_collection_inner_bloom"]
+transparency = 1
+blend_mode = 1
+cull_mode = 2
+shading_mode = 0
+albedo_color = Color(1, 0.84, 0.58, 0)
+albedo_texture = ExtResource("5_spark")
+emission_enabled = true
+emission = Color(1, 0.62, 0.28, 1)
+emission_energy_multiplier = 0.2
+billboard_mode = 1
+
+[sub_resource type="QuadMesh" id="QuadMesh_collection_inner_bloom"]
+material = SubResource("StandardMaterial3D_collection_inner_bloom")
+size = Vector2(0.34, 0.34)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_collection_outer_bloom"]
+transparency = 1
+blend_mode = 1
+cull_mode = 2
+shading_mode = 0
+albedo_color = Color(1, 0.72, 0.42, 0)
+albedo_texture = ExtResource("3_halo")
+emission_enabled = true
+emission = Color(1, 0.5, 0.24, 1)
+emission_energy_multiplier = 0.12
+billboard_mode = 1
+
+[sub_resource type="QuadMesh" id="QuadMesh_collection_outer_bloom"]
+material = SubResource("StandardMaterial3D_collection_outer_bloom")
+size = Vector2(0.9, 1.05)
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_shard"]
 radius = 0.50625
@@ -397,14 +462,41 @@ position = Vector3(0, 1.08, 0)
 [node name="CollectionBurst" type="GPUParticles3D" parent="."]
 cast_shadow = 0
 emitting = false
-amount = 28
-lifetime = 0.9
+amount = 24
+lifetime = 0.72
 one_shot = true
-explosiveness = 0.92
-randomness = 0.45
+explosiveness = 0.96
+randomness = 0.38
 fixed_fps = 30
-visibility_aabb = AABB(-1.8, -1.8, -1.8, 3.6, 3.6, 3.6)
+visibility_aabb = AABB(-1.2, -1.2, -1.2, 2.4, 2.4, 2.4)
 process_material = SubResource("ParticleProcessMaterial_collection_burst")
 draw_pass_1 = SubResource("QuadMesh_collection_burst_spark")
+
+
+[node name="CollectionPetalBurst" type="GPUParticles3D" parent="."]
+cast_shadow = 0
+emitting = false
+amount = 7
+lifetime = 1.0
+one_shot = true
+explosiveness = 0.9
+randomness = 0.72
+fixed_fps = 24
+visibility_aabb = AABB(-1.1, -1.1, -1.1, 2.2, 2.2, 2.2)
+process_material = SubResource("ParticleProcessMaterial_collection_petals")
+draw_pass_1 = SubResource("QuadMesh_collection_petal")
+
+[node name="CollectionBloomRoot" type="Node3D" parent="."]
+visible = false
+
+[node name="CollectionOuterBloom" type="MeshInstance3D" parent="CollectionBloomRoot"]
+cast_shadow = 0
+scale = Vector3(0.22, 0.22, 0.22)
+mesh = SubResource("QuadMesh_collection_outer_bloom")
+
+[node name="CollectionInnerBloom" type="MeshInstance3D" parent="CollectionBloomRoot"]
+cast_shadow = 0
+scale = Vector3(0.18, 0.18, 0.18)
+mesh = SubResource("QuadMesh_collection_inner_bloom")
 
 [node name="ShoulShardModel" parent="VisualRoot/ModelOffset" instance=ExtResource("2_shoul_shard")]

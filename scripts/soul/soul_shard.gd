@@ -37,6 +37,19 @@ const HEART_HALO_ALPHA_BOOST := 0.14
 const HEART_HALO_BASE_EMISSION := 0.42
 const HEART_HALO_EMISSION_BOOST := 0.34
 const CHARGE_TERMINAL_HOLD_SECONDS := 0.06
+const COLLECTION_BLOOM_DURATION := 0.42
+const COLLECTION_INNER_BLOOM_END_PROGRESS := 0.43
+const COLLECTION_INNER_BLOOM_START_SCALE := 0.18
+const COLLECTION_INNER_BLOOM_PEAK_SCALE := 0.62
+const COLLECTION_INNER_BLOOM_START_ALPHA := 0.56
+const COLLECTION_INNER_BLOOM_START_EMISSION := 1.25
+const COLLECTION_INNER_BLOOM_END_EMISSION := 0.2
+const COLLECTION_OUTER_BLOOM_START_SCALE := 0.22
+const COLLECTION_OUTER_BLOOM_END_SCALE := 0.92
+const COLLECTION_OUTER_BLOOM_START_ALPHA := 0.28
+const COLLECTION_OUTER_BLOOM_START_EMISSION := 0.72
+const COLLECTION_OUTER_BLOOM_END_EMISSION := 0.12
+
 
 enum CollectionState {
 	IDLE,
@@ -95,6 +108,13 @@ var _charge_settle_eased := 1.0
 var _charge_core_pulse_multiplier := 1.0
 var _charge_light_pulse_multiplier := 1.0
 var _charge_light_multiplier := 1.0
+var _collection_bloom_tween: Tween
+var _collection_bloom_progress := 0.0
+var _collection_outer_bloom_material: StandardMaterial3D
+var _collection_inner_bloom_material: StandardMaterial3D
+var _collection_outer_bloom_base_scale := Vector3.ONE
+var _collection_inner_bloom_base_scale := Vector3.ONE
+
 
 @onready var ground_vfx_root: Node3D = $GroundVFXRoot
 @onready var visual_root: Node3D = $VisualRoot
@@ -112,6 +132,10 @@ var _charge_light_multiplier := 1.0
 @onready var prompt_anchor: Marker3D = $PromptAnchor
 @onready var interaction_prompt = $WorldInteractionPrompt
 @onready var collection_burst: GPUParticles3D = $CollectionBurst
+@onready var collection_petal_burst: GPUParticles3D = $CollectionPetalBurst
+@onready var collection_bloom_root: Node3D = $CollectionBloomRoot
+@onready var collection_outer_bloom: MeshInstance3D = $CollectionBloomRoot/CollectionOuterBloom
+@onready var collection_inner_bloom: MeshInstance3D = $CollectionBloomRoot/CollectionInnerBloom
 
 
 func _ready() -> void:
@@ -121,6 +145,9 @@ func _ready() -> void:
 	interaction_prompt.set_target(prompt_anchor)
 	interaction_prompt.hide_prompt()
 	collection_burst.emitting = false
+	collection_burst.one_shot = true
+	collection_petal_burst.emitting = false
+	collection_petal_burst.one_shot = true
 	_visual_base_position = visual_root.position
 	_visual_base_scale = visual_root.scale
 	_ground_vfx_base_scale = ground_vfx_root.scale
@@ -129,11 +156,15 @@ func _ready() -> void:
 	_heart_pulse_halo_base_scale = heart_pulse_halo.scale
 	_heart_pulse_halo_base_position = heart_pulse_halo.position
 	_core_base_scale = core_glow.scale
+	_collection_outer_bloom_base_scale = collection_outer_bloom.scale
+	_collection_inner_bloom_base_scale = collection_inner_bloom.scale
 	_setup_crystal_halo_material()
 	_setup_orbit_arc_materials()
 	_idle_phase = _get_idle_phase()
 	_setup_heart_halo_material()
 	_setup_spiral_motes()
+	_setup_collection_bloom_materials()
+	_reset_collection_burst_visuals()
 	glow_light.light_energy = glow_energy_base
 
 
@@ -280,9 +311,79 @@ func _play_world_burst() -> void:
 	_state = CollectionState.BURSTING
 	visual_root.visible = false
 	ground_vfx_root.visible = false
+	_start_collection_burst_visuals()
+
+
+func _setup_collection_bloom_materials() -> void:
+	_collection_outer_bloom_material = collection_outer_bloom.mesh.surface_get_material(0).duplicate() as StandardMaterial3D
+	collection_outer_bloom.material_override = _collection_outer_bloom_material
+	_collection_inner_bloom_material = collection_inner_bloom.mesh.surface_get_material(0).duplicate() as StandardMaterial3D
+	collection_inner_bloom.material_override = _collection_inner_bloom_material
+
+
+func _start_collection_burst_visuals() -> void:
+	_reset_collection_burst_visuals()
 	collection_burst.global_position = global_position
 	collection_burst.restart()
 	collection_burst.emitting = true
+	collection_petal_burst.global_position = global_position
+	collection_petal_burst.restart()
+	collection_petal_burst.emitting = true
+	collection_bloom_root.global_position = global_position
+	collection_bloom_root.visible = true
+	_set_collection_bloom_progress(0.0)
+	_collection_bloom_tween = create_tween()
+	_collection_bloom_tween.tween_method(Callable(self, "_set_collection_bloom_progress"), 0.0, 1.0, COLLECTION_BLOOM_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	_collection_bloom_tween.finished.connect(_finish_collection_bloom)
+
+
+func _reset_collection_burst_visuals() -> void:
+	_kill_collection_bloom_tween()
+	_collection_bloom_progress = 0.0
+	collection_burst.emitting = false
+	collection_petal_burst.emitting = false
+	collection_bloom_root.visible = false
+	collection_bloom_root.global_position = global_position
+	collection_inner_bloom.scale = Vector3.ONE * COLLECTION_INNER_BLOOM_START_SCALE
+	collection_outer_bloom.scale = Vector3.ONE * COLLECTION_OUTER_BLOOM_START_SCALE
+	_apply_collection_bloom_visuals(0.0)
+
+
+func _kill_collection_bloom_tween() -> void:
+	if _collection_bloom_tween != null and _collection_bloom_tween.is_valid():
+		_collection_bloom_tween.kill()
+
+	_collection_bloom_tween = null
+
+
+func _set_collection_bloom_progress(value: float) -> void:
+	_collection_bloom_progress = clampf(value, 0.0, 1.0)
+	_apply_collection_bloom_visuals(_collection_bloom_progress)
+
+
+func _apply_collection_bloom_visuals(progress: float) -> void:
+	var inner_progress := _remap_clamped(progress, 0.0, COLLECTION_INNER_BLOOM_END_PROGRESS)
+	var outer_progress := clampf(progress, 0.0, 1.0)
+	var inner_scale_eased := sin(inner_progress * PI * 0.5)
+	var outer_scale_eased := sin(outer_progress * PI * 0.5)
+	var inner_fade := 1.0 - smoothstep(0.0, 1.0, inner_progress)
+	var outer_fade := 1.0 - smoothstep(0.0, 1.0, outer_progress)
+
+	collection_inner_bloom.scale = Vector3.ONE * lerpf(COLLECTION_INNER_BLOOM_START_SCALE, COLLECTION_INNER_BLOOM_PEAK_SCALE, inner_scale_eased)
+	collection_outer_bloom.scale = Vector3.ONE * lerpf(COLLECTION_OUTER_BLOOM_START_SCALE, COLLECTION_OUTER_BLOOM_END_SCALE, outer_scale_eased)
+
+	if _collection_inner_bloom_material != null:
+		_collection_inner_bloom_material.albedo_color = Color(1.0, 0.84, 0.58, COLLECTION_INNER_BLOOM_START_ALPHA * inner_fade)
+		_collection_inner_bloom_material.emission_energy_multiplier = lerpf(COLLECTION_INNER_BLOOM_END_EMISSION, COLLECTION_INNER_BLOOM_START_EMISSION, inner_fade)
+	if _collection_outer_bloom_material != null:
+		_collection_outer_bloom_material.albedo_color = Color(1.0, 0.72, 0.42, COLLECTION_OUTER_BLOOM_START_ALPHA * outer_fade)
+		_collection_outer_bloom_material.emission_energy_multiplier = lerpf(COLLECTION_OUTER_BLOOM_END_EMISSION, COLLECTION_OUTER_BLOOM_START_EMISSION, outer_fade)
+
+
+func _finish_collection_bloom() -> void:
+	_collection_bloom_tween = null
+	_set_collection_bloom_progress(1.0)
+	collection_bloom_root.visible = false
 
 
 func _request_or_complete_collection() -> void:
