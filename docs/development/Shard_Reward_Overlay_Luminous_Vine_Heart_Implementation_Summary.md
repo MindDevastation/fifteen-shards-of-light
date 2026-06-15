@@ -333,3 +333,94 @@ Code review: PASS AFTER CORRECTIVE UPDATE
 Visual quality: NOT VERIFIED
 Merge: WAIT FOR VIDEO
 ```
+
+## Visual Corrective Pass V2
+
+Status: corrective implementation completed by static/headless validation only. Final visual PASS is not claimed; a new gameplay/video capture is still required before merge.
+
+### Font choice / font status
+
+- Reward text now uses the existing repository asset `assets/fonts/cormorant_garamond/CormorantGaramond-SemiBoldItalic.otf`.
+- The font is assigned both in the scene theme overrides and at runtime for the RichTextLabel normal/italic/bold-italic slots so the existing `[i]` BBCode path keeps the intended centered italic feel.
+- Starting font size is now `48`, with responsive scaling from viewport height.
+
+### Text layout changes
+
+- The text remains a `RichTextLabel` driven by external `display_text`, fallback-backed by `DEFAULT_REWARD_TEXT`, and escaped through the existing BBCode escape helper.
+- The responsive text rectangle was narrowed and shifted upward inside the vine heart so 2-4 lines favor the broader upper/middle heart area and avoid dropping into the narrow lower point.
+- Text color was tuned to light golden cream with a softer dark outline for readability against the darker matte world.
+
+### TextHaze removal
+
+- The separate TextHaze Panel node, stylebox resource, runtime onready reference, fade-in choreography, reset handling, and return fade were removed from production files.
+- Readability now relies on typography, outline, placement inside the heart, and the darker global atmosphere rather than a text card/backing.
+
+### Darker atmosphere
+
+- `MatteVeil` is deeper and warmer while still translucent enough to leave the world visible.
+- `WarmWash` was reduced and warmed so it supports the overlay instead of competing with the text and vine.
+
+### Vine smoothing / curls / leaves
+
+- The main authored Curve2D heart path uses a lower bake interval and additional curve point shaping for a smoother, more organic silhouette.
+- Decorative curls increased from four authored thresholds per side to six per side, including a lower source curl that visually bridges the fox button and the heart split.
+- Leaves increased from three per side to five per side while using smaller scales to avoid crowding the text opening.
+
+### Leaf integration
+
+- Leaf scale was reduced roughly into the 20-30% smaller visual range relative to the prior pass.
+- Leaf rotation now samples the main vine tangent near each reveal threshold and blends that tangent into the authored rotation, making leaves read more like growths from the vine instead of stickers.
+
+### Vine-button connection changes
+
+- The vine origin was adjusted lower and the first lower curl starts near the button/source area.
+- The fox button was slightly tightened and raised so the button reads as the source feeding the lower stem and split.
+
+### Crystal frame density changes
+
+- Procedural frame particles increased from 40 to 76:
+  - top: 22
+  - bottom: 22
+  - left: 16
+  - right: 16
+- Formation and return still preserve the rectangular perimeter but use varied offsets, sizes, rotations, phase, speed, and alpha shimmer for a more living non-uniform frame.
+
+### Button hover / hit area fix
+
+- The button visual rect is smaller and no longer reaches the bottom edge of the window.
+- Runtime setup now creates a TextureButton alpha click mask from `button_idle.png` and assigns it to `texture_click_mask` so hover/click behavior follows the button texture instead of feeling window-sized.
+- ButtonRoot remains mouse-passive; the TextureButton remains the only stopped mouse target in that layer.
+
+### Retract timing change
+
+- Vine growth duration remains `2.3` seconds.
+- Vine retract now also uses `VINE_GROWTH_DURATION`, making the vine close symmetrically over `2.3` seconds.
+- Return choreography remains parallel: text, button, atmosphere, vine, and frame return start together under one return sequence.
+
+### Optimization review
+
+- The production path still creates overlay-owned decorative nodes only during overlay reset/build phases, not during every animation frame.
+- Baked main vine points are cached after building the Curve2D paths.
+- Point truncation now uses `PackedVector2Array.slice()` instead of manually appending into a new array for every reveal update.
+- Frame living updates are throttled to about 30 Hz via `FRAME_LIVING_UPDATE_INTERVAL` instead of updating all frame particles every rendered frame.
+- The particle count was increased only to a moderate 76 to strengthen the frame while keeping the pass lightweight.
+
+### Tests
+
+Required validation for this pass:
+
+```text
+git diff --check
+godot --headless --path . --check-only --quit
+timeout 20s godot --headless --path . --quit
+```
+
+### Remaining limitations
+
+- Visual quality is NOT VERIFIED until a new video capture is reviewed.
+- Runtime/responsive behavior is only partially validated through static/headless checks in this environment.
+- Push proof and GitHub PR head SHA can only be verified when a Git remote is configured and push access is available.
+
+### Need for new video
+
+A fresh PR #77 video capture is required to confirm text readability, heart composition, button-source feel, frame readability, hover area feel, and performance smoothness in the actual gameplay viewport.

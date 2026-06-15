@@ -4,15 +4,7 @@
 [ext_resource type="Texture2D" path="res://assets/ui/shard_reward_overlay/button_idle.png" id="2_button_idle"]
 [ext_resource type="Texture2D" path="res://assets/ui/shard_reward_overlay/button_hovered.png" id="3_button_hovered"]
 [ext_resource type="Texture2D" path="res://assets/ui/shard_reward_overlay/button_pressed.png" id="4_button_pressed"]
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_text_haze"]
-bg_color = Color(0.42, 0.22, 0.1, 0.18)
-corner_radius_top_left = 96
-corner_radius_top_right = 96
-corner_radius_bottom_right = 96
-corner_radius_bottom_left = 96
-shadow_color = Color(0.16, 0.07, 0.025, 0.28)
-shadow_size = 28
-shadow_offset = Vector2(0, 10)
+[ext_resource type="FontFile" path="res://assets/fonts/cormorant_garamond/CormorantGaramond-SemiBoldItalic.otf" id="5_reward_font"]
 
 [node name="ShardRewardOverlay" type="Control"]
 visible = false
@@ -42,7 +34,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.045, 0.028, 0.02, 0.38)
+color = Color(0.032, 0.021, 0.018, 0.62)
 
 [node name="WarmWash" type="ColorRect" parent="Atmosphere"]
 layout_mode = 1
@@ -52,23 +44,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.46, 0.22, 0.1, 0.1)
-
-[node name="TextHaze" type="Panel" parent="Atmosphere"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -560.0
-offset_top = -175.0
-offset_right = 560.0
-offset_bottom = 175.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_text_haze")
+color = Color(0.34, 0.15, 0.075, 0.14)
 
 [node name="LightFrameLayer" type="Node2D" parent="."]
 
@@ -136,10 +112,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -500.0
-offset_top = -128.0
-offset_right = 500.0
-offset_bottom = 112.0
+offset_left = -470.0
+offset_top = -178.0
+offset_right = 470.0
+offset_bottom = 58.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
@@ -149,10 +125,15 @@ fit_content = true
 scroll_active = false
 autowrap_mode = 3
 visible_ratio = 0.0
-theme_override_colors/default_color = Color(1, 0.91, 0.72, 1)
-theme_override_colors/font_outline_color = Color(0.16, 0.07, 0.035, 1)
-theme_override_constants/outline_size = 6
-theme_override_font_sizes/normal_font_size = 52
+theme_override_colors/default_color = Color(1, 0.925, 0.745, 1)
+theme_override_colors/font_outline_color = Color(0.095, 0.045, 0.028, 0.92)
+theme_override_constants/outline_size = 5
+theme_override_fonts/normal_font = ExtResource("5_reward_font")
+theme_override_fonts/italics_font = ExtResource("5_reward_font")
+theme_override_fonts/bold_italics_font = ExtResource("5_reward_font")
+theme_override_font_sizes/normal_font_size = 48
+theme_override_font_sizes/italics_font_size = 48
+theme_override_font_sizes/bold_italics_font_size = 48
 
 [node name="ButtonRoot" type="Control" parent="."]
 layout_mode = 1
@@ -170,10 +151,10 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -92.0
-offset_top = -184.0
-offset_right = 92.0
-offset_bottom = 0.0
+offset_left = -82.0
+offset_top = -172.0
+offset_right = 82.0
+offset_bottom = -8.0
 grow_horizontal = 2
 grow_vertical = 0
 focus_mode = 2
