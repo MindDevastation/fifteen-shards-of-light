@@ -71,8 +71,6 @@ var _button_mouse_inside := false
 var _button_has_focus := false
 var _last_geometry_viewport_size := Vector2.ZERO
 var _frame_targets_cache: Array[Vector2] = []
-var _frame_targets_cache_viewport_size := Vector2.ZERO
-var _button_click_mask: BitMap
 
 @onready var atmosphere: Control = $Atmosphere
 @onready var matte_veil: ColorRect = $Atmosphere/MatteVeil
@@ -353,11 +351,10 @@ func _prepare_reward_text(display_text: String) -> void:
 	var layout := _layout_reward_text(display_text)
 	var lines := layout["lines"] as Array[String]
 	_current_text_font_size = int(layout["font_size"])
-	var viewport_size := _get_viewport_size()
 	var scale_factor := _get_text_scale_factor()
 	var line_height := 58.0 * scale_factor
 	var total_height := line_height * float(lines.size())
-	var start_y := viewport_size.y * 0.425 - total_height * 0.5
+	var start_y := _get_viewport_size().y * 0.425 - total_height * 0.5
 	_reset_text_reveal_nodes()
 	for i in range(lines.size()):
 		var line := lines[i]
@@ -371,7 +368,7 @@ func _prepare_reward_text(display_text: String) -> void:
 		label.size = Vector2(measured.x + 18.0 * scale_factor, line_height)
 		label.modulate.a = 0.0
 		mask.visible = true
-		mask.position = Vector2((viewport_size.x - label.size.x) * 0.5, start_y + line_height * float(i))
+		mask.position = Vector2((_get_viewport_size().x - label.size.x) * 0.5, start_y + line_height * float(i))
 		mask.size = Vector2(0.0, line_height)
 		glint.size = Vector2(10.0 * scale_factor, line_height * 0.82)
 		glint.position = Vector2(-glint.size.x, line_height * 0.09)
@@ -557,9 +554,7 @@ func _build_frame_particles(origin_screen_position: Vector2) -> void:
 	_create_frame_particle_pool()
 	var viewport_size := _get_viewport_size()
 	var origin := origin_screen_position.clamp(Vector2.ZERO, viewport_size)
-	if _frame_targets_cache.is_empty() or _frame_targets_cache_viewport_size != viewport_size:
-		_frame_targets_cache = _build_frame_targets(viewport_size)
-		_frame_targets_cache_viewport_size = viewport_size
+	_frame_targets_cache = _build_frame_targets(viewport_size)
 	for i in range(FRAME_PARTICLE_COUNT):
 		var data := _frame_particles[i]
 		var particle := data["node"] as Polygon2D
@@ -986,15 +981,12 @@ func _apply_responsive_layout() -> void:
 func _configure_button_hit_area() -> void:
 	confirm_button.mouse_filter = Control.MOUSE_FILTER_STOP
 	confirm_button.ignore_texture_size = true
-	if _button_click_mask != null:
-		confirm_button.texture_click_mask = _button_click_mask
-		return
 	if confirm_button.texture_normal != null and confirm_button.texture_normal is Texture2D:
 		var image := confirm_button.texture_normal.get_image()
 		if image != null:
-			_button_click_mask = BitMap.new()
-			_button_click_mask.create_from_image_alpha(image, 0.12)
-			confirm_button.texture_click_mask = _button_click_mask
+			var click_mask := BitMap.new()
+			click_mask.create_from_image_alpha(image, 0.12)
+			confirm_button.texture_click_mask = click_mask
 
 
 func _sample_main_tangent_rotation(points: PackedVector2Array, progress: float) -> float:

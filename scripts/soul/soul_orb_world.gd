@@ -7,13 +7,11 @@ const SOUL_ORB_FOLLOW_SCENE := preload("res://scenes/core/SoulOrb_Follow.tscn")
 @export var hover_base_height: float = 1.25
 @export var hover_amplitude: float = 0.12
 @export var hover_speed: float = 1.1
-@export_range(15.0, 60.0, 1.0) var visual_update_hz: float = 30.0
 
 @onready var hover_root: Node3D = $HoverRoot
 @onready var pickup_area: Area3D = $PickupArea
 
 var _time: float = 0.0
-var _visual_update_accumulator: float = 0.0
 var _player_in_range: bool = false
 var _is_collected: bool = false
 var _player_ref: Node3D = null
@@ -28,15 +26,9 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	if _is_collected:
-		set_process(false)
 		return
 
 	_time += delta
-	_visual_update_accumulator += delta
-	var update_interval := 1.0 / maxf(1.0, visual_update_hz)
-	if _visual_update_accumulator < update_interval:
-		return
-	_visual_update_accumulator = 0.0
 	hover_root.position.y = hover_base_height + sin(_time * hover_speed) * hover_amplitude
 
 
