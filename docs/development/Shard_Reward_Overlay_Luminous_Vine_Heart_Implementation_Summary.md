@@ -424,3 +424,156 @@ timeout 20s godot --headless --path . --quit
 ### Need for new video
 
 A fresh PR #77 video capture is required to confirm text readability, heart composition, button-source feel, frame readability, hover area feel, and performance smoothness in the actual gameplay viewport.
+
+## Final Visual Corrective Pass V3
+
+Actual PR #77 head before pass:
+
+```text
+NOT VERIFIED by GitHub CLI in this environment; local base before pass was e3a2ae6337cf289974e58e17122a5adaf63c69a4.
+```
+
+Actual corrective commit:
+
+```text
+Recorded in final handoff from `git rev-parse HEAD` after the final amend.
+```
+
+Final GitHub head after push:
+
+```text
+NOT VERIFIED; no git remote/push destination is configured in this environment.
+```
+
+Cormorant font path:
+
+```text
+res://assets/fonts/cormorant_garamond/CormorantGaramond-SemiBoldItalic.otf
+```
+
+Text layout algorithm:
+
+- The overlay keeps `display_text` external and normalizes repeated spaces without adding shard-specific phrase logic.
+- Explicit line breaks are respected when they can fit the three-line heart-safe layout.
+- Otherwise, word-aware split candidates are evaluated for one, two, and three lines.
+- Each candidate is measured with the actual Cormorant Garamond SemiBold Italic font and scored for balance.
+- Single-word dangling lines receive a generic penalty when better balanced candidates exist.
+- Words are not split mid-word.
+
+Per-line width limits at 1920x1080:
+
+```text
+line 1 = 720 px
+line 2 = 650 px
+line 3 = 560 px
+```
+
+The limits scale from viewport height.
+
+Font size and fallback:
+
+```text
+default = 48 px at 1920x1080
+emergency fallback = 44 px at 1920x1080
+```
+
+The fallback is universal and only exists for cases where a valid three-line layout is not otherwise possible.
+
+Text reveal architecture:
+
+- The unstable `visible_ratio` typewriter reveal was removed from the active presentation path.
+- The overlay now creates reusable `TextRevealRoot`-style line masks in code: `LineRevealMask1..3`, each with a final text copy and a small golden glint.
+- Layout is completed before animation starts.
+- Reveal changes only mask width, line alpha, and glint position/alpha; it does not mutate text wrapping during the reveal.
+
+Text reveal timing:
+
+```text
+line reveal duration = 1.25 sec
+line stagger = 0.55 sec
+```
+
+Vine cap/join settings:
+
+- Main vine and branch `Line2D` nodes use rounded joint mode.
+- Main vine and branch `Line2D` nodes use rounded begin and end caps.
+- Branch starts are overlapped slightly into the main path to reduce visible seams.
+
+Leaf path/tangent attachment:
+
+- Leaves are sampled from the baked main vine path rather than arbitrary viewport coordinates.
+- Each leaf stores a source path, progress threshold, side offset, target scale, rotation, and mirrored scale state.
+- Tangent angle is calculated from neighboring baked points and combined with the authored rotation offset.
+
+Crystal count and distribution:
+
+```text
+total = 72
+top = 22
+bottom = 22
+left = 14
+right = 14
+```
+
+Distribution remains rectangular but uses deterministic clustered offsets and small jitter for heterogeneous density.
+
+Crystal X/Y drift:
+
+- Each pooled crystal stores target, size/aspect via polygon, base rotation, X/Y phase, X/Y speed, X/Y amplitude, and alpha amplitude.
+- Living motion updates at approximately 30 Hz and changes only position, rotation, and alpha.
+
+Button focus/hover fix:
+
+- `texture_focused` now uses the idle texture rather than the hover expression.
+- Mouse hover state is tracked with `mouse_entered`/`mouse_exited` and recalculated after enable/button-up.
+- Keyboard focus remains available via `grab_focus()`, but focus now uses subtle scale/warm modulation instead of the hover face.
+
+Return fade timings:
+
+```text
+vine retract = 2.30 sec
+atmosphere fade = 2.20 sec
+crystal return/fade = approximately 1.97-2.15 sec plus small stagger
+text fade = 1.55 sec
+button fade = 0.65 sec
+```
+
+Optimization changes:
+
+- Frame particles are pooled once and reused instead of being freed/recreated at reward start.
+- Text reveal mask/label/glint nodes are created once and reset per reward.
+- Branch and leaf nodes are reused across rewards for the same viewport size.
+- Geometry is rebuilt only when needed for first use or viewport-size changes.
+- Per-frame crystal living motion remains simple and allocation-light at a 0.033 sec cadence.
+
+Node reuse strategy:
+
+- Reuse crystal `Polygon2D` nodes.
+- Reuse text reveal controls.
+- Reuse branch `Line2D` and leaf `Sprite2D` nodes unless viewport geometry changes.
+
+Cache strategy:
+
+- Cache the last viewport size used for vine/leaf/branch geometry.
+- Cache frame targets for the current viewport/origin setup.
+- Keep baked main/branch points and leaf attachment data for reset-safe reuse.
+
+Tests:
+
+- Static diff whitespace validation.
+- Godot headless parse/check-only.
+- Godot headless launch.
+- Required `rg` inspections for font, reveal, TextHaze, line caps, button focus/mouse signals, frame counts, return timing, allocation calls, and frozen public API.
+- Temporary runtime script attempted the required one-line, two-line, and three-line generic Russian text cases; full runtime asset loading was limited by missing generated `.godot/imported` cache files in this environment.
+
+Remaining limitations:
+
+- Visual quality is not marked final without a new user video capture.
+- Profiler/monitor frame-time and script-time confidence remains partial without an interactive profiler capture.
+- GitHub PR head/push proof depends on remote access from the environment.
+
+New video required:
+
+```text
+YES. Do not mark final visual PASS until a new 1920x1080 and 1280x720 video review confirms the result.
+```
