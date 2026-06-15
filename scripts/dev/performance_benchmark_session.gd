@@ -7,12 +7,12 @@ class_name PerformanceBenchmarkSession
 const CAPTURE_KEY := KEY_F4
 const PROBE_SCRIPT := preload("res://scripts/dev/lightweight_performance_probe.gd")
 
-var _probe: Node = null
+var _probe = null
 
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	_probe = PROBE_SCRIPT.new() as Node
+	_probe = PROBE_SCRIPT.new()
 	_probe.name = "LightweightPerformanceProbe"
 	add_child(_probe)
 	print("Performance benchmark session ready. Press F4 to start a 5s warm-up + 30s capture.")
