@@ -13,7 +13,7 @@ var _loading := false
 
 
 func _ready() -> void:
-	_ensure_benchmark_session()
+	call_deferred("_ensure_benchmark_session")
 	_build_ui()
 
 
