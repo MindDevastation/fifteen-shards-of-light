@@ -7,19 +7,18 @@ signal return_completed
 const DEFAULT_REWARD_TEXT := "..."
 const BUTTON_DISABLED_ALPHA := 0.58
 const BUTTON_ENABLED_ALPHA := 1.0
-const MATTE_VEIL_COLOR := Color(0.045, 0.028, 0.020, 0.38)
-const WARM_WASH_COLOR := Color(0.46, 0.22, 0.10, 0.10)
-const TEXT_HAZE_ALPHA := 0.82
-const TEXT_COLOR := Color(1.0, 0.91, 0.72, 1.0)
-const TEXT_OUTLINE_COLOR := Color(0.16, 0.07, 0.035, 1.0)
+const MATTE_VEIL_COLOR := Color(0.032, 0.021, 0.018, 0.62)
+const WARM_WASH_COLOR := Color(0.34, 0.15, 0.075, 0.14)
+const TEXT_COLOR := Color(1.0, 0.925, 0.745, 1.0)
+const TEXT_OUTLINE_COLOR := Color(0.095, 0.045, 0.028, 0.92)
 const BUTTON_PRESS_SCALE := Vector2(0.945, 0.945)
 const BUTTON_PRESS_OFFSET := Vector2(0.0, 5.0)
 const BUTTON_PRESS_ALPHA := 0.82
-const FRAME_PARTICLE_COUNT := 40
-const FRAME_TOP_COUNT := 12
-const FRAME_BOTTOM_COUNT := 12
-const FRAME_LEFT_COUNT := 8
-const FRAME_RIGHT_COUNT := 8
+const FRAME_PARTICLE_COUNT := 76
+const FRAME_TOP_COUNT := 22
+const FRAME_BOTTOM_COUNT := 22
+const FRAME_LEFT_COUNT := 16
+const FRAME_RIGHT_COUNT := 16
 const FRAME_FORMATION_DURATION := 0.86
 const FRAME_COLORS := [
 	Color(1.0, 0.82, 0.38, 0.92),
@@ -29,7 +28,9 @@ const FRAME_COLORS := [
 ]
 const VINE_LEAF_TEXTURE := preload("res://assets/ui/shard_reward_overlay/vine_leaf.png")
 const VINE_GROWTH_DURATION := 2.3
-const LEAF_THRESHOLDS := [0.28, 0.52, 0.74]
+const REWARD_FONT := preload("res://assets/fonts/cormorant_garamond/CormorantGaramond-SemiBoldItalic.otf")
+const FRAME_LIVING_UPDATE_INTERVAL := 0.033
+const LEAF_THRESHOLDS := [0.20, 0.34, 0.50, 0.66, 0.80]
 const VINE_OUTER_COLOR := Color(1.0, 0.62, 0.18, 0.24)
 const VINE_MAIN_COLOR := Color(1.0, 0.67, 0.26, 0.90)
 const VINE_INNER_COLOR := Color(1.0, 0.92, 0.70, 0.98)
@@ -47,6 +48,7 @@ var _owned_tweens: Array[Tween] = []
 var _button_base_position := Vector2.ZERO
 var _frame_particles: Array[Dictionary] = []
 var _living_time := 0.0
+var _living_update_accumulator := 0.0
 var _vine_progress := 0.0
 var _left_main_points := PackedVector2Array()
 var _right_main_points := PackedVector2Array()
@@ -56,7 +58,6 @@ var _leaf_data: Array[Dictionary] = []
 @onready var atmosphere: Control = $Atmosphere
 @onready var matte_veil: ColorRect = $Atmosphere/MatteVeil
 @onready var warm_wash: ColorRect = $Atmosphere/WarmWash
-@onready var text_haze: Panel = $Atmosphere/TextHaze
 @onready var light_frame_layer: Node2D = $LightFrameLayer
 @onready var vine_canvas: Node2D = $VineCanvas
 @onready var left_outer_glow: Line2D = $VineCanvas/LeftVine/OuterGlow
@@ -94,7 +95,10 @@ func _notification(what: int) -> void:
 
 func _process(delta: float) -> void:
 	_living_time += delta
-	_update_frame_living_state()
+	_living_update_accumulator += delta
+	if _living_update_accumulator >= FRAME_LIVING_UPDATE_INTERVAL:
+		_living_update_accumulator = 0.0
+		_update_frame_living_state()
 
 
 func play_reward(display_text: String, origin_screen_position: Vector2) -> void:
@@ -134,7 +138,6 @@ func _play_reward_async(display_text: String, origin_screen_position: Vector2, g
 	_animate_atmosphere_in()
 	_start_frame_after_delay(generation)
 	_start_vine_after_delay(generation)
-	_start_haze_after_delay(generation)
 	_start_text_after_delay(text_to_show, generation)
 
 
@@ -166,7 +169,6 @@ func _reset_visual_state(reset_signals: bool = true) -> void:
 	matte_veil.color = MATTE_VEIL_COLOR
 	warm_wash.color = WARM_WASH_COLOR
 	atmosphere.modulate.a = 0.0
-	text_haze.modulate.a = 0.0
 	light_frame_layer.modulate.a = 1.0
 	vine_canvas.modulate.a = 1.0
 	text_root.modulate.a = 0.0
@@ -226,14 +228,6 @@ func _start_vine_after_delay(generation: int) -> void:
 	_try_enable_button(generation)
 
 
-func _start_haze_after_delay(generation: int) -> void:
-	await get_tree().create_timer(0.25).timeout
-	if generation != _sequence_generation:
-		return
-	var tween := _track_tween(create_tween())
-	tween.tween_property(text_haze, "modulate:a", TEXT_HAZE_ALPHA, 0.42).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-
-
 func _start_text_after_delay(text_to_show: String, generation: int) -> void:
 	await get_tree().create_timer(0.50).timeout
 	if generation != _sequence_generation:
@@ -272,17 +266,16 @@ func _animate_return_sequence(target_screen_position: Vector2, generation: int) 
 	var tween := _track_tween(create_tween())
 	tween.set_parallel(true)
 	tween.tween_property(text_root, "modulate:a", 0.0, 0.22).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
-	tween.tween_property(text_haze, "modulate:a", 0.0, 0.26).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
 	tween.tween_property(button_root, "modulate:a", 0.0, 0.18).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
 	tween.tween_property(atmosphere, "modulate:a", 0.0, 0.42).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	tween.tween_method(_update_vine_visuals, _vine_progress, 0.0, 0.58).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_method(_update_vine_visuals, _vine_progress, 0.0, VINE_GROWTH_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	for i in range(_frame_particles.size()):
 		var data := _frame_particles[i]
 		var particle := data["node"] as Polygon2D
 		if particle == null:
 			continue
-		var delay := float(i % 8) * 0.018 + _hash_01(i, 211) * 0.05
-		var duration := 0.52 + _hash_01(i, 223) * 0.18
+		var delay := float(i % 10) * 0.022 + _hash_01(i, 211) * 0.06
+		var duration := 0.72 + _hash_01(i, 223) * 0.24
 		tween.tween_property(particle, "position", target + _hash_vector(i, 227) * 7.0, duration).set_delay(delay).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
 		tween.tween_property(particle, "scale", Vector2.ZERO, duration * 0.82).set_delay(delay + duration * 0.12).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
 		tween.tween_property(particle, "modulate:a", 0.0, duration * 0.6).set_delay(delay + duration * 0.3).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
@@ -363,7 +356,7 @@ func _update_frame_living_state() -> void:
 		var target := data["target"] as Vector2
 		var phase := float(data["phase"])
 		var speed := float(data["speed"])
-		var offset := Vector2(sin(_living_time * speed + phase), cos(_living_time * speed * 0.79 + phase)) * 1.35
+		var offset := Vector2(sin(_living_time * speed + phase), cos(_living_time * speed * 0.79 + phase)) * 1.65
 		particle.position = target + offset
 		particle.rotation = float(data["base_rotation"]) + sin(_living_time * speed + phase) * 0.012
 		particle.modulate.a = 0.88 + sin(_living_time * speed * 1.7 + phase) * 0.10
@@ -379,14 +372,15 @@ func _build_vine_geometry() -> void:
 	_leaf_data.clear()
 	var viewport_size := _get_viewport_size()
 	var center_x := viewport_size.x * 0.5
-	var origin := Vector2(center_x, viewport_size.y * 0.78)
+	var origin := Vector2(center_x, viewport_size.y * 0.785)
 	var left_curve := Curve2D.new()
-	left_curve.bake_interval = 12.0
-	_add_curve_point(left_curve, origin, Vector2.ZERO, Vector2(-viewport_size.x * 0.055, -viewport_size.y * 0.09))
-	_add_curve_point(left_curve, Vector2(viewport_size.x * 0.38, viewport_size.y * 0.62), Vector2(viewport_size.x * 0.055, viewport_size.y * 0.05), Vector2(-viewport_size.x * 0.13, -viewport_size.y * 0.13))
-	_add_curve_point(left_curve, Vector2(viewport_size.x * 0.25, viewport_size.y * 0.38), Vector2(viewport_size.x * 0.13, viewport_size.y * 0.10), Vector2(-viewport_size.x * 0.02, -viewport_size.y * 0.18))
-	_add_curve_point(left_curve, Vector2(viewport_size.x * 0.37, viewport_size.y * 0.17), Vector2(-viewport_size.x * 0.13, viewport_size.y * 0.03), Vector2(viewport_size.x * 0.08, -viewport_size.y * 0.03))
-	_add_curve_point(left_curve, Vector2(center_x, viewport_size.y * 0.29), Vector2(-viewport_size.x * 0.07, -viewport_size.y * 0.09), Vector2.ZERO)
+	left_curve.bake_interval = 8.0
+	_add_curve_point(left_curve, origin, Vector2.ZERO, Vector2(-viewport_size.x * 0.035, -viewport_size.y * 0.055))
+	_add_curve_point(left_curve, Vector2(viewport_size.x * 0.42, viewport_size.y * 0.665), Vector2(viewport_size.x * 0.035, viewport_size.y * 0.04), Vector2(-viewport_size.x * 0.07, -viewport_size.y * 0.07))
+	_add_curve_point(left_curve, Vector2(viewport_size.x * 0.335, viewport_size.y * 0.535), Vector2(viewport_size.x * 0.08, viewport_size.y * 0.06), Vector2(-viewport_size.x * 0.095, -viewport_size.y * 0.085))
+	_add_curve_point(left_curve, Vector2(viewport_size.x * 0.255, viewport_size.y * 0.37), Vector2(viewport_size.x * 0.11, viewport_size.y * 0.08), Vector2(-viewport_size.x * 0.035, -viewport_size.y * 0.16))
+	_add_curve_point(left_curve, Vector2(viewport_size.x * 0.36, viewport_size.y * 0.165), Vector2(-viewport_size.x * 0.13, viewport_size.y * 0.02), Vector2(viewport_size.x * 0.075, -viewport_size.y * 0.025))
+	_add_curve_point(left_curve, Vector2(center_x, viewport_size.y * 0.275), Vector2(-viewport_size.x * 0.065, -viewport_size.y * 0.085), Vector2.ZERO)
 	_left_main_points = left_curve.get_baked_points()
 	_right_main_points = _mirror_points(_left_main_points, center_x)
 	_build_branch_geometry(viewport_size, center_x)
@@ -407,10 +401,12 @@ func _mirror_points(points: PackedVector2Array, center_x: float) -> PackedVector
 
 func _build_branch_geometry(viewport_size: Vector2, center_x: float) -> void:
 	var branches := [
-		{"side": -1, "threshold": 0.24, "anchor": Vector2(0.40, 0.60), "curl": Vector2(-0.08, -0.07)},
-		{"side": -1, "threshold": 0.44, "anchor": Vector2(0.31, 0.44), "curl": Vector2(-0.08, 0.03)},
-		{"side": -1, "threshold": 0.62, "anchor": Vector2(0.29, 0.29), "curl": Vector2(0.055, -0.055)},
-		{"side": -1, "threshold": 0.78, "anchor": Vector2(0.39, 0.21), "curl": Vector2(-0.055, -0.02)},
+		{"side": -1, "threshold": 0.12, "anchor": Vector2(0.49, 0.755), "curl": Vector2(-0.045, -0.055)},
+		{"side": -1, "threshold": 0.22, "anchor": Vector2(0.405, 0.635), "curl": Vector2(-0.065, -0.055)},
+		{"side": -1, "threshold": 0.36, "anchor": Vector2(0.34, 0.515), "curl": Vector2(-0.075, 0.035)},
+		{"side": -1, "threshold": 0.50, "anchor": Vector2(0.285, 0.39), "curl": Vector2(-0.055, -0.045)},
+		{"side": -1, "threshold": 0.64, "anchor": Vector2(0.305, 0.285), "curl": Vector2(0.052, -0.050)},
+		{"side": -1, "threshold": 0.78, "anchor": Vector2(0.39, 0.205), "curl": Vector2(-0.048, -0.020)},
 	]
 	for branch in branches:
 		_add_branch_pair(branch, viewport_size, center_x)
@@ -457,9 +453,11 @@ func _create_branch_line(line_name: String, width: float, color: Color) -> Line2
 
 func _build_leaf_geometry(viewport_size: Vector2, center_x: float) -> void:
 	var leaf_ratios := [
-		{"threshold": LEAF_THRESHOLDS[0], "left": Vector2(0.39, 0.58), "rotation": -0.55, "scale": 0.080},
-		{"threshold": LEAF_THRESHOLDS[1], "left": Vector2(0.29, 0.38), "rotation": 0.28, "scale": 0.068},
-		{"threshold": LEAF_THRESHOLDS[2], "left": Vector2(0.36, 0.22), "rotation": -0.18, "scale": 0.092},
+		{"threshold": LEAF_THRESHOLDS[0], "left": Vector2(0.435, 0.655), "rotation": -0.78, "scale": 0.054},
+		{"threshold": LEAF_THRESHOLDS[1], "left": Vector2(0.355, 0.535), "rotation": -0.34, "scale": 0.050},
+		{"threshold": LEAF_THRESHOLDS[2], "left": Vector2(0.285, 0.405), "rotation": 0.20, "scale": 0.052},
+		{"threshold": LEAF_THRESHOLDS[3], "left": Vector2(0.315, 0.285), "rotation": 0.54, "scale": 0.047},
+		{"threshold": LEAF_THRESHOLDS[4], "left": Vector2(0.405, 0.205), "rotation": -0.28, "scale": 0.058},
 	]
 	for leaf in leaf_ratios:
 		for side in [-1, 1]:
@@ -472,7 +470,7 @@ func _build_leaf_geometry(viewport_size: Vector2, center_x: float) -> void:
 			sprite.position = Vector2(viewport_size.x * x_ratio, viewport_size.y * left_pos.y)
 			var target_scale := float(leaf["scale"]) * viewport_size.y / 1024.0
 			sprite.scale = Vector2.ZERO
-			sprite.rotation = float(leaf["rotation"]) * side
+			sprite.rotation = float(leaf["rotation"]) * side + _sample_main_tangent_rotation(_left_main_points if side < 0 else _right_main_points, float(leaf["threshold"])) * 0.35
 			sprite.modulate = Color(1.0, 0.84 + 0.04 * float(_leaf_data.size() % 2), 0.52, 0.0)
 			leaf_layer.add_child(sprite)
 			_leaf_data.append({"node": sprite, "threshold": float(leaf["threshold"]), "scale": Vector2(target_scale * side, target_scale), "rotation": sprite.rotation})
@@ -499,13 +497,10 @@ func _update_vine_visuals(progress: float) -> void:
 
 
 func _truncate_points(points: PackedVector2Array, progress: float) -> PackedVector2Array:
-	var visible := PackedVector2Array()
 	if points.is_empty() or progress <= 0.0:
-		return visible
+		return PackedVector2Array()
 	var count := clampi(int(ceil(float(points.size()) * progress)), 1, points.size())
-	for i in range(count):
-		visible.append(points[i])
-	return visible
+	return points.slice(0, count)
 
 
 func _update_tip_from_points(tip: Polygon2D, points: PackedVector2Array, progress: float) -> void:
@@ -606,29 +601,51 @@ func _configure_vine_line_styles() -> void:
 func _apply_responsive_layout() -> void:
 	var viewport_size := _get_viewport_size()
 	var scale_factor: float = clampf(viewport_size.y / 1080.0, 0.72, 1.08)
-	var haze_width: float = clampf(viewport_size.x * 0.58, 760.0, 1120.0)
-	var haze_height: float = clampf(viewport_size.y * 0.32, 250.0, 350.0)
-	text_haze.offset_left = -haze_width * 0.5
-	text_haze.offset_right = haze_width * 0.5
-	text_haze.offset_top = -haze_height * 0.5
-	text_haze.offset_bottom = haze_height * 0.5
-	var text_width: float = haze_width - 120.0 * scale_factor
-	var text_height: float = haze_height - 90.0 * scale_factor
+	var text_width: float = clampf(viewport_size.x * 0.49, 620.0, 940.0)
+	var text_height: float = clampf(viewport_size.y * 0.235, 210.0, 270.0)
 	reward_text_label.offset_left = -text_width * 0.5
 	reward_text_label.offset_right = text_width * 0.5
-	reward_text_label.offset_top = -text_height * 0.5
-	reward_text_label.offset_bottom = text_height * 0.5
-	reward_text_label.add_theme_font_size_override("normal_font_size", int(round(52.0 * scale_factor)))
+	reward_text_label.offset_top = -text_height * 0.72
+	reward_text_label.offset_bottom = text_height * 0.28
+	reward_text_label.add_theme_font_override("normal_font", REWARD_FONT)
+	reward_text_label.add_theme_font_override("italics_font", REWARD_FONT)
+	reward_text_label.add_theme_font_override("bold_italics_font", REWARD_FONT)
+	var reward_font_size := int(round(48.0 * scale_factor))
+	reward_text_label.add_theme_font_size_override("normal_font_size", reward_font_size)
+	reward_text_label.add_theme_font_size_override("italics_font_size", reward_font_size)
+	reward_text_label.add_theme_font_size_override("bold_italics_font_size", reward_font_size)
 	reward_text_label.add_theme_color_override("default_color", TEXT_COLOR)
 	reward_text_label.add_theme_color_override("font_outline_color", TEXT_OUTLINE_COLOR)
-	reward_text_label.add_theme_constant_override("outline_size", int(round(6.0 * scale_factor)))
-	var button_size: float = clampf(viewport_size.y * 0.17, 132.0, 184.0)
+	reward_text_label.add_theme_constant_override("outline_size", int(round(5.0 * scale_factor)))
+	var button_size: float = clampf(viewport_size.y * 0.152, 120.0, 164.0)
 	confirm_button.offset_left = -button_size * 0.5
 	confirm_button.offset_right = button_size * 0.5
-	confirm_button.offset_top = -button_size - 52.0 * scale_factor
-	confirm_button.offset_bottom = -52.0 * scale_factor
+	confirm_button.offset_top = -button_size - 44.0 * scale_factor
+	confirm_button.offset_bottom = -44.0 * scale_factor
 	_button_base_position = confirm_button.position
 	confirm_button.pivot_offset = Vector2(button_size, button_size) * 0.5
+	_configure_button_hit_area()
+
+
+func _configure_button_hit_area() -> void:
+	confirm_button.mouse_filter = Control.MOUSE_FILTER_STOP
+	confirm_button.ignore_texture_size = true
+	if confirm_button.texture_normal != null and confirm_button.texture_normal is Texture2D:
+		var image := confirm_button.texture_normal.get_image()
+		if image != null:
+			var click_mask := BitMap.new()
+			click_mask.create_from_image_alpha(image, 0.12)
+			confirm_button.texture_click_mask = click_mask
+
+
+func _sample_main_tangent_rotation(points: PackedVector2Array, progress: float) -> float:
+	if points.size() < 2:
+		return 0.0
+	var index := clampi(int(round(float(points.size() - 1) * progress)), 1, points.size() - 1)
+	var tangent := points[index] - points[index - 1]
+	if tangent.length_squared() <= 0.001:
+		return 0.0
+	return tangent.angle()
 
 
 func _get_viewport_size() -> Vector2:
