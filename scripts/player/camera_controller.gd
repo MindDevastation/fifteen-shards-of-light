@@ -16,6 +16,7 @@ extends Camera3D
 @export_range(1.0, 40.0, 0.5) var camera_collision_release_smoothness: float = 8.0
 @export_range(0.0, 0.5, 0.01) var camera_collision_deadzone: float = 0.08
 @export_range(0.0, 1.0, 0.01) var camera_min_obstruction_delta: float = 0.12
+@export_range(0.05, 1.0, 0.01) var blocking_ui_poll_interval: float = 0.25
 
 @onready var target: Node3D = get_node_or_null(target_path) as Node3D
 
@@ -25,10 +26,15 @@ var _zoom_distance: float = 2.6
 var _smoothed_target_focus: Vector3 = Vector3.ZERO
 var _current_camera_distance: float = 2.6
 var _has_smoothed_target_focus: bool = false
+var _blocking_ui_poll_accumulator: float = 0.0
+var _blocking_ui_open: bool = false
+var _dev_menu_panel: Control = null
 
 
 func _ready() -> void:
 	_zoom_distance = clamp(_zoom_distance, min_zoom_distance, max_zoom_distance)
+	_cache_dev_menu_panel()
+	_refresh_blocking_ui_state()
 	_snap_to_orbit_position()
 	_update_mouse_mode()
 
@@ -57,7 +63,11 @@ func _process(_delta: float) -> void:
 	if target == null:
 		return
 
-	_update_mouse_mode()
+	_blocking_ui_poll_accumulator += _delta
+	if _blocking_ui_poll_accumulator >= blocking_ui_poll_interval:
+		_blocking_ui_poll_accumulator = 0.0
+		_refresh_blocking_ui_state()
+		_update_mouse_mode()
 
 	var target_focus := _get_smoothed_target_focus(_delta)
 	var camera_direction := _get_orbit_direction()
@@ -132,30 +142,45 @@ func _update_mouse_mode() -> void:
 	if not current:
 		return
 
-	if _is_blocking_ui_open():
+	if _blocking_ui_open:
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	else:
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 
 func _is_blocking_ui_open() -> bool:
+	_refresh_blocking_ui_state()
+	return _blocking_ui_open
+
+
+func _refresh_blocking_ui_state() -> void:
 	if _is_dev_menu_visible():
-		return true
+		_blocking_ui_open = true
+		return
 	if _is_poem_reward_visible():
-		return true
+		_blocking_ui_open = true
+		return
 	if _is_ending_overlay_visible():
-		return true
+		_blocking_ui_open = true
+		return
 	if _is_shard_reward_overlay_visible():
-		return true
-	return false
+		_blocking_ui_open = true
+		return
+	_blocking_ui_open = false
 
 
 func _is_dev_menu_visible() -> bool:
+	if _dev_menu_panel == null or not is_instance_valid(_dev_menu_panel):
+		_cache_dev_menu_panel()
+	return _dev_menu_panel != null and _dev_menu_panel.visible
+
+
+func _cache_dev_menu_panel() -> void:
 	var menu := get_tree().root.get_node_or_null("/root/DevLevelMenu") as CanvasLayer
 	if menu == null:
-		return false
-	var panel := menu.get_node_or_null("OverlayRoot/MenuPanel") as Control
-	return panel != null and panel.visible
+		_dev_menu_panel = null
+		return
+	_dev_menu_panel = menu.get_node_or_null("OverlayRoot/MenuPanel") as Control
 
 
 func _is_poem_reward_visible() -> bool:
