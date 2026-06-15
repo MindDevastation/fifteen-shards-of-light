@@ -49,7 +49,6 @@ const COLLECTION_OUTER_BLOOM_END_SCALE := 0.92
 const COLLECTION_OUTER_BLOOM_START_ALPHA := 0.28
 const COLLECTION_OUTER_BLOOM_START_EMISSION := 0.72
 const COLLECTION_OUTER_BLOOM_END_EMISSION := 0.12
-const IDLE_PRESENTATION_UPDATE_INTERVAL := 0.033
 
 
 enum CollectionState {
@@ -63,7 +62,6 @@ enum CollectionState {
 var _state := CollectionState.IDLE
 var _player_in_range := false
 var _idle_time := 0.0
-var _idle_update_accumulator := 0.0
 var _spiral_time := 0.0
 var _visual_base_position := Vector3.ZERO
 var _visual_base_scale := Vector3.ONE
@@ -176,15 +174,7 @@ func _process(delta: float) -> void:
 		return
 
 	if _state == CollectionState.IDLE:
-		_idle_time += delta
-		_idle_update_accumulator += delta
-		if _idle_update_accumulator >= IDLE_PRESENTATION_UPDATE_INTERVAL:
-			var accumulated_delta := _idle_update_accumulator
-			_idle_update_accumulator = 0.0
-			_update_idle_presentation(accumulated_delta)
-		return
-
-	set_process(false)
+		_update_idle_presentation(delta)
 
 
 func _on_body_entered(body: Node3D) -> void:
@@ -214,8 +204,6 @@ func _begin_collection_sequence() -> void:
 		return
 
 	_state = CollectionState.CHARGING
-	_idle_update_accumulator = 0.0
-	set_process(true)
 	_player_in_range = false
 	interaction_prompt.play_confirm_and_hide()
 	set_deferred("monitoring", false)
@@ -321,7 +309,6 @@ func _remap_clamped(value: float, input_min: float, input_max: float) -> float:
 
 func _play_world_burst() -> void:
 	_state = CollectionState.BURSTING
-	set_process(false)
 	visual_root.visible = false
 	ground_vfx_root.visible = false
 	_start_collection_burst_visuals()
@@ -419,7 +406,6 @@ func complete_collection_sequence() -> void:
 
 	_collection_completed = true
 	_state = CollectionState.COLLECTED
-	set_process(false)
 	_player_in_range = false
 	interaction_prompt.hide_prompt()
 	visual_root.visible = false
@@ -432,6 +418,7 @@ func complete_collection_sequence() -> void:
 
 
 func _update_idle_presentation(delta: float) -> void:
+	_idle_time += delta
 	_spiral_time += delta
 	var wave_time := _idle_time * hover_speed + _idle_phase
 	visual_root.position = _visual_base_position + Vector3.UP * (sin(wave_time) * hover_amplitude)

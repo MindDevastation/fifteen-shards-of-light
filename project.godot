@@ -21,7 +21,7 @@ DevLevelMenu="*res://scenes/dev/DevLevelMenu.tscn"
 
 [debug]
 
-settings/stdout/print_fps=false
+settings/stdout/print_fps=true
 
 [display]
 
