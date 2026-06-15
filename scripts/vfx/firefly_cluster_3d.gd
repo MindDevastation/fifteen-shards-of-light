@@ -70,7 +70,7 @@ func _process(delta: float) -> void:
 	var update_interval := 1.0 / maxf(1.0, visual_update_hz)
 	if _visual_update_accumulator < update_interval:
 		return
-	_visual_update_accumulator = fmod(_visual_update_accumulator, update_interval)
+	_visual_update_accumulator = 0.0
 
 	var time_sec := Time.get_ticks_msec() * 0.001
 	for firefly_data in _fireflies:
@@ -128,7 +128,7 @@ func _rebuild_fireflies() -> void:
 		child.queue_free()
 
 	_fireflies.clear()
-	var count := max(1, firefly_count)
+	var count: int = maxi(1, firefly_count)
 
 	for i in count:
 		var firefly := MeshInstance3D.new()

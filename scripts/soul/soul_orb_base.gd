@@ -48,7 +48,7 @@ func _process(delta: float) -> void:
 	if _visual_update_accumulator < update_interval:
 		return
 	var visual_delta := _visual_update_accumulator
-	_visual_update_accumulator = fmod(_visual_update_accumulator, update_interval)
+	_visual_update_accumulator = 0.0
 
 	if inner_ring_root != null:
 		inner_ring_root.rotate_y(inner_ring_speed * visual_delta)

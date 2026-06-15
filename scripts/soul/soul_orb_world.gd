@@ -36,7 +36,7 @@ func _process(delta: float) -> void:
 	var update_interval := 1.0 / maxf(1.0, visual_update_hz)
 	if _visual_update_accumulator < update_interval:
 		return
-	_visual_update_accumulator = fmod(_visual_update_accumulator, update_interval)
+	_visual_update_accumulator = 0.0
 	hover_root.position.y = hover_base_height + sin(_time * hover_speed) * hover_amplitude
 
 

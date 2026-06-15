@@ -2,6 +2,8 @@ extends CanvasLayer
 
 const PRIMARY_TOGGLE_KEY := KEY_Q
 const LEGACY_TOGGLE_KEY := KEY_F10
+const PERFORMANCE_CAPTURE_KEY := KEY_F8
+const PERFORMANCE_PROBE_SCRIPT := preload("res://scripts/dev/performance_probe.gd")
 const DEV_LEVELS := [
 	{"button_name": "Level01Button", "label": "Level 01", "scene_path": "res://scenes/levels/Level_01.tscn"},
 	{"button_name": "Level02Button", "label": "Level 02", "scene_path": "res://scenes/levels/Level_02.tscn"},
@@ -24,6 +26,7 @@ const DEV_LEVELS := [
 @onready var menu_panel: PanelContainer = %MenuPanel
 
 var _is_loading := false
+var _performance_probe: Node = null
 
 
 func _ready() -> void:
@@ -42,6 +45,10 @@ func _ready() -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == PERFORMANCE_CAPTURE_KEY:
+			_start_performance_capture()
+			get_viewport().set_input_as_handled()
+			return
 		if event.keycode == PRIMARY_TOGGLE_KEY or event.keycode == LEGACY_TOGGLE_KEY:
 			menu_panel.visible = not menu_panel.visible
 			_update_mouse_mode()
@@ -80,6 +87,26 @@ func _update_mouse_mode() -> void:
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	else:
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+
+
+func _start_performance_capture(phase_label: String = "f8_manual") -> void:
+	if _performance_probe == null or not is_instance_valid(_performance_probe):
+		_performance_probe = PERFORMANCE_PROBE_SCRIPT.new() as Node
+		_performance_probe.name = "PerformanceProbe"
+		get_tree().root.add_child(_performance_probe)
+
+	var scene_label := _get_current_scene_label()
+	_performance_probe.start_capture(scene_label, phase_label)
+	print("Performance benchmark capture started. Output path will be printed when capture completes.")
+
+
+func _get_current_scene_label() -> String:
+	var current_scene := get_tree().current_scene
+	if current_scene == null:
+		return "no_scene"
+	if current_scene.scene_file_path.is_empty():
+		return current_scene.name
+	return current_scene.scene_file_path.get_file().get_basename()
 
 
 func _is_gameplay_scene_active() -> bool:

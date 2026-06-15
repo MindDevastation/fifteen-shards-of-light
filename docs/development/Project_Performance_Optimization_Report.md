@@ -103,3 +103,123 @@ Headless startup confirms project load/check-only success, but does not prove re
 - Stutter reduction: PARTIAL; overlay/probe/cache changes reduce avoidable runtime work, but target benchmark is required
 - Stable 60 FPS: NOT VERIFIED ON TARGET HARDWARE
 - Merge: WAIT FOR USER BENCHMARK
+
+## Pre-Benchmark Corrective Pass
+
+### PR #80 reconciliation
+
+- Reported local SHA from previous handoff: `f86b181ac23375011852e08d837dec5be218a4fd`.
+- Actual GitHub head before this corrective pass, per user-provided PR state: `20afb056f9bf1a34048db653ccb86af11f17747c` on `feature/conduct-project-wide-performance-audit` with 1 commit.
+- Local checkout before this corrective pass: branch `work`, SHA `840883793f9f86fb8dbca1b121e77ec01b256de2`.
+- Remote/GitHub re-read in Codex: unavailable because this checkout has no configured Git remote and `gh pr view 80` returned no data.
+- Content equivalence: local branch contains the same file set described in PR #80, but exact GitHub tree equivalence could not be proven from Codex without remote access.
+- Missing commits: previous multi-commit local history was represented locally as a single squashed commit before this corrective pass.
+- Missing files: none detected in local PR content; the expected report, probe, and low-risk script/config edits are present.
+- Selected authoritative state: current local working tree on top of the PR #80 content, with this corrective pass applied.
+
+### Camera recursion fix
+
+The previous camera change still allowed `_unhandled_input()` to call `_is_blocking_ui_open()`, which refreshed blocking UI state and could recursively scan named controls during high-frequency mouse motion.
+
+Corrective behavior:
+
+- `_unhandled_input()` now reads cached `_blocking_ui_open` only.
+- Camera code caches direct references to DevLevelMenu, `UILayer/PoemRewardUI`, `UILayer/EndingOverlay`, and `UILayer/ShardRewardOverlay`.
+- Cached references refresh when the current scene changes or when cached instances become invalid.
+- Blocking UI state is refreshed from direct cached references, not recursive `get_children()` traversal.
+- A low-frequency forced reference refresh remains as a fallback; ordinary overlay visibility response is immediate because direct cached visibility is read every frame without recursion.
+
+### Visual accumulator correction
+
+Corrected the newly introduced visual accumulators in:
+
+- `scripts/soul/soul_orb_base.gd`
+- `scripts/soul/soul_orb_world.gd`
+- `scripts/soul/soul_shard.gd`
+- `scripts/vfx/firefly_cluster_3d.gd`
+
+The selected strategy is simple accumulated-time consumption:
+
+```gdscript
+var visual_delta := _visual_update_accumulator
+_visual_update_accumulator = 0.0
+```
+
+For absolute-time visuals, the accumulator is reset to `0.0` after the update threshold. This avoids double-counting a preserved remainder while keeping animations time-based.
+
+### PerformanceProbe overhead correction
+
+Capture-time overhead was reduced by replacing per-frame formatted CSV strings with numeric sample arrays. CSV string formatting is deferred until `_write_csv()`.
+
+- Frame time source for authoritative percentiles and 1% low: `delta * 1000.0`.
+- `Engine.get_frames_per_second()` remains a secondary smoothed FPS sample only.
+- Node/diagnostic counting is optional and runs no more than once per second.
+- 1% low method: `1000 / average(slowest ceil(sample_count * 0.01) frame times)`.
+- Summary metrics written/printed: sample count, average FPS from frame times, median frame time, p95, p99, 1% low FPS, minimum FPS, maximum frame time, average process time, average physics time, average draw calls, and diagnostic max counts.
+
+### Probe launch instructions
+
+Dev-only hotkey workflow:
+
+1. Run the standalone build or editor run on target hardware.
+2. Navigate to the scene/test phase to benchmark.
+3. Press `F8` to start the default 5-second warm-up plus 30-second capture.
+4. Wait for the console message `PerformanceProbe wrote ...`.
+5. Repeat `F8` for a second or third capture; each run clears stale samples and writes a new timestamped CSV.
+6. CSV files are written under `user://performance` and include scene and phase labels in the filename.
+
+This workflow is disabled by default until the user presses `F8`; it does not add a production autoload.
+
+### 30 Hz visual gating impact reassessment
+
+At the reported 15–20 FPS, each rendered frame is already about 50–66 ms, which exceeds the 33.3 ms interval for a 30 Hz visual gate. Therefore these gates do not skip most frames at the current reported baseline.
+
+Interpretation:
+
+- They may reduce CPU work and improve headroom once the game is near or above 60 FPS.
+- They may reduce unnecessary decorative work in lighter scenes.
+- They are not sufficient evidence that the current 15–20 FPS bottleneck has been solved.
+- Target-hardware rendered profiling remains required to identify whether the main bottleneck is GPU, draw calls, shadows, overdraw, physics, loading, or script.
+
+### Diagnostic counts and likely hotspot candidates
+
+Static scene text counts from Codex before target runtime capture:
+
+| Counter | Static count / availability |
+| --- | --- |
+| FireflyCluster3D scenes | 1 source scene |
+| Total MeshInstance3D nodes in `.tscn` files | 62 |
+| SoulOrb/SoulShard named petal nodes in `.tscn` files | 52 |
+| Light nodes in `.tscn` files | 30 |
+| Explicit `shadow_enabled = true` entries | 9 |
+| Particle nodes | 4 |
+| Line2D nodes | 6 |
+| Runtime draw calls | Available from `PerformanceProbe` CSV |
+| Runtime objects drawn | Available from `PerformanceProbe` CSV |
+| Runtime visible meshes/lights/shadow lights/transparent materials | Available from `PerformanceProbe` once-per-second diagnostic counts |
+
+Candidates for target A/B testing, not applied automatically:
+
+| Candidate | Current count | Expected bottleneck type | Risk | Recommended A/B test |
+| --- | --- | --- | --- | --- |
+| Shadow-enabled local lights | 9 static `shadow_enabled = true` entries | GPU shadow-map cost / Forward Plus lighting | Medium visual risk | Capture before/after with selected non-critical local shadows disabled in a throwaway branch; compare screenshots and GPU/frame-time CSV |
+| Many decorative MeshInstance3D VFX nodes | 62 static mesh nodes; runtime visible count via probe | Draw calls / object submission | Medium if converted visually incorrectly | Measure visible mesh and draw-call counts during Level_01, shard charge, and overlay; consider MultiMesh only after metrics |
+| Transparent VFX and UI lines | 4 particle nodes and 6 Line2D nodes statically; runtime transparent material count via probe | Overdraw / blending | Medium visual risk | Capture overlay and burst phases; compare p95/max frame time and visual parity before reducing any effect |
+| SoulOrb/SoulShard petal/mote nodes | 52 static named petal nodes | Script transform cost and draw-call cost | Low-to-medium | Use probe visible counts and draw calls during orb/shard scenes; consider pooling/MultiMesh only with A/B screenshots |
+
+### Remaining Tier B approvals
+
+Still not applied without target metrics and user approval:
+
+- renderer switch;
+- global shadow disabling;
+- light removal;
+- texture reduction;
+- mesh simplification;
+- visible VFX or particle-count reduction;
+- physics behavior changes;
+- resolution reduction.
+
+### Target benchmark status
+
+Corrective pass improves benchmark readiness and removes a real input-path CPU regression, but target-hardware rendered benchmark is still required before claiming stable 60 FPS.
