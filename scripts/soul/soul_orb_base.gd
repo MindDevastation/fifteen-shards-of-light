@@ -7,6 +7,7 @@ extends Node3D
 @export var glow_energy_base: float = 0.85
 @export var glow_energy_amplitude: float = 0.2
 @export var glow_pulse_speed: float = 1.1
+@export_range(15.0, 60.0, 1.0) var visual_update_hz: float = 30.0
 
 @export_range(20, 25, 1) var petal_count: int = 25
 @export var petal_scale: Vector3 = Vector3(0.25, 0.25, 0.25)
@@ -30,6 +31,7 @@ var _absorb_pulse_tween: Tween = null
 var _core_base_scale: Vector3 = Vector3.ONE
 var _petal_data: Array[Dictionary] = []
 var _petal_roots: Array[Node3D] = []
+var _visual_update_accumulator: float = 0.0
 
 
 func _ready() -> void:
@@ -41,12 +43,18 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	_time += delta
+	_visual_update_accumulator += delta
+	var update_interval := 1.0 / maxf(1.0, visual_update_hz)
+	if _visual_update_accumulator < update_interval:
+		return
+	var visual_delta := _visual_update_accumulator
+	_visual_update_accumulator = 0.0
 
 	if inner_ring_root != null:
-		inner_ring_root.rotate_y(inner_ring_speed * delta)
+		inner_ring_root.rotate_y(inner_ring_speed * visual_delta)
 	if outer_ring_center_root != null:
-		outer_ring_center_root.rotate_x(outer_ring_speed * delta)
-		outer_ring_center_root.rotate_z(outer_ring_speed * 0.6 * delta)
+		outer_ring_center_root.rotate_x(outer_ring_speed * visual_delta)
+		outer_ring_center_root.rotate_z(outer_ring_speed * 0.6 * visual_delta)
 
 	var breathe_phase: float = sin(_time * core_breathe_speed)
 	var breathe_scale: float = 1.0 + (core_breathe_amplitude * breathe_phase)
@@ -57,7 +65,7 @@ func _process(delta: float) -> void:
 	if orb_light != null:
 		orb_light.light_energy = glow_energy_base + (glow_energy_amplitude * glow_phase) + _absorb_pulse_boost
 
-	_update_petals(delta)
+	_update_petals(visual_delta)
 
 
 func play_absorb_pulse() -> void:

@@ -32,6 +32,7 @@ extends Node3D
 
 @export_range(0.05, 2.0, 0.01) var drift_speed: float = 0.22
 @export_range(0.0, 1.0, 0.01) var flicker_strength: float = 0.2
+@export_range(15.0, 60.0, 1.0) var visual_update_hz: float = 30.0
 @export_range(0.01, 0.2, 0.005) var firefly_size: float = 0.045:
 	set(value):
 		firefly_size = value
@@ -53,6 +54,7 @@ extends Node3D
 var _shared_mesh: SphereMesh
 var _shared_material: StandardMaterial3D
 var _fireflies: Array[Dictionary] = []
+var _visual_update_accumulator := 0.0
 
 func _ready() -> void:
 	_ensure_visual_resources()
@@ -63,6 +65,12 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if not emission_enabled:
 		return
+
+	_visual_update_accumulator += delta
+	var update_interval := 1.0 / maxf(1.0, visual_update_hz)
+	if _visual_update_accumulator < update_interval:
+		return
+	_visual_update_accumulator = 0.0
 
 	var time_sec := Time.get_ticks_msec() * 0.001
 	for firefly_data in _fireflies:
@@ -120,7 +128,7 @@ func _rebuild_fireflies() -> void:
 		child.queue_free()
 
 	_fireflies.clear()
-	var count := max(1, firefly_count)
+	var count: int = maxi(1, firefly_count)
 
 	for i in count:
 		var firefly := MeshInstance3D.new()
@@ -157,6 +165,7 @@ func _apply_enabled_state() -> void:
 	if not is_node_ready():
 		return
 	_firefly_root.visible = emission_enabled
+	_visual_update_accumulator = 0.0
 	set_process(emission_enabled)
 	_apply_light_settings()
 
