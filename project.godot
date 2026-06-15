@@ -19,10 +19,14 @@ config/icon="res://icon.svg"
 
 DevLevelMenu="*res://scenes/dev/DevLevelMenu.tscn"
 
+[debug]
+
+settings/stdout/print_fps=true
+
 [display]
 
-window/size/viewport_width=1920
-window/size/viewport_height=1080
+window/size/viewport_width=1280
+window/size/viewport_height=720
 window/size/mode=4
 
 [input]
