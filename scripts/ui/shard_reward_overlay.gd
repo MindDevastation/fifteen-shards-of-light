@@ -89,7 +89,7 @@ func _ready() -> void:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_RESIZED and is_node_ready():
 		_apply_responsive_layout()
-		_button_root.pivot_offset = button_root.size * 0.5
+		button_root.pivot_offset = button_root.size * 0.5
 
 
 func _process(delta: float) -> void:
