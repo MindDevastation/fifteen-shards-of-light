@@ -131,6 +131,7 @@ func _set_player_controls(enabled: bool) -> void:
 
 func _on_light_column_appearance_completed() -> void:
 	if _state != FinaleState.STARTING:
+		_recover_controls_on_abort()
 		return
 	_state = FinaleState.SHOWING_TEXT
 	if _finale_overlay != null and _finale_overlay.has_signal(&"closed") and _finale_overlay.has_method("show_finale_text"):
@@ -142,7 +143,9 @@ func _on_light_column_appearance_completed() -> void:
 
 func _on_finale_overlay_closed() -> void:
 	if _state != FinaleState.SHOWING_TEXT:
+		_recover_controls_on_abort()
 		return
+	_set_player_controls(true)
 	_state = FinaleState.ACTIVATING_PORTAL
 	if _portal != null and _portal.has_signal(&"activation_completed") and _portal.has_method("activate"):
 		_portal.activation_completed.connect(_on_portal_activation_completed, CONNECT_ONE_SHOT)
@@ -153,7 +156,12 @@ func _on_finale_overlay_closed() -> void:
 
 func _on_portal_activation_completed() -> void:
 	if _state != FinaleState.ACTIVATING_PORTAL:
+		_recover_controls_on_abort()
 		return
-	_set_player_controls(true)
 	_state = FinaleState.COMPLETE
 	finale_completed.emit()
+
+
+func _recover_controls_on_abort() -> void:
+	if _state != FinaleState.COMPLETE:
+		_set_player_controls(true)
