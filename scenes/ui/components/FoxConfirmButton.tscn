@@ -1,0 +1,16 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/fox_confirm_button.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/ui/shard_reward_overlay/button_idle.png" id="2_idle"]
+[ext_resource type="Texture2D" path="res://assets/ui/shard_reward_overlay/button_hovered.png" id="3_hover"]
+[ext_resource type="Texture2D" path="res://assets/ui/shard_reward_overlay/button_pressed.png" id="4_pressed"]
+
+[node name="FoxConfirmButton" type="TextureButton"]
+custom_minimum_size = Vector2(140, 140)
+texture_normal = ExtResource("2_idle")
+texture_pressed = ExtResource("4_pressed")
+texture_hover = ExtResource("3_hover")
+texture_disabled = ExtResource("2_idle")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("1_script")

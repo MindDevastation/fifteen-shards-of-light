@@ -90,20 +90,14 @@ var _frame_targets_cache: Array[Vector2] = []
 @onready var text_root: Control = $TextRoot
 @onready var reward_text_label: RichTextLabel = $TextRoot/RewardText
 @onready var button_root: Control = $ButtonRoot
-@onready var confirm_button: TextureButton = $ButtonRoot/ConfirmButton
+@onready var confirm_button: FoxConfirmButton = $ButtonRoot/ConfirmButton
 
 
 func _ready() -> void:
 	visible = false
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	set_process(false)
-	confirm_button.pressed.connect(_on_confirm_button_pressed)
-	confirm_button.mouse_entered.connect(_on_confirm_button_mouse_entered)
-	confirm_button.mouse_exited.connect(_on_confirm_button_mouse_exited)
-	confirm_button.button_down.connect(_on_confirm_button_down)
-	confirm_button.button_up.connect(_on_confirm_button_up)
-	confirm_button.focus_entered.connect(_on_confirm_button_focus_entered)
-	confirm_button.focus_exited.connect(_on_confirm_button_focus_exited)
+	confirm_button.fox_confirmed.connect(_on_confirm_button_pressed)
 	_create_text_reveal_nodes()
 	_create_frame_particle_pool()
 	_configure_vine_line_styles()
@@ -156,7 +150,7 @@ func _play_reward_async(display_text: String, origin_screen_position: Vector2, g
 	matte_veil.color = MATTE_VEIL_COLOR
 	warm_wash.color = WARM_WASH_COLOR
 	button_root.modulate.a = BUTTON_DISABLED_ALPHA
-	confirm_button.disabled = true
+	confirm_button.set_enabled(false)
 	_build_vine_geometry()
 	_build_frame_particles(origin_screen_position)
 	_animate_atmosphere_in()
@@ -169,7 +163,7 @@ func _play_return_to_async(target_screen_position: Vector2, generation: int) -> 
 	if not visible:
 		_emit_return_completed_once()
 		return
-	confirm_button.disabled = true
+	confirm_button.set_enabled(false)
 	set_process(false)
 	await get_tree().create_timer(0.10).timeout
 	if generation != _sequence_generation:
@@ -200,10 +194,8 @@ func _reset_visual_state(reset_signals: bool = true) -> void:
 	reward_text_label.text = ""
 	reward_text_label.visible_ratio = 1.0
 	_reset_text_reveal_nodes()
-	confirm_button.disabled = true
-	confirm_button.scale = Vector2.ONE
-	confirm_button.position = _button_base_position
-	confirm_button.modulate = Color(1.0, 1.0, 1.0, 1.0)
+	confirm_button.set_enabled(false)
+	confirm_button.reset_visuals()
 	_button_mouse_inside = false
 	_button_has_focus = false
 	confirm_button.button_pressed = false
@@ -289,11 +281,8 @@ func _try_enable_button(generation: int) -> void:
 	if not _text_complete or not _vine_complete:
 		return
 	button_root.modulate.a = BUTTON_ENABLED_ALPHA
-	confirm_button.disabled = false
-	_update_button_mouse_inside()
-	_apply_button_visual_state()
+	confirm_button.set_enabled(true)
 	confirm_button.grab_focus()
-	_apply_button_visual_state()
 
 
 func _animate_return_sequence(target_screen_position: Vector2, generation: int) -> void:
@@ -900,20 +889,14 @@ func _update_button_mouse_inside() -> void:
 
 
 func _apply_button_visual_state() -> void:
-	confirm_button.texture_focused = confirm_button.texture_normal
-	if confirm_button.disabled:
-		confirm_button.modulate = Color(1.0, 1.0, 1.0, BUTTON_DISABLED_ALPHA)
-		return
-	var focus_boost := 1.04 if _button_has_focus and not _button_mouse_inside else 1.0
-	confirm_button.scale = Vector2.ONE * focus_boost
-	confirm_button.modulate = Color(1.0, 0.96 if _button_has_focus and not _button_mouse_inside else 1.0, 0.88 if _button_has_focus and not _button_mouse_inside else 1.0, BUTTON_ENABLED_ALPHA)
+	confirm_button.reset_visuals()
 
 
 func _on_confirm_button_pressed() -> void:
 	if _confirmation_emitted or confirm_button.disabled:
 		return
 	_confirmation_emitted = true
-	confirm_button.disabled = true
+	confirm_button.set_enabled(false)
 	_play_button_press_feedback()
 	confirmation_requested.emit()
 
@@ -974,6 +957,7 @@ func _apply_responsive_layout() -> void:
 	confirm_button.offset_top = -button_size - 44.0 * scale_factor
 	confirm_button.offset_bottom = -44.0 * scale_factor
 	_button_base_position = confirm_button.position
+	confirm_button.set_base_position(_button_base_position)
 	confirm_button.pivot_offset = Vector2(button_size, button_size) * 0.5
 	_configure_button_hit_area()
 
@@ -981,12 +965,6 @@ func _apply_responsive_layout() -> void:
 func _configure_button_hit_area() -> void:
 	confirm_button.mouse_filter = Control.MOUSE_FILTER_STOP
 	confirm_button.ignore_texture_size = true
-	if confirm_button.texture_normal != null and confirm_button.texture_normal is Texture2D:
-		var image := confirm_button.texture_normal.get_image()
-		if image != null:
-			var click_mask := BitMap.new()
-			click_mask.create_from_image_alpha(image, 0.12)
-			confirm_button.texture_click_mask = click_mask
 
 
 func _sample_main_tangent_rotation(points: PackedVector2Array, progress: float) -> float:
