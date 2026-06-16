@@ -2,31 +2,43 @@ extends Node3D
 
 signal activation_started
 signal activation_completed
+signal entry_confirmation_requested(player: Node)
 signal transition_started
+signal transition_failed(player: Node, error_code: int)
+signal transition_completed
 
-enum PortalState { INACTIVE, ACTIVATING, ACTIVE, ENTERING }
+enum PortalState { INACTIVE, ACTIVATING, ACTIVE, WAITING_FOR_CONFIRMATION, ENTERING }
 enum EntryMode { AUTO_ENTER, INTERACT }
 
 @export var target_scene_path: String = ""
 @export var entry_mode: EntryMode = EntryMode.AUTO_ENTER
+@export var require_entry_confirmation: bool = false
 @export var interaction_prompt_text: String = "Шагнуть к свету"
-@export_range(0.2, 5.0, 0.1) var activation_duration: float = 1.65
-@export_range(0.1, 2.0, 0.05) var transition_duration: float = 0.65
+@export_range(0.2, 5.0, 0.1) var activation_duration: float = 1.75
+@export_range(0.1, 2.0, 0.05) var transition_duration: float = 0.55
+@export_range(0.1, 2.0, 0.05) var transition_fade_out_duration: float = 0.70
 
 var _state := PortalState.INACTIVE
 var _is_loading_scene := false
 var _player_in_range := false
 var _current_player: Node
+var _confirmation_player: Node
 var _surface_material: ShaderMaterial
+var _back_veil_material: ShaderMaterial
 var _ring_materials: Array[ShaderMaterial] = []
 var _ground_material: ShaderMaterial
+var _activation_tween: Tween
 @onready var visual_root: Node3D = $VisualRoot
+@onready var ground_ring: MeshInstance3D = $VisualRoot/GroundRing
+@onready var outer_ring: MeshInstance3D = $VisualRoot/OuterRing
+@onready var inner_ring: MeshInstance3D = $VisualRoot/InnerRing
+@onready var portal_surface: MeshInstance3D = $VisualRoot/PortalSurface
+@onready var back_veil: MeshInstance3D = $VisualRoot/BackVeil
 @onready var interaction_area: Area3D = $InteractionArea
 @onready var interaction_shape: CollisionShape3D = $InteractionArea/CollisionShape3D
 @onready var orbit_motes: GPUParticles3D = $VisualRoot/OrbitMotes
 @onready var portal_light: OmniLight3D = $VisualRoot/PortalLight
 @onready var prompt: CanvasLayer = $WorldInteractionPrompt
-@onready var veil: ColorRect = $TransitionVeil/ColorRect
 
 func _ready() -> void:
 	add_to_group("player_interactable")
@@ -42,96 +54,232 @@ func _ready() -> void:
 	_deactivate()
 
 func activate() -> void:
-	if _state == PortalState.ACTIVE or _state == PortalState.ACTIVATING or _state == PortalState.ENTERING:
+	if _state == PortalState.ACTIVE or _state == PortalState.ACTIVATING or _state == PortalState.WAITING_FOR_CONFIRMATION or _state == PortalState.ENTERING:
 		return
 	_state = PortalState.ACTIVATING
-	show(); visual_root.show(); set_process(true); activation_started.emit()
-	var tween := create_tween()
-	tween.tween_method(_set_activation, 0.0, 1.0, activation_duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	tween.parallel().tween_property(portal_light, "light_energy", 0.75, activation_duration * 0.7)
-	get_tree().create_timer(minf(0.55, activation_duration * 0.5)).timeout.connect(func():
-		if _state == PortalState.ACTIVATING:
-			orbit_motes.emitting = true
-	)
-	tween.finished.connect(_finish_activation)
+	show()
+	visual_root.show()
+	set_process(true)
+	activation_started.emit()
+	_play_staged_activation()
 
 func can_player_interact(player: Node) -> bool:
 	return entry_mode == EntryMode.INTERACT and _state == PortalState.ACTIVE and _player_in_range and not _is_loading_scene and player == _current_player
 
 func interact(player: Node) -> void:
-	if can_player_interact(player):
+	if not can_player_interact(player):
+		return
+	if require_entry_confirmation:
+		_request_entry_confirmation(player)
+	else:
 		_begin_entry(player)
+
+func continue_entry_after_confirmation(player: Node) -> void:
+	if _state != PortalState.WAITING_FOR_CONFIRMATION or player != _confirmation_player:
+		return
+	_confirmation_player = null
+	_begin_entry(player, true)
+
+func cancel_entry_confirmation(player: Node) -> void:
+	if _state != PortalState.WAITING_FOR_CONFIRMATION or (_confirmation_player != null and player != _confirmation_player):
+		return
+	_confirmation_player = null
+	_is_loading_scene = false
+	_state = PortalState.ACTIVE
+	_set_interaction_enabled(true)
+	_update_prompt()
 
 func _process(delta: float) -> void:
 	if _state == PortalState.INACTIVE:
 		return
-	$VisualRoot/OuterRing.rotate_z(-0.28 * delta)
-	$VisualRoot/InnerRing.rotate_z(-0.18 * delta)
-	$VisualRoot/GroundRing.rotate_y(0.10 * delta)
+	outer_ring.rotate_z(-0.26 * delta)
+	inner_ring.rotate_z(-0.18 * delta)
+	ground_ring.rotate_y(0.08 * delta)
+	orbit_motes.rotation.y -= 0.10 * delta
 
 func _duplicate_runtime_materials() -> void:
-	var surface := $VisualRoot/PortalSurface
-	if surface.material_override is ShaderMaterial:
-		surface.material_override = surface.material_override.duplicate(); _surface_material = surface.material_override
-	for ring_path in ["VisualRoot/OuterRing", "VisualRoot/InnerRing"]:
-		var ring := get_node(ring_path) as MeshInstance3D
+	if portal_surface.material_override is ShaderMaterial:
+		portal_surface.material_override = portal_surface.material_override.duplicate()
+		_surface_material = portal_surface.material_override
+	if back_veil.material_override is ShaderMaterial:
+		back_veil.material_override = back_veil.material_override.duplicate()
+		_back_veil_material = back_veil.material_override
+	for ring in [outer_ring, inner_ring]:
 		if ring.material_override is ShaderMaterial:
-			ring.material_override = ring.material_override.duplicate(); _ring_materials.append(ring.material_override)
-	var ground := $VisualRoot/GroundRing
-	if ground.material_override is ShaderMaterial:
-		ground.material_override = ground.material_override.duplicate(); _ground_material = ground.material_override
+			ring.material_override = ring.material_override.duplicate()
+			_ring_materials.append(ring.material_override)
+	if ground_ring.material_override is ShaderMaterial:
+		ground_ring.material_override = ground_ring.material_override.duplicate()
+		_ground_material = ground_ring.material_override
+
+func _play_staged_activation() -> void:
+	if _activation_tween != null and _activation_tween.is_valid():
+		_activation_tween.kill()
+	_set_activation(0.0)
+	visual_root.scale = Vector3.ONE
+	ground_ring.scale = Vector3.ONE * 0.72
+	outer_ring.scale = Vector3.ONE * 0.78
+	inner_ring.scale = Vector3.ONE * 0.70
+	portal_surface.scale = Vector3.ONE * 0.86
+	back_veil.scale = Vector3.ONE * 0.90
+	portal_light.light_energy = 0.0
+	orbit_motes.emitting = false
+	_activation_tween = create_tween()
+	_activation_tween.set_parallel(true)
+	_activation_tween.tween_method(_set_ground_activation, 0.0, 1.0, 0.40).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	_activation_tween.tween_method(_set_ring_activation, 0.0, 1.0, 1.05).set_delay(0.15).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	_activation_tween.tween_property(outer_ring, "scale", Vector3.ONE, 1.05).set_delay(0.15).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	_activation_tween.tween_property(inner_ring, "scale", Vector3.ONE, 1.05).set_delay(0.15).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	_activation_tween.tween_method(_set_surface_activation, 0.0, 1.0, 1.20).set_delay(0.30).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_activation_tween.tween_property(portal_surface, "scale", Vector3.ONE, 1.20).set_delay(0.30).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	_activation_tween.tween_method(_set_back_veil_activation, 0.0, 1.0, 1.10).set_delay(0.25).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	_activation_tween.tween_property(back_veil, "scale", Vector3.ONE, 1.10).set_delay(0.25).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	_activation_tween.tween_property(portal_light, "light_energy", 0.50, 0.75).set_delay(0.35).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	get_tree().create_timer(0.50).timeout.connect(func():
+		if _state == PortalState.ACTIVATING:
+			orbit_motes.emitting = true
+	)
+	_activation_tween.finished.connect(func():
+		await get_tree().create_timer(maxf(0.0, activation_duration - 1.50)).timeout
+		_finish_activation()
+	)
 
 func _set_activation(value: float) -> void:
-	if _surface_material != null: _surface_material.set_shader_parameter("activation", value)
-	for mat in _ring_materials: mat.set_shader_parameter("activation", value)
-	if _ground_material != null: _ground_material.set_shader_parameter("activation", value)
-	visual_root.scale = Vector3.ONE * lerpf(0.72, 1.0, value)
+	_set_ground_activation(value)
+	_set_ring_activation(value)
+	_set_surface_activation(value)
+	_set_back_veil_activation(value)
+
+func _set_ground_activation(value: float) -> void:
+	if _ground_material != null:
+		_ground_material.set_shader_parameter("activation", value)
+
+func _set_ring_activation(value: float) -> void:
+	for mat in _ring_materials:
+		mat.set_shader_parameter("activation", value)
+
+func _set_surface_activation(value: float) -> void:
+	if _surface_material != null:
+		_surface_material.set_shader_parameter("activation", value)
+
+func _set_back_veil_activation(value: float) -> void:
+	if _back_veil_material != null:
+		_back_veil_material.set_shader_parameter("activation", value)
 
 func _finish_activation() -> void:
-	if _state != PortalState.ACTIVATING: return
+	if _state != PortalState.ACTIVATING:
+		return
+	_set_activation(1.0)
+	portal_light.light_energy = 0.50
 	_state = PortalState.ACTIVE
 	_set_interaction_enabled(true)
 	_update_prompt()
 	activation_completed.emit()
 
 func _deactivate() -> void:
-	_state = PortalState.INACTIVE; hide(); visual_root.hide(); set_process(false); _set_interaction_enabled(false); orbit_motes.emitting = false; portal_light.light_energy = 0.0
-	veil.color.a = 0.0
-	if prompt.has_method("hide_prompt"): prompt.call("hide_prompt")
+	_state = PortalState.INACTIVE
+	hide()
+	visual_root.hide()
+	set_process(false)
+	_set_interaction_enabled(false)
+	orbit_motes.emitting = false
+	portal_light.light_energy = 0.0
+	if prompt.has_method("hide_prompt"):
+		prompt.call("hide_prompt")
 
 func _set_interaction_enabled(enabled: bool) -> void:
-	interaction_area.set_deferred("monitoring", enabled); interaction_area.set_deferred("monitorable", enabled); interaction_shape.set_deferred("disabled", not enabled)
+	interaction_area.set_deferred("monitoring", enabled)
+	interaction_area.set_deferred("monitorable", enabled)
+	interaction_shape.set_deferred("disabled", not enabled)
 
 func _on_body_entered(body: Node3D) -> void:
-	if not _is_player_body(body): return
-	_player_in_range = true; _current_player = body; _update_prompt()
+	if not _is_player_body(body):
+		return
+	_player_in_range = true
+	_current_player = body
+	_update_prompt()
 	if entry_mode == EntryMode.AUTO_ENTER and _state == PortalState.ACTIVE and not _is_loading_scene:
 		_begin_entry(body)
 
 func _on_body_exited(body: Node3D) -> void:
-	if body != _current_player: return
-	_player_in_range = false; _current_player = null; _update_prompt()
+	if body != _current_player:
+		return
+	_player_in_range = false
+	_current_player = null
+	_update_prompt()
 
 func _update_prompt() -> void:
-	if prompt == null: return
-	if can_player_interact(_current_player): prompt.call("show_prompt")
-	elif prompt.has_method("hide_prompt"): prompt.call("hide_prompt")
+	if prompt == null:
+		return
+	if can_player_interact(_current_player):
+		prompt.call("show_prompt")
+	elif prompt.has_method("hide_prompt"):
+		prompt.call("hide_prompt")
 
-func _begin_entry(player: Node) -> void:
-	if _state != PortalState.ACTIVE or _is_loading_scene: return
-	if target_scene_path.is_empty(): push_warning("LevelPortal has no target_scene_path set."); return
-	_state = PortalState.ENTERING; _is_loading_scene = true; _set_interaction_enabled(false)
-	if prompt.has_method("play_confirm_and_hide"): prompt.call("play_confirm_and_hide")
-	_set_player_controls(player, false); transition_started.emit()
-	var tween := create_tween(); tween.tween_property(veil, "color:a", 1.0, transition_duration); tween.finished.connect(_change_scene_to_target.bind(player))
+func _request_entry_confirmation(player: Node) -> void:
+	if _state != PortalState.ACTIVE or _is_loading_scene:
+		return
+	_state = PortalState.WAITING_FOR_CONFIRMATION
+	_confirmation_player = player
+	_set_interaction_enabled(false)
+	if prompt.has_method("play_confirm_and_hide"):
+		prompt.call("play_confirm_and_hide")
+	elif prompt.has_method("hide_prompt"):
+		prompt.call("hide_prompt")
+	entry_confirmation_requested.emit(player)
 
-func _change_scene_to_target(player: Node) -> void:
-	var error := get_tree().change_scene_to_file(target_scene_path)
-	if error != OK:
-		push_error("Could not load portal target %s. Error code: %d" % [target_scene_path, error])
-		_is_loading_scene = false; _state = PortalState.ACTIVE; _set_player_controls(player, true); _set_interaction_enabled(true)
-		create_tween().tween_property(veil, "color:a", 0.0, 0.25)
-		_update_prompt()
+func _begin_entry(player: Node, from_confirmation := false) -> void:
+	if _is_loading_scene:
+		return
+	if (not from_confirmation and _state != PortalState.ACTIVE) or (from_confirmation and _state != PortalState.WAITING_FOR_CONFIRMATION):
+		return
+	if target_scene_path.is_empty():
+		push_warning("LevelPortal has no target_scene_path set.")
+		if from_confirmation:
+			cancel_entry_confirmation(player)
+		return
+	_state = PortalState.ENTERING
+	_is_loading_scene = true
+	_confirmation_player = null
+	_set_interaction_enabled(false)
+	if prompt.has_method("play_confirm_and_hide") and not from_confirmation:
+		prompt.call("play_confirm_and_hide")
+	transition_started.emit()
+	if not from_confirmation:
+		_set_player_controls(player, false)
+	_start_transition(player)
+
+func _start_transition(player: Node) -> void:
+	var transition := get_node_or_null("/root/SceneTransition")
+	if transition == null or not transition.has_method("transition_to"):
+		var error := get_tree().change_scene_to_file(target_scene_path)
+		_handle_transition_result(player, error)
+		return
+	if transition.has_signal(&"transition_failed"):
+		transition.transition_failed.connect(_on_scene_transition_failed.bind(player), CONNECT_ONE_SHOT)
+	if transition.has_signal(&"transition_finished"):
+		transition.transition_finished.connect(_on_scene_transition_finished.bind(player), CONNECT_ONE_SHOT)
+	var result: int = transition.call("transition_to", target_scene_path, transition_duration, transition_fade_out_duration)
+	if result != OK:
+		_handle_transition_result(player, result)
+
+func _on_scene_transition_failed(scene_path: String, error_code: int, player: Node) -> void:
+	_handle_transition_result(player, error_code)
+
+func _on_scene_transition_finished(player: Node) -> void:
+	transition_completed.emit()
+
+func _handle_transition_result(player: Node, error: int) -> void:
+	if error == OK:
+		transition_completed.emit()
+		return
+	push_error("Could not load portal target %s. Error code: %d" % [target_scene_path, error])
+	_is_loading_scene = false
+	_state = PortalState.ACTIVE
+	_set_player_controls(player, true)
+	_set_interaction_enabled(true)
+	_update_prompt()
+	transition_failed.emit(player, error)
 
 func _set_player_controls(player: Node, enabled: bool) -> void:
 	if player != null and player.has_method("set_controls_enabled"):

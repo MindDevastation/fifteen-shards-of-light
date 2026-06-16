@@ -1,124 +1,140 @@
 # Level 01 90–95 Corrective Pass Implementation Report
 
-## Baseline
-- Branch at start: `work`.
-- HEAD at start: `edf9debad6b2b06b7646041df5e778da55aa8c6b`.
-- Working tree at start: clean.
-- Remote `origin` was not configured, so remote `main` and push proof could not be verified.
-- Requested reference files were not present locally: `docs/design/Level_01_90_95_Corrective_Pass_Development_Reference.md` and `docs/design/Level_01_90_95_Corrective_Pass_Codex_Prompt.md`. Work used the task body as the operative requirements source.
+## PR facts
+- PR number: #85.
+- PR URL: https://github.com/MindDevastation/fifteen-shards-of-light/pull/85
+- PR base reported by review prompt: `feature/implement-level-01-finale-and-portal-transitions`.
+- PR head branch reported by review prompt: `feature/complete-level-01-corrective-pass`.
+- Reviewed remote head SHA from review prompt: `5c1f6297e282e8295cef645be1850901716f964e`.
+- Local branch in this checkout: `work`.
+- Local baseline before this follow-up: `baa18b9a559cd50e38d01391bcb498c4b41c063d`.
+- Remote verification: unverified in this container because no Git remote is configured and `gh pr view 85` could not return PR data.
 
-## Local unpushed work
-- Existing local branch had prior local commits relative to the unavailable remote state; no reset, checkout, or deletion of existing finale, portal, or UI implementation was performed.
-- Push proof: **NOT VERIFIED** because no Git remote is configured.
+## New commits after review
+- `aaa126f` — Add gated portal entry confirmation flow.
+- `852893d` — Move Level 01 final text to portal interaction.
+- `6d91154` — Persist portal transition veil across scene loading.
+- `a18c605` — Correct portal spiral shader math and direction.
+- `d2e0c8c` — Polish woven light portal materialization.
+- `6db69cd` — Build two-sided rectangular vine finale frame.
+- `ef24bba` — Harden finale text layout and progressive reveal.
+- `d6e1b8c` — Fix reusable fox button focus hover and hit mask.
+- `f6015f7` — Refine finale overlay opening and closing timing.
+- `8c7536a` — Complete verified soft cloud material correction.
+- This report update commit follows these changes.
 
-## Commits
-- `a540ada` — Reconstruct Level 01 cloud quality and finale control timing.
-- `4d22884` — Add reusable fox confirm button states.
-- `52ce445` — Rebuild Level 01 finale overlay reveal.
-- `1d4f22b` — Rebuild portal woven light spiral presentation.
-- Final report commit records this implementation report.
+## Replaced finale flow
+The previous flow has been replaced. Landmark trigger no longer opens final text and no longer starts transition.
 
-## Root cause of black cloud spots
-- The cloud scene instanced a GLB with baked texture resources, including `cloud_001_Baked_BaseColor.png` and `cloud_001_Baked_MetallicRoughness.png`.
-- The likely root cause was embedded baked albedo/roughness/AO-style texture information on the imported cloud asset, not runtime lighting brightness. The fix removes dependence on embedded material texture channels for the cloud instance.
+Current intended flow:
+1. Barrier opens.
+2. Landmark trigger becomes active.
+3. Player enters Landmark trigger.
+4. Landmark beam appears.
+5. Portal materializes.
+6. Portal becomes interactable.
+7. Player retains movement control until portal interaction.
+8. Player presses `E` at the portal.
+9. Portal requests entry confirmation from `Level01FinaleController`.
+10. Controller locks controls and opens final text overlay in the same frame.
+11. Player closes overlay.
+12. Overlay closing animation completes fully and emits `closed`.
+13. Controller calls `portal.continue_entry_after_confirmation(player)`.
+14. Persistent `SceneTransition` fades to opaque, changes to Level_02, waits briefly/camera-ready, then fades out.
 
-## Cloud fix
-- Added a one-time cloud quality controller that traverses the cloud instance only in `_ready()`.
-- Applies a shared `StandardMaterial3D` resource with soft unshaded color, roughness 1.0, metallic 0.0, and disabled specular mode.
-- Disables cloud shadow casting and GI contribution on cloud geometry.
-- No per-frame material traversal was added.
+## Portal gate implementation
+- `LevelPortal` remains reusable and keeps `target_scene_path`, `entry_mode`, `activate()`, `can_player_interact(player)`, and `interact(player)`.
+- Added `require_entry_confirmation`, `entry_confirmation_requested(player)`, `transition_failed(player, error_code)`, `transition_completed`, `WAITING_FOR_CONFIRMATION`, `continue_entry_after_confirmation(player)`, and `cancel_entry_confirmation(player)`.
+- Level_01 sets `entry_mode = INTERACT` and `require_entry_confirmation = true`.
+- Older portal instances keep `require_entry_confirmation = false`, preserving direct AUTO_ENTER/INTERACT transitions.
+- Repeated input is ignored while the portal is waiting for confirmation or entering.
 
-## Performance before/after
-- Automated FPS capture was not available in this non-interactive session.
-- Expected performance impact is neutral-to-positive for clouds because baked texture sampling/specular response and cloud shadows are bypassed.
-- Portal particle count was restrained to 22, inside the requested 18–26 range.
-- Hidden processing is preserved for the portal by disabling `_process()` while inactive.
+## Persistent transition
+- Added `SceneTransition` autoload using `scenes/core/SceneTransition.tscn` and `scripts/core/scene_transition.gd`.
+- Transition veil color is `Color(0.035, 0.020, 0.028, 1.0)`.
+- Transition flow fades to opaque before `change_scene_to_file()`, keeps the veil across scene replacement, waits two process frames plus camera or timeout, then fades out.
+- On scene change failure, the veil fades back to transparent and emits failure so the portal/controller can restore interaction and controls.
+- Old portal-local `TransitionVeil` was removed from `LevelPortal.tscn` to avoid competing fade systems.
 
-## Portal settings
-- Portal keeps `@export var target_scene_path` and `func activate()`.
-- Portal keeps `player_interactable`, `can_player_interact(player)`, and `interact(player)` integration.
-- Level 01 remains configured with `INTERACT`; older level instances retain `AUTO_ENTER` defaults.
-- Visual design now uses two torus rings, a procedural clockwise woven spiral shader, a ground ring, 22 soft motes, and a shadowless light.
-- Materialization duration remains 1.65 seconds, within the requested 1.6–2.0 second range.
+## Portal shader and visual correction
+- Removed reversed-edge `smoothstep` from portal surface and ground ring shaders.
+- Portal surface now uses one dominant slow clockwise angular sign, restrained alpha, and lower emission to avoid clipping/sphere impression.
+- Added a soft `BackVeil` layer behind the surface.
+- Portal light target is restrained to 0.50 energy with 4.25 range and shadows off.
+- Portal materialization is staged: ground, rings, surface, back veil, particles, and light animate on different offsets.
+- Portal motes are restrained to 22 particles with ring-like orbital emission settings.
 
-## Control timing before/after
-- Before: player control was restored only after portal activation completed, creating dead time while the portal materialized.
-- After: player controls are restored immediately after `LevelFinaleOverlay.closed`, before `portal.activate()`.
-- Abort paths call a recovery helper to restore controls when the sequence is interrupted unexpectedly.
-- Beam appearance does not independently block controls beyond the overlay sequence gate.
+## Finale overlay
+- Finale overlay now uses two independent vines: left and right both emerge from the fox button area and form a rectangular frame without heart or crystal motifs.
+- Branches are generated as short curved triple-line branches.
+- Leaves are generated 8 per side, 16 total, with tangent-aligned rotation and scale variation.
+- Progressive text reveal remains line-based and only enables the fox button after left vine, right vine, and text reveal complete.
+- Closing now waits for text fade, vine retract/fade, atmosphere fade, and button fade before emitting `closed`.
 
-## Final overlay hierarchy
-- `LevelFinaleOverlay`
-  - `Atmosphere`
-    - `MatteVeil`
-    - `WarmWash`
-  - `VineCanvas`
-    - `OuterGlow`
-    - `MainGold`
-    - `InnerIvory`
-    - `Branches`
-    - `Leaves`
-  - `TextRoot`
-  - `FoxConfirmButton`
-- The overlay uses the same visual family as `ShardRewardOverlay`: matte veil, warm wash, Cormorant Garamond, warm vine colors, leaf texture, and fox confirmation button.
-- The finale intentionally does not use heart shapes, crystals, crystal borders, or shard return animation.
+## Text wrapping
+- Finale text layout now uses word-aware wrapping with explicit newline support.
+- Maximum output is 3 lines.
+- Font size attempts 48 px target, 44 px fallback, then 40 px minimum scaled to viewport.
+- Text safe width is clamped to keep text inside the vine frame and avoid array overflow.
 
-## Text timing
-- Text starts after 0.72 seconds.
-- Each line reveals over 1.48 seconds.
-- Line stagger is 0.46 seconds.
-- The button enables only after both vine frame completion and text reveal completion.
+## Fox button
+- `FoxConfirmButton` explicitly applies the displayed texture for every state.
+- Hover texture is used only when the mouse is inside the button.
+- Keyboard focus uses the idle texture with warm tint and mild scale.
+- The reusable button creates its own alpha-based click mask in `_ready()`.
+- Duplicate click-mask/state responsibility was removed from `ShardRewardOverlay` while preserving its public API.
 
-## Button state matrix
-| State | Texture | Alpha | Scale | Offset |
-| --- | --- | --- | --- | --- |
-| Disabled | `button_idle.png` | 0.58 | 1.00 | none |
-| Idle | `button_idle.png` | 1.00 | 1.00 | none |
-| Hover | `button_hovered.png` | 1.00 | 1.03 | none |
-| Pressed | `button_pressed.png` | 1.00 | 0.95 | 4 px down |
-| Keyboard focus | `button_idle.png` with warm focus tint | 1.00 | 1.025 | none |
+## Cloud diagnosis and correction
+- Diagnostic status: partially verified by static asset inspection and material override design; not visually confirmed in a graphical gameplay run.
+- Confirmed facts: the cloud asset has baked BaseColor and MetallicRoughness textures and no separate normal map file was found in `assets/nature/cloud_01`.
+- Likely root cause remains embedded baked material channel contribution from the imported GLB/material textures rather than runtime brightness alone.
+- Final correction replaces the flat beige material with a shared stylized cloud shader material using a soft blue-grey vertical gradient and low-frequency procedural noise.
+- Cloud traversal remains one-time in `_ready()` with no per-frame material traversal.
+- Cloud shadow casting and GI are disabled for cloud geometry.
 
-## Transition
-- Portal transition fade is unchanged and still uses `target_scene_path`.
-- Level 02 transition concealment remains covered by the portal veil path; no broad transition rewrite was made.
+## Actual automated tests
+- `git status --short --branch`.
+- `git diff --check`.
+- `godot --headless --path . --quit` completed with exit code 0.
+- Static search confirmed no old reversed portal smoothstep patterns remained.
 
-## Requirement checklist
-| Requirement | Status | Notes |
+## Graphical/runtime tests
+- Not performed in this headless non-interactive container.
+- No claims are made that runtime visual quality, FPS gates, exact control timing, portal motion readability, cloud black-spot removal, or Level_02 transition concealment are fully validated.
+
+## Manual QA still required
+- Full Shard_01 → Shard_02 and Shard_02 → Shard_01 playthroughs.
+- Verify final overlay does not appear from Landmark trigger.
+- Verify portal `E` opens final overlay and does not transition immediately.
+- Verify repeated `E` and repeated click are ignored.
+- Verify transition starts once and only after overlay closing completes.
+- Verify Level_02 first frame is concealed by persistent veil.
+- Verify load failure restores controls and prompt.
+- Verify player movement in Level_02.
+- Verify no hidden portal emitters/process before activation.
+- Verify no cloud black spots or high-frequency grain in gameplay camera.
+- Verify portal spiral is clearly clockwise in motion.
+- Verify two vines visibly emerge from fox, leaves align to tangents, no crystals appear.
+- Verify keyboard focus does not show hover texture and click mask is non-rectangular.
+- Verify 1, 2, and 3 line text layouts at 1280×720 and 1920×1080.
+- Capture FPS and frame-time metrics.
+
+## Requirement audit
+| Area | Status | Notes |
 | --- | --- | --- |
-| Cloud black spot root cause identified | implemented | Embedded baked material channels identified as likely source. |
-| Cloud no normal/AO/metallic/sharp specular | implemented | Shared material avoids these channels. |
-| Cloud shadowless | implemented | Cast shadows disabled. |
-| Shared immutable cloud material | implemented | Shared `.tres` material is preloaded. |
-| No per-frame cloud traversal | implemented | Traversal only in `_ready()`. |
-| Portal Woven Light Spiral | implemented | Procedural shader, torus rings, ground ring, motes. |
-| Portal INTERACT and AUTO_ENTER compatibility | implemented | Existing API retained. |
-| Controls restored before portal activation | implemented | Finale controller restores before `activate()`. |
-| Finale overlay visual family | implemented | Uses shared colors, font, leaf, fox button. |
-| Progressive text reveal | implemented | Line masks and staggered reveal. |
-| Deterministic fox button states | implemented | Reusable component owns explicit state transitions. |
-| Audio verification | not applicable | No audio assets or audio changes were introduced. |
-| Performance gates measured | partial | Static validation completed; runtime benchmark requires manual capture. |
-
-## QA actually performed
-- `git status --short --branch` before work.
-- `git diff --check` before each commit batch.
-- Full diff/stat review before each commit batch.
-- `godot --headless --path . --quit` completed successfully.
-- Checked generated untracked `.uid` files and removed unintended generated files.
-
-## Remaining manual QA
-- Play Level 01 at 1280×720 and 1920×1080.
-- Confirm cloud surfaces have no black spots from gameplay camera angles.
-- Confirm portal clockwise spiral readability and particle restraint in motion.
-- Confirm finale overlay first visible element appears within 0.10 seconds after control lock.
-- Confirm controls return within 0.10 seconds after overlay disappears and during portal materialization.
-- Capture FPS metrics for cloud, beam, portal, and full finale sequence.
-- Verify Level 02 transition concealment from an actual Level 01 portal entry.
-
-## Deviations
-- The two requested reference/prompt documents were absent from the repository, so the task body was used as the source of truth.
-- Runtime FPS gates could not be measured in this headless non-interactive session.
-- No remote `main` or push proof could be verified because no Git remote is configured.
+| New portal-gated finale flow | implemented | Static/headless validated; manual runtime QA pending. |
+| Portal confirmation gate | implemented | Reusable API preserved. |
+| Persistent transition service | implemented | Headless startup validated; runtime transition QA pending. |
+| Portal shader math/direction | implemented | Reversed smoothstep patterns removed from portal shaders. |
+| Portal materialization polish | implemented | Staged tween and restrained light/particles. |
+| Two-vine finale frame | implemented | Two independent path sets and 16 leaves. |
+| Text layout hardening | implemented | Word-aware max-three-line layout. |
+| Fox button state/click mask | implemented | Explicit texture assignment and component-owned mask. |
+| Overlay timing refinement | implemented | `closed` emitted after close animation completion. |
+| Cloud material correction | partial | Static correction done; graphical validation pending. |
+| Runtime FPS gates | missing | Requires graphical gameplay benchmark. |
+| Audio verification | not applicable | No audio changes. |
 
 ## Merge confirmation
 - No merge was performed.
+- Auto-merge was not enabled.

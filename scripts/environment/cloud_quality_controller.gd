@@ -1,7 +1,7 @@
 extends Node3D
 class_name CloudQualityController
 
-const CLOUD_MATERIAL := preload("res://resources/materials/cloud_soft_shared.tres")
+const CLOUD_MATERIAL := preload("res://resources/environment/stylized_cloud_material.tres")
 
 func _ready() -> void:
 	_apply_shadowless_soft_cloud_material(self)

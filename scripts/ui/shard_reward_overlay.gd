@@ -965,12 +965,6 @@ func _apply_responsive_layout() -> void:
 func _configure_button_hit_area() -> void:
 	confirm_button.mouse_filter = Control.MOUSE_FILTER_STOP
 	confirm_button.ignore_texture_size = true
-	if confirm_button.texture_normal != null and confirm_button.texture_normal is Texture2D:
-		var image := confirm_button.texture_normal.get_image()
-		if image != null:
-			var click_mask := BitMap.new()
-			click_mask.create_from_image_alpha(image, 0.12)
-			confirm_button.texture_click_mask = click_mask
 
 
 func _sample_main_tangent_rotation(points: PackedVector2Array, progress: float) -> float:

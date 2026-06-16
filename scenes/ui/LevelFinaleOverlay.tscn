@@ -37,18 +37,28 @@ color = Color(0.34, 0.15, 0.075, 0.14)
 
 [node name="VineCanvas" type="Node2D" parent="."]
 
-[node name="OuterGlow" type="Line2D" parent="VineCanvas"]
+[node name="LeftVine" type="Node2D" parent="VineCanvas"]
+[node name="OuterGlow" type="Line2D" parent="VineCanvas/LeftVine"]
+antialiased = true
+[node name="MainGold" type="Line2D" parent="VineCanvas/LeftVine"]
+antialiased = true
+[node name="InnerIvory" type="Line2D" parent="VineCanvas/LeftVine"]
 antialiased = true
 
-[node name="MainGold" type="Line2D" parent="VineCanvas"]
+[node name="RightVine" type="Node2D" parent="VineCanvas"]
+[node name="OuterGlow" type="Line2D" parent="VineCanvas/RightVine"]
+antialiased = true
+[node name="MainGold" type="Line2D" parent="VineCanvas/RightVine"]
+antialiased = true
+[node name="InnerIvory" type="Line2D" parent="VineCanvas/RightVine"]
 antialiased = true
 
-[node name="InnerIvory" type="Line2D" parent="VineCanvas"]
-antialiased = true
-
-[node name="Branches" type="Node2D" parent="VineCanvas"]
-
-[node name="Leaves" type="Node2D" parent="VineCanvas"]
+[node name="BranchLayer" type="Node2D" parent="VineCanvas"]
+[node name="LeafLayer" type="Node2D" parent="VineCanvas"]
+[node name="LeftTipGlow" type="Polygon2D" parent="VineCanvas"]
+color = Color(1, 0.74, 0.3, 0)
+[node name="RightTipGlow" type="Polygon2D" parent="VineCanvas"]
+color = Color(1, 0.74, 0.3, 0)
 
 [node name="TextRoot" type="Control" parent="."]
 layout_mode = 1

@@ -1,0 +1,13 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3]
+
+[ext_resource type="Shader" path="res://shaders/environment/stylized_cloud.gdshader" id="1_shader"]
+[ext_resource type="Texture2D" path="res://resources/environment/stylized_cloud_noise.tres" id="2_noise"]
+
+[resource]
+resource_name = "StylizedCloudSharedMaterial"
+shader = ExtResource("1_shader")
+shader_parameter/top_color = Color(0.91, 0.93, 0.95, 1)
+shader_parameter/middle_color = Color(0.8, 0.84, 0.88, 1)
+shader_parameter/bottom_color = Color(0.64, 0.7, 0.76, 1)
+shader_parameter/cloud_noise = ExtResource("2_noise")
+shader_parameter/noise_influence = 0.055

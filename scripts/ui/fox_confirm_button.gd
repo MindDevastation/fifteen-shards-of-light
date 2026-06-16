@@ -5,9 +5,9 @@ signal fox_confirmed
 
 enum VisualState { DISABLED, IDLE, HOVER, PRESSED, KEYBOARD_FOCUS }
 
-const IDLE_TEXTURE := preload("res://assets/ui/shard_reward_overlay/button_idle.png")
-const HOVER_TEXTURE := preload("res://assets/ui/shard_reward_overlay/button_hovered.png")
-const PRESSED_TEXTURE := preload("res://assets/ui/shard_reward_overlay/button_pressed.png")
+const IDLE_TEXTURE: Texture2D = preload("res://assets/ui/shard_reward_overlay/button_idle.png")
+const HOVER_TEXTURE: Texture2D = preload("res://assets/ui/shard_reward_overlay/button_hovered.png")
+const PRESSED_TEXTURE: Texture2D = preload("res://assets/ui/shard_reward_overlay/button_pressed.png")
 const DISABLED_ALPHA := 0.58
 const PRESS_OFFSET := Vector2(0.0, 4.0)
 
@@ -17,10 +17,7 @@ var _base_position := Vector2.ZERO
 var _visual_state := VisualState.DISABLED
 
 func _ready() -> void:
-	texture_normal = IDLE_TEXTURE
-	texture_hover = HOVER_TEXTURE
-	texture_pressed = PRESSED_TEXTURE
-	texture_disabled = IDLE_TEXTURE
+	_apply_display_texture(IDLE_TEXTURE)
 	ignore_texture_size = true
 	stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
 	pivot_offset = size * 0.5
@@ -32,6 +29,7 @@ func _ready() -> void:
 	button_up.connect(func(): _sync_visual_state(false))
 	focus_entered.connect(func(): _keyboard_focus = true; _sync_visual_state())
 	focus_exited.connect(func(): _keyboard_focus = false; _sync_visual_state())
+	_configure_click_mask()
 	_sync_visual_state()
 
 func set_enabled(enabled: bool) -> void:
@@ -69,19 +67,49 @@ func _sync_visual_state(force_pressed := false) -> void:
 
 func _apply_state(state: VisualState) -> void:
 	_visual_state = state
-	texture_normal = HOVER_TEXTURE if state == VisualState.HOVER else IDLE_TEXTURE
-	texture_focused = HOVER_TEXTURE if state == VisualState.KEYBOARD_FOCUS else IDLE_TEXTURE
 	match state:
 		VisualState.DISABLED:
-			texture_normal = IDLE_TEXTURE; modulate = Color(1, 1, 1, DISABLED_ALPHA); scale = Vector2.ONE; position = _base_position
+			_apply_display_texture(IDLE_TEXTURE)
+			modulate = Color(1, 1, 1, DISABLED_ALPHA)
+			scale = Vector2.ONE
+			position = _base_position
 		VisualState.IDLE:
-			modulate = Color.WHITE; scale = Vector2.ONE; position = _base_position
+			_apply_display_texture(IDLE_TEXTURE)
+			modulate = Color.WHITE
+			scale = Vector2.ONE
+			position = _base_position
 		VisualState.HOVER:
-			modulate = Color.WHITE; scale = Vector2.ONE * 1.03; position = _base_position
+			_apply_display_texture(HOVER_TEXTURE)
+			modulate = Color.WHITE
+			scale = Vector2.ONE * 1.03
+			position = _base_position
 		VisualState.PRESSED:
-			texture_normal = PRESSED_TEXTURE; modulate = Color.WHITE; scale = Vector2.ONE * 0.95; position = _base_position + PRESS_OFFSET
+			_apply_display_texture(PRESSED_TEXTURE)
+			modulate = Color.WHITE
+			scale = Vector2.ONE * 0.95
+			position = _base_position + PRESS_OFFSET
 		VisualState.KEYBOARD_FOCUS:
-			modulate = Color(1.0, 0.96, 0.88, 1.0); scale = Vector2.ONE * 1.025; position = _base_position
+			_apply_display_texture(IDLE_TEXTURE)
+			modulate = Color(1.0, 0.96, 0.88, 1.0)
+			scale = Vector2.ONE * 1.025
+			position = _base_position
+
+func _apply_display_texture(texture: Texture2D) -> void:
+	texture_normal = texture
+	texture_hover = texture
+	texture_pressed = texture
+	texture_focused = texture
+	texture_disabled = IDLE_TEXTURE
+
+func _configure_click_mask() -> void:
+	if IDLE_TEXTURE == null:
+		return
+	var image: Image = IDLE_TEXTURE.get_image()
+	if image == null:
+		return
+	var click_mask := BitMap.new()
+	click_mask.create_from_image_alpha(image, 0.12)
+	texture_click_mask = click_mask
 
 func _update_mouse_inside() -> void:
 	_mouse_inside = Rect2(Vector2.ZERO, size).has_point(get_local_mouse_position())

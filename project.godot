@@ -17,6 +17,7 @@ config/icon="res://icon.svg"
 
 [autoload]
 
+SceneTransition="*res://scenes/core/SceneTransition.tscn"
 DevLevelMenu="*res://scenes/dev/DevLevelMenu.tscn"
 
 [debug]
