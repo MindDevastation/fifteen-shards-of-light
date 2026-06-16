@@ -15,20 +15,20 @@
 [ext_resource type="PackedScene" path="res://scenes/core/SoulShard.tscn" id="14_soul_shard"]
 [ext_resource type="PackedScene" path="res://scenes/core/ShardRewardSequenceController.tscn" id="15_sequence_controller"]
 [ext_resource type="PackedScene" path="res://scenes/ui/ShardRewardOverlay.tscn" id="16_reward_overlay"]
-[ext_resource type="Script" path="res://scripts/levels/level_01_progression_controller.gd" id="17_progression"]
-[ext_resource type="Script" path="res://scripts/levels/level_01_finale_controller.gd" id="18_finale"]
+[ext_resource type="Script" uid="uid://d3khxl17l24c2" path="res://scripts/levels/level_01_progression_controller.gd" id="17_progression"]
+[ext_resource type="Script" uid="uid://dyabenfqicta8" path="res://scripts/levels/level_01_finale_controller.gd" id="18_finale"]
 [ext_resource type="PackedScene" path="res://scenes/environment/vfx/LandmarkLightColumn.tscn" id="19_light_column"]
 [ext_resource type="PackedScene" path="res://scenes/ui/LevelFinaleOverlay.tscn" id="20_finale_overlay"]
 [ext_resource type="PackedScene" path="res://scenes/core/LevelPortal.tscn" id="21_level_portal"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_finale_trigger"]
+size = Vector3(12.087067, 4, 5)
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_step_assist_ramp"]
 points = PackedVector3Array(-1.5, -0.02, -0.6, 1.5, -0.02, -0.6, -1.5, -0.02, 0.6, 1.5, -0.02, 0.6, -1.5, 0.32, 0.6, 1.5, 0.32, 0.6)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_step_assist_cap"]
 size = Vector3(3, 0.08, 0.35)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_finale_trigger"]
-size = Vector3(7, 4, 5)
 
 [sub_resource type="Sky" id="Sky_hhyrm"]
 
@@ -94,14 +94,12 @@ overlay_path = NodePath("../../UILayer/ShardRewardOverlay")
 player_path = NodePath("../../PlayerRoot/Player")
 shard_search_root_path = NodePath("../..")
 
-[node name="Level01ProgressionController" type="Node" parent="LevelRuntimeRoot"]
+[node name="Level01ProgressionController" type="Node" parent="LevelRuntimeRoot" unique_id=1371682820]
 script = ExtResource("17_progression")
-required_shard_paths = [NodePath("../../Shard_01"), NodePath("../../Shard_02")]
+required_shard_paths = Array[NodePath]([NodePath("../../Shard_01"), NodePath("../../Shard_02")])
 barrier_path = NodePath("../../Architecture/Ancient_Stone_Barrier_01")
-barrier_open_offset = Vector3(0, -7, 0)
-barrier_open_duration = 2.5
 
-[node name="Level01FinaleController" type="Node" parent="LevelRuntimeRoot"]
+[node name="Level01FinaleController" type="Node" parent="LevelRuntimeRoot" unique_id=1179719514]
 script = ExtResource("18_finale")
 progression_controller_path = NodePath("../Level01ProgressionController")
 player_path = NodePath("../../PlayerRoot/Player")
@@ -114,40 +112,45 @@ portal_path = NodePath("../../LandmarkFinaleRoot/PortalAnchor/LevelPortal")
 minimum_entry_height = 0.4
 minimum_approach_dot = 0.2
 
-[node name="LandmarkFinaleRoot" type="Node3D" parent="."]
+[node name="LandmarkFinaleRoot" type="Node3D" parent="." unique_id=1560038229]
 transform = Transform3D(0.9925461, 0, -0.12186927, 0, 1, 0, 0.12186927, 0, 0.9925461, -47.918728, 2.25, 306.05453)
 
-[node name="FinaleApproachMarker" type="Marker3D" parent="LandmarkFinaleRoot"]
+[node name="FinaleApproachMarker" type="Marker3D" parent="LandmarkFinaleRoot" unique_id=459859679]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.3, -7.5)
 
-[node name="LandmarkLightAnchor" type="Marker3D" parent="LandmarkFinaleRoot"]
+[node name="LandmarkLightAnchor" type="Marker3D" parent="LandmarkFinaleRoot" unique_id=552980164]
+transform = Transform3D(1.0000001, 0, 0, 0, 1, 0, 0, 0, 1.0000001, 1.9385338, 0, -0.23800659)
 
-[node name="LandmarkLightColumn" parent="LandmarkFinaleRoot/LandmarkLightAnchor" instance=ExtResource("19_light_column")]
+[node name="LandmarkLightColumn" parent="LandmarkFinaleRoot/LandmarkLightAnchor" unique_id=2029807248 instance=ExtResource("19_light_column")]
+transform = Transform3D(0.99999917, 0, 0, 0, 1, 0, 0, 0, 0.99999917, -1.2782097, 4.6118784, 10.119812)
 
-[node name="PortalAnchor" type="Marker3D" parent="LandmarkFinaleRoot"]
-transform = Transform3D(0.8660254, 0, 0.5, 0, 1, 0, -0.5, 0, 0.8660254, 4.2, 0.1, -1.8)
+[node name="PortalAnchor" type="Marker3D" parent="LandmarkFinaleRoot" unique_id=298717810]
+transform = Transform3D(0.99555427, 0, 0.094195336, 0, 1, 0, -0.094195336, 0, 0.99555427, 0.32615662, 2.1427035, -0.5040283)
 
-[node name="LevelPortal" parent="LandmarkFinaleRoot/PortalAnchor" instance=ExtResource("21_level_portal")]
+[node name="LevelPortal" parent="LandmarkFinaleRoot/PortalAnchor" unique_id=185985983 instance=ExtResource("21_level_portal")]
 target_scene_path = "res://scenes/levels/Level_02.tscn"
 entry_mode = 1
 require_entry_confirmation = true
 interaction_prompt_text = "Шагнуть к свету"
 
-[node name="FinaleTrigger" type="Area3D" parent="LandmarkFinaleRoot"]
+[node name="FinaleTrigger" type="Area3D" parent="LandmarkFinaleRoot" unique_id=1063440564]
+transform = Transform3D(1.0000006, 0, 0, 0, 1, 0, 0, 0, 1.0000006, 1.0066376, -0.22679043, -1.1806335)
 monitoring = false
 monitorable = false
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="LandmarkFinaleRoot/FinaleTrigger"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, -3.2)
-disabled = true
+[node name="CollisionShape3D" type="CollisionShape3D" parent="LandmarkFinaleRoot/FinaleTrigger" unique_id=169886065]
+transform = Transform3D(1.0000001, 0, 0, 0, 1, 0, 0, 0, 1.0000001, -0.62854385, 3.119627, -5.8865967)
 shape = SubResource("BoxShape3D_finale_trigger")
+disabled = true
 
 [node name="UILayer" type="CanvasLayer" parent="." unique_id=1319326164]
 
 [node name="ShardRewardOverlay" parent="UILayer" unique_id=2119356460 instance=ExtResource("16_reward_overlay")]
 
-[node name="LevelFinaleOverlay" parent="UILayer" instance=ExtResource("20_finale_overlay")]
+[node name="LevelFinaleOverlay" parent="UILayer" unique_id=1723095977 instance=ExtResource("20_finale_overlay")]
 visible = false
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="StepAssistRoot" type="Node3D" parent="." unique_id=1562224144]
 
@@ -201,14 +204,14 @@ transform = Transform3D(-0.98480767, 0, 0.17364828, 0, 1, 0, -0.17364828, 0, -0.
 transform = Transform3D(-0.9925461, 0, 0.12186927, 0, 1, 0, -0.12186927, 0, -0.9925461, -47.918728, -1.9413855, 306.05453)
 
 [node name="Shard_01" parent="." unique_id=1867435069 instance=ExtResource("14_soul_shard")]
-transform = Transform3D(-0.6197755, 0, -0.32538947, 0, 0.7, 0, 0.32538947, 0, -0.6197755, -14.59278, 5.957037, -32.56049)
+transform = Transform3D(-0.88539356, 0, -0.4648421, 0, 1, 0, 0.4648421, 0, -0.88539356, -24.818441, 2.3674388, 118.77108)
 shard_id = &"Shard_01"
-reward_text = "С тобой в моем мире стало теплее...С тобой в моем мире стало теплееС тобой в моем мире стало теплее"
+reward_text = "С тобой в моем мире стало теплее..."
 
 [node name="Shard_02" parent="." unique_id=690272596 instance=ExtResource("14_soul_shard")]
-transform = Transform3D(-0.6977452, 0, -0.056139253, 0, 0.7, 0, 0.056139253, 0, -0.6977452, -40.980263, 3.5240073, 254.95113)
+transform = Transform3D(-0.99677885, 0, -0.080199, 0, 1, 0, 0.080199, 0, -0.99677885, -40.980263, 3.5240073, 254.95113)
 shard_id = &"Shard_02"
-reward_text = "Test_2"
+reward_text = "Ты появилась и в моем мире стало светло..."
 
 [node name="Architecture" type="Node3D" parent="." unique_id=563144666]
 

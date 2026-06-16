@@ -23,6 +23,7 @@ light_size = 0.18
 shadow_enabled = true
 distance_fade_enabled = true
 distance_fade_shadow = 10.0
+omni_range = 1.575
 omni_shadow_mode = 0
 
 [node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=257211122]
