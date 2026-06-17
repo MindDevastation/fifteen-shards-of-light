@@ -115,8 +115,9 @@ func _reveal_text_async() -> void:
 			continue
 		var label := _line_labels[i]
 		var delay := float(i) * line_reveal_stagger
-		tween.tween_property(mask, "size:x", label.size.x + 18.0, line_reveal_duration).set_delay(delay).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-		tween.tween_property(label, "modulate:a", 1.0, 0.60).set_delay(delay).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		mask.size.x = label.size.x
+		tween.tween_property(label, "position:y", 0.0, line_reveal_duration).set_delay(delay).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		tween.tween_property(label, "modulate:a", 1.0, line_reveal_duration).set_delay(delay).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	await tween.finished
 	_text_complete = true
 	_try_enable_button()
@@ -195,13 +196,13 @@ func _layout_text_lines(scale_factor: float) -> void:
 		label.text = "[center][i]%s[/i][/center]" % _bbcode_escape(lines[i])
 		var measured: Vector2 = REWARD_FONT.get_string_size(lines[i], HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size)
 		var width := minf(measured.x + 26.0 * scale_factor, _safe_text_width(scale_factor))
-		label.position = Vector2.ZERO
+		label.position = Vector2(0.0, 10.0 * scale_factor)
 		label.size = Vector2(width, line_height)
 		label.modulate.a = 0.0
 		var mask := _line_masks[i]
 		mask.visible = true
 		mask.position = Vector2((vp.x - width) * 0.5 - vp.x * 0.055, start_y + line_height * float(i))
-		mask.size = Vector2(0.0, line_height)
+		mask.size = Vector2(width, line_height)
 
 func _layout_finale_text(text: String, scale_factor: float) -> Dictionary:
 	var normalized := _normalize_text(text)
@@ -445,7 +446,7 @@ func _create_text_lines() -> void:
 	for i in range(3):
 		var mask := Control.new()
 		mask.name = "LineMask%d" % (i + 1)
-		mask.clip_contents = true
+		mask.clip_contents = false
 		mask.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		text_root.add_child(mask)
 		var label := RichTextLabel.new()
@@ -464,6 +465,7 @@ func _reset_line_masks() -> void:
 		_line_masks[i].visible = false
 		_line_masks[i].size.x = 0.0
 		_line_labels[i].text = ""
+		_line_labels[i].position.y = 10.0
 		_line_labels[i].modulate.a = 0.0
 
 func _configure_label(label: RichTextLabel, font_size: int) -> void:
