@@ -1,166 +1,234 @@
 # Level 01 Gameplay Video Corrective Pass Report
 
 - Date: 2026-06-17
-- Current PR number: 89
-- Current PR URL: https://github.com/MindDevastation/fifteen-shards-of-light/pull/89
+- Current PR number: 90
+- Current PR URL: https://github.com/MindDevastation/fifteen-shards-of-light/pull/90
 - Base branch: `feature/implement-level-01-finale-and-portal-transitions`
-- Base SHA from PR #89 review context: `cf9d3dc73b6e7762e6f38570011c342efbaa0fe5`
-- Remote head branch: `feature/-level_01`
-- Initial reviewed remote head: `2bb86d40bb26a2c2b636f46e4a5d9b464a8710c1`
-- Local pre-correction baseline in this checkout: `8e3a30c` (`Level 01 gameplay video corrective pass`)
-- Final verified remote SHA: `NOT VERIFIED` until push/`git ls-remote` succeeds.
-- Remote commit count: `NOT VERIFIED` until push/PR refresh succeeds; last provided remote count was `1` before this targeted corrective pass.
-- PR #88 presence proof: baseline contains `maxi()`/`maxf()` in `scripts/vfx/firefly_cluster_3d.gd`, `_configure_line_group()` and `FoxConfirmButtonType` preload in `scripts/ui/level_finale_overlay.gd`, and `FoxConfirmButtonType` preload in `scripts/ui/shard_reward_overlay.gd`.
+- Base SHA: `20a1cc9427dbc98bfbee94729fc15a57607be920`
+- Remote head branch: `feature/perform-gameplay-video-corrective-pass-for-level_01`
+- Initial reviewed remote head: `0245b8a8103d2dcabe4ad19f848dd3e024306715`
+- Initial remote commit count: `2`
+- Final remote SHA: `NOT VERIFIED` until push and `git ls-remote` succeed.
+- Final remote commit count: `NOT VERIFIED` until push/PR refresh succeeds.
 - No-merge confirmation: no merge was performed.
 - Auto-merge confirmation: auto-merge was not enabled.
+- New PR confirmation: no new PR was created.
 
-## Files Changed
+## PR #90 Baseline Preservation
 
-Created:
-- `scenes/ui/world/HelpStoneTextPanel3D.tscn`
-- `scripts/ui/world/help_stone_text_panel_3d.gd`
-- `docs/development/Level_01_Gameplay_Video_Corrective_Pass_Report.md`
+Preserved accepted PR #90 fixes:
+- Soul Orb continues to use `WorldInteractionPrompt`.
+- `SoulShard.interaction_radius` remains `1.30`.
+- Camera sensitivity remains `0.002`.
+- Barrier duration remains `5.0`.
+- Cloud clarity pass remains in place.
+- `mouse_blocking_ui` remains in overlay/camera flow.
+- Finale text safe area, 12 branches per side, 24 leaves per side, and soft masked reveal remain in place.
+- `Level01FinaleController.finale_text` remains the Level_01 finale text owner.
+- SceneTransition recovery/callback cleanup remains untouched.
+- Portal architecture remains four vertical full-size strand layers with depth/yaw offsets, authored-transform preservation, `PortalLight` target `0.28`, and `OrbitMotes.amount = 48`.
 
-Modified by the original corrective pass:
+## Help Stone Source Inspection
+
+Inspected:
+- `assets/props/help_stone_01/`
+- `assets/props/help_stone_02/`
 - `scenes/environment/assets/help_stone_01.tscn`
 - `scenes/environment/assets/help_stone_02.tscn`
-- `scripts/player/camera_controller.gd`
-- `resources/environment/stylized_cloud_material.tres`
-- `shaders/environment/stylized_cloud.gdshader`
-- `scripts/soul/soul_shard.gd`
-- `scripts/levels/level_01_progression_controller.gd`
-- `scripts/levels/level_01_finale_controller.gd`
-- `scenes/levels/Level_01.tscn`
-- `scenes/core/LevelPortal.tscn`
-- `scripts/core/level_portal.gd`
-- `shaders/vfx/level_portal_surface.gdshader`
-- `shaders/vfx/level_portal_back_veil.gdshader`
-- `shaders/vfx/level_portal_ring.gdshader`
-- `scripts/ui/level_finale_overlay.gd`
-- `scripts/ui/shard_reward_overlay.gd`
 
-Modified by this targeted PR #89 follow-up:
-- `scenes/core/LevelPortal.tscn`
-- `scripts/core/level_portal.gd`
-- `shaders/vfx/level_portal_ring.gdshader`
+Findings:
+- Each Help Stone GLB contains one mesh, one material, three embedded/external texture images, and one node.
+- The material uses texture index `0` as `baseColorTexture`, texture index `1` as metallic/roughness, and texture index `2` as normal.
+- No separate inscription mesh, node, or material was found in the GLB structure.
+- The old inscription is therefore treated as baked into the base-color texture/asset surface rather than a separately hideable mesh.
+
+## Chosen Inscription Replacement Method
+
+Because there was no separate inscription mesh/material to hide, the corrective pass uses a Godot-only fallback designed to mask the baked old inscription while avoiding a cream plaque:
+- Deleted the temporary `HelpStoneTextPanel3D` Label3D-only overlay resources.
+- Added `HelpStoneInscription3D`, which combines an irregular stone-colored mask shader with an engraved-style `Label3D` inscription.
+- Replaced both Help Stone scene instances with `CorrectedInscription` using `HelpStoneInscription3D`.
+- This path did not regenerate GLB or source texture assets; it masks the baked inscription in-scene because no separable inscription mesh was available in the GLB.
+
+## Removed HelpStoneTextPanel3D Resources
+
+Removed obsolete temporary overlay resources:
 - `scenes/ui/world/HelpStoneTextPanel3D.tscn`
 - `scripts/ui/world/help_stone_text_panel_3d.gd`
-- `docs/development/Level_01_Gameplay_Video_Corrective_Pass_Report.md`
 
-## Original Corrective Pass Notes
+Replacement resources:
+- `scenes/ui/world/HelpStoneInscription3D.tscn`
+- `scripts/ui/world/help_stone_inscription_3d.gd`
+- `shaders/ui/world/help_stone_inscription_mask.gdshader`
 
-### Help Stone implementation
-Reusable `HelpStoneTextPanel3D` has a `Node3D` root, `MeshInstance3D` backing plane, and `Label3D`. It exposes multiline text, panel size, font size, text color, and panel color. The backing is non-emissive cream/stone material and the label is centered dark text.
+## Help Stone Mask Smoothstep Correction
 
-Exact texts:
+The mask shader no longer uses reversed `smoothstep(0.50, 0.50 - edge_softness, ...)` calls. Horizontal and vertical organic edge values now use ascending thresholds via `1.0 - smoothstep(0.50 - edge_softness, 0.50, value)`, avoiding undefined GPU-specific behavior while keeping the center at full opacity and fading only the noisy organic edges.
 
-Help Stone 01:
-```text
-WASD - движение
-Мышь - обзор
-Space - прыжок
-Shift - бег
-```
+## Help Stone Full-Opacity Center
 
-Help Stone 02:
-```text
-E - взаимодействие
+The Help Stone mask center is now fully opaque:
+- shader default `stone_tint.a = 1.0`,
+- `HelpStoneInscription3D` material `stone_tint.a = 1.0`,
+- both Help Stone instance `mask_color.a = 1.0`,
+- final shader alpha is `ALPHA = organic_mask`, so the center is not multiplied by the previous `0.92` opacity.
 
-Нажми E, чтобы подобрать
-или активировать объект.
-```
+## Help Stone Lit Stone-Material Behavior
 
-### Camera before/after sensitivity
-- Before: `0.003`
-- After: exported range `0.0005..0.005` with default `0.002`
-- Level_01 override audit: no Level_01 override to `0.003` remains.
+The mask shader no longer uses `unshaded` rendering and no longer writes non-zero `EMISSION`. It now uses lit spatial shading with:
+- `ROUGHNESS = 0.95`,
+- `METALLIC = 0.0`,
+- `SPECULAR = 0.08`.
 
-### Cloud before/after colors
-- Top: `Color(0.91, 0.93, 0.95, 1)` -> `Color(0.95, 0.92, 0.85, 1)`
-- Middle: `Color(0.8, 0.84, 0.88, 1)` -> `Color(0.87, 0.83, 0.76, 1)`
-- Bottom: `Color(0.64, 0.7, 0.76, 1)` -> `Color(0.72, 0.68, 0.64, 1)`
-- `noise_influence` remains `0.045`; cloud shader remains unshaded and low-frequency.
+This should make the mask respond to scene lighting more like a stone surface instead of a flat glowing UI patch.
 
-### SoulShard radius before/after
-- Before reusable scene shape: `SphereShape3D radius = 0.50625`
-- After runtime default: `interaction_radius = 1.15`, duplicated from the shape before mutation.
+## Help Stone Text Whitespace Normalization
 
-### Barrier duration before/after
-- Before: `2.5`
-- After: `5.0`
-- Signal timing remains tied to tween `finished`.
+Both Help Stone serialized text values were checked and are stored without leading spaces after newline characters:
+- Help Stone 01: `WASD - движение`, `Мышь - обзор`, `Space - прыжок`, `Shift - бег`.
+- Help Stone 02: `E - взаимодействие`, blank line, `Нажми E, чтобы подобрать`, `или активировать объект.`
 
-### Authoritative finale text source
-- `Level01FinaleController.finale_text` is the only Level_01 authoritative final text source.
-- Level_01 explicitly sets `Ты появилась как тёплый первый свет` on `Level01FinaleController`.
+No wording, font size, or placement changes were made for this whitespace check.
 
-### Legacy LevelManager decision
-The legacy `LevelManager` node and its Level_01 `level_manager.gd` ext_resource were removed from `Level_01.tscn`; the Stage 1D placeholder `reward_text` wiring was obsolete for Level_01 and would duplicate final text ownership.
+## Portal Orientation Root Cause
 
-### Cursor ownership
-`ShardRewardOverlay` and `LevelFinaleOverlay` join `mouse_blocking_ui`. `CameraController` uses the group to show the cursor and ignore mouse look while visible Control overlays are open. `LevelFinaleOverlay` no longer closes from `interact`/`E`; `ui_accept` remains for keyboard accessibility.
+The portal used `QuadMesh` surfaces, which already live in local XY and face along local Z. The earlier problematic transform basis mapped local Y into world Z, rotating doorway surfaces into a horizontal XZ-like plane. PR #90 corrected those scene transforms before this final shader pass.
 
-## Targeted PR #89 Follow-Up Corrections
+## Portal Vertical Transform Correction
 
-### Portal ring geometry correction
-`OuterRing` and `InnerRing` no longer use `TorusMesh` resources with near-zero `inner_radius`. They are now vertical `QuadMesh` layers in the portal plane, preserving the existing node names for script references while avoiding solid torus/disc geometry.
+Corrected vertical portal elements remain:
+- `PortalStrandLayerBack`
+- `PortalStrandLayerMiddle`
+- `PortalStrandLayerNearMiddle`
+- `PortalStrandLayerFront`
+- `BackVeil`
+- `OuterRing`
+- `InnerRing`
+- `OrbitMotes`
 
-### Elliptical outline implementation
-`shaders/vfx/level_portal_ring.gdshader` now computes a thin ring mask in UV space using `ring_radius`, `ring_width`, and `edge_softness`. Because the ring meshes are vertical rectangular quads, the circular UV outline reads as a vertical oval in world space.
+`GroundRing` remains horizontal. Strand layer center Y remains `1.575`, so the 3.15-high portal doorway rests at approximately ground level.
 
-### Ring brightness reduction
-Runtime duplicated ring materials are parameterized as:
-- OuterRing: `ring_radius = 0.92`, `ring_width = 0.035`, `ring_alpha = 0.12`, `emission_strength = 0.16`, `edge_softness = 0.025`.
-- InnerRing: `ring_radius = 0.76`, `ring_width = 0.022`, `ring_alpha = 0.08`, `emission_strength = 0.12`, `edge_softness = 0.025`.
+## Portal Layer Reduction
 
-The strand layers remain the primary internal portal structure. `BackVeil` remains at alpha `0.10`, `PortalLight` target energy remains `0.28`, and `PortalLight` range remains `3.4`.
+Active full-size additive strand planes remain reduced from six to four:
+- `PortalStrandLayerBack`
+- `PortalStrandLayerMiddle`
+- `PortalStrandLayerNearMiddle`
+- `PortalStrandLayerFront`
 
-### Strand target scale preservation
-`LevelPortal` captures scene-authored target scales for `PortalStrandLayerBack`, `PortalStrandLayerMiddle`, and `PortalStrandLayerFront` once during `_ready()`. Activation starts each layer from `target_scale * start_multiplier` and tweens it back to the authored target scale, preserving the Back/Middle/Front scale differences after materialization.
+Depth offsets remain `-0.12`, `-0.04`, `+0.04`, `+0.12`; yaw offsets around world Y remain `-3°`, `-1°`, `+1°`, `+3°`.
 
-### Help Stone instance-local resources
-`PlaneMesh_backing` is marked `resource_local_to_scene = true`, and `HelpStoneTextPanel3D` defensively duplicates the backing mesh once per instance with a `_mesh_localized` guard. The backing material is also localized once per instance. Text/font/color/panel-size changes do not allocate a new mesh every setter call.
+## Overdraw and Light Safety
 
-### Help Stone editor preview
-`HelpStoneTextPanel3D` is now a `@tool` script with an Inspector category. Inspector setters call `_update_panel()` safely after node readiness, so `Label3D.text`, `Label3D.font_size`, `Label3D.modulate`, `Label3D.width`, backing `PlaneMesh.size`, backing material albedo, and outline color update in the Godot editor without running the game.
+Density remains shader-driven rather than plane-count-driven.
 
-### Portal visual hierarchy static review
-Static checks confirm: three strand layers only, two lightweight outline layers only, no new particles, no per-frame material duplication, no per-frame resource creation, no `TorusMesh` portal rings, no ring geometry rotation, `BackVeil` alpha `<= 0.10`, `PortalLight` target energy `0.28`, and `PortalLight` range `3.4`.
+Runtime strand parameters remain:
+- `strand_density = 20.0, 22.1, 24.2, 26.3`
+- `radial_density = 25.0, 27.8, 30.6, 33.4`
+- `rotation_speed = 0.12, 0.138, 0.156, 0.174`
+- `layer_alpha = 0.28, 0.325, 0.37, 0.415`
 
-## Automated Tests Performed
+Lighting/particles remain:
+- `PortalLight` target energy `0.28`.
+- Orbit motes `48`.
+- No per-frame material duplication was added; runtime material duplication remains setup-time only.
 
-- `git status --short --branch --untracked-files=all` (preflight and post-commit checks)
-- `git log -15 --oneline --decorate` (preflight)
-- `git branch -avv` (preflight)
-- `git remote -v` (preflight)
-- `git diff --check` (preflight and after edits)
-- `git diff --stat` (after commits)
-- `godot --headless --path . --quit --check-only` passed.
-- `timeout 180s godot --headless --editor --path . --quit` first timed out during asset import/reimport at ~88%; this was treated as import-cache warmup, not a parse failure.
-- A second `timeout 180s godot --headless --editor --path . --quit` completed successfully.
-- `/tmp/validate_pr89_corrective.gd` targeted validation passed: affected scripts/resources loaded, `LevelPortal` strand scales returned to authored target scales after activation, and two `HelpStoneTextPanel3D` instances used independent `PlaneMesh` sizes.
-- Structural validation performed with `rg` confirmed no `TorusMesh`, `inner_radius`, or `outer_radius` portal ring resources remain in `scenes/core/LevelPortal.tscn`; the only remaining `inner_radius`-style match is `emission_ring_inner_radius` for `OrbitMotes` particles.
+## Portal Silhouette Edge-Clipping Correction
 
-## Graphical Tests Not Performed
+The portal surface shader no longer applies the old `c.y *= 0.70` vertical stretch. The mask now uses `vec2 c = UV - vec2(0.5)` directly, with tighter thresholds:
+- `oval = 1.0 - smoothstep(0.40, 0.48, r)`
+- `center_open = smoothstep(0.055, 0.18, r)`
+- `edge_alpha = (1.0 - smoothstep(0.32, 0.46, r)) * oval * 0.045`
 
-No rendered viewport/gameplay graphical QA was performed in this headless non-interactive container. The following remain manual QA items and are not claimed as visually approved:
-- Portal doorway shape, side-angle readability, non-lollipop read, ring/strand hierarchy, player silhouette, and activation appearance.
-- Help Stone baked-text coverage, decorative-frame clearance, text readability at 2–3 meters, and z-fighting check.
-- Final overlay visual hierarchy over the redesigned portal.
+CPU-side shader-equivalent sampling expects alpha to fade to approximately `0.0` at `UV(0.5, 0.0)`, `UV(0.5, 1.0)`, `UV(0.0, 0.5)`, and `UV(1.0, 0.5)`, preventing strand/body alpha from reaching the QuadMesh edges.
 
-## Performance Not Measured
+## Targeted Portal Transform Validation
 
-No average FPS, 1% low, p95 frame time, or portal sustained-regression benchmark was captured. Performance must still be measured on the target machine. Static performance review found no additional strand layers beyond three, no new particles, no per-frame material allocations, and no recursive editor update loops.
+Targeted portal validation verifies:
+- `res://scenes/core/LevelPortal.tscn` loads,
+- active strand layer count is `<= 4`,
+- each vertical portal node keeps local Y aligned with world Y,
+- surface normals remain horizontal rather than upward,
+- activation preserves each strand layer's authored transform.
+
+## Help Stone Old-Text Removal Validation
+
+Static validation:
+- GLB inspection found no separate inscription mesh/material; old text is treated as baked into the asset surface.
+- The corrected `HelpStoneInscription3D` mask is present on both Help Stone scenes and the old `HelpStoneTextPanel3D` resources are removed.
+- The mask center is now fully opaque, lit, and free of reversed smoothstep calls.
+
+Graphical validation is still required to visually confirm no old baked letters leak through the mask.
+
+## Final Shader Validation
+
+Final shader validation checks:
+- Help Stone shader/resource loads.
+- `stone_tint.a == 1.0`.
+- Help Stone mask shader does not contain `unshaded`.
+- Help Stone mask shader does not contain reversed `smoothstep(0.50, 0.50 - ...)`.
+- Help Stone mask shader does not contain non-zero `EMISSION`.
+- Both Help Stone scenes use `HelpStoneInscription3D`.
+- Old `HelpStoneTextPanel3D` production references are absent.
+- Portal shader/resource loads.
+- Portal shader does not contain `c.y *= 0.70`.
+- Portal shader-equivalent edge samples fade to zero at QuadMesh edges.
+- Four active strand layers remain in the scene.
+- Portal vertical transforms and authored-transform preservation remain valid after activation.
+
+Final pass/fail result is recorded in the final handoff.
+
+## Automated Validation Performed
+
+Performed during this pass:
+- `git status --short --branch --untracked-files=all`
+- `git log -15 --oneline --decorate`
+- `git branch -avv`
+- `git remote -v`
+- `git diff --check`
+- `rg` structural checks for PR #90 baseline preservation.
+- `rg` structural checks for shader regressions, portal strand layer count, and Help Stone references.
+
+Final Godot check-only, editor import, targeted resource load, and shader validation results are recorded in the final handoff.
+
+## Graphical QA Actually Performed
+
+No rendered viewport/gameplay graphical QA was performed in this headless container. Do not treat Help Stone masking, portal readability, player silhouette, or finale visuals as graphically approved by Codex.
+
+## Performance Measurements Actually Performed
+
+Performance not measured. No average FPS, 1% low, p95 frame time, or target-machine portal arena benchmark was captured.
+
+Static performance checks:
+- Active full-size strand layers are `4`.
+- Orbit motes are `48`.
+- No per-frame resource allocation was added.
+- Runtime material duplication remains setup-time only.
 
 ## Remaining Manual QA
 
-- Help Stone baked-text coverage from gameplay angles.
-- Camera feel comparison against prior manual video.
-- Cloud separation on long bridges.
-- Shard prompt distance in both collection orders.
-- Barrier observed duration `5.0 ± 0.2s` and collision movement.
-- Portal 3m/10m readability, side-angle visibility, and materialization timing.
-- Finale overlay cursor, fox hover/click, and failed-transition cursor recovery.
-- Regression cases: empty target path, invalid target path, failed transition retry, repeated E/click, 1280×720, 1920×1080.
-- Performance measurements on target machine.
-- Audio was not verified.
+Help Stones:
+- Verify old text does not show through.
+- Verify no double letters remain.
+- Verify the mask does not read as a rectangle.
+- Verify the mask does not glow and responds to scene light like stone.
+- Verify patch color matches the stone face.
+- Verify no z-fighting.
+- Verify text has no leading spaces and reads from 2–3 meters.
+
+Portal:
+- Verify portal remains vertical.
+- Verify upper and lower silhouettes are rounded.
+- Verify no flat clipping or rectangular silhouette appears.
+- Verify strands do not terminate against QuadMesh edges.
+- Verify center does not become a solid blob.
+- Verify player silhouette, volume, and motion remain readable.
+
+Regression:
+- Verify Soul Orb prompt still works.
+- Verify SoulShard radius remains `1.30`.
+- Verify camera sensitivity remains `0.002`.
+- Verify barrier duration remains `5.0`.
+- Verify finale frame, finale safe text area, and soft reveal are not reverted.
+- Verify mouse cursor flow remains stable.
+- Verify E does not close the final overlay.

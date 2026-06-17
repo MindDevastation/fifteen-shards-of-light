@@ -25,6 +25,7 @@ var _current_player: Node
 var _confirmation_player: Node
 var _strand_materials: Array[ShaderMaterial] = []
 var _strand_target_scales: Array[Vector3] = []
+var _strand_target_transforms: Array[Transform3D] = []
 var _back_veil_material: ShaderMaterial
 var _ring_materials: Array[ShaderMaterial] = []
 var _ground_material: ShaderMaterial
@@ -37,7 +38,7 @@ var _transition_finished_callback := Callable()
 @onready var ground_ring: MeshInstance3D = $VisualRoot/GroundRing
 @onready var outer_ring: MeshInstance3D = $VisualRoot/OuterRing
 @onready var inner_ring: MeshInstance3D = $VisualRoot/InnerRing
-@onready var strand_layers: Array[MeshInstance3D] = [$VisualRoot/PortalStrandLayerBack, $VisualRoot/PortalStrandLayerMiddle, $VisualRoot/PortalStrandLayerFront]
+@onready var strand_layers: Array[MeshInstance3D] = [$VisualRoot/PortalStrandLayerBack, $VisualRoot/PortalStrandLayerMiddle, $VisualRoot/PortalStrandLayerNearMiddle, $VisualRoot/PortalStrandLayerFront]
 @onready var back_veil: MeshInstance3D = $VisualRoot/BackVeil
 @onready var interaction_area: Area3D = $InteractionArea
 @onready var interaction_shape: CollisionShape3D = $InteractionArea/CollisionShape3D
@@ -101,19 +102,32 @@ func cancel_entry_confirmation(player: Node) -> void:
 func _process(delta: float) -> void:
 	if _state == PortalState.INACTIVE:
 		return
-	ground_ring.rotate_y(0.08 * delta)
-	orbit_motes.rotate_z(-0.10 * delta)
+	ground_ring.rotate_y(0.12 * delta)
+	orbit_motes.rotate_z(-0.24 * delta)
 
 func _capture_strand_target_scales() -> void:
 	if not _strand_target_scales.is_empty():
 		return
 	for layer in strand_layers:
 		_strand_target_scales.append(layer.scale)
+		_strand_target_transforms.append(layer.transform)
 
 func _get_strand_target_scale(index: int) -> Vector3:
 	if index >= 0 and index < _strand_target_scales.size():
 		return _strand_target_scales[index]
 	return Vector3.ONE
+
+func _get_strand_target_transform(index: int) -> Transform3D:
+	if index >= 0 and index < _strand_target_transforms.size():
+		return _strand_target_transforms[index]
+	return Transform3D.IDENTITY
+
+func _scaled_transform(source: Transform3D, scale_multiplier: float) -> Transform3D:
+	var result := source
+	result.basis.x *= scale_multiplier
+	result.basis.y *= scale_multiplier
+	result.basis.z *= scale_multiplier
+	return result
 
 func _duplicate_runtime_materials() -> void:
 	_strand_materials.clear()
@@ -124,10 +138,10 @@ func _duplicate_runtime_materials() -> void:
 			var material := layer.material_override as ShaderMaterial
 			_strand_materials.append(material)
 			material.set_shader_parameter("phase_offset", float(index) * 0.23)
-			material.set_shader_parameter("strand_density", 8.6 + float(index) * 0.7)
-			material.set_shader_parameter("radial_density", 11.4 + float(index) * 0.55)
-			material.set_shader_parameter("rotation_speed", 0.034 + float(index) * 0.006)
-			material.set_shader_parameter("layer_alpha", 0.46 + float(index) * 0.08)
+			material.set_shader_parameter("strand_density", 20.0 + float(index) * 2.1)
+			material.set_shader_parameter("radial_density", 25.0 + float(index) * 2.8)
+			material.set_shader_parameter("rotation_speed", 0.12 + float(index) * 0.018)
+			material.set_shader_parameter("layer_alpha", 0.28 + float(index) * 0.045)
 	if back_veil.material_override is ShaderMaterial:
 		back_veil.material_override = back_veil.material_override.duplicate()
 		_back_veil_material = back_veil.material_override
@@ -161,9 +175,9 @@ func _play_staged_activation() -> void:
 	outer_ring.scale = Vector3.ONE * 0.78
 	inner_ring.scale = Vector3.ONE * 0.70
 	for index in range(strand_layers.size()):
-		var target_scale := _get_strand_target_scale(index)
+		var target_transform := _get_strand_target_transform(index)
 		var start_multiplier := 0.90 + float(index) * 0.045
-		strand_layers[index].scale = target_scale * start_multiplier
+		strand_layers[index].transform = _scaled_transform(target_transform, start_multiplier)
 	back_veil.scale = Vector3.ONE * 0.90
 	portal_light.light_energy = 0.0
 	orbit_motes.emitting = false
@@ -175,7 +189,7 @@ func _play_staged_activation() -> void:
 	_activation_tween.tween_property(inner_ring, "scale", Vector3.ONE, 1.05).set_delay(0.15).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	_activation_tween.tween_method(_set_surface_activation, 0.0, 1.0, 1.20).set_delay(0.30).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	for index in range(strand_layers.size()):
-		_activation_tween.tween_property(strand_layers[index], "scale", _get_strand_target_scale(index), 1.20).set_delay(0.30).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		_activation_tween.tween_property(strand_layers[index], "transform", _get_strand_target_transform(index), 1.20).set_delay(0.30).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	_activation_tween.tween_method(_set_back_veil_activation, 0.0, 1.0, 1.10).set_delay(0.25).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	_activation_tween.tween_property(back_veil, "scale", Vector3.ONE, 1.10).set_delay(0.25).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	_activation_tween.tween_property(portal_light, "light_energy", 0.28, 0.75).set_delay(0.35).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)

@@ -34,8 +34,8 @@ const VINE_LEAF_TEXTURE := preload("res://assets/ui/shard_reward_overlay/vine_le
 const VINE_GROWTH_DURATION := 2.3
 const REWARD_FONT := preload("res://assets/fonts/cormorant_garamond/CormorantGaramond-SemiBoldItalic.otf")
 const FRAME_LIVING_UPDATE_INTERVAL := 0.033
-const TEXT_REVEAL_LINE_DURATION := 1.25
-const TEXT_REVEAL_LINE_STAGGER := 0.55
+const TEXT_REVEAL_LINE_DURATION := 1.85
+const TEXT_REVEAL_LINE_STAGGER := 0.72
 const TEXT_REVEAL_DEFAULT_FONT_SIZE := 48
 const TEXT_REVEAL_FALLBACK_FONT_SIZE := 44
 const TEXT_LINE_WIDTHS := [720.0, 650.0, 560.0]
@@ -269,7 +269,7 @@ func _reveal_text() -> void:
 		var target_width := label.size.x + 18.0
 		var delay := float(i) * TEXT_REVEAL_LINE_STAGGER
 		tween.tween_property(mask, "size:x", target_width, TEXT_REVEAL_LINE_DURATION).set_delay(delay).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-		tween.tween_property(label, "modulate:a", 1.0, 0.25).set_delay(delay).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		tween.tween_property(label, "modulate:a", 1.0, 0.55).set_delay(delay).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		tween.tween_property(glint, "position:x", target_width - glint.size.x * 0.5, TEXT_REVEAL_LINE_DURATION).set_delay(delay).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 		tween.tween_property(glint, "modulate:a", 0.62, 0.18).set_delay(delay).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		tween.tween_property(glint, "modulate:a", 0.0, 0.28).set_delay(delay + TEXT_REVEAL_LINE_DURATION - 0.18).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)

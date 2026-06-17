@@ -19,8 +19,8 @@ const REWARD_FONT: FontFile = preload("res://assets/fonts/cormorant_garamond/Cor
 const VINE_LEAF_TEXTURE: Texture2D = preload("res://assets/ui/shard_reward_overlay/vine_leaf.png")
 
 @export var text_start_delay: float = 0.72
-@export var line_reveal_duration: float = 1.48
-@export var line_reveal_stagger: float = 0.46
+@export var line_reveal_duration: float = 2.15
+@export var line_reveal_stagger: float = 0.68
 @export var vine_duration: float = 1.55
 @export var atmosphere_open_duration: float = 0.42
 @export var text_close_duration: float = 0.40
@@ -116,7 +116,7 @@ func _reveal_text_async() -> void:
 		var label := _line_labels[i]
 		var delay := float(i) * line_reveal_stagger
 		tween.tween_property(mask, "size:x", label.size.x + 18.0, line_reveal_duration).set_delay(delay).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-		tween.tween_property(label, "modulate:a", 1.0, 0.24).set_delay(delay).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		tween.tween_property(label, "modulate:a", 1.0, 0.60).set_delay(delay).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	await tween.finished
 	_text_complete = true
 	_try_enable_button()
@@ -175,7 +175,7 @@ func _apply_responsive_layout() -> void:
 	var scale_factor := clampf(vp.y / 1080.0, 0.72, 1.08)
 	var button_size := clampf(vp.y * 0.152, 120.0, 164.0)
 	fox_button.size = Vector2.ONE * button_size
-	fox_button.position = Vector2((vp.x - button_size) * 0.5, vp.y * 0.775)
+	fox_button.position = Vector2((vp.x - button_size) * 0.5, vp.y * 0.795)
 	fox_button.set_base_position(fox_button.position)
 	fox_button.pivot_offset = fox_button.size * 0.5
 	_layout_text_lines(scale_factor)
@@ -187,7 +187,7 @@ func _layout_text_lines(scale_factor: float) -> void:
 	var vp := _viewport_size()
 	var line_height := 58.0 * scale_factor
 	var total_height := line_height * float(lines.size())
-	var start_y := vp.y * 0.42 - total_height * 0.5
+	var start_y := vp.y * 0.405 - total_height * 0.5
 	_reset_line_masks()
 	for i in range(lines.size()):
 		var label := _line_labels[i]
@@ -255,7 +255,7 @@ func _lines_fit(lines: Array[String], font_size: int, scale_factor: float) -> bo
 	return true
 
 func _safe_text_width(scale_factor: float) -> float:
-	return clampf(_viewport_size().x * 0.48, 720.0 * scale_factor, 860.0 * scale_factor)
+	return clampf(_viewport_size().x * 0.40, 600.0 * scale_factor, 760.0 * scale_factor)
 
 func _build_vines() -> void:
 	_clear_branches_and_leaves()
@@ -308,15 +308,15 @@ func _truncate_points(points: PackedVector2Array, progress: float) -> PackedVect
 
 func _build_branch_geometry() -> void:
 	for side in [-1, 1]:
-		for i in range(4):
-			var progress := 0.22 + float(i) * 0.17
+		for i in range(12):
+			var progress := 0.13 + float(i) * 0.068
 			var data := _make_branch(side, progress, i)
 			_branch_data.append(data)
 
 func _make_branch(side: int, progress: float, index: int) -> Dictionary:
 	var path: PackedVector2Array = _left_points if side < 0 else _right_points
 	var sample: Dictionary = _sample_path(path, progress, 0.0)
-	var length := _viewport_size().y * lerpf(0.045, 0.072, _hash_01(index, 17))
+	var length := _viewport_size().y * lerpf(0.032, 0.082, _hash_01(index, 17))
 	var sample_angle: float = float(sample["angle"])
 	var sample_position: Vector2 = sample["position"] as Vector2
 	var normal: Vector2 = Vector2(-sin(sample_angle), cos(sample_angle)) * float(side)
@@ -333,9 +333,9 @@ func _make_branch(side: int, progress: float, index: int) -> Dictionary:
 
 func _build_leaf_geometry() -> void:
 	for side in [-1, 1]:
-		for i in range(8):
-			var progress := 0.14 + float(i) * 0.095
-			var side_offset := (10.0 if i % 2 == 0 else -10.0) * float(side)
+		for i in range(24):
+			var progress := 0.08 + float(i) * 0.036
+			var side_offset := lerpf(7.0, 18.0, _hash_01(i, side + 43)) * (1.0 if i % 2 == 0 else -1.0) * float(side)
 			var path: PackedVector2Array = _left_points if side < 0 else _right_points
 			var sample: Dictionary = _sample_path(path, progress, side_offset)
 			var leaf := Sprite2D.new()
@@ -346,7 +346,7 @@ func _build_leaf_geometry() -> void:
 			leaf.scale = Vector2.ZERO
 			leaf.modulate = Color(1.0, 0.84, 0.52, 0.0)
 			leaf_layer.add_child(leaf)
-			_leaf_data.append({"node": leaf, "side": side, "progress": progress, "scale": lerpf(0.82, 1.12, _hash_01(i, side + 31))})
+			_leaf_data.append({"node": leaf, "side": side, "progress": progress, "scale": lerpf(0.64, 1.08, _hash_01(i, side + 31))})
 
 func _update_decorations() -> void:
 	for data in _branch_data:

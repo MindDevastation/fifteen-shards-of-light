@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bn2bgg4k0mn14"]
 
-[ext_resource type="PackedScene" path="res://scenes/ui/world/HelpStoneTextPanel3D.tscn" id="2_text_panel"]
+[ext_resource type="PackedScene" path="res://scenes/ui/world/HelpStoneInscription3D.tscn" id="2_inscription"]
 [ext_resource type="PackedScene" uid="uid://d1vewq7yo8ovt" path="res://assets/props/help_stone_02/help_stone_02.glb" id="1_asset"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_0bpfh"]
@@ -18,11 +18,12 @@ size = Vector3(1.8946381, 1.9587402, 0.89501953)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0068740845, -0.022827148, -0.049072266)
 shape = SubResource("BoxShape3D_0bpfh")
 
-[node name="EditableTextPanel" parent="VisualRoot" instance=ExtResource("2_text_panel")]
+[node name="CorrectedInscription" parent="VisualRoot" instance=ExtResource("2_inscription")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.12, -0.49)
 text = "E - взаимодействие
 
 Нажми E, чтобы подобрать
 или активировать объект."
-panel_size = Vector2(1.18, 0.78)
+inscription_size = Vector2(1.24, 0.84)
 font_size = 36
+mask_color = Color(0.34, 0.30, 0.25, 1)
