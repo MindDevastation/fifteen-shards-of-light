@@ -10,7 +10,7 @@ enum BarrierState { LOCKED, OPEN_PENDING, OPENING, OPEN }
 @export var required_shard_paths: Array[NodePath] = []
 @export var barrier_path: NodePath
 @export var barrier_open_offset: Vector3 = Vector3(0.0, -7.0, 0.0)
-@export_range(0.1, 10.0, 0.1) var barrier_open_duration: float = 2.5
+@export_range(0.1, 10.0, 0.1) var barrier_open_duration: float = 5.0
 @export var barrier_transition: Tween.TransitionType = Tween.TRANS_SINE
 @export var barrier_ease: Tween.EaseType = Tween.EASE_IN_OUT
 

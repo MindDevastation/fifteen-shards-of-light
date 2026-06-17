@@ -1,6 +1,5 @@
 [gd_scene format=3 uid="uid://dlnxbfldy6yg3"]
 
-[ext_resource type="Script" uid="uid://c3dnc4tgsuwbs" path="res://scripts/core/level_manager.gd" id="1_level_manager"]
 [ext_resource type="PackedScene" uid="uid://sqpwvxehf3t7" path="res://scenes/levels/level_01/blocks/Block_01_01_StartClearing.tscn" id="2_block"]
 [ext_resource type="PackedScene" uid="uid://buybh0c880w1y" path="res://scenes/core/Player.tscn" id="3_player"]
 [ext_resource type="Script" uid="uid://b5fastfa3rppc" path="res://scripts/player/camera_controller.gd" id="4_camera_controller"]
@@ -47,9 +46,6 @@ fog_density = 0.012
 
 [node name="Level_01" type="Node3D" unique_id=389746896]
 
-[node name="LevelManager" type="Node" parent="." unique_id=682181116]
-script = ExtResource("1_level_manager")
-reward_text = "Ты появилась как тёплый первый свет"
 
 [node name="BlockRoot" type="Node3D" parent="." unique_id=1489238210]
 
@@ -109,6 +105,7 @@ approach_marker_path = NodePath("../../LandmarkFinaleRoot/FinaleApproachMarker")
 light_column_path = NodePath("../../LandmarkFinaleRoot/LandmarkLightAnchor/LandmarkLightColumn")
 finale_overlay_path = NodePath("../../UILayer/LevelFinaleOverlay")
 portal_path = NodePath("../../LandmarkFinaleRoot/PortalAnchor/LevelPortal")
+finale_text = "Ты появилась как тёплый первый свет"
 minimum_entry_height = 0.4
 minimum_approach_dot = 0.2
 

@@ -59,6 +59,7 @@ var _active_tweens: Array[Tween] = []
 )
 
 func _ready() -> void:
+	add_to_group(&"mouse_blocking_ui")
 	hide()
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	matte_veil.color = MATTE_VEIL_COLOR
@@ -89,7 +90,7 @@ func show_finale_text(text: String) -> bool:
 	return true
 
 func _unhandled_input(event: InputEvent) -> void:
-	if visible and _can_confirm and (event.is_action_pressed("ui_accept") or event.is_action_pressed("interact")):
+	if visible and _can_confirm and (event.is_action_pressed("ui_accept")):
 		accept_event()
 		_close_once()
 
