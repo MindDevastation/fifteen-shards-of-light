@@ -1,6 +1,10 @@
 extends Control
 class_name LevelFinaleOverlay
 
+const FoxConfirmButtonType = preload(
+	"res://scripts/ui/fox_confirm_button.gd"
+)
+
 signal closed
 
 const MATTE_VEIL_COLOR := Color(0.032, 0.021, 0.018, 0.62)
@@ -50,7 +54,9 @@ var _active_tweens: Array[Tween] = []
 @onready var left_tip_glow: Polygon2D = $VineCanvas/LeftTipGlow
 @onready var right_tip_glow: Polygon2D = $VineCanvas/RightTipGlow
 @onready var text_root: Control = $TextRoot
-@onready var fox_button: FoxConfirmButton = $FoxConfirmButton
+@onready var fox_button: FoxConfirmButtonType = (
+	$FoxConfirmButton as FoxConfirmButtonType
+)
 
 func _ready() -> void:
 	hide()
@@ -204,7 +210,7 @@ func _layout_finale_text(text: String, scale_factor: float) -> Dictionary:
 		var result: Array[String] = []
 		if explicit.size() > 1:
 			for part in explicit:
-				result.append_array(_word_wrap(part, font_size, max(1, 3 - result.size()), scale_factor))
+				result.append_array(_word_wrap(part, font_size, maxi(1, 3 - result.size()), scale_factor))
 		else:
 			result = _word_wrap(normalized.replace("\n", " "), font_size, 3, scale_factor)
 		if result.size() <= 3 and _lines_fit(result, font_size, scale_factor):
@@ -217,7 +223,7 @@ func _layout_finale_text(text: String, scale_factor: float) -> Dictionary:
 	return {"lines": fallback, "font_size": int(round(40.0 * scale_factor))}
 
 func _word_wrap(text: String, font_size: int, max_lines: int, scale_factor: float) -> Array[String]:
-	var words := text.split(" ", false)
+	var words: PackedStringArray = text.split(" ", false)
 	if words.is_empty():
 		return []
 	var lines: Array[String] = []
@@ -307,17 +313,19 @@ func _build_branch_geometry() -> void:
 			_branch_data.append(data)
 
 func _make_branch(side: int, progress: float, index: int) -> Dictionary:
-	var path := _left_points if side < 0 else _right_points
-	var sample := _sample_path(path, progress, 0.0)
+	var path: PackedVector2Array = _left_points if side < 0 else _right_points
+	var sample: Dictionary = _sample_path(path, progress, 0.0)
 	var length := _viewport_size().y * lerpf(0.045, 0.072, _hash_01(index, 17))
-	var normal := Vector2(-sin(sample["angle"]), cos(sample["angle"])) * float(side)
-	var end: Vector2 = sample["position"] + normal * length + Vector2(0, -length * 0.35)
+	var sample_angle: float = float(sample["angle"])
+	var sample_position: Vector2 = sample["position"] as Vector2
+	var normal: Vector2 = Vector2(-sin(sample_angle), cos(sample_angle)) * float(side)
+	var end: Vector2 = sample_position + normal * length + Vector2(0, -length * 0.35)
 	var curve := Curve2D.new()
 	curve.bake_interval = 6.0
-	curve.add_point(sample["position"], Vector2.ZERO, normal * 18.0)
-	curve.add_point((sample["position"] + end) * 0.5 + Vector2(0, -8.0), -normal * 12.0, normal * 12.0)
+	curve.add_point(sample_position, Vector2.ZERO, normal * 18.0)
+	curve.add_point((sample_position + end) * 0.5 + Vector2(0, -8.0), -normal * 12.0, normal * 12.0)
 	curve.add_point(end, -normal * 16.0, Vector2.ZERO)
-	var lines := [_create_branch_line(BRANCH_WIDTHS.x, VINE_OUTER_COLOR), _create_branch_line(BRANCH_WIDTHS.y, VINE_MAIN_COLOR), _create_branch_line(BRANCH_WIDTHS.z, VINE_INNER_COLOR)]
+	var lines: Array[Line2D] = [_create_branch_line(BRANCH_WIDTHS.x, VINE_OUTER_COLOR), _create_branch_line(BRANCH_WIDTHS.y, VINE_MAIN_COLOR), _create_branch_line(BRANCH_WIDTHS.z, VINE_INNER_COLOR)]
 	for branch_line: Line2D in lines:
 		branch_layer.add_child(branch_line)
 	return {"side": side, "progress": progress, "points": curve.get_baked_points(), "lines": lines}
@@ -327,13 +335,13 @@ func _build_leaf_geometry() -> void:
 		for i in range(8):
 			var progress := 0.14 + float(i) * 0.095
 			var side_offset := (10.0 if i % 2 == 0 else -10.0) * float(side)
-			var path := _left_points if side < 0 else _right_points
-			var sample := _sample_path(path, progress, side_offset)
+			var path: PackedVector2Array = _left_points if side < 0 else _right_points
+			var sample: Dictionary = _sample_path(path, progress, side_offset)
 			var leaf := Sprite2D.new()
 			leaf.texture = VINE_LEAF_TEXTURE
 			leaf.centered = true
-			leaf.position = sample["position"]
-			leaf.rotation = sample["angle"] + (0.45 if i % 2 == 0 else -0.45) * float(side)
+			leaf.position = sample["position"] as Vector2
+			leaf.rotation = float(sample["angle"]) + (0.45 if i % 2 == 0 else -0.45) * float(side)
 			leaf.scale = Vector2.ZERO
 			leaf.modulate = Color(1.0, 0.84, 0.52, 0.0)
 			leaf_layer.add_child(leaf)
@@ -343,7 +351,7 @@ func _update_decorations() -> void:
 	for data in _branch_data:
 		var progress := _left_progress if int(data["side"]) < 0 else _right_progress
 		var local := clampf((progress - float(data["progress"])) / 0.14, 0.0, 1.0)
-		var points := _truncate_points(data["points"], local)
+		var points: PackedVector2Array = _truncate_points(data["points"] as PackedVector2Array, local)
 		for line in data["lines"]:
 			(line as Line2D).points = points
 	for data in _leaf_data:
@@ -368,22 +376,30 @@ func _update_tip(tip: Polygon2D, points: PackedVector2Array, progress: float) ->
 	if points.is_empty() or progress <= 0.0 or progress >= 0.96:
 		tip.modulate.a = 0.0
 		return
-	var visible := _truncate_points(points, progress)
+	var visible: PackedVector2Array = _truncate_points(points, progress)
 	tip.position = visible[visible.size() - 1]
 	tip.modulate.a = 0.55
 
 func _configure_lines() -> void:
-	var widths := [20.0, 9.0, 3.0]
-	var colors := [VINE_OUTER_COLOR, VINE_MAIN_COLOR, VINE_INNER_COLOR]
-	for group in [left_lines, right_lines]:
-		for i in range(group.size()):
-			var line := group[i]
-			line.width = widths[i]
-			line.default_color = colors[i]
-			line.antialiased = true
-			line.joint_mode = Line2D.LINE_JOINT_ROUND
-			line.begin_cap_mode = Line2D.LINE_CAP_ROUND
-			line.end_cap_mode = Line2D.LINE_CAP_ROUND
+	var widths: Array[float] = [20.0, 9.0, 3.0]
+	var colors: Array[Color] = [
+		VINE_OUTER_COLOR,
+		VINE_MAIN_COLOR,
+		VINE_INNER_COLOR,
+	]
+
+	_configure_line_group(left_lines, widths, colors)
+	_configure_line_group(right_lines, widths, colors)
+
+func _configure_line_group(lines: Array[Line2D], widths: Array[float], colors: Array[Color]) -> void:
+	for i: int in range(lines.size()):
+		var line: Line2D = lines[i]
+		line.width = widths[i]
+		line.default_color = colors[i]
+		line.antialiased = true
+		line.joint_mode = Line2D.LINE_JOINT_ROUND
+		line.begin_cap_mode = Line2D.LINE_CAP_ROUND
+		line.end_cap_mode = Line2D.LINE_CAP_ROUND
 
 func _create_branch_line(width: float, color: Color) -> Line2D:
 	var line := Line2D.new()

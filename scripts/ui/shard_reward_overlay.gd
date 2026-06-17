@@ -1,6 +1,10 @@
 extends Control
 class_name ShardRewardOverlay
 
+const FoxConfirmButtonType = preload(
+	"res://scripts/ui/fox_confirm_button.gd"
+)
+
 signal confirmation_requested
 signal return_completed
 
@@ -88,7 +92,9 @@ var _frame_targets_cache: Array[Vector2] = []
 @onready var text_root: Control = $TextRoot
 @onready var reward_text_label: RichTextLabel = $TextRoot/RewardText
 @onready var button_root: Control = $ButtonRoot
-@onready var confirm_button: FoxConfirmButton = $ButtonRoot/ConfirmButton
+@onready var confirm_button: FoxConfirmButtonType = (
+	$ButtonRoot/ConfirmButton as FoxConfirmButtonType
+)
 
 
 func _ready() -> void:
