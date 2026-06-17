@@ -289,3 +289,82 @@ Regression:
 - Verify the Soul Orb prompt shows exactly `Коснуться света` in-game.
 - Verify the portal remains vertical, uses a readable six-arm structure, has thicker arms, denser fill, faster movement, and a strong luminous rim without becoming a solid white wall.
 - Verify the final overlay text pacing, left offset, organic curls/branchlets, and branch-attached leaves at 1920×1080 and 1280×720.
+
+## PR #91 Corrective Follow-up — Help Stone, Portal, and Finale Reveal
+
+### Help Stone original baked inscription
+
+Help Stone keeps only original baked inscription.
+All additional Label3D, mask, and plaque helpers were removed.
+
+- Removed `CorrectedInscription` instances from `help_stone_01.tscn` and `help_stone_02.tscn`.
+- Removed the now-unused `HelpStoneInscription3D` scene and `help_stone_inscription_3d.gd` helper script.
+- No GLB, texture, or material files for `help_stone_01.glb` or `help_stone_02.glb` were changed.
+
+### Portal six-arm depth coherence
+
+- The portal remains a vertical six-layer depth stack.
+- All six depth layers now share one coherent six-arm shader envelope.
+- Former secondary/tertiary strand details are constrained inside the same `main_arms` mask so they do not form independent bright arm sets between the six primary arms.
+
+### Portal synchronized phases/speeds
+
+Runtime layer phase offsets:
+
+```text
+0.000, +0.012, -0.012, +0.022, -0.022, +0.032
+```
+
+Runtime layer rotation speeds:
+
+```text
+0.510, 0.515, 0.505, 0.520, 0.500, 0.525
+```
+
+The maximum speed spread is within the requested small variation band for coherent depth motion.
+
+### Portal density/overdraw balance
+
+- Layer alphas are depth-weighted: `0.28, 0.34, 0.42, 0.42, 0.34, 0.28`.
+- Surface `base_alpha` is `0.045` for low-volume fill without hiding the arm structure.
+- Surface `arm_alpha` is `0.27`, keeping arms much denser than the base fill.
+- Surface `emission_strength` is `1.15`.
+- `PortalLight` target energy is `0.48`.
+- `OrbitMotes.amount` is `96`.
+- Outer rim parameters are `ring_width = 0.115`, `ring_alpha = 0.48`, `emission_strength = 0.62`.
+- Inner rim parameters are `ring_width = 0.070`, `ring_alpha = 0.32`, `emission_strength = 0.48`.
+
+### Finale whole-line reveal
+
+- Finale text no longer grows a horizontal clipping mask.
+- Each line is laid out at full width before reveal and appears as a complete line.
+- Reveal now animates line alpha from `0` to `1` and vertical offset from approximately `10 px` to `0`.
+- `line_reveal_duration = 12.0`, `line_reveal_stagger = 3.6`, and `vine_duration = 3.7` remain preserved.
+- The left text offset, close animation, input blocking, cursor flow, and finale source ownership remain unchanged.
+
+### Frame/leaf audit
+
+- Organic finale frame still uses `Curve2D` paths for main branches and curved curls.
+- Leaves are sampled from each branch's `branch_points` data and reveal after their parent branch progress.
+- No separate leaf generation on the main frame path was introduced.
+- No frame geometry changes were required during this follow-up.
+
+### Cloud and Soul Orb preservation
+
+- Soul Orb prompt remains `Коснуться света`.
+- Cloud material parameters remain `noise_influence = 0.082`, `body_shadow_strength = 0.105`, and `crown_highlight_strength = 0.075`.
+
+### Performance status
+
+Performance not measured. The headless container does not provide a reliable rendered gameplay viewport/FPS capture path for average FPS, 1% low, or p95 frame time.
+
+### Remaining graphical QA
+
+Manual rendered QA is still required to confirm:
+
+- only the original baked Help Stone inscriptions are visible in-game;
+- exactly six thick portal arms remain readable through activation and active idle;
+- portal density does not become a white blob and the player silhouette remains readable;
+- rim clarity is thick but not an overbright halo;
+- finale lines appear as complete whole lines with no partial-word wipe;
+- organic frame branches/curls/leaves stay outside the text safe area at target resolutions.

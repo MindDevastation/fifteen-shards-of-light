@@ -15,7 +15,10 @@ shader_parameter/phase_offset = 0.0
 shader_parameter/strand_density = 6.0
 shader_parameter/radial_density = 28.0
 shader_parameter/rotation_speed = 0.42
-shader_parameter/layer_alpha = 0.86
+shader_parameter/layer_alpha = 0.42
+shader_parameter/base_alpha = 0.045
+shader_parameter/arm_alpha = 0.27
+shader_parameter/emission_strength = 1.15
 [sub_resource type="ShaderMaterial" id="RingMat"]
 shader = ExtResource("3_ring_shader")
 shader_parameter/activation = 0.0
@@ -123,7 +126,7 @@ material_override = SubResource("GroundMat")
 [node name="OrbitMotes" type="GPUParticles3D" parent="VisualRoot"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.575, 0)
 emitting = false
-amount = 126
+amount = 96
 lifetime = 1.65
 visibility_aabb = AABB(-1.9, -1.9, -0.35, 3.8, 3.8, 0.7)
 process_material = SubResource("OrbitProcess")
