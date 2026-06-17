@@ -12,10 +12,10 @@ shader = ExtResource("2_surface_shader")
 shader_parameter/swirl_noise = ExtResource("5_noise")
 shader_parameter/activation = 0.0
 shader_parameter/phase_offset = 0.0
-shader_parameter/strand_density = 18.0
-shader_parameter/radial_density = 24.0
-shader_parameter/rotation_speed = 0.085
-shader_parameter/layer_alpha = 0.62
+shader_parameter/strand_density = 22.0
+shader_parameter/radial_density = 28.0
+shader_parameter/rotation_speed = 0.14
+shader_parameter/layer_alpha = 0.36
 [sub_resource type="ShaderMaterial" id="RingMat"]
 shader = ExtResource("3_ring_shader")
 shader_parameter/activation = 0.0
@@ -63,53 +63,41 @@ visible = false
 script = ExtResource("1_level_portal")
 [node name="VisualRoot" type="Node3D" parent="."]
 [node name="PortalStrandLayerBack" type="MeshInstance3D" parent="VisualRoot"]
-transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0, 1.45, -0.06)
-cast_shadow = 0
-mesh = SubResource("PortalDisc")
-material_override = SubResource("SurfaceMat")
-
-[node name="PortalStrandLayerFarBack" type="MeshInstance3D" parent="VisualRoot"]
-transform = Transform3D(0.94, 0, 0, 0, 0, 1.08, 0, -0.94, 0, 0, 1.45, -0.18)
+transform = Transform3D(0.998630, 0, 0.052336, 0, 1, 0, -0.052336, 0, 0.998630, 0, 1.575, -0.12)
 cast_shadow = 0
 mesh = SubResource("PortalDisc")
 material_override = SubResource("SurfaceMat")
 
 [node name="PortalStrandLayerMiddle" type="MeshInstance3D" parent="VisualRoot"]
-transform = Transform3D(1.025, 0, 0, 0, 0, 1.025, 0, -1.025, 0, 0, 1.45, 0)
+transform = Transform3D(1.019845, 0, 0.017801, 0, 1.020000, 0, -0.017452, 0, 0.999848, 0, 1.575, -0.04)
 cast_shadow = 0
 mesh = SubResource("PortalDisc")
 material_override = SubResource("SurfaceMat")
 
 [node name="PortalStrandLayerNearMiddle" type="MeshInstance3D" parent="VisualRoot"]
-transform = Transform3D(1.08, 0, 0, 0, 0, 0.98, 0, -1.08, 0, 0, 1.45, 0.12)
+transform = Transform3D(1.019845, 0, -0.017801, 0, 1.020000, 0, 0.017452, 0, 0.999848, 0, 1.575, 0.04)
 cast_shadow = 0
 mesh = SubResource("PortalDisc")
 material_override = SubResource("SurfaceMat")
 
 [node name="PortalStrandLayerFront" type="MeshInstance3D" parent="VisualRoot"]
-transform = Transform3D(0.975, 0, 0, 0, 0, 0.975, 0, -0.975, 0, 0, 1.45, 0.06)
-cast_shadow = 0
-mesh = SubResource("PortalDisc")
-material_override = SubResource("SurfaceMat")
-
-[node name="PortalStrandLayerForward" type="MeshInstance3D" parent="VisualRoot"]
-transform = Transform3D(0.90, 0, 0, 0, 0, 1.10, 0, -0.90, 0, 0, 1.45, 0.22)
+transform = Transform3D(0.978657, 0, -0.051289, 0, 0.980000, 0, 0.052336, 0, 0.998630, 0, 1.575, 0.12)
 cast_shadow = 0
 mesh = SubResource("PortalDisc")
 material_override = SubResource("SurfaceMat")
 
 [node name="BackVeil" type="MeshInstance3D" parent="VisualRoot"]
-transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0, 1.45, 0.08)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.575, 0.08)
 cast_shadow = 0
 mesh = SubResource("BackVeilQuad")
 material_override = SubResource("BackVeilMat")
 [node name="OuterRing" type="MeshInstance3D" parent="VisualRoot"]
-transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0, 1.45, -0.025)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.575, -0.025)
 cast_shadow = 0
 mesh = SubResource("OuterRingQuad")
 material_override = SubResource("RingMat")
 [node name="InnerRing" type="MeshInstance3D" parent="VisualRoot"]
-transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0, 1.45, 0.025)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.575, 0.025)
 cast_shadow = 0
 mesh = SubResource("InnerRingQuad")
 material_override = SubResource("RingMat")
@@ -119,9 +107,9 @@ cast_shadow = 0
 mesh = SubResource("GroundQuad")
 material_override = SubResource("GroundMat")
 [node name="OrbitMotes" type="GPUParticles3D" parent="VisualRoot"]
-transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0, 1.45, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.575, 0)
 emitting = false
-amount = 58
+amount = 48
 lifetime = 2.2
 visibility_aabb = AABB(-1.9, -1.9, -0.35, 3.8, 3.8, 0.7)
 process_material = SubResource("OrbitProcess")
