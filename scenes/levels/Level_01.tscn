@@ -130,6 +130,8 @@ transform = Transform3D(0.99555427, 0, 0.094195336, 0, 1, 0, -0.094195336, 0, 0.
 [node name="LevelPortal" parent="LandmarkFinaleRoot/PortalAnchor" unique_id=185985983 instance=ExtResource("21_level_portal")]
 target_scene_path = "res://scenes/levels/Level_02.tscn"
 entry_mode = 1
+require_entry_confirmation = true
+interaction_prompt_text = "Шагнуть к свету"
 
 [node name="FinaleTrigger" type="Area3D" parent="LandmarkFinaleRoot" unique_id=1063440564]
 transform = Transform3D(1.0000006, 0, 0, 0, 1, 0, 0, 0, 1.0000006, 1.0066376, -0.22679043, -1.1806335)
