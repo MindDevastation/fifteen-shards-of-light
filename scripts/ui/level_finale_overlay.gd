@@ -19,9 +19,9 @@ const REWARD_FONT: FontFile = preload("res://assets/fonts/cormorant_garamond/Cor
 const VINE_LEAF_TEXTURE: Texture2D = preload("res://assets/ui/shard_reward_overlay/vine_leaf.png")
 
 @export var text_start_delay: float = 0.72
-@export var line_reveal_duration: float = 2.15
-@export var line_reveal_stagger: float = 0.68
-@export var vine_duration: float = 1.55
+@export var line_reveal_duration: float = 12.0
+@export var line_reveal_stagger: float = 3.6
+@export var vine_duration: float = 3.7
 @export var atmosphere_open_duration: float = 0.42
 @export var text_close_duration: float = 0.40
 @export var vine_close_duration: float = 0.62
@@ -200,7 +200,7 @@ func _layout_text_lines(scale_factor: float) -> void:
 		label.modulate.a = 0.0
 		var mask := _line_masks[i]
 		mask.visible = true
-		mask.position = Vector2((vp.x - width) * 0.5, start_y + line_height * float(i))
+		mask.position = Vector2((vp.x - width) * 0.5 - vp.x * 0.055, start_y + line_height * float(i))
 		mask.size = Vector2(0.0, line_height)
 
 func _layout_finale_text(text: String, scale_factor: float) -> Dictionary:
@@ -312,41 +312,70 @@ func _build_branch_geometry() -> void:
 			var progress := 0.13 + float(i) * 0.068
 			var data := _make_branch(side, progress, i)
 			_branch_data.append(data)
+			if i % 2 == 0:
+				_branch_data.append(_make_curl(side, progress + 0.018, i))
 
 func _make_branch(side: int, progress: float, index: int) -> Dictionary:
 	var path: PackedVector2Array = _left_points if side < 0 else _right_points
 	var sample: Dictionary = _sample_path(path, progress, 0.0)
-	var length := _viewport_size().y * lerpf(0.032, 0.082, _hash_01(index, 17))
+	var length := _viewport_size().y * lerpf(0.04, 0.09, _hash_01(index, 17))
 	var sample_angle: float = float(sample["angle"])
 	var sample_position: Vector2 = sample["position"] as Vector2
 	var normal: Vector2 = Vector2(-sin(sample_angle), cos(sample_angle)) * float(side)
-	var end: Vector2 = sample_position + normal * length + Vector2(0, -length * 0.35)
+	var tangent := Vector2(cos(sample_angle), sin(sample_angle))
+	var end: Vector2 = sample_position + normal * length + tangent * length * 0.18 - Vector2(0, length * 0.18)
 	var curve := Curve2D.new()
-	curve.bake_interval = 6.0
-	curve.add_point(sample_position, Vector2.ZERO, normal * 18.0)
-	curve.add_point((sample_position + end) * 0.5 + Vector2(0, -8.0), -normal * 12.0, normal * 12.0)
-	curve.add_point(end, -normal * 16.0, Vector2.ZERO)
+	curve.bake_interval = 4.0
+	curve.add_point(sample_position, Vector2.ZERO, normal * 22.0)
+	curve.add_point(sample_position + normal * length * 0.46 - tangent * length * 0.20, -normal * 9.0, normal * 18.0)
+	curve.add_point(end, -normal * 20.0 + tangent * 12.0, Vector2.ZERO)
 	var lines: Array[Line2D] = [_create_branch_line(BRANCH_WIDTHS.x, VINE_OUTER_COLOR), _create_branch_line(BRANCH_WIDTHS.y, VINE_MAIN_COLOR), _create_branch_line(BRANCH_WIDTHS.z, VINE_INNER_COLOR)]
 	for branch_line: Line2D in lines:
 		branch_layer.add_child(branch_line)
 	return {"side": side, "progress": progress, "points": curve.get_baked_points(), "lines": lines}
 
+func _make_curl(side: int, progress: float, index: int) -> Dictionary:
+	var path: PackedVector2Array = _left_points if side < 0 else _right_points
+	var sample: Dictionary = _sample_path(path, clampf(progress, 0.05, 0.93), 0.0)
+	var sample_angle: float = float(sample["angle"])
+	var center: Vector2 = sample["position"] as Vector2
+	var normal: Vector2 = Vector2(-sin(sample_angle), cos(sample_angle)) * float(side)
+	var radius := _viewport_size().y * lerpf(0.012, 0.024, _hash_01(index, 91))
+	var points := PackedVector2Array()
+	for step in range(24):
+		var t := float(step) / 23.0
+		var angle := t * TAU * 0.82 * float(side) + float(index) * 0.21
+		var outward := normal * radius * (1.0 + t * 1.5)
+		points.append(center + outward + Vector2(cos(angle), sin(angle)) * radius * t)
+	var lines: Array[Line2D] = [_create_branch_line(BRANCH_WIDTHS.x * 0.62, VINE_OUTER_COLOR), _create_branch_line(BRANCH_WIDTHS.y * 0.62, VINE_MAIN_COLOR), _create_branch_line(BRANCH_WIDTHS.z, VINE_INNER_COLOR)]
+	for branch_line: Line2D in lines:
+		branch_layer.add_child(branch_line)
+	return {"side": side, "progress": progress, "points": points, "lines": lines}
+
 func _build_leaf_geometry() -> void:
 	for side in [-1, 1]:
+		var side_branches: Array[Dictionary] = []
+		for branch_data in _branch_data:
+			var branch := branch_data as Dictionary
+			if int(branch.get("side", side)) == side:
+				side_branches.append(branch)
 		for i in range(24):
-			var progress := 0.08 + float(i) * 0.036
-			var side_offset := lerpf(7.0, 18.0, _hash_01(i, side + 43)) * (1.0 if i % 2 == 0 else -1.0) * float(side)
-			var path: PackedVector2Array = _left_points if side < 0 else _right_points
-			var sample: Dictionary = _sample_path(path, progress, side_offset)
+			if side_branches.is_empty():
+				continue
+			var branch_index := clampi(int(i / 2), 0, side_branches.size() - 1)
+			var branch := side_branches[branch_index]
+			var branch_points := branch.get("points", PackedVector2Array()) as PackedVector2Array
+			var leaf_progress := 0.48 + 0.36 * _hash_01(i, side + 43)
+			var sample: Dictionary = _sample_path(branch_points, leaf_progress, 0.0)
 			var leaf := Sprite2D.new()
 			leaf.texture = VINE_LEAF_TEXTURE
 			leaf.centered = true
 			leaf.position = sample["position"] as Vector2
-			leaf.rotation = float(sample["angle"]) + (0.45 if i % 2 == 0 else -0.45) * float(side)
+			leaf.rotation = float(sample["angle"]) + (0.55 if i % 2 == 0 else -0.55) * float(side)
 			leaf.scale = Vector2.ZERO
 			leaf.modulate = Color(1.0, 0.84, 0.52, 0.0)
 			leaf_layer.add_child(leaf)
-			_leaf_data.append({"node": leaf, "side": side, "progress": progress, "scale": lerpf(0.64, 1.08, _hash_01(i, side + 31))})
+			_leaf_data.append({"node": leaf, "side": side, "progress": float(branch.get("progress", 0.0)) + 0.035, "scale": lerpf(0.64, 1.08, _hash_01(i, side + 31))})
 
 func _update_decorations() -> void:
 	for data in _branch_data:

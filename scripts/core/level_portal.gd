@@ -38,7 +38,7 @@ var _transition_finished_callback := Callable()
 @onready var ground_ring: MeshInstance3D = $VisualRoot/GroundRing
 @onready var outer_ring: MeshInstance3D = $VisualRoot/OuterRing
 @onready var inner_ring: MeshInstance3D = $VisualRoot/InnerRing
-@onready var strand_layers: Array[MeshInstance3D] = [$VisualRoot/PortalStrandLayerBack, $VisualRoot/PortalStrandLayerMiddle, $VisualRoot/PortalStrandLayerNearMiddle, $VisualRoot/PortalStrandLayerFront]
+@onready var strand_layers: Array[MeshInstance3D] = [$VisualRoot/PortalStrandLayerDeepBack, $VisualRoot/PortalStrandLayerBack, $VisualRoot/PortalStrandLayerMiddle, $VisualRoot/PortalStrandLayerNearMiddle, $VisualRoot/PortalStrandLayerFront, $VisualRoot/PortalStrandLayerDeepFront]
 @onready var back_veil: MeshInstance3D = $VisualRoot/BackVeil
 @onready var interaction_area: Area3D = $InteractionArea
 @onready var interaction_shape: CollisionShape3D = $InteractionArea/CollisionShape3D
@@ -102,8 +102,8 @@ func cancel_entry_confirmation(player: Node) -> void:
 func _process(delta: float) -> void:
 	if _state == PortalState.INACTIVE:
 		return
-	ground_ring.rotate_y(0.12 * delta)
-	orbit_motes.rotate_z(-0.24 * delta)
+	ground_ring.rotate_y(0.34 * delta)
+	orbit_motes.rotate_z(-0.78 * delta)
 
 func _capture_strand_target_scales() -> void:
 	if not _strand_target_scales.is_empty():
@@ -138,10 +138,10 @@ func _duplicate_runtime_materials() -> void:
 			var material := layer.material_override as ShaderMaterial
 			_strand_materials.append(material)
 			material.set_shader_parameter("phase_offset", float(index) * 0.23)
-			material.set_shader_parameter("strand_density", 20.0 + float(index) * 2.1)
-			material.set_shader_parameter("radial_density", 25.0 + float(index) * 2.8)
-			material.set_shader_parameter("rotation_speed", 0.12 + float(index) * 0.018)
-			material.set_shader_parameter("layer_alpha", 0.28 + float(index) * 0.045)
+			material.set_shader_parameter("strand_density", 6.0)
+			material.set_shader_parameter("radial_density", 31.0 + float(index) * 3.6)
+			material.set_shader_parameter("rotation_speed", 0.38 + float(index) * 0.045)
+			material.set_shader_parameter("layer_alpha", 0.78 + float(index) * 0.035)
 	if back_veil.material_override is ShaderMaterial:
 		back_veil.material_override = back_veil.material_override.duplicate()
 		_back_veil_material = back_veil.material_override
@@ -153,15 +153,15 @@ func _duplicate_runtime_materials() -> void:
 			_ring_materials.append(material)
 			if index == 0:
 				material.set_shader_parameter("ring_radius", 0.92)
-				material.set_shader_parameter("ring_width", 0.035)
-				material.set_shader_parameter("ring_alpha", 0.12)
-				material.set_shader_parameter("emission_strength", 0.16)
+				material.set_shader_parameter("ring_width", 0.135)
+				material.set_shader_parameter("ring_alpha", 0.62)
+				material.set_shader_parameter("emission_strength", 0.82)
 			else:
 				material.set_shader_parameter("ring_radius", 0.76)
-				material.set_shader_parameter("ring_width", 0.022)
-				material.set_shader_parameter("ring_alpha", 0.08)
-				material.set_shader_parameter("emission_strength", 0.12)
-			material.set_shader_parameter("edge_softness", 0.025)
+				material.set_shader_parameter("ring_width", 0.085)
+				material.set_shader_parameter("ring_alpha", 0.42)
+				material.set_shader_parameter("emission_strength", 0.64)
+			material.set_shader_parameter("edge_softness", 0.055)
 	if ground_ring.material_override is ShaderMaterial:
 		ground_ring.material_override = ground_ring.material_override.duplicate()
 		_ground_material = ground_ring.material_override
@@ -228,7 +228,7 @@ func _finish_activation() -> void:
 	if _state != PortalState.ACTIVATING:
 		return
 	_set_activation(1.0)
-	portal_light.light_energy = 0.28
+	portal_light.light_energy = 0.72
 	_state = PortalState.ACTIVE
 	_set_interaction_enabled(true)
 	_update_prompt()

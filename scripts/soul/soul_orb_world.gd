@@ -3,6 +3,7 @@ extends Node3D
 signal collected
 
 const SOUL_ORB_FOLLOW_SCENE := preload("res://scenes/core/SoulOrb_Follow.tscn")
+const INTERACTION_PROMPT_TEXT := "Коснуться света"
 
 @export var hover_base_height: float = 1.25
 @export var hover_amplitude: float = 0.12
@@ -25,7 +26,13 @@ func _ready() -> void:
 	pickup_area.body_entered.connect(_on_pickup_area_body_entered)
 	pickup_area.body_exited.connect(_on_pickup_area_body_exited)
 	interaction_prompt.set_target(prompt_anchor)
+	_set_prompt_text(INTERACTION_PROMPT_TEXT)
 	interaction_prompt.hide_prompt()
+
+func _set_prompt_text(value: String) -> void:
+	var prompt_label := interaction_prompt.get_node_or_null("Root/TrackingRoot/AnimationRoot/PromptRoot/PromptBox/ActionLabel")
+	if prompt_label is Label:
+		prompt_label.text = value
 
 
 func _process(delta: float) -> void:

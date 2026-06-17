@@ -232,3 +232,60 @@ Regression:
 - Verify finale frame, finale safe text area, and soft reveal are not reverted.
 - Verify mouse cursor flow remains stable.
 - Verify E does not close the final overlay.
+
+## PR 90 Targeted Corrective Pass — June 17, 2026
+
+### Help Stone plaque removal and final inscription approach
+- Removed the visible `StoneMask` plane from `HelpStoneInscription3D`; the helper now renders only dark engraved-style `Label3D` text directly over the stone face rather than a plaque, cream panel, or signboard.
+- Removed the now-unused help-stone mask shader resource.
+- Preserved the approved Help Stone 01 and Help Stone 02 Russian control texts, existing front-facing transforms, and scene placement.
+
+### Cloud volume pass
+- Increased the stylized cloud shader's low-frequency tonal shaping while keeping the warm cream palette.
+- Added soft lower-body shadow shaping and upper crown highlight shaping through `body_shadow_strength` and `crown_highlight_strength` uniforms.
+- Kept the shader low-frequency and clean; no grain/speckle/noisy AO pass was added.
+
+### Soul Orb prompt wording correction
+- Set the Soul Orb world prompt action text to exactly `Коснуться света` at runtime through the existing world prompt node.
+- The existing prompt framework, anchor, visibility behavior, and interaction flow were preserved.
+
+### Six-arm portal rebuild
+- LevelPortal now uses six vertical strand layers: deep back, back, middle, near middle, front, and deep front.
+- The shader locks the primary spiral structure to six arms while increasing strand width substantially.
+- Portal material opacity, additive emission, layer alpha, motes, and light energy were increased to make the doorway denser and more volumetric while preserving vertical orientation.
+
+### Portal density, thickness, speed, and rim changes
+- Spiral arm mask widths were increased from the previous narrow values to much broader primary/secondary/tertiary widths.
+- Base portal fill alpha increased from `0.018` to `0.085`; strand contribution increased through higher `layer_alpha` and `strand_alpha` scaling.
+- Runtime strand speed now starts at `0.38` and increases per layer; ground-ring/orbit motion was also accelerated.
+- Outer/inner ring width, alpha, emission strength, and edge softness were increased to create a thicker luminous rim.
+
+### Final overlay timing retune
+- Final text line reveal duration increased from `2.15` seconds to `12.0` seconds and line stagger from `0.68` seconds to `3.6` seconds, making text appearance roughly 5–6x slower.
+- Finale vine/frame growth duration increased from `1.55` seconds to `3.7` seconds, making frame appearance roughly 2–2.5x slower.
+
+### Final overlay text-left repositioning
+- Finale text masks now shift left by `5.5%` of viewport width to move the text away from the right-side frame pressure.
+
+### Final overlay decorative branch and leaf redesign
+- Branches now use curved multi-point growth rather than blunt short protrusions.
+- Added smaller curl/spiral branchlets to every other branch position.
+- Leaves are now sampled from branch geometry and grow after their parent branch progress, so they appear attached to branches rather than randomly detached from the frame.
+
+### Automated validation performed
+- `git diff --check` was run after each commit and completed without whitespace errors.
+- Full Godot and targeted scene/resource validation for this new pass is recorded below if completed in the final validation block.
+
+### Graphical QA actually performed
+- No interactive graphical QA or captured gameplay video review was performed during this pass in the current non-interactive environment.
+- Visual conclusions are implementation-intent notes only and require manual in-editor/gameplay verification.
+
+### Performance measurements actually performed
+- No FPS, p95 frame time, GPU timing, or benchmark capture was performed during this pass.
+
+### Remaining manual QA
+- Verify Help Stone text readability and that the old visible plaque/panel look is gone from gameplay distance.
+- Verify clouds read as more volumetric while remaining soft, warm, and clean.
+- Verify the Soul Orb prompt shows exactly `Коснуться света` in-game.
+- Verify the portal remains vertical, uses a readable six-arm structure, has thicker arms, denser fill, faster movement, and a strong luminous rim without becoming a solid white wall.
+- Verify the final overlay text pacing, left offset, organic curls/branchlets, and branch-attached leaves at 1920×1080 and 1280×720.

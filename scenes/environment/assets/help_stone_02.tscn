@@ -26,4 +26,3 @@ text = "E - взаимодействие
 или активировать объект."
 inscription_size = Vector2(1.24, 0.84)
 font_size = 36
-mask_color = Color(0.34, 0.30, 0.25, 1)
