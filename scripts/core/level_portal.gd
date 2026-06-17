@@ -3,6 +3,7 @@ extends Node3D
 const PORTAL_LAYER_PHASE_OFFSETS: Array[float] = [0.000, 0.012, -0.012, 0.022, -0.022, 0.032]
 const PORTAL_LAYER_ROTATION_SPEEDS: Array[float] = [0.510, 0.515, 0.505, 0.520, 0.500, 0.525]
 const PORTAL_LAYER_ALPHAS: Array[float] = [0.28, 0.34, 0.42, 0.42, 0.34, 0.28]
+const PORTAL_LAYER_RADIAL_DENSITIES: Array[float] = [40.0, 40.3, 39.7, 40.5, 39.5, 40.2]
 
 
 signal activation_started
@@ -144,7 +145,7 @@ func _duplicate_runtime_materials() -> void:
 			_strand_materials.append(material)
 			material.set_shader_parameter("phase_offset", PORTAL_LAYER_PHASE_OFFSETS[index])
 			material.set_shader_parameter("strand_density", 6.0)
-			material.set_shader_parameter("radial_density", 31.0 + float(index) * 3.6)
+			material.set_shader_parameter("radial_density", PORTAL_LAYER_RADIAL_DENSITIES[index])
 			material.set_shader_parameter("rotation_speed", PORTAL_LAYER_ROTATION_SPEEDS[index])
 			material.set_shader_parameter("layer_alpha", PORTAL_LAYER_ALPHAS[index])
 	if back_veil.material_override is ShaderMaterial:

@@ -323,6 +323,19 @@ Runtime layer rotation speeds:
 
 The maximum speed spread is within the requested small variation band for coherent depth motion.
 
+
+### Portal radial-pitch synchronization
+
+The six depth layers now use nearly identical radial-density values, so all layers represent depth slices of the same six-arm spiral field instead of divergent spiral pitches.
+
+Runtime radial density values:
+
+```text
+40.0, 40.3, 39.7, 40.5, 39.5, 40.2
+```
+
+Absolute spread is `1.0`; relative spread is approximately `2.5%` around an average of approximately `40.03`.
+
 ### Portal density/overdraw balance
 
 - Layer alphas are depth-weighted: `0.28, 0.34, 0.42, 0.42, 0.34, 0.28`.
