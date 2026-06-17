@@ -18,11 +18,10 @@ float strand_mask(float value, float width) {
 
 void fragment() {
 	vec2 c = UV - vec2(0.5);
-	c.y *= 0.70;
 	float r = length(c);
 	float angle = atan(c.y, c.x) * 0.15915494;
-	float oval = 1.0 - smoothstep(0.43, 0.51, r);
-	float center_open = smoothstep(0.045, 0.17, r);
+	float oval = 1.0 - smoothstep(0.40, 0.48, r);
+	float center_open = smoothstep(0.055, 0.18, r);
 	float body = oval * center_open;
 	float clockwise_time = -TIME * rotation_speed + phase_offset;
 	float low_noise = texture(swirl_noise, vec2(r * 0.72 + phase_offset, angle + clockwise_time * 0.45)).r;
@@ -32,7 +31,7 @@ void fragment() {
 	float strands = clamp(primary + secondary + tertiary, 0.0, 1.0);
 	float base_alpha = body * 0.018;
 	float strand_alpha = strands * body * layer_alpha * 0.46;
-	float edge_alpha = (1.0 - smoothstep(0.34, 0.50, r)) * oval * 0.045;
+	float edge_alpha = (1.0 - smoothstep(0.32, 0.46, r)) * oval * 0.045;
 	float alpha = (base_alpha + strand_alpha + edge_alpha) * activation;
 	ALBEDO = mix(portal_color.rgb, strand_color.rgb, strands * 0.72);
 	ALPHA = alpha;
