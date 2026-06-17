@@ -12,10 +12,10 @@ shader = ExtResource("2_surface_shader")
 shader_parameter/swirl_noise = ExtResource("5_noise")
 shader_parameter/activation = 0.0
 shader_parameter/phase_offset = 0.0
-shader_parameter/strand_density = 9.0
-shader_parameter/radial_density = 12.0
-shader_parameter/rotation_speed = 0.038
-shader_parameter/layer_alpha = 0.55
+shader_parameter/strand_density = 18.0
+shader_parameter/radial_density = 24.0
+shader_parameter/rotation_speed = 0.085
+shader_parameter/layer_alpha = 0.62
 [sub_resource type="ShaderMaterial" id="RingMat"]
 shader = ExtResource("3_ring_shader")
 shader_parameter/activation = 0.0
@@ -47,10 +47,10 @@ emission_ring_inner_radius = 0.82
 direction = Vector3(-1, 0, 0)
 spread = 28.0
 gravity = Vector3(0, 0, 0)
-initial_velocity_min = 0.04
-initial_velocity_max = 0.12
-angular_velocity_min = -26.0
-angular_velocity_max = -12.0
+initial_velocity_min = 0.08
+initial_velocity_max = 0.22
+angular_velocity_min = -62.0
+angular_velocity_max = -30.0
 radial_velocity_min = -0.025
 radial_velocity_max = 0.035
 scale_min = 0.025
@@ -68,14 +68,32 @@ cast_shadow = 0
 mesh = SubResource("PortalDisc")
 material_override = SubResource("SurfaceMat")
 
+[node name="PortalStrandLayerFarBack" type="MeshInstance3D" parent="VisualRoot"]
+transform = Transform3D(0.94, 0, 0, 0, 0, 1.08, 0, -0.94, 0, 0, 1.45, -0.18)
+cast_shadow = 0
+mesh = SubResource("PortalDisc")
+material_override = SubResource("SurfaceMat")
+
 [node name="PortalStrandLayerMiddle" type="MeshInstance3D" parent="VisualRoot"]
 transform = Transform3D(1.025, 0, 0, 0, 0, 1.025, 0, -1.025, 0, 0, 1.45, 0)
 cast_shadow = 0
 mesh = SubResource("PortalDisc")
 material_override = SubResource("SurfaceMat")
 
+[node name="PortalStrandLayerNearMiddle" type="MeshInstance3D" parent="VisualRoot"]
+transform = Transform3D(1.08, 0, 0, 0, 0, 0.98, 0, -1.08, 0, 0, 1.45, 0.12)
+cast_shadow = 0
+mesh = SubResource("PortalDisc")
+material_override = SubResource("SurfaceMat")
+
 [node name="PortalStrandLayerFront" type="MeshInstance3D" parent="VisualRoot"]
 transform = Transform3D(0.975, 0, 0, 0, 0, 0.975, 0, -0.975, 0, 0, 1.45, 0.06)
+cast_shadow = 0
+mesh = SubResource("PortalDisc")
+material_override = SubResource("SurfaceMat")
+
+[node name="PortalStrandLayerForward" type="MeshInstance3D" parent="VisualRoot"]
+transform = Transform3D(0.90, 0, 0, 0, 0, 1.10, 0, -0.90, 0, 0, 1.45, 0.22)
 cast_shadow = 0
 mesh = SubResource("PortalDisc")
 material_override = SubResource("SurfaceMat")
@@ -103,8 +121,8 @@ material_override = SubResource("GroundMat")
 [node name="OrbitMotes" type="GPUParticles3D" parent="VisualRoot"]
 transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0, 1.45, 0)
 emitting = false
-amount = 22
-lifetime = 3.0
+amount = 58
+lifetime = 2.2
 visibility_aabb = AABB(-1.9, -1.9, -0.35, 3.8, 3.8, 0.7)
 process_material = SubResource("OrbitProcess")
 [node name="PortalLight" type="OmniLight3D" parent="VisualRoot"]

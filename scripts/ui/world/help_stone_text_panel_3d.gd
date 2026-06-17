@@ -19,9 +19,13 @@ class_name HelpStoneTextPanel3D
 	set(value):
 		text_color = value
 		_update_panel()
-@export var panel_color: Color = Color(0.78, 0.70, 0.56, 1.0):
+@export var panel_color: Color = Color(0.34, 0.30, 0.25, 0.0):
 	set(value):
 		panel_color = value
+		_update_panel()
+@export var engraving_shadow_color: Color = Color(0.06, 0.045, 0.035, 0.72):
+	set(value):
+		engraving_shadow_color = value
 		_update_panel()
 
 @onready var backing_plane: MeshInstance3D = $BackingPlane
@@ -47,10 +51,12 @@ func _ensure_local_resources() -> void:
 		else:
 			_panel_material = StandardMaterial3D.new()
 		_panel_material.resource_local_to_scene = true
-		_panel_material.shading_mode = BaseMaterial3D.SHADING_MODE_PER_PIXEL
-		_panel_material.diffuse_mode = BaseMaterial3D.DIFFUSE_LAMBERT
+		_panel_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		_panel_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		_panel_material.blend_mode = BaseMaterial3D.BLEND_MODE_MIX
 		_panel_material.specular_mode = BaseMaterial3D.SPECULAR_DISABLED
 		_panel_material.cull_mode = BaseMaterial3D.CULL_DISABLED
+		_panel_material.no_depth_test = false
 		backing_plane.material_override = _panel_material
 
 func _update_panel() -> void:
@@ -60,8 +66,9 @@ func _update_panel() -> void:
 	if backing_plane.mesh is PlaneMesh:
 		(backing_plane.mesh as PlaneMesh).size = panel_size
 	_panel_material.albedo_color = panel_color
+	backing_plane.visible = panel_color.a > 0.01
 	label.text = text
 	label.font_size = font_size
 	label.modulate = text_color
-	label.outline_modulate = Color(panel_color.r, panel_color.g, panel_color.b, 0.62)
+	label.outline_modulate = engraving_shadow_color
 	label.width = panel_size.x * 900.0

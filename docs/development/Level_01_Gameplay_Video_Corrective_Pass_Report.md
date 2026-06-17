@@ -164,3 +164,93 @@ No average FPS, 1% low, p95 frame time, or portal sustained-regression benchmark
 - Regression cases: empty target path, invalid target path, failed transition retry, repeated E/click, 1280×720, 1920×1080.
 - Performance measurements on target machine.
 - Audio was not verified.
+
+## New Targeted Gameplay-Video Corrective Pass (2026-06-17)
+
+### Help Stone inscription replacement
+The previous visible cream plaque presentation was replaced with an editable Godot-only integrated inscription treatment. `HelpStoneTextPanel3D` still exposes multiline text, size, font size, text tint, and layout control in the Inspector, but the backing plane is hidden by default and only becomes visible if a non-transparent `panel_color` is intentionally assigned. The visible presentation is now `Label3D` text with a darker engraved/painted outline sitting very close to the stone face.
+
+Applied text remains:
+
+Stone 01:
+```text
+WASD - движение
+Мышь - обзор
+Space - прыжок
+Shift - бег
+```
+
+Stone 02:
+```text
+E - взаимодействие
+
+Нажми E, чтобы подобрать
+или активировать объект.
+```
+
+### Cloud clarity refinement
+The shared stylized cloud material keeps the cream-neutral palette while slightly increasing mid/bottom separation and low-frequency noise influence. No grain texture, black speckles, harsh AO-style dirt, or yellow recolor was added.
+
+### Soul Orb prompt unification
+`SoulOrb_World` now instances the same `WorldInteractionPrompt` scene used by shards and the portal. The prompt targets `InteractionPromptAnchor`, shows when the player enters the orb pickup range, hides on exit, and plays the same confirm/hide path when the orb is collected.
+
+### SoulShard radius final tuning
+`SoulShard.interaction_radius` was increased from `1.15` to `1.30`. This changes only the runtime interaction collision radius; shard visuals, glow, halo, particles, and E-to-collect flow were not changed.
+
+### Portal vertical density pass
+The `LevelPortal` API, state machine, prompt, confirmation flow, SceneTransition integration, and failure recovery were preserved. The visual pass adds six authored strand layers instead of three, spreads them along the portal depth axis, increases strand/radial shader density, adds a tertiary strand mask, raises layer alpha/emission modestly, increases particle count, and speeds strand/particle/ground motion. The portal remains a vertical quad-layer doorway, not a horizontal ground vortex or solid wall.
+
+### Final overlay text safe area correction
+The finale text safe width was reduced and the text block was moved slightly inward/upward while the fox button moved slightly lower. The approved narrative text remains owned by `Level01FinaleController` and was not changed.
+
+### Final overlay decorative enrichment
+The finale overlay frame now generates three times as many branch curls per side and three times as many leaves per side, with varied offsets and sizes to keep an organic vine rhythm while preserving the clean center text area and fox button readability.
+
+### Reveal animation replacement
+Shard reward and finale overlay text reveal timing was slowed and kept on the existing masked line-wipe system rather than per-character typing. Line mask duration/stagger and label fade timings were increased to make the reveal softer and less mechanical.
+
+## Automated Tests Performed For This New Pass
+
+- `git status --short --branch --untracked-files=all` preflight and after each commit.
+- `git log -15 --oneline --decorate` preflight.
+- `git diff --check` preflight and after each commit.
+- `git diff --stat` after each commit.
+- Final Godot and targeted load validation results are recorded in the final handoff for this pass.
+
+## Graphical Tests Actually Performed For This New Pass
+
+No interactive rendered gameplay/viewport QA was performed in this headless container. None of the graphical checklist items are claimed as visually approved by Codex.
+
+## Performance Measurements Actually Performed For This New Pass
+
+No FPS, p95 frame-time, 1% low, GPU timing, or target-machine benchmark was performed by Codex in this container.
+
+## Remaining Manual QA For This New Pass
+
+Help Stones:
+- Verify no ugly plaque remains.
+- Verify inscription looks integrated.
+- Verify text is readable from 2–3m.
+- Verify no z-fighting.
+- Verify old wrong text is no longer visible.
+
+Clouds:
+- Verify clouds are slightly clearer, still soft, not grainy, and not yellow.
+
+SoulShard:
+- Verify interaction distance feels better, prompt appears early enough, and range is not too large.
+
+Soul Orb:
+- Verify prompt style matches shard/portal and interaction readability is consistent.
+
+Portal:
+- Verify it is clearly vertical, denser, more volumetric, faster, still readable, not a white blob, not a flat disc, and not horizontally oriented.
+
+Final overlay:
+- Verify text no longer collides with frame, frame is richer, reveal is soft/slower, fox button remains usable, cursor flow still works, and E still does not close the final overlay.
+
+Regression:
+- Verify barrier still lasts 5.0 seconds.
+- Verify camera sensitivity remains 0.002.
+- Verify finale text source remains `Level01FinaleController`.
+- Verify interaction systems remain stable.

@@ -17,7 +17,7 @@ signal reward_sequence_requested(shard: Node, shard_id: StringName, reward_text:
 @export var orbit_rotation_speed: float = 0.18
 @export var charge_duration: float = 1.2
 @export var legacy_completion_delay: float = 0.9
-@export_range(0.5, 3.0, 0.05) var interaction_radius: float = 1.15
+@export_range(0.5, 3.0, 0.05) var interaction_radius: float = 1.30
 
 const SPIRAL_MOTE_COUNT := 15
 const SPIRAL_HEIGHT := 1.2

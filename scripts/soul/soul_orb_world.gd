@@ -10,6 +10,8 @@ const SOUL_ORB_FOLLOW_SCENE := preload("res://scenes/core/SoulOrb_Follow.tscn")
 
 @onready var hover_root: Node3D = $HoverRoot
 @onready var pickup_area: Area3D = $PickupArea
+@onready var prompt_anchor: Marker3D = $InteractionPromptAnchor
+@onready var interaction_prompt = $WorldInteractionPrompt
 
 var _time: float = 0.0
 var _player_in_range: bool = false
@@ -22,6 +24,8 @@ func _ready() -> void:
 	hover_root.position.y = hover_base_height
 	pickup_area.body_entered.connect(_on_pickup_area_body_entered)
 	pickup_area.body_exited.connect(_on_pickup_area_body_exited)
+	interaction_prompt.set_target(prompt_anchor)
+	interaction_prompt.hide_prompt()
 
 
 func _process(delta: float) -> void:
@@ -42,6 +46,7 @@ func _on_pickup_area_body_entered(body: Node3D) -> void:
 
 	_player_in_range = true
 	_player_ref = body
+	interaction_prompt.show_prompt()
 
 
 func _on_pickup_area_body_exited(body: Node3D) -> void:
@@ -53,6 +58,7 @@ func _on_pickup_area_body_exited(body: Node3D) -> void:
 
 	_player_in_range = false
 	_player_ref = null
+	interaction_prompt.hide_prompt()
 
 
 func _collect_to_follow() -> void:
@@ -64,6 +70,7 @@ func _collect_to_follow() -> void:
 
 	_is_collected = true
 	_player_in_range = false
+	interaction_prompt.play_confirm_and_hide()
 
 	set_process(false)
 	pickup_area.set_deferred("monitoring", false)
