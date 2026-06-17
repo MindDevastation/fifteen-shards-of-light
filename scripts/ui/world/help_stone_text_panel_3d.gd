@@ -1,6 +1,8 @@
+@tool
 extends Node3D
 class_name HelpStoneTextPanel3D
 
+@export_category("Help Stone Text")
 @export_multiline var text: String = "":
 	set(value):
 		text = value
@@ -26,22 +28,37 @@ class_name HelpStoneTextPanel3D
 @onready var label: Label3D = $Label3D
 
 var _panel_material: StandardMaterial3D
+var _mesh_localized := false
 
 func _ready() -> void:
+	_ensure_local_resources()
 	_update_panel()
 
-func _update_panel() -> void:
+func _ensure_local_resources() -> void:
 	if not is_node_ready():
 		return
-	if backing_plane.mesh is PlaneMesh:
-		(backing_plane.mesh as PlaneMesh).size = panel_size
+	if not _mesh_localized and backing_plane.mesh != null:
+		backing_plane.mesh = backing_plane.mesh.duplicate()
+		backing_plane.mesh.resource_local_to_scene = true
+		_mesh_localized = true
 	if _panel_material == null:
-		_panel_material = StandardMaterial3D.new()
+		if backing_plane.material_override is StandardMaterial3D:
+			_panel_material = (backing_plane.material_override as StandardMaterial3D).duplicate() as StandardMaterial3D
+		else:
+			_panel_material = StandardMaterial3D.new()
+		_panel_material.resource_local_to_scene = true
 		_panel_material.shading_mode = BaseMaterial3D.SHADING_MODE_PER_PIXEL
 		_panel_material.diffuse_mode = BaseMaterial3D.DIFFUSE_LAMBERT
 		_panel_material.specular_mode = BaseMaterial3D.SPECULAR_DISABLED
 		_panel_material.cull_mode = BaseMaterial3D.CULL_DISABLED
 		backing_plane.material_override = _panel_material
+
+func _update_panel() -> void:
+	if not is_node_ready():
+		return
+	_ensure_local_resources()
+	if backing_plane.mesh is PlaneMesh:
+		(backing_plane.mesh as PlaneMesh).size = panel_size
 	_panel_material.albedo_color = panel_color
 	label.text = text
 	label.font_size = font_size

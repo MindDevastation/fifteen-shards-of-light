@@ -24,6 +24,7 @@ var _player_in_range := false
 var _current_player: Node
 var _confirmation_player: Node
 var _strand_materials: Array[ShaderMaterial] = []
+var _strand_target_scales: Array[Vector3] = []
 var _back_veil_material: ShaderMaterial
 var _ring_materials: Array[ShaderMaterial] = []
 var _ground_material: ShaderMaterial
@@ -49,6 +50,7 @@ func _exit_tree() -> void:
 
 func _ready() -> void:
 	add_to_group("player_interactable")
+	_capture_strand_target_scales()
 	_duplicate_runtime_materials()
 	interaction_area.body_entered.connect(_on_body_entered)
 	interaction_area.body_exited.connect(_on_body_exited)
@@ -99,10 +101,19 @@ func cancel_entry_confirmation(player: Node) -> void:
 func _process(delta: float) -> void:
 	if _state == PortalState.INACTIVE:
 		return
-	outer_ring.rotate_z(-0.26 * delta)
-	inner_ring.rotate_z(-0.18 * delta)
 	ground_ring.rotate_y(0.08 * delta)
 	orbit_motes.rotate_z(-0.10 * delta)
+
+func _capture_strand_target_scales() -> void:
+	if not _strand_target_scales.is_empty():
+		return
+	for layer in strand_layers:
+		_strand_target_scales.append(layer.scale)
+
+func _get_strand_target_scale(index: int) -> Vector3:
+	if index >= 0 and index < _strand_target_scales.size():
+		return _strand_target_scales[index]
+	return Vector3.ONE
 
 func _duplicate_runtime_materials() -> void:
 	_strand_materials.clear()
@@ -120,10 +131,23 @@ func _duplicate_runtime_materials() -> void:
 	if back_veil.material_override is ShaderMaterial:
 		back_veil.material_override = back_veil.material_override.duplicate()
 		_back_veil_material = back_veil.material_override
-	for ring in [outer_ring, inner_ring]:
+	for index in range(2):
+		var ring: MeshInstance3D = [outer_ring, inner_ring][index]
 		if ring.material_override is ShaderMaterial:
 			ring.material_override = ring.material_override.duplicate()
-			_ring_materials.append(ring.material_override)
+			var material := ring.material_override as ShaderMaterial
+			_ring_materials.append(material)
+			if index == 0:
+				material.set_shader_parameter("ring_radius", 0.92)
+				material.set_shader_parameter("ring_width", 0.035)
+				material.set_shader_parameter("ring_alpha", 0.12)
+				material.set_shader_parameter("emission_strength", 0.16)
+			else:
+				material.set_shader_parameter("ring_radius", 0.76)
+				material.set_shader_parameter("ring_width", 0.022)
+				material.set_shader_parameter("ring_alpha", 0.08)
+				material.set_shader_parameter("emission_strength", 0.12)
+			material.set_shader_parameter("edge_softness", 0.025)
 	if ground_ring.material_override is ShaderMaterial:
 		ground_ring.material_override = ground_ring.material_override.duplicate()
 		_ground_material = ground_ring.material_override
@@ -137,7 +161,9 @@ func _play_staged_activation() -> void:
 	outer_ring.scale = Vector3.ONE * 0.78
 	inner_ring.scale = Vector3.ONE * 0.70
 	for index in range(strand_layers.size()):
-		strand_layers[index].scale = Vector3.ONE * (0.90 + float(index) * 0.045)
+		var target_scale := _get_strand_target_scale(index)
+		var start_multiplier := 0.90 + float(index) * 0.045
+		strand_layers[index].scale = target_scale * start_multiplier
 	back_veil.scale = Vector3.ONE * 0.90
 	portal_light.light_energy = 0.0
 	orbit_motes.emitting = false
@@ -148,8 +174,8 @@ func _play_staged_activation() -> void:
 	_activation_tween.tween_property(outer_ring, "scale", Vector3.ONE, 1.05).set_delay(0.15).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	_activation_tween.tween_property(inner_ring, "scale", Vector3.ONE, 1.05).set_delay(0.15).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	_activation_tween.tween_method(_set_surface_activation, 0.0, 1.0, 1.20).set_delay(0.30).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	for layer in strand_layers:
-		_activation_tween.tween_property(layer, "scale", Vector3.ONE, 1.20).set_delay(0.30).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	for index in range(strand_layers.size()):
+		_activation_tween.tween_property(strand_layers[index], "scale", _get_strand_target_scale(index), 1.20).set_delay(0.30).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	_activation_tween.tween_method(_set_back_veil_activation, 0.0, 1.0, 1.10).set_delay(0.25).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	_activation_tween.tween_property(back_veil, "scale", Vector3.ONE, 1.10).set_delay(0.25).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	_activation_tween.tween_property(portal_light, "light_energy", 0.28, 0.75).set_delay(0.35).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)

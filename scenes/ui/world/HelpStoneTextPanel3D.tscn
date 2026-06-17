@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://scripts/ui/world/help_stone_text_panel_3d.gd" id="1_script"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_backing"]
+resource_local_to_scene = true
 size = Vector2(1.16, 0.76)
 
 [node name="HelpStoneTextPanel3D" type="Node3D"]
