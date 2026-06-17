@@ -232,3 +232,152 @@ Regression:
 - Verify finale frame, finale safe text area, and soft reveal are not reverted.
 - Verify mouse cursor flow remains stable.
 - Verify E does not close the final overlay.
+
+## PR 90 Targeted Corrective Pass — June 17, 2026
+
+### Help Stone plaque removal and final inscription approach
+- Removed the visible `StoneMask` plane from `HelpStoneInscription3D`; the helper now renders only dark engraved-style `Label3D` text directly over the stone face rather than a plaque, cream panel, or signboard.
+- Removed the now-unused help-stone mask shader resource.
+- Preserved the approved Help Stone 01 and Help Stone 02 Russian control texts, existing front-facing transforms, and scene placement.
+
+### Cloud volume pass
+- Increased the stylized cloud shader's low-frequency tonal shaping while keeping the warm cream palette.
+- Added soft lower-body shadow shaping and upper crown highlight shaping through `body_shadow_strength` and `crown_highlight_strength` uniforms.
+- Kept the shader low-frequency and clean; no grain/speckle/noisy AO pass was added.
+
+### Soul Orb prompt wording correction
+- Set the Soul Orb world prompt action text to exactly `Коснуться света` at runtime through the existing world prompt node.
+- The existing prompt framework, anchor, visibility behavior, and interaction flow were preserved.
+
+### Six-arm portal rebuild
+- LevelPortal now uses six vertical strand layers: deep back, back, middle, near middle, front, and deep front.
+- The shader locks the primary spiral structure to six arms while increasing strand width substantially.
+- Portal material opacity, additive emission, layer alpha, motes, and light energy were increased to make the doorway denser and more volumetric while preserving vertical orientation.
+
+### Portal density, thickness, speed, and rim changes
+- Spiral arm mask widths were increased from the previous narrow values to much broader primary/secondary/tertiary widths.
+- Base portal fill alpha increased from `0.018` to `0.085`; strand contribution increased through higher `layer_alpha` and `strand_alpha` scaling.
+- Runtime strand speed now starts at `0.38` and increases per layer; ground-ring/orbit motion was also accelerated.
+- Outer/inner ring width, alpha, emission strength, and edge softness were increased to create a thicker luminous rim.
+
+### Final overlay timing retune
+- Final text line reveal duration increased from `2.15` seconds to `12.0` seconds and line stagger from `0.68` seconds to `3.6` seconds, making text appearance roughly 5–6x slower.
+- Finale vine/frame growth duration increased from `1.55` seconds to `3.7` seconds, making frame appearance roughly 2–2.5x slower.
+
+### Final overlay text-left repositioning
+- Finale text masks now shift left by `5.5%` of viewport width to move the text away from the right-side frame pressure.
+
+### Final overlay decorative branch and leaf redesign
+- Branches now use curved multi-point growth rather than blunt short protrusions.
+- Added smaller curl/spiral branchlets to every other branch position.
+- Leaves are now sampled from branch geometry and grow after their parent branch progress, so they appear attached to branches rather than randomly detached from the frame.
+
+### Automated validation performed
+- `git diff --check` was run after each commit and completed without whitespace errors.
+- Full Godot and targeted scene/resource validation for this new pass is recorded below if completed in the final validation block.
+
+### Graphical QA actually performed
+- No interactive graphical QA or captured gameplay video review was performed during this pass in the current non-interactive environment.
+- Visual conclusions are implementation-intent notes only and require manual in-editor/gameplay verification.
+
+### Performance measurements actually performed
+- No FPS, p95 frame time, GPU timing, or benchmark capture was performed during this pass.
+
+### Remaining manual QA
+- Verify Help Stone text readability and that the old visible plaque/panel look is gone from gameplay distance.
+- Verify clouds read as more volumetric while remaining soft, warm, and clean.
+- Verify the Soul Orb prompt shows exactly `Коснуться света` in-game.
+- Verify the portal remains vertical, uses a readable six-arm structure, has thicker arms, denser fill, faster movement, and a strong luminous rim without becoming a solid white wall.
+- Verify the final overlay text pacing, left offset, organic curls/branchlets, and branch-attached leaves at 1920×1080 and 1280×720.
+
+## PR #91 Corrective Follow-up — Help Stone, Portal, and Finale Reveal
+
+### Help Stone original baked inscription
+
+Help Stone keeps only original baked inscription.
+All additional Label3D, mask, and plaque helpers were removed.
+
+- Removed `CorrectedInscription` instances from `help_stone_01.tscn` and `help_stone_02.tscn`.
+- Removed the now-unused `HelpStoneInscription3D` scene and `help_stone_inscription_3d.gd` helper script.
+- No GLB, texture, or material files for `help_stone_01.glb` or `help_stone_02.glb` were changed.
+
+### Portal six-arm depth coherence
+
+- The portal remains a vertical six-layer depth stack.
+- All six depth layers now share one coherent six-arm shader envelope.
+- Former secondary/tertiary strand details are constrained inside the same `main_arms` mask so they do not form independent bright arm sets between the six primary arms.
+
+### Portal synchronized phases/speeds
+
+Runtime layer phase offsets:
+
+```text
+0.000, +0.012, -0.012, +0.022, -0.022, +0.032
+```
+
+Runtime layer rotation speeds:
+
+```text
+0.510, 0.515, 0.505, 0.520, 0.500, 0.525
+```
+
+The maximum speed spread is within the requested small variation band for coherent depth motion.
+
+
+### Portal radial-pitch synchronization
+
+The six depth layers now use nearly identical radial-density values, so all layers represent depth slices of the same six-arm spiral field instead of divergent spiral pitches.
+
+Runtime radial density values:
+
+```text
+40.0, 40.3, 39.7, 40.5, 39.5, 40.2
+```
+
+Absolute spread is `1.0`; relative spread is approximately `2.5%` around an average of approximately `40.03`.
+
+### Portal density/overdraw balance
+
+- Layer alphas are depth-weighted: `0.28, 0.34, 0.42, 0.42, 0.34, 0.28`.
+- Surface `base_alpha` is `0.045` for low-volume fill without hiding the arm structure.
+- Surface `arm_alpha` is `0.27`, keeping arms much denser than the base fill.
+- Surface `emission_strength` is `1.15`.
+- `PortalLight` target energy is `0.48`.
+- `OrbitMotes.amount` is `96`.
+- Outer rim parameters are `ring_width = 0.115`, `ring_alpha = 0.48`, `emission_strength = 0.62`.
+- Inner rim parameters are `ring_width = 0.070`, `ring_alpha = 0.32`, `emission_strength = 0.48`.
+
+### Finale whole-line reveal
+
+- Finale text no longer grows a horizontal clipping mask.
+- Each line is laid out at full width before reveal and appears as a complete line.
+- Reveal now animates line alpha from `0` to `1` and vertical offset from approximately `10 px` to `0`.
+- `line_reveal_duration = 12.0`, `line_reveal_stagger = 3.6`, and `vine_duration = 3.7` remain preserved.
+- The left text offset, close animation, input blocking, cursor flow, and finale source ownership remain unchanged.
+
+### Frame/leaf audit
+
+- Organic finale frame still uses `Curve2D` paths for main branches and curved curls.
+- Leaves are sampled from each branch's `branch_points` data and reveal after their parent branch progress.
+- No separate leaf generation on the main frame path was introduced.
+- No frame geometry changes were required during this follow-up.
+
+### Cloud and Soul Orb preservation
+
+- Soul Orb prompt remains `Коснуться света`.
+- Cloud material parameters remain `noise_influence = 0.082`, `body_shadow_strength = 0.105`, and `crown_highlight_strength = 0.075`.
+
+### Performance status
+
+Performance not measured. The headless container does not provide a reliable rendered gameplay viewport/FPS capture path for average FPS, 1% low, or p95 frame time.
+
+### Remaining graphical QA
+
+Manual rendered QA is still required to confirm:
+
+- only the original baked Help Stone inscriptions are visible in-game;
+- exactly six thick portal arms remain readable through activation and active idle;
+- portal density does not become a white blob and the player silhouette remains readable;
+- rim clarity is thick but not an overbright halo;
+- finale lines appear as complete whole lines with no partial-word wipe;
+- organic frame branches/curls/leaves stay outside the text safe area at target resolutions.
