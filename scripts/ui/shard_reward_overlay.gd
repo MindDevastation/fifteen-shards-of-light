@@ -98,6 +98,7 @@ var _frame_targets_cache: Array[Vector2] = []
 
 
 func _ready() -> void:
+	add_to_group(&"mouse_blocking_ui")
 	visible = false
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	set_process(false)

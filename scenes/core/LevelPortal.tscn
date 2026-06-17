@@ -11,6 +11,11 @@
 shader = ExtResource("2_surface_shader")
 shader_parameter/swirl_noise = ExtResource("5_noise")
 shader_parameter/activation = 0.0
+shader_parameter/phase_offset = 0.0
+shader_parameter/strand_density = 9.0
+shader_parameter/radial_density = 12.0
+shader_parameter/rotation_speed = 0.038
+shader_parameter/layer_alpha = 0.55
 [sub_resource type="ShaderMaterial" id="RingMat"]
 shader = ExtResource("3_ring_shader")
 shader_parameter/activation = 0.0
@@ -24,11 +29,11 @@ shader_parameter/activation = 0.0
 [sub_resource type="QuadMesh" id="PortalDisc"]
 size = Vector2(2.35, 3.15)
 [sub_resource type="TorusMesh" id="OuterTorus"]
-inner_radius = 0.045
-outer_radius = 1.36
+inner_radius = 0.026
+outer_radius = 1.32
 [sub_resource type="TorusMesh" id="InnerTorus"]
-inner_radius = 0.03
-outer_radius = 1.08
+inner_radius = 0.018
+outer_radius = 1.04
 [sub_resource type="QuadMesh" id="GroundQuad"]
 size = Vector2(3.7, 3.7)
 [sub_resource type="QuadMesh" id="BackVeilQuad"]
@@ -59,8 +64,20 @@ size = Vector3(3.0, 3.0, 2.2)
 visible = false
 script = ExtResource("1_level_portal")
 [node name="VisualRoot" type="Node3D" parent="."]
-[node name="PortalSurface" type="MeshInstance3D" parent="VisualRoot"]
-transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0, 1.45, 0)
+[node name="PortalStrandLayerBack" type="MeshInstance3D" parent="VisualRoot"]
+transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0, 1.45, -0.06)
+cast_shadow = 0
+mesh = SubResource("PortalDisc")
+material_override = SubResource("SurfaceMat")
+
+[node name="PortalStrandLayerMiddle" type="MeshInstance3D" parent="VisualRoot"]
+transform = Transform3D(1.025, 0, 0, 0, 0, 1.025, 0, -1.025, 0, 0, 1.45, 0)
+cast_shadow = 0
+mesh = SubResource("PortalDisc")
+material_override = SubResource("SurfaceMat")
+
+[node name="PortalStrandLayerFront" type="MeshInstance3D" parent="VisualRoot"]
+transform = Transform3D(0.975, 0, 0, 0, 0, 0.975, 0, -0.975, 0, 0, 1.45, 0.06)
 cast_shadow = 0
 mesh = SubResource("PortalDisc")
 material_override = SubResource("SurfaceMat")
@@ -96,7 +113,7 @@ process_material = SubResource("OrbitProcess")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
 light_color = Color(1, 0.68, 0.32, 1)
 light_energy = 0.0
-omni_range = 4.25
+omni_range = 3.4
 shadow_enabled = false
 [node name="InteractionArea" type="Area3D" parent="."]
 monitoring = false

@@ -23,7 +23,7 @@ var _is_loading_scene := false
 var _player_in_range := false
 var _current_player: Node
 var _confirmation_player: Node
-var _surface_material: ShaderMaterial
+var _strand_materials: Array[ShaderMaterial] = []
 var _back_veil_material: ShaderMaterial
 var _ring_materials: Array[ShaderMaterial] = []
 var _ground_material: ShaderMaterial
@@ -36,7 +36,7 @@ var _transition_finished_callback := Callable()
 @onready var ground_ring: MeshInstance3D = $VisualRoot/GroundRing
 @onready var outer_ring: MeshInstance3D = $VisualRoot/OuterRing
 @onready var inner_ring: MeshInstance3D = $VisualRoot/InnerRing
-@onready var portal_surface: MeshInstance3D = $VisualRoot/PortalSurface
+@onready var strand_layers: Array[MeshInstance3D] = [$VisualRoot/PortalStrandLayerBack, $VisualRoot/PortalStrandLayerMiddle, $VisualRoot/PortalStrandLayerFront]
 @onready var back_veil: MeshInstance3D = $VisualRoot/BackVeil
 @onready var interaction_area: Area3D = $InteractionArea
 @onready var interaction_shape: CollisionShape3D = $InteractionArea/CollisionShape3D
@@ -105,9 +105,18 @@ func _process(delta: float) -> void:
 	orbit_motes.rotate_z(-0.10 * delta)
 
 func _duplicate_runtime_materials() -> void:
-	if portal_surface.material_override is ShaderMaterial:
-		portal_surface.material_override = portal_surface.material_override.duplicate()
-		_surface_material = portal_surface.material_override
+	_strand_materials.clear()
+	for index in range(strand_layers.size()):
+		var layer := strand_layers[index]
+		if layer.material_override is ShaderMaterial:
+			layer.material_override = layer.material_override.duplicate()
+			var material := layer.material_override as ShaderMaterial
+			_strand_materials.append(material)
+			material.set_shader_parameter("phase_offset", float(index) * 0.23)
+			material.set_shader_parameter("strand_density", 8.6 + float(index) * 0.7)
+			material.set_shader_parameter("radial_density", 11.4 + float(index) * 0.55)
+			material.set_shader_parameter("rotation_speed", 0.034 + float(index) * 0.006)
+			material.set_shader_parameter("layer_alpha", 0.46 + float(index) * 0.08)
 	if back_veil.material_override is ShaderMaterial:
 		back_veil.material_override = back_veil.material_override.duplicate()
 		_back_veil_material = back_veil.material_override
@@ -127,7 +136,8 @@ func _play_staged_activation() -> void:
 	ground_ring.scale = Vector3.ONE * 0.72
 	outer_ring.scale = Vector3.ONE * 0.78
 	inner_ring.scale = Vector3.ONE * 0.70
-	portal_surface.scale = Vector3.ONE * 0.86
+	for index in range(strand_layers.size()):
+		strand_layers[index].scale = Vector3.ONE * (0.90 + float(index) * 0.045)
 	back_veil.scale = Vector3.ONE * 0.90
 	portal_light.light_energy = 0.0
 	orbit_motes.emitting = false
@@ -138,10 +148,11 @@ func _play_staged_activation() -> void:
 	_activation_tween.tween_property(outer_ring, "scale", Vector3.ONE, 1.05).set_delay(0.15).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	_activation_tween.tween_property(inner_ring, "scale", Vector3.ONE, 1.05).set_delay(0.15).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	_activation_tween.tween_method(_set_surface_activation, 0.0, 1.0, 1.20).set_delay(0.30).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	_activation_tween.tween_property(portal_surface, "scale", Vector3.ONE, 1.20).set_delay(0.30).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	for layer in strand_layers:
+		_activation_tween.tween_property(layer, "scale", Vector3.ONE, 1.20).set_delay(0.30).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	_activation_tween.tween_method(_set_back_veil_activation, 0.0, 1.0, 1.10).set_delay(0.25).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	_activation_tween.tween_property(back_veil, "scale", Vector3.ONE, 1.10).set_delay(0.25).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	_activation_tween.tween_property(portal_light, "light_energy", 0.50, 0.75).set_delay(0.35).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	_activation_tween.tween_property(portal_light, "light_energy", 0.28, 0.75).set_delay(0.35).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	get_tree().create_timer(0.50).timeout.connect(func():
 		if _state == PortalState.ACTIVATING:
 			orbit_motes.emitting = true
@@ -166,8 +177,8 @@ func _set_ring_activation(value: float) -> void:
 		mat.set_shader_parameter("activation", value)
 
 func _set_surface_activation(value: float) -> void:
-	if _surface_material != null:
-		_surface_material.set_shader_parameter("activation", value)
+	for mat in _strand_materials:
+		mat.set_shader_parameter("activation", value)
 
 func _set_back_veil_activation(value: float) -> void:
 	if _back_veil_material != null:
@@ -177,7 +188,7 @@ func _finish_activation() -> void:
 	if _state != PortalState.ACTIVATING:
 		return
 	_set_activation(1.0)
-	portal_light.light_energy = 0.50
+	portal_light.light_energy = 0.28
 	_state = PortalState.ACTIVE
 	_set_interaction_enabled(true)
 	_update_prompt()

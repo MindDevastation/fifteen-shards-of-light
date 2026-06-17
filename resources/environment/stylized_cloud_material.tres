@@ -6,8 +6,8 @@
 [resource]
 resource_name = "StylizedCloudSharedMaterial"
 shader = ExtResource("1_shader")
-shader_parameter/top_color = Color(0.91, 0.93, 0.95, 1)
-shader_parameter/middle_color = Color(0.8, 0.84, 0.88, 1)
-shader_parameter/bottom_color = Color(0.64, 0.7, 0.76, 1)
+shader_parameter/top_color = Color(0.95, 0.92, 0.85, 1)
+shader_parameter/middle_color = Color(0.87, 0.83, 0.76, 1)
+shader_parameter/bottom_color = Color(0.72, 0.68, 0.64, 1)
 shader_parameter/cloud_noise = ExtResource("2_noise")
 shader_parameter/noise_influence = 0.045

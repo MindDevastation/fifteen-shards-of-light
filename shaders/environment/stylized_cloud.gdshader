@@ -1,9 +1,9 @@
 shader_type spatial;
 render_mode unshaded, cull_back, diffuse_lambert, specular_disabled;
 
-uniform vec4 top_color : source_color = vec4(0.91, 0.93, 0.95, 1.0);
-uniform vec4 middle_color : source_color = vec4(0.80, 0.84, 0.88, 1.0);
-uniform vec4 bottom_color : source_color = vec4(0.64, 0.70, 0.76, 1.0);
+uniform vec4 top_color : source_color = vec4(0.95, 0.92, 0.85, 1.0);
+uniform vec4 middle_color : source_color = vec4(0.87, 0.83, 0.76, 1.0);
+uniform vec4 bottom_color : source_color = vec4(0.72, 0.68, 0.64, 1.0);
 uniform sampler2D cloud_noise;
 uniform float noise_influence : hint_range(0.0, 0.10) = 0.045;
 

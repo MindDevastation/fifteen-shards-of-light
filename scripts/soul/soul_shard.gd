@@ -17,6 +17,7 @@ signal reward_sequence_requested(shard: Node, shard_id: StringName, reward_text:
 @export var orbit_rotation_speed: float = 0.18
 @export var charge_duration: float = 1.2
 @export var legacy_completion_delay: float = 0.9
+@export_range(0.5, 3.0, 0.05) var interaction_radius: float = 1.15
 
 const SPIRAL_MOTE_COUNT := 15
 const SPIRAL_HEIGHT := 1.2
@@ -140,6 +141,7 @@ var _collection_inner_bloom_base_scale := Vector3.ONE
 
 func _ready() -> void:
 	add_to_group("player_interactable")
+	_configure_interaction_shape()
 	body_entered.connect(_on_body_entered)
 	body_exited.connect(_on_body_exited)
 	interaction_prompt.set_target(prompt_anchor)
@@ -167,6 +169,16 @@ func _ready() -> void:
 	_reset_collection_burst_visuals()
 	glow_light.light_energy = glow_energy_base
 
+func _configure_interaction_shape() -> void:
+	if collision_shape == null or collision_shape.shape == null:
+		push_warning("SoulShard interaction radius could not be applied because CollisionShape3D has no shape.")
+		return
+	if not collision_shape.shape is SphereShape3D:
+		push_warning("SoulShard interaction radius expects SphereShape3D, found %s." % [collision_shape.shape.get_class()])
+		return
+	var sphere_shape := (collision_shape.shape as SphereShape3D).duplicate() as SphereShape3D
+	sphere_shape.radius = interaction_radius
+	collision_shape.shape = sphere_shape
 
 func _process(delta: float) -> void:
 	if _state == CollectionState.CHARGING:

@@ -17,7 +17,8 @@ enum FinaleState { LOCKED, ARMED, REVEALING_LANDMARK, ACTIVATING_PORTAL, PORTAL_
 @export var portal_path: NodePath
 @export var minimum_entry_height: float = 0.5
 @export_range(-1.0, 1.0, 0.01) var minimum_approach_dot: float = 0.25
-@export var finale_text: String = "Первый свет открыл дорогу дальше.\nПусть каждый следующий шаг будет мягче."
+@export_category("Finale Content")
+@export_multiline var finale_text: String = ""
 
 var _state := FinaleState.LOCKED
 var _progression_controller: Node
