@@ -34,6 +34,7 @@ func _make_lobe(lobe_data: Dictionary) -> MeshInstance3D:
 	lobe.position = lobe_data["position"] as Vector3
 	lobe.scale = lobe_data["scale"] as Vector3
 	lobe.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	lobe.gi_mode = GeometryInstance3D.GI_MODE_DISABLED
 	var material := CLOUD_MATERIAL.duplicate() as ShaderMaterial
 	material.set_shader_parameter("body_shadow_strength", float(lobe_data["shadow"]))
 	material.set_shader_parameter("crown_highlight_strength", float(lobe_data["highlight"]))

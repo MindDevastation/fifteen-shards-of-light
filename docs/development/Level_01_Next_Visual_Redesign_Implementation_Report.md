@@ -331,3 +331,22 @@ Targeted scene load:
 - Targeted scenes were actually loaded and instanced by `/tmp/targeted_load_pr93.gd`.
 - Cloud quality behavior was not assumed; the old controller was read and inherited to preserve recursive material/shadow/GI logic.
 - No rendered graphical QA or performance measurements were performed in this headless pass, so both remain manual/NOT MEASURED.
+
+## Cloud Lobe GI Follow-up Validation
+
+A final PR #93 follow-up found that `CloudQualityController` runs before `VolumeLobes` are generated. The inherited controller therefore configures only imported GLB geometry before generated lobes exist. Each generated lobe now explicitly sets `gi_mode = GeometryInstance3D.GI_MODE_DISABLED` immediately after `cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF`, while preserving its own duplicated per-lobe `ShaderMaterial` and shadow/highlight variation.
+
+Validation results from `/tmp/validate_cloud_volume_lobes.gd`:
+- 5 generated lobes found under `VolumeLobes`.
+- 5 shadows disabled.
+- 5 GI modes disabled.
+- 5 `ShaderMaterial` overrides preserved.
+- Material variation preserved: 5 distinct `body_shadow_strength` values and 5 distinct `crown_highlight_strength` values.
+- Z offsets preserved: `+0.26`, `0.0`, `-0.22`, `-0.10`, `+0.16`.
+- Targeted cloud load passed.
+- Targeted `Level_01` load passed after successful editor import.
+
+Follow-up review status:
+- Review Pass 1: COMPLETED for explicit generated-lobe GI disable, shadow disable, per-lobe material preservation, 5-lobe count, cloud scene load, Level_01 load, and report update. Remote PR body verification remains NOT VERIFIED in this checkout because no `origin` remote is configured.
+- Review Pass 2: COMPLETED locally by reopening the old controller, generated cloud cluster script, cloud scene, and report. The actual runtime path is `super._ready()` for imported geometry first, then `_build_volume_lobes()`, with each generated lobe setting its own shadow, GI, and duplicated material values.
+- Review Pass 3: COMPLETED locally; no recursive material reassignment was added after lobe material duplication, validation instantiated the scene, editor import exited with code `0`, and no graphical or performance QA is claimed.
