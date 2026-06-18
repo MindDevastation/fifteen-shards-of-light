@@ -93,3 +93,151 @@ Performance QA should capture average FPS, 1% low, p95 frame time, and subjectiv
 - No new gameplay systems were implemented; changes are presentation/UI/VFX-oriented and preserve Level_01 progression flow.
 - Merge performed: no.
 - Auto-merge enabled: no.
+
+---
+
+## Corrective Review After PR #93
+
+PR #93 first pass contained:
+- runtime portal parameter override conflict: `LevelPortal.tscn` authored broad-arm values were overwritten by old `level_portal.gd` arrays near radial density `40`;
+- planar clustered-light approximation: the shader drew bead-like clusters on portal planes, but no real 3D sleeve streams existed;
+- scale-independent leaf offset: the first pass used a hardcoded `10 px` branch offset and did not include texture size or animated scale;
+- shading-only cloud volume approximation: the cloud pass changed UV shading but did not add depth layers or lobe geometry.
+
+## Portal runtime parameter source of truth
+
+Runtime layer parameters are now the source of truth in `scripts/core/level_portal.gd`; `LevelPortal.tscn` keeps safe defaults only. The runtime values applied during `_duplicate_runtime_materials()` are:
+
+```gdscript
+PORTAL_LAYER_RADIAL_DENSITIES = [15.6, 15.9, 15.4, 16.1, 15.5, 15.8]
+PORTAL_LAYER_ROTATION_SPEEDS = [0.670, 0.680, 0.660, 0.690, 0.665, 0.675]
+PORTAL_LAYER_ALPHAS = [0.30, 0.38, 0.48, 0.48, 0.38, 0.30]
+```
+
+This removes the old radial-density `~40` runtime override and keeps six runtime layers mapped to six broad sleeves.
+
+## Volumetric light sleeve architecture
+
+Added `scenes/vfx/PortalLightSleeve3D.tscn` and `scripts/vfx/portal_light_sleeve_3d.gd`.
+
+Architecture:
+- 6 sleeve streams, one `MultiMeshInstance3D` per sleeve;
+- 64 motes per sleeve;
+- 384 total sleeve motes;
+- spiral turn count: `1.55`;
+- depth range: `0.62` world units;
+- mote size range: `0.055` to `0.145`;
+- flow speed: `0.68`;
+- additive unshaded emission material with compact sphere motes;
+- each sleeve uses phase `index / 6.0` and updates along an outer-to-inner spiral path.
+
+The older planar shader remains only as a supporting inner veil and is no longer the primary sleeve representation.
+
+## Portal performance integration
+
+The old duplicate load was reduced:
+- ambient `OrbitMotes.amount` reduced from `240` to `48`;
+- ambient mote size and velocity reduced;
+- planar surface shader was simplified by removing the procedural bead-cluster helper;
+- planar alpha/emission defaults were lowered;
+- the new sleeve root receives activation through `_set_surface_activation()` and is set to `0.0` on deactivation;
+- no per-frame material duplication was added; material duplication remains in `_ready()` only.
+
+## Texture-relative leaf stem anchoring
+
+Texture inspected: `assets/ui/shard_reward_overlay/vine_leaf.png`, PNG `1024 x 1024`.
+
+Stem anchor:
+- normalized UV: `Vector2(0.235, 0.855)`;
+- local texture anchor: `(Vector2(0.235, 0.855) - Vector2(0.5, 0.5)) * Vector2(1024, 1024) = Vector2(-271.36, 363.52)`.
+
+Each leaf stores:
+- `branch_position`;
+- `local_texture_anchor`;
+- `rotation` on the sprite;
+- animated `target_scale` through existing scale factor.
+
+During decoration updates, the final position is recalculated after animated scale:
+
+```gdscript
+var scaled_anchor := Vector2(local_texture_anchor.x * final_scale.x, local_texture_anchor.y * final_scale.y)
+leaf.scale = final_scale
+leaf.position = branch_position - scaled_anchor.rotated(leaf.rotation)
+```
+
+This applies both component-wise scale and rotation to the texture-relative stem anchor every frame of the growth animation.
+
+## Layered cloud volume architecture
+
+Added `scripts/environment/stylized_cloud_volume_cluster.gd` and wired it into `scenes/environment/assets/cloud_001.tscn`.
+
+The reusable cloud scene now builds a `VolumeLobes` child with five structural lobe meshes:
+- `BackLobe`: z `+0.26`;
+- `MiddleLobe`: z `0.0`;
+- `FrontLobe`: z `-0.22`;
+- `LeftPuff`: z `-0.10`;
+- `RightPuff`: z `+0.16`.
+
+This creates front/middle/back depth separation and soft parallax from actual geometry, not only UV shading. Each lobe duplicates the shared warm cream cloud material with modest shadow/highlight variation and lower noise influence to avoid grain regression.
+
+## Finale responsive-layout validation
+
+Static validation was performed against the current formula:
+- frame rect: `(0.17w, 0.16h, 0.66w, 0.56h)`;
+- inner margin: `(0.055w, 0.065h)` on each side;
+- text safe rect: centered `75%` of the inner frame;
+- word wrapping uses `_safe_text_width()`, which returns `_text_safe_rect.size.x` once computed;
+- line masks are positioned within `_text_safe_rect` and clip left-to-right reveal;
+- max line count remains 3;
+- close durations remain `1.00`, `1.55`, `1.45`.
+
+Viewport checks:
+- `1920x1080`: safe rect stays inside frame, max text width equals safe width, masks are horizontally centered inside safe rect.
+- `1280x720`: same formula scales down and preserves safe rect containment.
+
+No finale code changes were needed during this corrective audit beyond the leaf-anchor fix.
+
+## Corrective Review Pass 1 — Source requirements
+
+- Portal parameter source of truth: COMPLETED.
+- Six volumetric clustered-light sleeves: COMPLETED by actual `PortalLightSleeve3D` geometry streams, not shader-only beads.
+- Portal performance and integration cleanup: COMPLETED by lowering ambient motes and simplifying/supporting the planar veil.
+- Texture-relative leaf stem anchor: COMPLETED with texture-size UV anchor, scale, and rotation math.
+- Structural cloud volume pass: COMPLETED with real lobe geometry and depth offsets.
+- Finale regression audit: COMPLETED statically; no additional finale layout timing changes needed.
+- Soul Orb accepted fix preservation: COMPLETED; not changed in corrective pass.
+- Help Stone baked-only preservation: COMPLETED; no Help Stone files changed.
+
+## Corrective Review Pass 2 — Actual runtime integration
+
+- Runtime portal radial densities after `_ready()`: `[15.6, 15.9, 15.4, 16.1, 15.5, 15.8]`.
+- Authored `LevelPortal.tscn` shader values are safe defaults and are intentionally overwritten by the runtime source of truth.
+- Real 3D sleeves exist as six `MultiMeshInstance3D` streams under `PortalLightSleeve3D`.
+- Sleeve activation is driven from `LevelPortal._set_surface_activation()` and disabled on `_deactivate()`.
+- Ambient `OrbitMotes` remain but are reduced to 48 and are not the sleeve representation.
+- Leaf anchors use the actual 1024x1024 texture size, component scale, and sprite rotation.
+- Clouds have actual lobe meshes in `VolumeLobes`, and Level_01 instances the reusable `cloud_001.tscn` scene.
+
+## Corrective Review Pass 3 — Review the review
+
+- The portal redesign is no longer claimed complete based only on a shader helper; it now has six real 3D streams.
+- The leaf anchor is no longer claimed correct based only on a visual offset; it is texture-relative and recalculated with scale/rotation.
+- Clouds are no longer claimed volumetric based only on shading; structural lobe geometry is now generated.
+- Runtime portal overrides were explicitly checked and corrected.
+- Handoff must still avoid claiming rendered graphical QA or measured performance because neither was captured in this headless pass.
+
+## Remaining graphical QA
+
+Still required in a rendered gameplay/video pass:
+1. verify six portal sleeves from front view;
+2. verify sleeve depth from side view;
+3. verify player silhouette in front of active portal;
+4. verify portal is not a white blob;
+5. verify cloud lobe depth/parallax during camera motion;
+6. verify leaf stem attachment during finale frame growth;
+7. verify Soul Orb prompt remains `Поднять сферу`;
+8. verify finale text layout/reveal at 1920x1080 and 1280x720.
+
+## Performance status
+
+Performance not measured. No average FPS, 1% low, p95 frame time, or active-portal regression percentage was captured in this environment.

@@ -19,12 +19,6 @@ float strand_mask(float value, float width) {
 	return 1.0 - smoothstep(0.0, width, centered);
 }
 
-float mote_cluster(float coordinate, float r, float t, float seed) {
-	float beads = strand_mask(coordinate * 3.0 + sin(r * 14.0 + t + seed) * 0.16 + seed, 0.19);
-	float clustered = pow(beads, 2.2) * (0.72 + 0.28 * sin(r * 38.0 - t * 2.6 + seed));
-	return clamp(clustered, 0.0, 1.0);
-}
-
 void fragment() {
 	vec2 c = UV - vec2(0.5);
 	float r = length(c);
@@ -35,14 +29,11 @@ void fragment() {
 	float clockwise_time = -TIME * rotation_speed + phase_offset;
 	float low_noise = texture(swirl_noise, vec2(r * 0.72 + phase_offset, angle + clockwise_time * 0.45)).r;
 	float arm_coordinate = angle * 6.0 + r * radial_density + clockwise_time + low_noise * 0.18;
-	float sleeve_core = strand_mask(arm_coordinate, 0.34);
-	float sleeve_body = pow(sleeve_core, 0.72);
-	float motes_a = mote_cluster(arm_coordinate, r, clockwise_time, phase_offset + 0.17) * sleeve_body;
-	float motes_b = mote_cluster(arm_coordinate + 0.37, r, clockwise_time * 1.25, phase_offset + 1.31) * sleeve_body * 0.72;
-	float motes_c = mote_cluster(arm_coordinate - low_noise * 0.28, r, clockwise_time * 0.85, phase_offset + 2.09) * sleeve_body * 0.54;
-	float clustered_motes = clamp(motes_a + motes_b + motes_c, 0.0, 1.0);
-	float strands = clamp(sleeve_body * 0.68 + clustered_motes * 0.78, 0.0, 1.0);
-	float volume_fill = body * base_alpha * layer_alpha * (0.8 + sleeve_body * 0.45);
+	float sleeve_core = strand_mask(arm_coordinate, 0.38);
+	float sleeve_body = pow(sleeve_core, 0.82);
+	float veil_noise = 0.82 + low_noise * 0.18;
+	float strands = sleeve_body * veil_noise;
+	float volume_fill = body * base_alpha * layer_alpha;
 	float strand_alpha = strands * body * layer_alpha * arm_alpha;
 	float edge_alpha = (1.0 - smoothstep(0.28, 0.47, r)) * oval * 0.075 * layer_alpha;
 	float alpha = (volume_fill + strand_alpha + edge_alpha) * activation;

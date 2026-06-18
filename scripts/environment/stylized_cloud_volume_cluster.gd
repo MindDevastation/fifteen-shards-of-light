@@ -1,0 +1,51 @@
+extends Node3D
+class_name StylizedCloudVolumeCluster
+
+const CLOUD_MATERIAL := preload("res://resources/environment/stylized_cloud_material.tres")
+const LOBE_LAYOUT := [
+	{"name": "BackLobe", "position": Vector3(-0.18, 0.06, 0.26), "scale": Vector3(1.35, 0.54, 0.62), "shadow": 0.145, "highlight": 0.082},
+	{"name": "MiddleLobe", "position": Vector3(0.0, 0.0, 0.0), "scale": Vector3(1.55, 0.62, 0.72), "shadow": 0.125, "highlight": 0.105},
+	{"name": "FrontLobe", "position": Vector3(0.22, -0.03, -0.22), "scale": Vector3(1.22, 0.48, 0.54), "shadow": 0.105, "highlight": 0.118},
+	{"name": "LeftPuff", "position": Vector3(-0.62, -0.04, -0.10), "scale": Vector3(0.82, 0.42, 0.48), "shadow": 0.115, "highlight": 0.112},
+	{"name": "RightPuff", "position": Vector3(0.66, 0.02, 0.16), "scale": Vector3(0.92, 0.46, 0.50), "shadow": 0.135, "highlight": 0.096},
+]
+
+func _ready() -> void:
+	_apply_shadowless_soft_cloud_material(self)
+	_build_volume_lobes()
+
+func _apply_shadowless_soft_cloud_material(root: Node) -> void:
+	if root is MeshInstance3D:
+		var mesh_instance := root as MeshInstance3D
+		mesh_instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		mesh_instance.material_override = CLOUD_MATERIAL
+	for child in root.get_children():
+		_apply_shadowless_soft_cloud_material(child)
+
+func _build_volume_lobes() -> void:
+	if has_node("VolumeLobes"):
+		return
+	var volume_root := Node3D.new()
+	volume_root.name = "VolumeLobes"
+	add_child(volume_root)
+	for lobe_data in LOBE_LAYOUT:
+		volume_root.add_child(_make_lobe(lobe_data))
+
+func _make_lobe(lobe_data: Dictionary) -> MeshInstance3D:
+	var mesh := SphereMesh.new()
+	mesh.radius = 0.5
+	mesh.height = 1.0
+	mesh.radial_segments = 16
+	mesh.rings = 8
+	var lobe := MeshInstance3D.new()
+	lobe.name = String(lobe_data["name"])
+	lobe.mesh = mesh
+	lobe.position = lobe_data["position"] as Vector3
+	lobe.scale = lobe_data["scale"] as Vector3
+	lobe.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	var material := CLOUD_MATERIAL.duplicate() as ShaderMaterial
+	material.set_shader_parameter("body_shadow_strength", float(lobe_data["shadow"]))
+	material.set_shader_parameter("crown_highlight_strength", float(lobe_data["highlight"]))
+	material.set_shader_parameter("noise_influence", 0.045)
+	lobe.material_override = material
+	return lobe

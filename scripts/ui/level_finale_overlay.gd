@@ -17,6 +17,7 @@ const VINE_INNER_COLOR := Color(1.0, 0.92, 0.70, 0.98)
 const BRANCH_WIDTHS := Vector3(9.0, 4.2, 1.4)
 const REWARD_FONT: FontFile = preload("res://assets/fonts/cormorant_garamond/CormorantGaramond-SemiBoldItalic.otf")
 const VINE_LEAF_TEXTURE: Texture2D = preload("res://assets/ui/shard_reward_overlay/vine_leaf.png")
+const LEAF_STEM_ANCHOR_UV := Vector2(0.235, 0.855)
 
 @export var text_start_delay: float = 0.72
 @export var line_reveal_duration: float = 4.6
@@ -391,13 +392,22 @@ func _build_leaf_geometry() -> void:
 			leaf.texture = VINE_LEAF_TEXTURE
 			leaf.centered = true
 			var leaf_angle := float(sample["angle"]) + (0.55 if i % 2 == 0 else -0.55) * float(side)
-			var base_anchor := Vector2(-10.0 * float(side), 0.0).rotated(leaf_angle)
-			leaf.position = (sample["position"] as Vector2) - base_anchor
+			var branch_position := sample["position"] as Vector2
+			var texture_size := leaf.texture.get_size()
+			var local_texture_anchor := (LEAF_STEM_ANCHOR_UV - Vector2(0.5, 0.5)) * texture_size
+			leaf.position = branch_position
 			leaf.rotation = leaf_angle
 			leaf.scale = Vector2.ZERO
 			leaf.modulate = Color(1.0, 0.84, 0.52, 0.0)
 			leaf_layer.add_child(leaf)
-			_leaf_data.append({"node": leaf, "side": side, "progress": float(branch.get("progress", 0.0)) + 0.035, "scale": lerpf(0.64, 1.08, _hash_01(i, side + 31))})
+			_leaf_data.append({
+				"node": leaf,
+				"side": side,
+				"progress": float(branch.get("progress", 0.0)) + 0.035,
+				"scale": lerpf(0.64, 1.08, _hash_01(i, side + 31)),
+				"branch_position": branch_position,
+				"local_texture_anchor": local_texture_anchor,
+			})
 
 func _update_decorations() -> void:
 	for data in _branch_data:
@@ -411,7 +421,11 @@ func _update_decorations() -> void:
 		var local := clampf((progress - float(data["progress"])) / 0.10, 0.0, 1.0)
 		var eased := sin(local * PI * 0.5)
 		var leaf := data["node"] as Sprite2D
-		leaf.scale = Vector2.ONE * eased * float(data["scale"]) * 0.048 * _viewport_size().y / 1024.0
+		var final_scale := Vector2.ONE * eased * float(data["scale"]) * 0.048 * _viewport_size().y / 1024.0
+		var local_texture_anchor := data["local_texture_anchor"] as Vector2
+		var scaled_anchor := Vector2(local_texture_anchor.x * final_scale.x, local_texture_anchor.y * final_scale.y)
+		leaf.scale = final_scale
+		leaf.position = (data["branch_position"] as Vector2) - scaled_anchor.rotated(leaf.rotation)
 		leaf.modulate.a = eased * 0.92
 
 func _sample_path(points: PackedVector2Array, progress: float, offset: float) -> Dictionary:
