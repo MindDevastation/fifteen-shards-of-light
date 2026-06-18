@@ -46,7 +46,6 @@ fog_density = 0.012
 
 [node name="Level_01" type="Node3D" unique_id=389746896]
 
-
 [node name="BlockRoot" type="Node3D" parent="." unique_id=1489238210]
 
 [node name="SoulOrb_World" parent="BlockRoot" unique_id=237478893 instance=ExtResource("5_soul_orb_world")]
@@ -105,9 +104,9 @@ approach_marker_path = NodePath("../../LandmarkFinaleRoot/FinaleApproachMarker")
 light_column_path = NodePath("../../LandmarkFinaleRoot/LandmarkLightAnchor/LandmarkLightColumn")
 finale_overlay_path = NodePath("../../UILayer/LevelFinaleOverlay")
 portal_path = NodePath("../../LandmarkFinaleRoot/PortalAnchor/LevelPortal")
-finale_text = "Ты появилась как тёплый первый свет"
 minimum_entry_height = 0.4
 minimum_approach_dot = 0.2
+finale_text = "Когда ты появилась в моей жизни, мир не стал громче - он стал теплее. В этом не было драмы или резкого поворота, просто рядом с мыслью о тебе стало светлее. Мне дорого это первое тепло, потому что с него все и началось"
 
 [node name="LandmarkFinaleRoot" type="Node3D" parent="." unique_id=1560038229]
 transform = Transform3D(0.9925461, 0, -0.12186927, 0, 1, 0, 0.12186927, 0, 0.9925461, -47.918728, 2.25, 306.05453)
@@ -128,7 +127,6 @@ transform = Transform3D(0.99555427, 0, 0.094195336, 0, 1, 0, -0.094195336, 0, 0.
 target_scene_path = "res://scenes/levels/Level_02.tscn"
 entry_mode = 1
 require_entry_confirmation = true
-interaction_prompt_text = "Шагнуть к свету"
 
 [node name="FinaleTrigger" type="Area3D" parent="LandmarkFinaleRoot" unique_id=1063440564]
 transform = Transform3D(1.0000006, 0, 0, 0, 1, 0, 0, 0, 1.0000006, 1.0066376, -0.22679043, -1.1806335)
@@ -145,7 +143,6 @@ disabled = true
 [node name="ShardRewardOverlay" parent="UILayer" unique_id=2119356460 instance=ExtResource("16_reward_overlay")]
 
 [node name="LevelFinaleOverlay" parent="UILayer" unique_id=1723095977 instance=ExtResource("20_finale_overlay")]
-visible = false
 grow_horizontal = 2
 grow_vertical = 2
 
