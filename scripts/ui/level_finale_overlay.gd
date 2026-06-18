@@ -18,6 +18,8 @@ const BRANCH_WIDTHS := Vector3(9.0, 4.2, 1.4)
 const REWARD_FONT: FontFile = preload("res://assets/fonts/cormorant_garamond/CormorantGaramond-SemiBoldItalic.otf")
 const VINE_LEAF_TEXTURE: Texture2D = preload("res://assets/ui/shard_reward_overlay/vine_leaf.png")
 const LEAF_STEM_ANCHOR_UV := Vector2(0.235, 0.855)
+const MAX_TEXT_LINES := 6
+const FINALE_TEXT_SAFE_AREA_RATIO := 0.80
 
 @export var text_start_delay: float = 0.72
 @export var line_reveal_duration: float = 4.6
@@ -117,12 +119,14 @@ func _reveal_text_async() -> void:
 		if not mask.visible:
 			continue
 		var label := _line_labels[i]
-		var delay := float(i) * line_reveal_stagger
+		var visible_line_count := _visible_line_mask_count()
+		var effective_stagger := minf(line_reveal_stagger, 2.4 / maxf(float(visible_line_count - 1), 1.0))
+		var delay := float(i) * effective_stagger
 		var final_x := mask.size.x
 		mask.clip_contents = true
 		mask.size.x = 0.0
 		tween.tween_property(mask, "size:x", final_x, line_reveal_duration).set_delay(delay).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-		tween.tween_property(label, "position:y", 0.0, line_reveal_duration * 0.72).set_delay(delay).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		tween.tween_property(label, "position:y", float(label.get_meta("settled_y", label.position.y)), line_reveal_duration * 0.72).set_delay(delay).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		tween.tween_property(label, "modulate:a", 1.0, line_reveal_duration * 0.86).set_delay(delay).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	await tween.finished
 	_text_complete = true
@@ -192,7 +196,7 @@ func _layout_text_lines(scale_factor: float) -> void:
 	var layout := _layout_finale_text(_full_text, scale_factor)
 	var lines := layout["lines"] as Array[String]
 	var font_size := int(layout["font_size"])
-	var line_height := minf(64.0 * scale_factor, _text_safe_rect.size.y / maxf(float(lines.size()), 1.0))
+	var line_height := _visual_line_height(font_size, scale_factor)
 	var total_height := line_height * float(lines.size())
 	var start_y := _text_safe_rect.position.y + (_text_safe_rect.size.y - total_height) * 0.5
 	_reset_line_masks()
@@ -201,9 +205,14 @@ func _layout_text_lines(scale_factor: float) -> void:
 		_configure_label(label, font_size)
 		label.text = "[center][i]%s[/i][/center]" % _bbcode_escape(lines[i])
 		var measured: Vector2 = REWARD_FONT.get_string_size(lines[i], HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size)
-		var width := minf(measured.x + 26.0 * scale_factor, _safe_text_width(scale_factor))
-		label.position = Vector2(0.0, 10.0 * scale_factor)
-		label.size = Vector2(width, line_height)
+		var horizontal_padding := _horizontal_text_padding(scale_factor)
+		var vertical_padding := _vertical_text_padding(scale_factor)
+		var reveal_offset := _reveal_start_offset(scale_factor)
+		var width := minf(measured.x + horizontal_padding * 2.0, _safe_text_width(scale_factor))
+		label.position = Vector2(horizontal_padding, vertical_padding + reveal_offset)
+		label.set_meta("settled_y", vertical_padding)
+		label.size = Vector2(maxf(1.0, width - horizontal_padding * 2.0), line_height - vertical_padding * 2.0 - reveal_offset)
+		label.visible = true
 		label.modulate.a = 0.0
 		var mask := _line_masks[i]
 		mask.visible = true
@@ -213,23 +222,30 @@ func _layout_text_lines(scale_factor: float) -> void:
 
 func _layout_finale_text(text: String, scale_factor: float) -> Dictionary:
 	var normalized := _normalize_text(text)
-	for base_size in [56, 52, 48, 44]:
+	for base_size in [60, 56, 52, 48, 44, 40, 36, 32, 28, 24, 20, 18, 16, 14, 12, 10]:
 		var font_size := int(round(float(base_size) * scale_factor))
 		var explicit := normalized.split("\n", false)
 		var result: Array[String] = []
 		if explicit.size() > 1:
 			for part in explicit:
-				result.append_array(_word_wrap(part, font_size, maxi(1, 6 - result.size()), scale_factor))
+				result.append_array(_word_wrap(part, font_size, maxi(1, MAX_TEXT_LINES - result.size()), scale_factor))
 		else:
-			result = _word_wrap(normalized.replace("\n", " "), font_size, 6, scale_factor)
-		if result.size() <= 6 and _lines_fit(result, font_size, scale_factor):
+			result = _word_wrap(normalized.replace("\n", " "), font_size, MAX_TEXT_LINES, scale_factor)
+		if result.size() <= MAX_TEXT_LINES and _lines_fit(result, font_size, scale_factor):
 			return {"lines": result, "font_size": font_size}
-	var fallback := _word_wrap(normalized.replace("\n", " "), int(round(44.0 * scale_factor)), 6, scale_factor)
-	while fallback.size() > 6:
-		fallback[5] = "%s %s" % [fallback[5], fallback.pop_back()]
+	var fallback_size := int(round(10.0 * scale_factor))
+	var fallback: Array[String] = []
+	var explicit_fallback := normalized.split("\n", false)
+	if explicit_fallback.size() > 1:
+		for part in explicit_fallback:
+			fallback.append_array(_word_wrap(part, fallback_size, maxi(1, MAX_TEXT_LINES - fallback.size()), scale_factor))
+	else:
+		fallback = _word_wrap(normalized.replace("\n", " "), fallback_size, MAX_TEXT_LINES, scale_factor)
+	while fallback.size() > MAX_TEXT_LINES:
+		fallback[MAX_TEXT_LINES - 1] = "%s %s" % [fallback[MAX_TEXT_LINES - 1], fallback.pop_back()]
 	for i in range(fallback.size()):
 		fallback[i] = fallback[i].strip_edges()
-	return {"lines": fallback, "font_size": int(round(44.0 * scale_factor))}
+	return {"lines": fallback, "font_size": fallback_size}
 
 func _word_wrap(text: String, font_size: int, max_lines: int, scale_factor: float) -> Array[String]:
 	var words: PackedStringArray = text.split(" ", false)
@@ -255,12 +271,47 @@ func _word_wrap(text: String, font_size: int, max_lines: int, scale_factor: floa
 	return lines
 
 func _lines_fit(lines: Array[String], font_size: int, scale_factor: float) -> bool:
-	if lines.size() > 6:
+	if lines.size() > MAX_TEXT_LINES:
+		return false
+	var visual_line_height := _visual_line_height(font_size, scale_factor)
+	var total_visual_height := visual_line_height * float(lines.size())
+	if total_visual_height > _text_safe_rect.size.y:
 		return false
 	for line in lines:
-		if REWARD_FONT.get_string_size(line, HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size).x > _safe_text_width(scale_factor):
+		var measured := REWARD_FONT.get_string_size(line, HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size).x
+		if measured + _horizontal_text_padding(scale_factor) * 2.0 > _safe_text_width(scale_factor):
 			return false
 	return true
+
+func _visual_line_height(font_size: int, scale_factor: float) -> float:
+	var outline := _outline_size()
+	var shadow_y := _shadow_offset_y()
+	return REWARD_FONT.get_height(font_size) + float(outline) * 2.0 + absf(float(shadow_y)) + _reveal_start_offset(scale_factor) + _vertical_text_padding(scale_factor) * 2.0
+
+func _horizontal_text_padding(scale_factor: float) -> float:
+	return 18.0 * scale_factor + float(_outline_size()) + absf(float(_shadow_offset_x()))
+
+func _vertical_text_padding(scale_factor: float) -> float:
+	return 8.0 * scale_factor
+
+func _reveal_start_offset(scale_factor: float) -> float:
+	return 10.0 * scale_factor
+
+func _outline_size() -> int:
+	return int(round(7.0 * _viewport_size().y / 1080.0))
+
+func _shadow_offset_x() -> int:
+	return int(round(2.0 * _viewport_size().y / 1080.0))
+
+func _shadow_offset_y() -> int:
+	return int(round(3.0 * _viewport_size().y / 1080.0))
+
+func _visible_line_mask_count() -> int:
+	var count := 0
+	for mask in _line_masks:
+		if mask.visible:
+			count += 1
+	return count
 
 func _safe_text_width(scale_factor: float) -> float:
 	if _text_safe_rect.size.x > 1.0:
@@ -274,7 +325,7 @@ func _update_frame_and_text_safe_rect() -> void:
 	var inner_rect := _frame_rect.grow_individual(-inner_margin.x, -inner_margin.y, -inner_margin.x, -inner_margin.y)
 	_text_safe_rect = Rect2(
 		inner_rect.position + inner_rect.size * 0.10,
-		inner_rect.size * 0.80
+		inner_rect.size * FINALE_TEXT_SAFE_AREA_RATIO
 	)
 
 func _build_vines() -> void:
@@ -478,7 +529,7 @@ func _create_branch_line(width: float, color: Color) -> Line2D:
 	return line
 
 func _create_text_lines() -> void:
-	for i in range(3):
+	for i in range(MAX_TEXT_LINES):
 		var mask := Control.new()
 		mask.name = "LineMask%d" % (i + 1)
 		mask.clip_contents = false
@@ -500,7 +551,8 @@ func _reset_line_masks() -> void:
 		_line_masks[i].visible = false
 		_line_masks[i].size.x = 0.0
 		_line_labels[i].text = ""
-		_line_labels[i].position.y = 10.0
+		_line_labels[i].visible = false
+		_line_labels[i].position.y = _reveal_start_offset(1.0)
 		_line_labels[i].modulate.a = 0.0
 
 func _configure_label(label: RichTextLabel, font_size: int) -> void:
@@ -512,10 +564,10 @@ func _configure_label(label: RichTextLabel, font_size: int) -> void:
 	label.add_theme_font_size_override("bold_italics_font_size", font_size)
 	label.add_theme_color_override("default_color", TEXT_COLOR)
 	label.add_theme_color_override("font_outline_color", TEXT_OUTLINE_COLOR)
-	label.add_theme_constant_override("outline_size", int(round(7.0 * _viewport_size().y / 1080.0)))
+	label.add_theme_constant_override("outline_size", _outline_size())
 	label.add_theme_color_override("font_shadow_color", Color(0.55, 0.24, 0.08, 0.42))
-	label.add_theme_constant_override("shadow_offset_x", int(round(2.0 * _viewport_size().y / 1080.0)))
-	label.add_theme_constant_override("shadow_offset_y", int(round(3.0 * _viewport_size().y / 1080.0)))
+	label.add_theme_constant_override("shadow_offset_x", _shadow_offset_x())
+	label.add_theme_constant_override("shadow_offset_y", _shadow_offset_y())
 
 func _configure_tip_glows() -> void:
 	var poly := PackedVector2Array([Vector2(0, -10), Vector2(10, 0), Vector2(0, 10), Vector2(-10, 0)])
@@ -563,8 +615,12 @@ func _bbcode_escape(value: String) -> String:
 	return value.replace("[", "[lb]").replace("]", "[rb]")
 
 func _viewport_size() -> Vector2:
-	var size := get_viewport_rect().size
-	return Vector2(1920, 1080) if size == Vector2.ZERO else size
+	if size.x >= 320.0 and size.y >= 240.0:
+		return size
+	var viewport_size := get_viewport_rect().size
+	if viewport_size.x >= 320.0 and viewport_size.y >= 240.0:
+		return viewport_size
+	return Vector2(1920, 1080)
 
 func _hash_01(index: int, salt: int) -> float:
 	var v := int(index * 92821 + salt * 68917 + 1337)

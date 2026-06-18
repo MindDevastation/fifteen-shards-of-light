@@ -1,119 +1,159 @@
-# Level_01 Pre-External-Review Corrective Pass Report
+# Level 01 Pre-External Review Corrective Pass Report
 
-## Baseline
-- branch: work
-- starting SHA: 1c508184c31998fabfedd5eb0b54e5cfd276ea45
-- final local SHA: f6fdf48fc28ca73d2cbc81a6b4ff0347778e56d6
-- final verified remote SHA: NOT VERIFIED
-- ordered commits: f6fdf48fc28ca73d2cbc81a6b4ff0347778e56d6 Implement Level 01 pre-review corrective pass
-- merge performed: no
-- auto-merge enabled: no
-- new PR created: no
+## Branch and baseline
 
-## Created files
-- scripts/puzzles/light_route_barrier_gate.gd
-- scripts/puzzles/light_route_barrier_gate.gd.uid
-- scripts/puzzles/light_route_beam.gd
-- scripts/puzzles/light_route_beam.gd.uid
-- scripts/puzzles/light_route_lamp.gd
-- scripts/puzzles/light_route_lamp.gd.uid
-- scripts/puzzles/light_route_puzzle_controller.gd
-- scripts/puzzles/light_route_puzzle_controller.gd.uid
+- Branch: `work`.
+- Starting SHA: `114c89c38fb26fca61abd202fc83944c3a13b3a8`.
+- Final local SHA: recorded in final handoff after commit.
+- Final verified remote SHA: `NOT VERIFIED`.
+- Merge performed: no.
+- Auto-merge enabled: no.
+- New PR created: no.
 
-## Modified files
-- scenes/levels/Level_01.tscn
-- scripts/core/level_portal.gd
-- scripts/environment/stylized_cloud_volume_cluster.gd
-- scripts/ui/level_finale_overlay.gd
-- scripts/vfx/portal_light_sleeve_3d.gd
-- shaders/vfx/level_portal_surface.gdshader
+## Ordered implementation summary
 
-## Deleted files
-- None.
+1. Finale six-line control fix — COMPLETED.
+2. Finale visual bounds validation — COMPLETED by automated headless layout validation for 1920×1080 and 1280×720; rendered graphical QA remains manual.
+3. Lamp initial beam state — COMPLETED.
+4. Free-route behavior — COMPLETED.
+5. Wrong-route behavior — COMPLETED.
+6. Channel reset behavior — COMPLETED.
+7. Prompt refresh behavior — COMPLETED.
+8. Existing lamp visual binding — COMPLETED.
+9. Portal stable-arm geometry — COMPLETED by structural/script validation; rendered visual QA remains manual.
+10. Lower-third vortex — COMPLETED.
+11. Collision root-cause analysis — COMPLETED for the identified Level_01 start-zone culprit.
+12. Runtime puzzle test — COMPLETED.
+13. Editor import and Level_01 load — COMPLETED.
 
-## Slice results
-- Slice 0 — Preflight and baseline lock: COMPLETED. The requested design files were present, readable, and read fully. Baseline branch/SHA/worktree state was recorded.
-- Slice 1 — Player collision reliability pass: COMPLETED. Player safe margin was increased, step debug was disabled, and protruding step-assist cap collision shapes near the start/early route were disabled to reduce snag risk while preserving ramp collision.
-- Slice 2 — Side-island lamp puzzle architecture: COMPLETED. Added reusable controller/lamp/beam/barrier scripts and configured a two-channel Level_01 lamp route with two sources, seven relays, two destinations, ordered paths, colors, and a one-shot barrier gate.
-- Slice 3 — Lamp puzzle UX / prompt / state polish: COMPLETED. Lamps expose dedicated Russian prompt text, selected endpoint columns, invalid/success light feedback, state-specific materials/lights, and locked/completed state handling.
-- Slice 4 — Portal structural VFX rework: COMPLETED. Portal sleeve VFX now uses five vertical counterclockwise sleeve streams, sparse galaxy motes, and a particle rim; the surface shader uses five-arm counterclockwise motion.
-- Slice 5 — Cloud volume refinement: COMPLETED. Cloud lobes were enlarged in height/depth, mesh detail was increased, and noise influence was reduced to improve soft volume without grain regression.
-- Slice 6 — Finale overlay text layout and readability pass: COMPLETED. Text layout now targets 80% of the inner frame, supports up to six lines, uses larger font candidates, and adds stronger outline/shadow depth styling.
-- Slice 7 — Finale overlay animation polish: COMPLETED. Reveal/close timing remains soft with the enlarged layout and line mask flow supports six lines.
-- Slice 8 — Integrated validation pass: PARTIAL. Static checks and script-loading checks passed; full Level_01 scene/runtime validation is limited by imported GLB resources unavailable to the headless loader in this environment.
-- Slice 9 — Final report: COMPLETED. This report records implementation, validation, limitations, and remaining manual QA.
+## Finale details
 
-## Review Pass 1 — сверка с MD
-- Slice 0: COMPLETED
-- Slice 1: COMPLETED
-- Slice 2: COMPLETED
-- Slice 3: COMPLETED
-- Slice 4: COMPLETED
-- Slice 5: COMPLETED
-- Slice 6: COMPLETED
-- Slice 7: COMPLETED
-- Slice 8: PARTIAL
-- Slice 9: COMPLETED
-- Acceptance target 1, player snag reduction: COMPLETED by collision simplification/static configuration; rendered movement QA remains manual.
-- Acceptance target 2, side-island lamp-routing mini-game: COMPLETED structurally and logically.
-- Acceptance target 3, portal galaxy/sleeve structure: COMPLETED structurally; rendered visual QA remains manual.
-- Acceptance target 4, volumetric clouds: COMPLETED structurally; rendered visual QA remains manual.
-- Acceptance target 5, finale larger unclipped six-line text: COMPLETED structurally; rendered responsive QA remains manual.
-- Acceptance target 6, ready for external review: PARTIAL until rendered gameplay QA confirms collision/visual feel.
+- `MAX_TEXT_LINES = 6` is the single source of truth for line allocation, wrapping, fitting, fallback, and validation.
+- The overlay now creates six `LineMask` controls and six `RichTextLabel` controls.
+- `_lines_fit()` checks line count, per-line width including horizontal padding, visual line height, and total visual height inside the 80% inner vine-frame safe rect.
+- Visual line height includes font height, outline, shadow Y offset, reveal offset, and vertical padding.
+- Unused masks and labels are hidden/reset before every layout pass.
+- Reveal uses the padded mask width and settles label Y back to its padded final position instead of the mask edge.
+- Six-line reveal stagger is capped so total reveal stays in the intended 6–9 second range.
 
-## Review Pass 2 — factual implementation check
-- Runtime values checked in changed files: COMPLETED.
-- Scene wiring checked for lamp node paths, ordered paths, barrier path, prompt nodes, and controller script: COMPLETED.
-- Interaction flow checked: COMPLETED in code; invalid selections deselect safely and do not advance state.
-- Soft-lock check: COMPLETED in code; invalid targets return selected endpoint to available endpoint.
-- Portal activation/deactivation checked in code: COMPLETED; sleeves are activation-driven and deactivated with the portal.
-- Finale layout checked in code: COMPLETED for 80% inner area and six-line wrapping.
-- Cloud integration checked in code: COMPLETED for generated lobe shadows/GI disabled.
-- Hidden runtime overrides checked: COMPLETED for touched systems; no unrelated progression rewrite made.
+## Lamp puzzle details
 
-## Review Pass 3 — review of verification
-- Missing slice check: COMPLETED; all slices 0–9 are represented.
-- Claimed vs implemented check: COMPLETED; claims are tied to actual scripts/scenes, with rendered QA honestly marked not performed.
-- Graphical QA claim check: COMPLETED; no rendered graphical QA is claimed.
-- Performance claim check: COMPLETED; no measured FPS/performance claim is made.
-- Handoff vs diff check: COMPLETED.
-- Report vs repository state check: COMPLETED.
+- Initial state creates two automatic beams: `SourceWarm → WarmRelay01` and `SourceMoon → MoonRelay01`.
+- Sources remain locked and are not valid link targets.
+- The first relay in each channel becomes `AVAILABLE_ENDPOINT`, so the player starts from the already-lit relay.
+- Route state stores the actual selected lamp sequence per channel.
+- After selecting an endpoint, the player can connect to any inactive relay or the matching channel destination.
+- Wrong relays create real beams and lock/assign the chosen lamp, but only the exact configured route completes a channel.
+- Wrong destinations mark the channel incorrect and expose source reset.
+- Resetting one channel removes non-initial beams for that channel, releases lamps after the first relay, restores the initial beam, and leaves the other channel intact.
+- Re-selecting the selected endpoint cancels selection.
+- Prompt text is centralized through `refresh_all_prompts()` and the reusable `WorldInteractionPrompt.set_action_text()` API.
+
+## Existing lamp visual binding
+
+Existing relay visual node paths used by the logical lamp anchors:
+
+- `LandmarkIsland01/Lantern/lantern_02` → `WarmRelay01`.
+- `LandmarkIsland01/Lantern/lantern_03` → `WarmRelay02`.
+- `LandmarkIsland01/Lantern/lantern_01` → `WarmRelay03`.
+- `LandmarkIsland01/Lantern/lantern_07` → `WarmRelay04`.
+- `LandmarkIsland01/Lantern/lantern_04` → `MoonRelay01`.
+- `LandmarkIsland01/Lantern/lantern_05` → `MoonRelay02`.
+- `LandmarkIsland01/Lantern/lantern_06` → `MoonRelay03`.
+
+Source/destination sockets prepared for manual replacement:
+
+- `SideIslandLampPuzzle/WarmSourceSocket`.
+- `SideIslandLampPuzzle/MoonSourceSocket`.
+- `SideIslandLampPuzzle/WarmDestinationSocket`.
+- `SideIslandLampPuzzle/MoonDestinationSocket`.
+
+All logical lamp `LampMesh` placeholders are `visible = false`; beam endpoints use child `BeamAnchor` nodes.
+
+## Portal details
+
+- Sleeve count: 5.
+- Motes per sleeve: 54.
+- Global rotation speed: 0.24, applied by decrementing `_global_rotation_phase` for counterclockwise motion.
+- Sleeve twist: `turn_count = 1.55`.
+- Stable-arm proof: sleeve Y is computed as `portal_center_y + sin(spiral_angle) * radius_y`, not by a monotonic bottom-to-top lerp.
+- Lower vortex group: `LowerVortexMotes`.
+- Lower vortex mote count: 56.
+- Galaxy mote count: 60.
+- Rim mote count: 72.
+- Total mote target: 458 configured instances (270 sleeves + 60 galaxy + 72 rim + 56 lower vortex), slightly above the 350–450 soft target but still within the explicit per-group budgets.
+
+## Collision root-cause analysis
+
+- Identified culprit: `StepAssistRoot/StepAssistRamp_04/StepAssistCapShape_04`.
+- Cause: the protruding cap collider overlapped the early start-route movement corridor near spawn and could catch the player capsule against the helper ramp edge.
+- Old state: `StepAssistCapShape_04` was enabled as a solid decorative/helper cap with an oversized box relative to the early-route corridor.
+- New state: only `StepAssistCapShape_04` is disabled; `StepAssistCapShape_01`, `StepAssistCapShape_02`, and `StepAssistCapShape_03` remain enabled.
+- Player `safe_margin` is restored to `0.01`; the fix no longer relies on a global safe-margin increase.
+- Spawn collision static validation passed for this targeted correction.
 
 ## Automated validation
-- `git status --short --branch --untracked-files=all`: passed during slice checks and final checks.
-- `git diff --check`: passed.
-- `git diff --stat`: reviewed.
-- `godot --headless --path . --quit --check-only`: passed.
-- `godot --headless --path . --script /tmp/validate_scripts.gd`: passed for changed/new scripts after editor import; earlier missing imported UI assets were resolved by import.
-- `godot --headless --path . --editor --quit`: PARTIAL. It started editor/import validation and registered the new global classes, but was stopped because full import was long-running in the container.
+
+- `git diff --check` — pass.
+- `godot --headless --path . --quit --check-only` — pass.
+- `timeout 300s godot --headless --editor --path . --quit` — pass, exit code 0.
+- `/tmp/validate_target_loads.gd` — pass for `Level_01.tscn`, `LevelPortal.tscn`, `LevelFinaleOverlay.tscn`, and `scenes/environment/assets/cloud_001.tscn`.
+- `/tmp/validate_light_route_runtime.gd` — pass for initial beams, cancel, wrong route beam, reset, correct warm/moon route, and barrier unlock.
+- `/tmp/validate_finale_six_lines.gd` — pass for 1/3/4/5/6 line cases at 1920×1080 and 1280×720; warnings were limited to the temporary test forcing size on an anchored control in headless mode.
+- `/tmp/validate_portal_targeted.gd` — pass for structural portal requirements and mote budgets.
+- `/tmp/validate_spawn_collisions.gd` — pass for specific culprit state and non-culprit caps.
 
 ## Targeted validation
-- Collision-focused validation: PARTIAL. Spawn/start/early-route scene configuration was inspected and collision cap shapes were disabled; rendered movement was not performed.
-- Lamp puzzle validation: PARTIAL. Code and scene wiring confirm two channels, relays, destinations, ordered paths, invalid handling, no lamp reuse, barrier unlock, prompts, and inspector-driven configuration. Full Level_01 runtime load is blocked by missing imported GLB resources in the headless loader.
-- Portal validation: PARTIAL. Code confirms lower ground vortex remains separate, five sleeves, counterclockwise updates, sparse galaxy motes, particle rim, activation/deactivation hooks, and removal of six/upward-lift emphasis. Rendered portal view was not performed.
-- Cloud scene validation: PARTIAL. Cloud lobe generation and no-shadow/no-GI behavior were checked in code; rendered cloud view was not performed.
-- Finale responsive-layout validation: PARTIAL. Layout code supports 1920x1080 and 1280x720 through viewport scaling and six-line 80% safe rect; rendered UI screenshots were not performed.
 
-## Graphical QA actually performed
-- Not performed. No rendered gameplay or screenshots were captured in this headless environment.
+- Lamp puzzle: COMPLETED by runtime script.
+- Finale responsive layout: COMPLETED by headless script; rendered visual QA still manual.
+- Portal targeted validation: COMPLETED by structural/script validation; rendered visual QA still manual.
+- Cloud scene load: COMPLETED by targeted load script.
+- Collision-focused validation: PARTIAL/COMPLETED for the documented culprit and static state; full rendered gameplay feel remains manual.
 
-## Performance actually measured
-- Not measured. Performance risk was mitigated structurally by using MultiMesh motes and modest particle counts, but no FPS/GPU measurements were taken.
+## Review Pass 1 — Against requirements
 
-## Remaining manual QA
-- Play from spawn through early route to verify the collision snag is gone.
-- Complete both lamp channels from a normal camera angle and confirm prompt readability/beam readability.
-- Try invalid lamp selections and repeated lamp interaction attempts in game.
-- Confirm lamp barrier fade/collision disable in rendered gameplay.
-- Activate/deactivate portal and inspect five sleeves, lower-third vortex, sparse motes, rim, and absence of white blob/upward-lift read.
-- Inspect cloud volume in rendered camera shots.
-- Verify Level_01 finale overlay at 1920x1080 and 1280x720 with approved text for no clipping.
-- Run a real performance benchmark around the active lamp puzzle and portal.
+- Finale six-line controls: COMPLETED.
+- Finale clipping prevention: COMPLETED by visual-bounds calculations and automated validation.
+- Lamp initial beams: COMPLETED.
+- Lamp free routing: COMPLETED.
+- Lamp wrong-route behavior: COMPLETED.
+- Lamp channel reset/backtracking: COMPLETED.
+- Lamp centralized prompt refresh: COMPLETED.
+- Existing seven relay lamp visuals: COMPLETED.
+- Beam robustness and BeamAnchor endpoints: COMPLETED.
+- Portal no vertical lift: COMPLETED by script formula; rendered QA still manual.
+- Lower-third vortex: COMPLETED.
+- Collision culprit: COMPLETED.
+- Editor import / Level_01 load / runtime validation: COMPLETED.
 
-## Godot project structure preservation
-- Godot project structure preserved: yes.
-- Gameplay implemented: yes, the requested side-island lamp mini-game gameplay slice was implemented.
-- Help Stone baked inscription changed: no.
+## Review Pass 2 — Actual runtime implementation
+
+- Reopened scripts, scene wiring, and portal/finale scene dependencies through targeted Godot load scripts.
+- Verified controller route state and prompt paths are runtime-driven, not only declarative.
+- Verified reset leaves the other channel intact in the runtime puzzle test.
+- Verified no procedural sphere placeholders are visible at runtime for logical lamp anchors.
+- Verified `Level_01.tscn` loads after editor import.
+
+## Review Pass 3 — Review the review
+
+- Route choice is free after endpoint selection: COMPLETED.
+- Wrong route creates a beam: COMPLETED.
+- Reset path exists and works: COMPLETED.
+- Six controls are allocated: COMPLETED.
+- Vertical fit is checked: COMPLETED.
+- Portal arms use non-monotonic Y: COMPLETED.
+- Lower-third vortex exists: COMPLETED.
+- Collision culprit is documented: COMPLETED.
+- Level_01 load is verified: COMPLETED.
+- Handoff matches diff: COMPLETED.
+
+## Graphical QA and performance
+
+- Graphical QA actually performed: no rendered gameplay capture was produced in this headless environment.
+- Performance actually measured: no frame-time benchmark was captured; only configured mote budgets were validated.
+- Remaining manual QA: rendered portal read, final overlay aesthetics at real display sizes, player feel around spawn/start route, and side-island lamp placement readability.
 
 ## Report path
-- docs/development/Level_01_Pre_External_Review_Corrective_Pass_Report.md
+
+`docs/development/Level_01_Pre_External_Review_Corrective_Pass_Report.md`

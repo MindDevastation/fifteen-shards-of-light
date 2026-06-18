@@ -4,9 +4,11 @@ class_name PortalLightSleeve3D
 const SLEEVE_COUNT := 5
 
 @export_range(32, 72, 1) var motes_per_sleeve: int = 54
-@export_range(40, 120, 1) var galaxy_mote_count: int = 72
-@export_range(48, 120, 1) var rim_mote_count: int = 80
+@export_range(40, 120, 1) var galaxy_mote_count: int = 60
+@export_range(48, 120, 1) var rim_mote_count: int = 72
+@export_range(40, 64, 1) var lower_vortex_mote_count: int = 56
 @export_range(1.2, 2.2, 0.05) var turn_count: float = 1.55
+@export_range(0.05, 0.8, 0.01) var sleeve_rotation_speed: float = 0.24
 @export_range(0.4, 0.8, 0.05) var depth_range: float = 0.62
 @export_range(0.04, 0.18, 0.005) var min_mote_size: float = 0.055
 @export_range(0.06, 0.24, 0.005) var max_mote_size: float = 0.145
@@ -22,6 +24,8 @@ var _streams: Array[MultiMeshInstance3D] = []
 var _multimeshes: Array[MultiMesh] = []
 var _galaxy_multimesh: MultiMesh
 var _rim_multimesh: MultiMesh
+var _lower_vortex_multimesh: MultiMesh
+var _global_rotation_phase := 0.0
 
 func _ready() -> void:
 	_build_streams()
@@ -31,6 +35,7 @@ func _process(delta: float) -> void:
 	if _activation <= 0.001:
 		return
 	_time += delta
+	_global_rotation_phase -= delta * sleeve_rotation_speed
 	_update_streams()
 
 func set_activation(value: float) -> void:
@@ -65,6 +70,7 @@ func _build_streams() -> void:
 		_multimeshes.append(multimesh)
 	_galaxy_multimesh = _make_multimesh("SparseGalaxyMotes", galaxy_mote_count, material)
 	_rim_multimesh = _make_multimesh("ParticleRimMotes", rim_mote_count, material)
+	_lower_vortex_multimesh = _make_multimesh("LowerVortexMotes", lower_vortex_mote_count, material)
 
 func _make_multimesh(node_name: String, count: int, material: ShaderMaterial) -> MultiMesh:
 	var mesh := SphereMesh.new()
@@ -97,35 +103,28 @@ func _update_streams() -> void:
 		_update_stream(sleeve_index, _multimeshes[sleeve_index])
 	_update_galaxy_motes()
 	_update_rim_motes()
+	_update_lower_vortex_motes()
 
 func _update_stream(sleeve_index: int, multimesh: MultiMesh) -> void:
-	var phase := float(sleeve_index) / float(SLEEVE_COUNT)
-	var base_angle := phase * TAU
+	var base_angle := float(sleeve_index) * TAU / float(SLEEVE_COUNT)
+	var activation_eased := _get_activation_eased()
 	for mote_index in range(motes_per_sleeve):
-		var t := float(mote_index) / float(maxi(1, motes_per_sleeve - 1))
-		var flow := fmod(t + _time * flow_speed * 0.18 + phase, 1.0)
-		var radial := lerpf(0.24, 1.18, flow)
-		var angle := base_angle + flow * turn_count * TAU + _time * flow_speed * 0.16
-		var scatter_seed := _hash_01(sleeve_index * 97 + mote_index * 13)
-		var side_jitter := (scatter_seed - 0.5) * 0.16
-		var height := lerpf(-0.45, 1.24, flow) + sin(flow * TAU * 1.7 + phase * TAU) * 0.10
-		var depth := sin(flow * turn_count * TAU + base_angle) * depth_range * 0.5 + side_jitter
-		var position := Vector3(cos(angle) * radial, height + 1.55, sin(angle) * radial * 0.42 + depth)
+		var u := float(mote_index) / float(maxi(1, motes_per_sleeve - 1))
+		var local_flow := sin(_time * 0.45 + float(mote_index) * 0.19) * 0.018
+		var spiral_u := clampf(u + local_flow, 0.0, 1.0)
+		var spiral_angle := base_angle + _global_rotation_phase + spiral_u * turn_count * TAU
+		var radius_x := lerpf(0.16, 1.15, u)
+		var radius_y := lerpf(0.12, 1.42, u)
+		var depth := sin(spiral_angle * 1.25 + float(sleeve_index)) * depth_range * 0.22
+		var jitter := (_hash_01(sleeve_index * 97 + mote_index * 13) - 0.5) * 0.035
+		var position := Vector3(cos(spiral_angle) * radius_x + jitter, 1.55 + sin(spiral_angle) * radius_y, depth)
 		var size_variation := lerpf(min_mote_size, max_mote_size, _hash_01(mote_index * 29 + sleeve_index * 41))
-		var pulse := 0.74 + 0.26 * sin(_time * 3.4 + float(mote_index) * 0.47 + phase * TAU)
-		var activation_eased := _get_activation_eased()
-		var activation_scale := lerpf(0.04, 1.0, activation_eased)
-		var final_scale := size_variation * pulse * activation_scale
-		var basis := Basis().scaled(Vector3.ONE * final_scale)
-		multimesh.set_instance_transform(mote_index, Transform3D(basis, position))
+		var pulse := 0.74 + 0.26 * sin(_time * 2.2 + float(mote_index) * 0.47 + base_angle)
+		var final_scale := size_variation * pulse * lerpf(0.04, 1.0, activation_eased)
+		multimesh.set_instance_transform(mote_index, Transform3D(Basis().scaled(Vector3.ONE * final_scale), position))
 		var alpha := sleeve_color.a * activation_eased * lerpf(0.58, 1.0, pulse)
 		var brightness := lerpf(0.72, 1.0, pulse)
-		multimesh.set_instance_color(mote_index, Color(
-			sleeve_color.r * brightness,
-			sleeve_color.g * brightness,
-			sleeve_color.b * brightness,
-			alpha
-		))
+		multimesh.set_instance_color(mote_index, Color(sleeve_color.r * brightness, sleeve_color.g * brightness, sleeve_color.b * brightness, alpha))
 
 func _update_galaxy_motes() -> void:
 	if _galaxy_multimesh == null:
@@ -156,6 +155,22 @@ func _update_rim_motes() -> void:
 		var size := lerpf(0.028, 0.07, _hash_01(mote_index * 67)) * activation_eased
 		_rim_multimesh.set_instance_transform(mote_index, Transform3D(Basis().scaled(Vector3.ONE * size), position))
 		_rim_multimesh.set_instance_color(mote_index, Color(1.0, 0.70, 0.32, 0.58 * activation_eased))
+
+func _update_lower_vortex_motes() -> void:
+	if _lower_vortex_multimesh == null:
+		return
+	var activation_eased := _get_activation_eased()
+	var center_y := 0.62
+	for mote_index in range(lower_vortex_mote_count):
+		var u := float(mote_index) / float(maxi(1, lower_vortex_mote_count - 1))
+		var angle := u * TAU * 2.6 - _time * 0.42
+		var radius := lerpf(0.42, 0.08, u)
+		var y := center_y + sin(angle * 0.75) * 0.22
+		var position := Vector3(cos(angle) * radius, y, sin(angle) * radius * 0.20)
+		var pulse := 0.72 + 0.28 * sin(_time * 1.8 + float(mote_index) * 0.31)
+		var size := lerpf(0.026, 0.060, _hash_01(mote_index * 83)) * pulse * activation_eased
+		_lower_vortex_multimesh.set_instance_transform(mote_index, Transform3D(Basis().scaled(Vector3.ONE * size), position))
+		_lower_vortex_multimesh.set_instance_color(mote_index, Color(1.0, 0.66, 0.28, 0.50 * activation_eased * pulse))
 
 func _get_activation_eased() -> float:
 	return smoothstep(0.0, 1.0, _activation)
