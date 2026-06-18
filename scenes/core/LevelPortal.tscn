@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3]
+[gd_scene load_steps=22 format=3]
 [ext_resource type="Script" path="res://scripts/core/level_portal.gd" id="1_level_portal"]
 [ext_resource type="Shader" path="res://shaders/vfx/level_portal_surface.gdshader" id="2_surface_shader"]
 [ext_resource type="Shader" path="res://shaders/vfx/level_portal_ring.gdshader" id="3_ring_shader"]
@@ -7,18 +7,19 @@
 [ext_resource type="Texture2D" path="res://resources/vfx/level_portal_swirl_noise.tres" id="5_noise"]
 [ext_resource type="Gradient" path="res://resources/vfx/level_portal_particle_gradient.tres" id="6_gradient"]
 [ext_resource type="PackedScene" path="res://scenes/ui/WorldInteractionPrompt.tscn" id="7_prompt"]
+[ext_resource type="PackedScene" path="res://scenes/vfx/PortalLightSleeve3D.tscn" id="9_sleeves"]
 [sub_resource type="ShaderMaterial" id="SurfaceMat"]
 shader = ExtResource("2_surface_shader")
 shader_parameter/swirl_noise = ExtResource("5_noise")
 shader_parameter/activation = 0.0
 shader_parameter/phase_offset = 0.0
 shader_parameter/strand_density = 6.0
-shader_parameter/radial_density = 28.0
-shader_parameter/rotation_speed = 0.42
-shader_parameter/layer_alpha = 0.42
-shader_parameter/base_alpha = 0.045
-shader_parameter/arm_alpha = 0.27
-shader_parameter/emission_strength = 1.15
+shader_parameter/radial_density = 16.0
+shader_parameter/rotation_speed = 0.67
+shader_parameter/layer_alpha = 0.36
+shader_parameter/base_alpha = 0.026
+shader_parameter/arm_alpha = 0.085
+shader_parameter/emission_strength = 0.72
 [sub_resource type="ShaderMaterial" id="RingMat"]
 shader = ExtResource("3_ring_shader")
 shader_parameter/activation = 0.0
@@ -51,13 +52,13 @@ direction = Vector3(-1, 0, 0)
 spread = 28.0
 gravity = Vector3(0, 0, 0)
 initial_velocity_min = 0.16
-initial_velocity_max = 0.38
+initial_velocity_max = 0.32
 angular_velocity_min = -150.0
 angular_velocity_max = -80.0
 radial_velocity_min = -0.025
 radial_velocity_max = 0.035
-scale_min = 0.045
-scale_max = 0.105
+scale_min = 0.035
+scale_max = 0.075
 color_ramp = SubResource("ParticleColor")
 [sub_resource type="BoxShape3D" id="InteractionShape"]
 size = Vector3(3.0, 3.0, 2.2)
@@ -126,10 +127,12 @@ material_override = SubResource("GroundMat")
 [node name="OrbitMotes" type="GPUParticles3D" parent="VisualRoot"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.575, 0)
 emitting = false
-amount = 96
-lifetime = 1.65
+amount = 48
+lifetime = 1.15
 visibility_aabb = AABB(-1.9, -1.9, -0.35, 3.8, 3.8, 0.7)
 process_material = SubResource("OrbitProcess")
+[node name="PortalLightSleeve3D" parent="VisualRoot" instance=ExtResource("9_sleeves")]
+
 [node name="PortalLight" type="OmniLight3D" parent="VisualRoot"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
 light_color = Color(1, 0.68, 0.32, 1)

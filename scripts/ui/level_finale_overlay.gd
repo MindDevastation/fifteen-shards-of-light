@@ -17,15 +17,16 @@ const VINE_INNER_COLOR := Color(1.0, 0.92, 0.70, 0.98)
 const BRANCH_WIDTHS := Vector3(9.0, 4.2, 1.4)
 const REWARD_FONT: FontFile = preload("res://assets/fonts/cormorant_garamond/CormorantGaramond-SemiBoldItalic.otf")
 const VINE_LEAF_TEXTURE: Texture2D = preload("res://assets/ui/shard_reward_overlay/vine_leaf.png")
+const LEAF_STEM_ANCHOR_UV := Vector2(0.235, 0.855)
 
 @export var text_start_delay: float = 0.72
-@export var line_reveal_duration: float = 12.0
-@export var line_reveal_stagger: float = 3.6
+@export var line_reveal_duration: float = 4.6
+@export var line_reveal_stagger: float = 0.55
 @export var vine_duration: float = 3.7
 @export var atmosphere_open_duration: float = 0.42
-@export var text_close_duration: float = 0.40
-@export var vine_close_duration: float = 0.62
-@export var atmosphere_close_duration: float = 0.58
+@export var text_close_duration: float = 1.00
+@export var vine_close_duration: float = 1.55
+@export var atmosphere_close_duration: float = 1.45
 
 var _full_text := ""
 var _can_confirm := false
@@ -41,6 +42,8 @@ var _branch_data: Array[Dictionary] = []
 var _leaf_data: Array[Dictionary] = []
 var _line_masks: Array[Control] = []
 var _line_labels: Array[RichTextLabel] = []
+var _frame_rect := Rect2()
+var _text_safe_rect := Rect2()
 var _active_tweens: Array[Tween] = []
 
 @onready var atmosphere: Control = $Atmosphere
@@ -115,9 +118,12 @@ func _reveal_text_async() -> void:
 			continue
 		var label := _line_labels[i]
 		var delay := float(i) * line_reveal_stagger
-		mask.size.x = label.size.x
-		tween.tween_property(label, "position:y", 0.0, line_reveal_duration).set_delay(delay).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-		tween.tween_property(label, "modulate:a", 1.0, line_reveal_duration).set_delay(delay).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+		var final_x := mask.size.x
+		mask.clip_contents = true
+		mask.size.x = 0.0
+		tween.tween_property(mask, "size:x", final_x, line_reveal_duration).set_delay(delay).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		tween.tween_property(label, "position:y", 0.0, line_reveal_duration * 0.72).set_delay(delay).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		tween.tween_property(label, "modulate:a", 1.0, line_reveal_duration * 0.86).set_delay(delay).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	await tween.finished
 	_text_complete = true
 	_try_enable_button()
@@ -174,6 +180,7 @@ func _reset_visuals() -> void:
 func _apply_responsive_layout() -> void:
 	var vp := _viewport_size()
 	var scale_factor := clampf(vp.y / 1080.0, 0.72, 1.08)
+	_update_frame_and_text_safe_rect()
 	var button_size := clampf(vp.y * 0.152, 120.0, 164.0)
 	fox_button.size = Vector2.ONE * button_size
 	fox_button.position = Vector2((vp.x - button_size) * 0.5, vp.y * 0.795)
@@ -185,10 +192,9 @@ func _layout_text_lines(scale_factor: float) -> void:
 	var layout := _layout_finale_text(_full_text, scale_factor)
 	var lines := layout["lines"] as Array[String]
 	var font_size := int(layout["font_size"])
-	var vp := _viewport_size()
-	var line_height := 58.0 * scale_factor
+	var line_height := minf(58.0 * scale_factor, _text_safe_rect.size.y / maxf(float(lines.size()), 1.0))
 	var total_height := line_height * float(lines.size())
-	var start_y := vp.y * 0.405 - total_height * 0.5
+	var start_y := _text_safe_rect.position.y + (_text_safe_rect.size.y - total_height) * 0.5
 	_reset_line_masks()
 	for i in range(lines.size()):
 		var label := _line_labels[i]
@@ -201,7 +207,8 @@ func _layout_text_lines(scale_factor: float) -> void:
 		label.modulate.a = 0.0
 		var mask := _line_masks[i]
 		mask.visible = true
-		mask.position = Vector2((vp.x - width) * 0.5 - vp.x * 0.055, start_y + line_height * float(i))
+		mask.clip_contents = true
+		mask.position = Vector2(_text_safe_rect.position.x + (_text_safe_rect.size.x - width) * 0.5, start_y + line_height * float(i))
 		mask.size = Vector2(width, line_height)
 
 func _layout_finale_text(text: String, scale_factor: float) -> Dictionary:
@@ -256,18 +263,31 @@ func _lines_fit(lines: Array[String], font_size: int, scale_factor: float) -> bo
 	return true
 
 func _safe_text_width(scale_factor: float) -> float:
+	if _text_safe_rect.size.x > 1.0:
+		return _text_safe_rect.size.x
 	return clampf(_viewport_size().x * 0.40, 600.0 * scale_factor, 760.0 * scale_factor)
+
+func _update_frame_and_text_safe_rect() -> void:
+	var vp := _viewport_size()
+	_frame_rect = Rect2(Vector2(vp.x * 0.17, vp.y * 0.16), Vector2(vp.x * 0.66, vp.y * 0.56))
+	var inner_margin := Vector2(vp.x * 0.055, vp.y * 0.065)
+	var inner_rect := _frame_rect.grow_individual(-inner_margin.x, -inner_margin.y, -inner_margin.x, -inner_margin.y)
+	_text_safe_rect = Rect2(
+		inner_rect.position + inner_rect.size * 0.125,
+		inner_rect.size * 0.75
+	)
 
 func _build_vines() -> void:
 	_clear_branches_and_leaves()
 	var vp := _viewport_size()
+	_update_frame_and_text_safe_rect()
 	var center_x := vp.x * 0.5
 	var fox_top := Vector2(center_x, fox_button.position.y + 12.0)
 	var overlap := Vector2(0, 12.0)
-	var left := vp.x * 0.17
-	var right := vp.x * 0.83
-	var top := vp.y * 0.16
-	var bottom := vp.y * 0.72
+	var left := _frame_rect.position.x
+	var right := _frame_rect.position.x + _frame_rect.size.x
+	var top := _frame_rect.position.y
+	var bottom := _frame_rect.position.y + _frame_rect.size.y
 	var radius := vp.y * 0.065
 	_left_points = _build_side_curve(fox_top + overlap, Vector2(center_x - vp.x * 0.16, bottom), Vector2(left, bottom - radius), Vector2(left, top + radius), Vector2(center_x, top), -1)
 	_right_points = _build_side_curve(fox_top + overlap, Vector2(center_x + vp.x * 0.16, bottom), Vector2(right, bottom - radius), Vector2(right, top + radius), Vector2(center_x, top), 1)
@@ -371,12 +391,23 @@ func _build_leaf_geometry() -> void:
 			var leaf := Sprite2D.new()
 			leaf.texture = VINE_LEAF_TEXTURE
 			leaf.centered = true
-			leaf.position = sample["position"] as Vector2
-			leaf.rotation = float(sample["angle"]) + (0.55 if i % 2 == 0 else -0.55) * float(side)
+			var leaf_angle := float(sample["angle"]) + (0.55 if i % 2 == 0 else -0.55) * float(side)
+			var branch_position := sample["position"] as Vector2
+			var texture_size := leaf.texture.get_size()
+			var local_texture_anchor := (LEAF_STEM_ANCHOR_UV - Vector2(0.5, 0.5)) * texture_size
+			leaf.position = branch_position
+			leaf.rotation = leaf_angle
 			leaf.scale = Vector2.ZERO
 			leaf.modulate = Color(1.0, 0.84, 0.52, 0.0)
 			leaf_layer.add_child(leaf)
-			_leaf_data.append({"node": leaf, "side": side, "progress": float(branch.get("progress", 0.0)) + 0.035, "scale": lerpf(0.64, 1.08, _hash_01(i, side + 31))})
+			_leaf_data.append({
+				"node": leaf,
+				"side": side,
+				"progress": float(branch.get("progress", 0.0)) + 0.035,
+				"scale": lerpf(0.64, 1.08, _hash_01(i, side + 31)),
+				"branch_position": branch_position,
+				"local_texture_anchor": local_texture_anchor,
+			})
 
 func _update_decorations() -> void:
 	for data in _branch_data:
@@ -390,7 +421,11 @@ func _update_decorations() -> void:
 		var local := clampf((progress - float(data["progress"])) / 0.10, 0.0, 1.0)
 		var eased := sin(local * PI * 0.5)
 		var leaf := data["node"] as Sprite2D
-		leaf.scale = Vector2.ONE * eased * float(data["scale"]) * 0.048 * _viewport_size().y / 1024.0
+		var final_scale := Vector2.ONE * eased * float(data["scale"]) * 0.048 * _viewport_size().y / 1024.0
+		var local_texture_anchor := data["local_texture_anchor"] as Vector2
+		var scaled_anchor := Vector2(local_texture_anchor.x * final_scale.x, local_texture_anchor.y * final_scale.y)
+		leaf.scale = final_scale
+		leaf.position = (data["branch_position"] as Vector2) - scaled_anchor.rotated(leaf.rotation)
 		leaf.modulate.a = eased * 0.92
 
 func _sample_path(points: PackedVector2Array, progress: float, offset: float) -> Dictionary:

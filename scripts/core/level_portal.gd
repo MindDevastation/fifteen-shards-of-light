@@ -1,9 +1,9 @@
 extends Node3D
 
 const PORTAL_LAYER_PHASE_OFFSETS: Array[float] = [0.000, 0.012, -0.012, 0.022, -0.022, 0.032]
-const PORTAL_LAYER_ROTATION_SPEEDS: Array[float] = [0.510, 0.515, 0.505, 0.520, 0.500, 0.525]
-const PORTAL_LAYER_ALPHAS: Array[float] = [0.28, 0.34, 0.42, 0.42, 0.34, 0.28]
-const PORTAL_LAYER_RADIAL_DENSITIES: Array[float] = [40.0, 40.3, 39.7, 40.5, 39.5, 40.2]
+const PORTAL_LAYER_ROTATION_SPEEDS: Array[float] = [0.670, 0.680, 0.660, 0.690, 0.665, 0.675]
+const PORTAL_LAYER_ALPHAS: Array[float] = [0.30, 0.38, 0.48, 0.48, 0.38, 0.30]
+const PORTAL_LAYER_RADIAL_DENSITIES: Array[float] = [15.6, 15.9, 15.4, 16.1, 15.5, 15.8]
 
 
 signal activation_started
@@ -49,6 +49,7 @@ var _transition_finished_callback := Callable()
 @onready var interaction_area: Area3D = $InteractionArea
 @onready var interaction_shape: CollisionShape3D = $InteractionArea/CollisionShape3D
 @onready var orbit_motes: GPUParticles3D = $VisualRoot/OrbitMotes
+@onready var light_sleeves: Node3D = $VisualRoot/PortalLightSleeve3D
 @onready var portal_light: OmniLight3D = $VisualRoot/PortalLight
 @onready var prompt: CanvasLayer = $WorldInteractionPrompt
 
@@ -225,6 +226,8 @@ func _set_ring_activation(value: float) -> void:
 func _set_surface_activation(value: float) -> void:
 	for mat in _strand_materials:
 		mat.set_shader_parameter("activation", value)
+	if light_sleeves != null and light_sleeves.has_method("set_activation"):
+		light_sleeves.call("set_activation", value)
 
 func _set_back_veil_activation(value: float) -> void:
 	if _back_veil_material != null:
@@ -247,6 +250,8 @@ func _deactivate() -> void:
 	set_process(false)
 	_set_interaction_enabled(false)
 	orbit_motes.emitting = false
+	if light_sleeves != null and light_sleeves.has_method("set_activation"):
+		light_sleeves.call("set_activation", 0.0)
 	portal_light.light_energy = 0.0
 	if prompt.has_method("hide_prompt"):
 		prompt.call("hide_prompt")
