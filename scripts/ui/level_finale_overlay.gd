@@ -192,7 +192,7 @@ func _layout_text_lines(scale_factor: float) -> void:
 	var layout := _layout_finale_text(_full_text, scale_factor)
 	var lines := layout["lines"] as Array[String]
 	var font_size := int(layout["font_size"])
-	var line_height := minf(58.0 * scale_factor, _text_safe_rect.size.y / maxf(float(lines.size()), 1.0))
+	var line_height := minf(64.0 * scale_factor, _text_safe_rect.size.y / maxf(float(lines.size()), 1.0))
 	var total_height := line_height * float(lines.size())
 	var start_y := _text_safe_rect.position.y + (_text_safe_rect.size.y - total_height) * 0.5
 	_reset_line_masks()
@@ -213,23 +213,23 @@ func _layout_text_lines(scale_factor: float) -> void:
 
 func _layout_finale_text(text: String, scale_factor: float) -> Dictionary:
 	var normalized := _normalize_text(text)
-	for base_size in [48, 44, 40]:
+	for base_size in [56, 52, 48, 44]:
 		var font_size := int(round(float(base_size) * scale_factor))
 		var explicit := normalized.split("\n", false)
 		var result: Array[String] = []
 		if explicit.size() > 1:
 			for part in explicit:
-				result.append_array(_word_wrap(part, font_size, maxi(1, 3 - result.size()), scale_factor))
+				result.append_array(_word_wrap(part, font_size, maxi(1, 6 - result.size()), scale_factor))
 		else:
-			result = _word_wrap(normalized.replace("\n", " "), font_size, 3, scale_factor)
-		if result.size() <= 3 and _lines_fit(result, font_size, scale_factor):
+			result = _word_wrap(normalized.replace("\n", " "), font_size, 6, scale_factor)
+		if result.size() <= 6 and _lines_fit(result, font_size, scale_factor):
 			return {"lines": result, "font_size": font_size}
-	var fallback := _word_wrap(normalized.replace("\n", " "), int(round(40.0 * scale_factor)), 3, scale_factor)
-	while fallback.size() > 3:
-		fallback[2] = "%s %s" % [fallback[2], fallback.pop_back()]
+	var fallback := _word_wrap(normalized.replace("\n", " "), int(round(44.0 * scale_factor)), 6, scale_factor)
+	while fallback.size() > 6:
+		fallback[5] = "%s %s" % [fallback[5], fallback.pop_back()]
 	for i in range(fallback.size()):
 		fallback[i] = fallback[i].strip_edges()
-	return {"lines": fallback, "font_size": int(round(40.0 * scale_factor))}
+	return {"lines": fallback, "font_size": int(round(44.0 * scale_factor))}
 
 func _word_wrap(text: String, font_size: int, max_lines: int, scale_factor: float) -> Array[String]:
 	var words: PackedStringArray = text.split(" ", false)
@@ -255,7 +255,7 @@ func _word_wrap(text: String, font_size: int, max_lines: int, scale_factor: floa
 	return lines
 
 func _lines_fit(lines: Array[String], font_size: int, scale_factor: float) -> bool:
-	if lines.size() > 3:
+	if lines.size() > 6:
 		return false
 	for line in lines:
 		if REWARD_FONT.get_string_size(line, HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size).x > _safe_text_width(scale_factor):
@@ -273,8 +273,8 @@ func _update_frame_and_text_safe_rect() -> void:
 	var inner_margin := Vector2(vp.x * 0.055, vp.y * 0.065)
 	var inner_rect := _frame_rect.grow_individual(-inner_margin.x, -inner_margin.y, -inner_margin.x, -inner_margin.y)
 	_text_safe_rect = Rect2(
-		inner_rect.position + inner_rect.size * 0.125,
-		inner_rect.size * 0.75
+		inner_rect.position + inner_rect.size * 0.10,
+		inner_rect.size * 0.80
 	)
 
 func _build_vines() -> void:
@@ -512,7 +512,10 @@ func _configure_label(label: RichTextLabel, font_size: int) -> void:
 	label.add_theme_font_size_override("bold_italics_font_size", font_size)
 	label.add_theme_color_override("default_color", TEXT_COLOR)
 	label.add_theme_color_override("font_outline_color", TEXT_OUTLINE_COLOR)
-	label.add_theme_constant_override("outline_size", int(round(5.0 * _viewport_size().y / 1080.0)))
+	label.add_theme_constant_override("outline_size", int(round(7.0 * _viewport_size().y / 1080.0)))
+	label.add_theme_color_override("font_shadow_color", Color(0.55, 0.24, 0.08, 0.42))
+	label.add_theme_constant_override("shadow_offset_x", int(round(2.0 * _viewport_size().y / 1080.0)))
+	label.add_theme_constant_override("shadow_offset_y", int(round(3.0 * _viewport_size().y / 1080.0)))
 
 func _configure_tip_glows() -> void:
 	var poly := PackedVector2Array([Vector2(0, -10), Vector2(10, 0), Vector2(0, 10), Vector2(-10, 0)])
