@@ -241,3 +241,93 @@ Still required in a rendered gameplay/video pass:
 ## Performance status
 
 Performance not measured. No average FPS, 1% low, p95 frame time, or active-portal regression percentage was captured in this environment.
+
+## Portal Sleeve Material and Runtime Validation
+
+Follow-up corrective review found that the sleeve `MultiMesh` streams already enabled `use_colors`, but the previous `StandardMaterial3D` did not explicitly consume the instance/vertex color channel. The mote material is now a dedicated `ShaderMaterial` using `shaders/vfx/portal_light_mote.gdshader`.
+
+Material behavior:
+- `MultiMesh.use_colors = true` remains enabled for every sleeve stream.
+- `multimesh.set_instance_color()` writes per-mote RGB brightness variation and per-mote alpha.
+- The shader reads `COLOR` and multiplies it into `ALBEDO`, `ALPHA`, and `EMISSION`.
+- `base_color` is white in the material so the per-instance sleeve color is not double-tinted.
+- `emission_strength = 1.65` remains the shared intensity control.
+
+Activation behavior:
+- scale uses `smoothstep(0.0, 1.0, _activation)` and `lerpf(0.04, 1.0, activation_eased)`, so the first visible activation samples start near zero instead of roughly 45% of final size.
+- alpha uses `sleeve_color.a * activation_eased * lerpf(0.58, 1.0, pulse)`, so fade-in and fade-out follow the same eased activation curve as scale.
+- visibility/process gating now uses `activation > 0.0001`, keeping the sleeve active through the final near-zero fade samples and disabling processing once fully inactive.
+
+Validation result:
+- `/tmp/validate_portal_sleeve_material.gd` loaded `res://scenes/vfx/PortalLightSleeve3D.tscn`, found 6 `MultiMeshInstance3D` streams, 64 motes per stream, `use_colors = true`, and the `ShaderMaterial` path `res://shaders/vfx/portal_light_mote.gdshader`.
+- The validation confirmed the shader source consumes `COLOR` in the alpha/emission path and sampled the activation curves: scale at activation `0.10` was `0.00495` versus `0.07400` at activation `1.00`; alpha at activation `0.10` was `0.02045` versus `0.73046` at activation `1.00`.
+- Note: Godot 4.6.2 headless uses a dummy renderer for `MultiMesh` readback, so `get_instance_transform()`/`get_instance_color()` do not return the written render-server values in this environment. The validation therefore verifies scene wiring, material type, shader source consumption of `COLOR`, lifecycle visibility/process state, and the same activation formulas used by runtime code.
+
+## Cloud Quality Controller Compatibility
+
+The old `scripts/environment/cloud_quality_controller.gd` was fully audited against the new `scripts/environment/stylized_cloud_volume_cluster.gd` and `scenes/environment/assets/cloud_001.tscn`.
+
+| Responsibility | Still needed | Preserved by new script | Action |
+| --- | --- | --- | --- |
+| Assign shared stylized cloud material | yes | yes | `StylizedCloudVolumeCluster` now extends `CloudQualityController` and calls `super._ready()`. |
+| Disable shadows on cloud geometry | yes | yes | Inherited recursive traversal applies `SHADOW_CASTING_SETTING_OFF`. |
+| Disable GI on mesh instances | yes | yes | Inherited traversal preserves `gi_mode = GI_MODE_DISABLED`. |
+| Traverse child mesh hierarchy | yes | yes | Inherited recursive traversal is reused for imported GLB children. |
+| Runtime/editor initialization in `_ready()` | yes | yes | New script calls `super._ready()` before building volume lobes. |
+| Distance/LOD behavior | no | not applicable | Old controller did not implement distance or LOD behavior. |
+| Visibility control | no | not applicable | Old controller did not implement custom visibility control. |
+| Platform-specific optimization | no | not applicable | Old controller did not implement platform-specific branches. |
+| Build 5 structural lobes | yes, new requirement | yes | New script builds `VolumeLobes` after inherited material/quality setup. |
+
+Compatibility action: inheritance was chosen so the imported GLB child traversal, material assignment, shadow disabling, and GI disabling remain centralized in `CloudQualityController` while the new volume builder only owns the five-lobe structural cloud geometry.
+
+## Godot Import and Targeted Runtime Validation
+
+Godot editor import:
+- command: `timeout 300s godot --headless --editor --path . --quit`
+- exit code: `0`
+- result: completed asset scan, reimport, post-reimport operations, and editor layout load without parse errors, shader compilation errors, or failed loads in the observed output.
+
+Targeted scene load:
+- `/tmp/targeted_load_pr93.gd` loaded and instantiated:
+  - `res://scenes/vfx/PortalLightSleeve3D.tscn`;
+  - `res://scenes/core/LevelPortal.tscn`;
+  - `res://scenes/environment/assets/cloud_001.tscn`;
+  - `res://scenes/core/SoulOrbInteractionPrompt.tscn`;
+  - `res://scenes/core/SoulOrb_World.tscn`;
+  - `res://scenes/ui/LevelFinaleOverlay.tscn`;
+  - `res://scenes/levels/Level_01.tscn`.
+- LevelPortal targeted activation check found 6 sleeve streams and verified sleeve visibility at activation `1.0` and clean visibility/process shutdown at activation `0.0`.
+- Cloud targeted load found `VolumeLobes`, 5 lobe meshes, and 5 unique z offsets.
+- Finale responsive validation checked 1920x1080 and 1280x720 safe-width formulas with 3 lines inside the 75% safe area.
+
+## Corrective Follow-up Review Pass 1 — Requirements
+
+- MultiMesh material honors instance RGB: COMPLETED; the mote shader consumes `COLOR.rgb` into albedo/emission.
+- MultiMesh material honors instance alpha: COMPLETED; the mote shader consumes `COLOR.a` into `ALPHA` and emission strength.
+- Activation fade visible in data/formula: COMPLETED; activation `0.10` alpha is much lower than activation `1.0`.
+- Activation scale starts near zero: COMPLETED; activation scale starts at `0.04` of the eased final size.
+- 6 streams × 64 motes preserved: COMPLETED.
+- Cloud controller responsibility checked: COMPLETED.
+- Editor import completed with exit code 0: COMPLETED.
+- Targeted scene load completed: COMPLETED.
+- PR body update: COMPLETED via final PR metadata update in this handoff.
+
+## Corrective Follow-up Review Pass 2 — Actual runtime code
+
+- `portal_light_sleeve_3d.gd` creates six `MultiMeshInstance3D` streams and assigns one shader-backed mote material to their sphere mesh.
+- `portal_light_mote.gdshader` explicitly uses `COLOR` for per-instance RGB/alpha.
+- `level_portal.gd` still drives sleeve activation from `_set_surface_activation()` and deactivates sleeves from `_deactivate()`.
+- `LevelPortal.tscn` still instances `PortalLightSleeve3D` under `VisualRoot` and keeps `OrbitMotes.amount = 48`.
+- `stylized_cloud_volume_cluster.gd` now inherits old cloud quality behavior and then builds five volume lobes.
+- `cloud_quality_controller.gd` remains the single recursive material/shadow/GI controller for imported cloud meshes.
+- `cloud_001.tscn` still uses the volumetric cluster script.
+- `level_finale_overlay.gd` retains the 75% safe text rect, faster reveal timings, slower close timings, and texture-relative leaf anchor.
+
+## Corrective Follow-up Review Pass 3 — Review the review
+
+- The instance-color fix is not claimed merely from `use_colors = true`; the shader source consumes `COLOR` directly.
+- The editor import pass is only claimed for the run that exited with code `0`.
+- Targeted scenes were actually loaded and instanced by `/tmp/targeted_load_pr93.gd`.
+- Cloud quality behavior was not assumed; the old controller was read and inherited to preserve recursive material/shadow/GI logic.
+- No rendered graphical QA or performance measurements were performed in this headless pass, so both remain manual/NOT MEASURED.

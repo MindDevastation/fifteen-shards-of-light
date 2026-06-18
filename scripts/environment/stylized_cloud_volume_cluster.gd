@@ -1,7 +1,6 @@
-extends Node3D
+extends "res://scripts/environment/cloud_quality_controller.gd"
 class_name StylizedCloudVolumeCluster
 
-const CLOUD_MATERIAL := preload("res://resources/environment/stylized_cloud_material.tres")
 const LOBE_LAYOUT := [
 	{"name": "BackLobe", "position": Vector3(-0.18, 0.06, 0.26), "scale": Vector3(1.35, 0.54, 0.62), "shadow": 0.145, "highlight": 0.082},
 	{"name": "MiddleLobe", "position": Vector3(0.0, 0.0, 0.0), "scale": Vector3(1.55, 0.62, 0.72), "shadow": 0.125, "highlight": 0.105},
@@ -11,16 +10,8 @@ const LOBE_LAYOUT := [
 ]
 
 func _ready() -> void:
-	_apply_shadowless_soft_cloud_material(self)
+	super._ready()
 	_build_volume_lobes()
-
-func _apply_shadowless_soft_cloud_material(root: Node) -> void:
-	if root is MeshInstance3D:
-		var mesh_instance := root as MeshInstance3D
-		mesh_instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		mesh_instance.material_override = CLOUD_MATERIAL
-	for child in root.get_children():
-		_apply_shadowless_soft_cloud_material(child)
 
 func _build_volume_lobes() -> void:
 	if has_node("VolumeLobes"):
