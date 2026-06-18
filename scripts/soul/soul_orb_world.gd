@@ -3,7 +3,7 @@ extends Node3D
 signal collected
 
 const SOUL_ORB_FOLLOW_SCENE := preload("res://scenes/core/SoulOrb_Follow.tscn")
-const INTERACTION_PROMPT_TEXT := "Коснуться света"
+const INTERACTION_PROMPT_TEXT := "Поднять сферу"
 
 @export var hover_base_height: float = 1.25
 @export var hover_amplitude: float = 0.12
@@ -12,7 +12,7 @@ const INTERACTION_PROMPT_TEXT := "Коснуться света"
 @onready var hover_root: Node3D = $HoverRoot
 @onready var pickup_area: Area3D = $PickupArea
 @onready var prompt_anchor: Marker3D = $InteractionPromptAnchor
-@onready var interaction_prompt = $WorldInteractionPrompt
+@onready var interaction_prompt = $SoulOrbInteractionPrompt
 
 var _time: float = 0.0
 var _player_in_range: bool = false

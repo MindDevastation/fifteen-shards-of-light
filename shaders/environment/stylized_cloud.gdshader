@@ -7,7 +7,8 @@ uniform vec4 bottom_color : source_color = vec4(0.72, 0.68, 0.64, 1.0);
 uniform sampler2D cloud_noise;
 uniform float noise_influence : hint_range(0.0, 0.16) = 0.082;
 uniform float body_shadow_strength : hint_range(0.0, 0.22) = 0.105;
-uniform float crown_highlight_strength : hint_range(0.0, 0.18) = 0.075;
+uniform float crown_highlight_strength : hint_range(0.0, 0.18) = 0.095;
+uniform float lobe_depth_strength : hint_range(0.0, 0.18) = 0.08;
 
 void fragment() {
 	float vertical = clamp(UV.y, 0.0, 1.0);
@@ -20,9 +21,14 @@ void fragment() {
 	float lower_body = 1.0 - smoothstep(0.18, 0.76, vertical);
 	float crown = smoothstep(0.42, 0.95, vertical);
 	float rounded_lobe = smoothstep(-0.18, 0.42, low_frequency_noise);
+	float broad_lobe = smoothstep(-0.32, 0.58, texture(cloud_noise, UV * 0.28 + vec2(0.23, 0.07)).r * 2.0 - 1.0);
+	float depth_shadow = lower_body * (1.0 - rounded_lobe) * (0.62 + broad_lobe * 0.38);
+	float lobe_highlight = crown * rounded_lobe * (0.74 + broad_lobe * 0.26);
 	vec3 volume = gradient;
 	volume -= bottom_color.rgb * lower_body * body_shadow_strength * (0.72 + rounded_lobe * 0.28);
+	volume -= middle_color.rgb * depth_shadow * lobe_depth_strength;
 	volume += top_color.rgb * crown * crown_highlight_strength * (0.55 + rounded_lobe * 0.45);
-	ALBEDO = clamp(volume + low_frequency_noise * noise_influence, vec3(0.56), vec3(0.99));
+	volume += top_color.rgb * lobe_highlight * lobe_depth_strength * 0.85;
+	ALBEDO = clamp(volume + low_frequency_noise * noise_influence * 0.72, vec3(0.56), vec3(0.99));
 	ALPHA = 1.0;
 }
