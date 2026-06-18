@@ -18,3 +18,10 @@ func open_gate() -> void:
 	tween.tween_property(mesh, "transparency", 1.0, dissolve_duration)
 	tween.tween_property(mesh, "position:y", mesh.position.y - 0.65, dissolve_duration)
 	tween.finished.connect(func(): hide(); opened.emit())
+
+func reset_gate() -> void:
+	_opened = false
+	show()
+	shape.set_deferred("disabled", false)
+	mesh.transparency = 0.0
+	mesh.position.y = 0.0

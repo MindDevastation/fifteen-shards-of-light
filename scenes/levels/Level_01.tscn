@@ -324,7 +324,7 @@ shape = SubResource("SphereShape3D_lamp_interaction")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21, 2.2, 70)
 script = ExtResource("23_lamp")
 lamp_id = &"WarmRelay01"
-visual_target_path = NodePath("../LandmarkIsland01/Lantern/lantern_02")
+visual_target_path = NodePath("../../LandmarkIsland01/Lantern/lantern_02")
 beam_anchor_path = NodePath("BeamAnchor")
 channel_id = -1
 role = 1
@@ -360,7 +360,7 @@ shape = SubResource("SphereShape3D_lamp_interaction")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -26, 2.25, 94)
 script = ExtResource("23_lamp")
 lamp_id = &"WarmRelay02"
-visual_target_path = NodePath("../LandmarkIsland01/Lantern/lantern_03")
+visual_target_path = NodePath("../../LandmarkIsland01/Lantern/lantern_03")
 beam_anchor_path = NodePath("BeamAnchor")
 channel_id = -1
 role = 1
@@ -396,7 +396,7 @@ shape = SubResource("SphereShape3D_lamp_interaction")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -31, 2.35, 120)
 script = ExtResource("23_lamp")
 lamp_id = &"WarmRelay03"
-visual_target_path = NodePath("../LandmarkIsland01/Lantern/lantern_01")
+visual_target_path = NodePath("../../LandmarkIsland01/Lantern/lantern_01")
 beam_anchor_path = NodePath("BeamAnchor")
 channel_id = -1
 role = 1
@@ -432,7 +432,7 @@ shape = SubResource("SphereShape3D_lamp_interaction")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, 2.45, 146)
 script = ExtResource("23_lamp")
 lamp_id = &"WarmRelay04"
-visual_target_path = NodePath("../LandmarkIsland01/Lantern/lantern_07")
+visual_target_path = NodePath("../../LandmarkIsland01/Lantern/lantern_07")
 beam_anchor_path = NodePath("BeamAnchor")
 channel_id = -1
 role = 1
@@ -540,7 +540,7 @@ shape = SubResource("SphereShape3D_lamp_interaction")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 2.2, 82)
 script = ExtResource("23_lamp")
 lamp_id = &"MoonRelay01"
-visual_target_path = NodePath("../LandmarkIsland01/Lantern/lantern_04")
+visual_target_path = NodePath("../../LandmarkIsland01/Lantern/lantern_04")
 beam_anchor_path = NodePath("BeamAnchor")
 channel_id = -1
 role = 1
@@ -576,7 +576,7 @@ shape = SubResource("SphereShape3D_lamp_interaction")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17, 2.35, 114)
 script = ExtResource("23_lamp")
 lamp_id = &"MoonRelay02"
-visual_target_path = NodePath("../LandmarkIsland01/Lantern/lantern_05")
+visual_target_path = NodePath("../../LandmarkIsland01/Lantern/lantern_05")
 beam_anchor_path = NodePath("BeamAnchor")
 channel_id = -1
 role = 1
@@ -612,7 +612,7 @@ shape = SubResource("SphereShape3D_lamp_interaction")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, 2.45, 146)
 script = ExtResource("23_lamp")
 lamp_id = &"MoonRelay03"
-visual_target_path = NodePath("../LandmarkIsland01/Lantern/lantern_06")
+visual_target_path = NodePath("../../LandmarkIsland01/Lantern/lantern_06")
 beam_anchor_path = NodePath("BeamAnchor")
 channel_id = -1
 role = 1
@@ -678,6 +678,19 @@ shadow_enabled = false
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="SideIslandLampPuzzle/MoonDestination/InteractionArea"]
 shape = SubResource("SphereShape3D_lamp_interaction")
+
+
+[node name="WarmSourceSocket" type="Marker3D" parent="SideIslandLampPuzzle"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 2.15, 50)
+
+[node name="MoonSourceSocket" type="Marker3D" parent="SideIslandLampPuzzle"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -31, 2.15, 50)
+
+[node name="WarmDestinationSocket" type="Marker3D" parent="SideIslandLampPuzzle"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17, 2.6, 176)
+
+[node name="MoonDestinationSocket" type="Marker3D" parent="SideIslandLampPuzzle"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -27, 2.6, 176)
 
 
 [node name="LampBarrierGate" type="StaticBody3D" parent="SideIslandLampPuzzle" unique_id=2088001999]

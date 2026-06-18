@@ -157,3 +157,111 @@ All logical lamp `LampMesh` placeholders are `visible = false`; beam endpoints u
 ## Report path
 
 `docs/development/Level_01_Pre_External_Review_Corrective_Pass_Report.md`
+
+## Follow-up Review Blocker Closure — Current Branch
+
+### Existing Lantern Runtime Binding
+
+- `LightRouteLamp.visual_target_path` is now resolved at runtime through `_resolve_visual_target()`.
+- When a visual target exists, the logical lamp is synchronized to the target `global_position` and recursively collects `MeshInstance3D` and `Light3D` nodes for state feedback.
+- Existing lantern meshes receive duplicated runtime `material_override` instances, avoiding shared material mutation.
+- `get_beam_anchor_position()` now returns `_visual_target.global_position + beam_anchor_offset` for bound lanterns.
+- Relay NodePaths validated in `/tmp/validate_lamp_visual_bindings.gd`:
+  - `WarmRelay01`: `../../LandmarkIsland01/Lantern/lantern_02`, delta `0.0`, meshes `1`, lights `1`.
+  - `WarmRelay02`: `../../LandmarkIsland01/Lantern/lantern_03`, delta `0.0`, meshes `1`, lights `1`.
+  - `WarmRelay03`: `../../LandmarkIsland01/Lantern/lantern_01`, delta `0.0`, meshes `1`, lights `1`.
+  - `WarmRelay04`: `../../LandmarkIsland01/Lantern/lantern_07`, delta `0.0`, meshes `1`, lights `1`.
+  - `MoonRelay01`: `../../LandmarkIsland01/Lantern/lantern_04`, delta `0.0`, meshes `1`, lights `1`.
+  - `MoonRelay02`: `../../LandmarkIsland01/Lantern/lantern_05`, delta `0.0`, meshes `1`, lights `1`.
+  - `MoonRelay03`: `../../LandmarkIsland01/Lantern/lantern_06`, delta `0.0`, meshes `1`, lights `1`.
+- Source/destination sockets were restored as invisible `Marker3D` nodes for future manual visual replacement.
+
+### Runtime Channel Color Assignment
+
+- `LightRouteLamp` now separates `configured_path_channel` from `runtime_channel`.
+- `assign_runtime_channel(channel, color)` and `clear_runtime_channel()` update runtime channel color, visual state, and prompts.
+- Controller assigns runtime channel colors during initial beam setup and every valid runtime connection.
+- Cross-side validation `WarmRelay01 → MoonRelay02` passed:
+  - beam channel: warm channel `0`;
+  - target runtime channel: `0`;
+  - target visual tint: warm;
+  - target is unavailable to the moon channel until warm reset;
+  - warm reset restores `MoonRelay02.runtime_channel == -1` and `INACTIVE` state.
+
+### Full Reset-All Validation
+
+- `reset_all()` now cancels selection, frees runtime beams immediately, fully clears all lamp runtime states/colors, clears channel dictionaries, recreates channel arrays, rebuilds initial beams, assigns source/first relay channels, refreshes prompts, and resets the barrier when supported.
+- `LightRouteBarrierGate.reset_gate()` restores closed/visible/colliding state for non-completed reset scenarios.
+- Runtime reset validation passed:
+  - initial beams after `reset_all()`: `2`;
+  - sources: `LOCKED`;
+  - first relays: `AVAILABLE_ENDPOINT`;
+  - other relays/destinations: `INACTIVE`;
+  - stale runtime channels: none in checked route lamps;
+  - stale non-initial beams: none in controller beam arrays.
+
+### Portal Rotation Direction Test
+
+- The portal sleeve phase now increments with `_global_rotation_phase += delta * sleeve_rotation_speed`.
+- `get_sleeve_mote_position()` exposes the same stable sleeve geometry used by runtime updates for deterministic angular validation.
+- `/tmp/validate_portal_rotation_direction.gd` result:
+  - `angle_t0 = -0.94931971587517`;
+  - `angle_t1 = -0.70981052707246`;
+  - `signed_delta = 0.23950918880271`;
+  - interpreted direction: counterclockwise.
+- Galaxy, rim, and lower vortex angular time signs were aligned with the counterclockwise sleeve direction.
+
+### Collision Physics Validation
+
+- Static/physics validation: COMPLETED.
+- Rendered gameplay movement QA: NOT PERFORMED.
+- `/tmp/validate_spawn_collisions.gd` confirmed:
+  - `StepAssistRoot/StepAssistRamp_04/StepAssistCapShape_04.disabled == true`;
+  - `StepAssistCapShape_01`, `StepAssistCapShape_02`, and `StepAssistCapShape_03` remain enabled;
+  - no overlap hit reports the disabled culprit cap;
+  - short motion sweeps were logged for forward/backward/left/right/diagonal directions.
+- Physics overlap hits are the terrain body at spawn, not the disabled culprit cap. Rendered movement feel remains manual QA.
+
+### Remote PR Body Verification
+
+- Remote PR body update: BLOCKED.
+- Reason: this checkout has no configured `origin` remote, so PR #94 cannot be pushed to or re-read from GitHub from this environment.
+- Required blocker text: `BLOCKER: existing PR #94 cannot be updated because origin is not configured.`
+
+### Additional Automated Validation
+
+- `timeout 300s godot --headless --editor --path . --quit`: pass, exit code `0`.
+- `godot --headless --path . --quit --check-only`: pass.
+- `/tmp/validate_lamp_visual_bindings.gd`: pass.
+- `/tmp/validate_runtime_channel_reset.gd`: pass.
+- `/tmp/validate_portal_rotation_direction.gd`: pass.
+- `/tmp/validate_spawn_collisions.gd`: pass.
+
+### Follow-up Review Pass 1 — Requirements
+
+- `visual_target_path` actually used: COMPLETED.
+- Seven target paths exist and resolve: COMPLETED.
+- Existing lantern visuals receive state feedback: COMPLETED.
+- Runtime channel color changes on cross-side routing: COMPLETED.
+- Reset clears runtime color: COMPLETED.
+- `reset_all()` clears stale states: COMPLETED.
+- Initial beams do not duplicate after reset: COMPLETED.
+- Portal direction confirmed by angular test: COMPLETED.
+- Collision static/physics validation: COMPLETED.
+- Remote PR body updated/read back: BLOCKED.
+
+### Follow-up Review Pass 2 — Actual Runtime Code
+
+- Reopened and validated `light_route_puzzle_controller.gd`, `light_route_lamp.gd`, `light_route_beam.gd`, `Level_01.tscn`, `portal_light_sleeve_3d.gd`, `LevelPortal.tscn`, and this report through targeted Godot scripts.
+- Runtime validation exercised cross-side routing, reset, reset_all, existing lantern binding, and portal angular direction.
+- Remote PR body could not be inspected because no remote is configured.
+
+### Follow-up Review Pass 3 — Review the Review
+
+- `visual_target_path` is not merely declared; it is resolved and used for position, materials/lights, and beam anchors: COMPLETED.
+- NodePaths are corrected to `../../LandmarkIsland01/...` for relay lamps: COMPLETED.
+- Cross-side relay color changes and clears after reset: COMPLETED.
+- `reset_all()` does not leave stale controller route arrays in validation: COMPLETED.
+- Portal rotation sign is confirmed mathematically: COMPLETED.
+- Collision verdict is not overstated; rendered gameplay remains manual: COMPLETED.
+- Remote PR body verification: BLOCKED.

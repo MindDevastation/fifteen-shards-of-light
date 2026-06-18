@@ -35,7 +35,7 @@ func _process(delta: float) -> void:
 	if _activation <= 0.001:
 		return
 	_time += delta
-	_global_rotation_phase -= delta * sleeve_rotation_speed
+	_global_rotation_phase += delta * sleeve_rotation_speed
 	_update_streams()
 
 func set_activation(value: float) -> void:
@@ -112,12 +112,7 @@ func _update_stream(sleeve_index: int, multimesh: MultiMesh) -> void:
 		var u := float(mote_index) / float(maxi(1, motes_per_sleeve - 1))
 		var local_flow := sin(_time * 0.45 + float(mote_index) * 0.19) * 0.018
 		var spiral_u := clampf(u + local_flow, 0.0, 1.0)
-		var spiral_angle := base_angle + _global_rotation_phase + spiral_u * turn_count * TAU
-		var radius_x := lerpf(0.16, 1.15, u)
-		var radius_y := lerpf(0.12, 1.42, u)
-		var depth := sin(spiral_angle * 1.25 + float(sleeve_index)) * depth_range * 0.22
-		var jitter := (_hash_01(sleeve_index * 97 + mote_index * 13) - 0.5) * 0.035
-		var position := Vector3(cos(spiral_angle) * radius_x + jitter, 1.55 + sin(spiral_angle) * radius_y, depth)
+		var position := get_sleeve_mote_position(sleeve_index, mote_index, _global_rotation_phase)
 		var size_variation := lerpf(min_mote_size, max_mote_size, _hash_01(mote_index * 29 + sleeve_index * 41))
 		var pulse := 0.74 + 0.26 * sin(_time * 2.2 + float(mote_index) * 0.47 + base_angle)
 		var final_scale := size_variation * pulse * lerpf(0.04, 1.0, activation_eased)
@@ -126,6 +121,18 @@ func _update_stream(sleeve_index: int, multimesh: MultiMesh) -> void:
 		var brightness := lerpf(0.72, 1.0, pulse)
 		multimesh.set_instance_color(mote_index, Color(sleeve_color.r * brightness, sleeve_color.g * brightness, sleeve_color.b * brightness, alpha))
 
+func get_sleeve_mote_position(sleeve_index: int, mote_index: int, phase: float = _global_rotation_phase) -> Vector3:
+	var base_angle := float(sleeve_index) * TAU / float(SLEEVE_COUNT)
+	var u := float(mote_index) / float(maxi(1, motes_per_sleeve - 1))
+	var local_flow := sin(_time * 0.45 + float(mote_index) * 0.19) * 0.018
+	var spiral_u := clampf(u + local_flow, 0.0, 1.0)
+	var spiral_angle := base_angle + phase + spiral_u * turn_count * TAU
+	var radius_x := lerpf(0.16, 1.15, u)
+	var radius_y := lerpf(0.12, 1.42, u)
+	var depth := sin(spiral_angle * 1.25 + float(sleeve_index)) * depth_range * 0.22
+	var jitter := (_hash_01(sleeve_index * 97 + mote_index * 13) - 0.5) * 0.035
+	return Vector3(cos(spiral_angle) * radius_x + jitter, 1.55 + sin(spiral_angle) * radius_y, depth)
+
 func _update_galaxy_motes() -> void:
 	if _galaxy_multimesh == null:
 		return
@@ -133,7 +140,7 @@ func _update_galaxy_motes() -> void:
 	for mote_index in range(galaxy_mote_count):
 		var seed := float(mote_index)
 		var radius := lerpf(0.10, 1.02, _hash_01(mote_index * 19))
-		var angle := _hash_01(mote_index * 31) * TAU - _time * 0.10
+		var angle := _hash_01(mote_index * 31) * TAU + _time * 0.10
 		var height := lerpf(-0.26, 1.18, _hash_01(mote_index * 43)) + 1.55
 		var z_depth := sin(angle * 1.7 + seed) * 0.24
 		var position := Vector3(cos(angle) * radius, height, sin(angle) * radius * 0.32 + z_depth)
@@ -148,7 +155,7 @@ func _update_rim_motes() -> void:
 	var activation_eased := _get_activation_eased()
 	for mote_index in range(rim_mote_count):
 		var t := float(mote_index) / float(maxi(1, rim_mote_count))
-		var angle := t * TAU - _time * 0.18
+		var angle := t * TAU + _time * 0.18
 		var vertical := sin(angle)
 		var radius_x := 1.20 + sin(_time * 0.7 + float(mote_index)) * 0.025
 		var position := Vector3(cos(angle) * radius_x, 1.55 + vertical * 1.50, sin(angle) * 0.16)
@@ -163,7 +170,7 @@ func _update_lower_vortex_motes() -> void:
 	var center_y := 0.62
 	for mote_index in range(lower_vortex_mote_count):
 		var u := float(mote_index) / float(maxi(1, lower_vortex_mote_count - 1))
-		var angle := u * TAU * 2.6 - _time * 0.42
+		var angle := u * TAU * 2.6 + _time * 0.42
 		var radius := lerpf(0.42, 0.08, u)
 		var y := center_y + sin(angle * 0.75) * 0.22
 		var position := Vector3(cos(angle) * radius, y, sin(angle) * radius * 0.20)

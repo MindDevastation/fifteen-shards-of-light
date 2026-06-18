@@ -74,19 +74,38 @@ func refresh_all_prompts() -> void:
 func reset_all() -> void:
 	_selected_lamp = null
 	_completed = false
-	_completed_channels.clear()
-	_incorrect_channels.clear()
+	_clear_runtime_beam_root()
+	_reset_all_lamp_runtime_state()
 	_lamp_channels.clear()
 	_actual_route_by_channel.clear()
+	_completed_channels.clear()
+	_incorrect_channels.clear()
 	_beams_by_channel.clear()
-	for child in _beam_root.get_children():
-		child.queue_free()
 	for channel in range(channel_paths.size()):
 		_actual_route_by_channel.append([])
 		_beams_by_channel.append([])
 		_reset_channel(channel, true)
+	if _barrier != null and _barrier.has_method("reset_gate"):
+		_barrier.call("reset_gate")
 	refresh_all_prompts()
 	puzzle_state_changed.emit()
+
+func _clear_runtime_beam_root() -> void:
+	if _beam_root == null:
+		_beam_root = Node3D.new()
+		_beam_root.name = "RuntimeBeams"
+		add_child(_beam_root)
+		return
+	for child in _beam_root.get_children():
+		child.free()
+
+func _reset_all_lamp_runtime_state() -> void:
+	for lamp in _lamps_by_id.values():
+		if lamp == null:
+			continue
+		if lamp.has_method("clear_runtime_channel"):
+			lamp.call("clear_runtime_channel")
+		lamp.set_lamp_state(STATE_INACTIVE)
 
 func reset_channel(channel: int) -> void:
 	_reset_channel(channel, false)
@@ -124,6 +143,8 @@ func _try_connect_to(target: Node) -> void:
 	_create_beam(source, target, _channel_color(channel), channel, false)
 	source.set_lamp_state(STATE_LOCKED)
 	_lamp_channels[target.lamp_id] = channel
+	if target.has_method("assign_runtime_channel"):
+		target.call("assign_runtime_channel", channel, _channel_color(channel))
 	_actual_route_by_channel[channel].append(String(target.lamp_id))
 	if target.role == ROLE_DESTINATION:
 		if _route_matches_correct_path(channel):
@@ -184,7 +205,7 @@ func _configure_lamps() -> void:
 		for lamp_id in path_ids:
 			var lamp: Node = _lamps_by_id.get(StringName(lamp_id))
 			if lamp != null:
-				lamp.configure(self, _channel_color(channel))
+				lamp.configure(self, _channel_color(channel), channel)
 				if lamp.role == ROLE_SOURCE:
 					lamp.channel_id = channel
 
@@ -212,6 +233,8 @@ func _reset_channel(channel: int, initial_setup: bool) -> void:
 		var lamp: Node = _lamps_by_id[lamp_id]
 		if int(_lamp_channels.get(lamp.lamp_id, -999)) == channel and lamp.lamp_id != source_id and lamp.lamp_id != first_id:
 			_lamp_channels.erase(lamp.lamp_id)
+			if lamp.has_method("clear_runtime_channel"):
+				lamp.call("clear_runtime_channel")
 			lamp.set_lamp_state(STATE_INACTIVE)
 	var source: Node = _lamps_by_id.get(source_id)
 	var first: Node = _lamps_by_id.get(first_id)
@@ -219,9 +242,13 @@ func _reset_channel(channel: int, initial_setup: bool) -> void:
 		_lamp_channels[source.lamp_id] = channel
 		source.channel_id = channel
 		source.set_lamp_state(STATE_LOCKED)
+		if source.has_method("assign_runtime_channel"):
+			source.call("assign_runtime_channel", channel, _channel_color(channel))
 	if first != null:
 		_lamp_channels[first.lamp_id] = channel
 		first.set_lamp_state(STATE_AVAILABLE)
+		if first.has_method("assign_runtime_channel"):
+			first.call("assign_runtime_channel", channel, _channel_color(channel))
 	_actual_route_by_channel[channel] = [String(source_id), String(first_id)]
 	_completed_channels.erase(channel)
 	_incorrect_channels.erase(channel)
