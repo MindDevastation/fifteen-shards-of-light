@@ -33,7 +33,9 @@ var _runtime_channel_color := inactive_color
 var _visual_target: Node3D
 var _visual_meshes: Array[MeshInstance3D] = []
 var _visual_lights: Array[Light3D] = []
-var _visual_materials: Dictionary = {}
+var _runtime_surface_materials: Dictionary = {}
+var _original_surface_materials: Dictionary = {}
+var _material_baselines: Dictionary = {}
 var _pulse_tween: Tween
 
 @onready var mesh: MeshInstance3D = get_node_or_null("LampMesh")
@@ -146,15 +148,16 @@ func _sync_to_visual_target() -> void:
 func _collect_visual_nodes(root: Node) -> void:
 	_visual_meshes.clear()
 	_visual_lights.clear()
-	_visual_materials.clear()
+	_runtime_surface_materials.clear()
+	_original_surface_materials.clear()
+	_material_baselines.clear()
 	_collect_visual_nodes_recursive(root)
 
 func _collect_visual_nodes_recursive(node: Node) -> void:
 	if node is MeshInstance3D:
 		var visual_mesh := node as MeshInstance3D
 		_visual_meshes.append(visual_mesh)
-		_visual_materials[visual_mesh] = StandardMaterial3D.new()
-		visual_mesh.material_override = _visual_materials[visual_mesh]
+		_capture_runtime_surface_materials(visual_mesh)
 	elif node is Light3D:
 		_visual_lights.append(node as Light3D)
 	for child in node.get_children():
@@ -228,20 +231,79 @@ func _apply_visual_state() -> void:
 			column_mat.albedo_color = Color(channel_color.r, channel_color.g, channel_color.b, 0.22)
 			column_mat.emission = channel_color
 
+func _capture_runtime_surface_materials(visual_mesh: MeshInstance3D) -> void:
+	var runtime_materials: Array[Material] = []
+	var original_materials: Array[Material] = []
+	_runtime_surface_materials[visual_mesh] = runtime_materials
+	_original_surface_materials[visual_mesh] = original_materials
+	if visual_mesh.mesh == null:
+		return
+	var surface_count := visual_mesh.mesh.get_surface_count()
+	for surface_index in range(surface_count):
+		var original := visual_mesh.get_active_material(surface_index)
+		original_materials.append(original)
+		if original == null:
+			runtime_materials.append(null)
+			continue
+		var runtime := original.duplicate(true) as Material
+		runtime_materials.append(runtime)
+		visual_mesh.set_surface_override_material(surface_index, runtime)
+		_material_baselines[runtime] = _build_material_baseline(runtime)
+
+func _build_material_baseline(material: Material) -> Dictionary:
+	var baseline := {
+		"material": material,
+		"class": material.get_class()
+	}
+	if material is BaseMaterial3D:
+		var base := material as BaseMaterial3D
+		baseline["type"] = "base"
+		baseline["albedo_color"] = base.albedo_color
+		baseline["emission_enabled"] = base.emission_enabled
+		baseline["emission"] = base.emission
+		baseline["emission_energy_multiplier"] = base.emission_energy_multiplier
+	elif material is ShaderMaterial:
+		baseline["type"] = "shader"
+		baseline["shader"] = (material as ShaderMaterial).shader
+	else:
+		baseline["type"] = "unknown"
+	return baseline
+
 func _apply_visual_material(color: Color, emission: Color) -> void:
 	for visual_mesh in _visual_meshes:
 		if not is_instance_valid(visual_mesh):
 			continue
-		var material := _visual_materials.get(visual_mesh) as StandardMaterial3D
-		if material == null:
-			material = StandardMaterial3D.new()
-			_visual_materials[visual_mesh] = material
-			visual_mesh.material_override = material
-		material.roughness = 0.82
-		material.albedo_color = color
-		material.emission_enabled = emission != Color.BLACK
-		material.emission = emission
-		material.emission_energy_multiplier = 0.65
+		var runtime_materials: Array = _runtime_surface_materials.get(visual_mesh, [])
+		for material in runtime_materials:
+			if material == null:
+				continue
+			var baseline: Dictionary = _material_baselines.get(material, {})
+			_apply_material_state(material, baseline, color, emission)
+
+func _apply_material_state(material: Material, baseline: Dictionary, color: Color, emission: Color) -> void:
+	if baseline.is_empty():
+		return
+	if material is BaseMaterial3D and String(baseline.get("type", "")) == "base":
+		var base := material as BaseMaterial3D
+		var original_albedo: Color = baseline.get("albedo_color", Color.WHITE)
+		if state == LampState.INACTIVE:
+			base.albedo_color = original_albedo
+			base.emission_enabled = bool(baseline.get("emission_enabled", false))
+			base.emission = baseline.get("emission", Color.BLACK)
+			base.emission_energy_multiplier = float(baseline.get("emission_energy_multiplier", 1.0))
+			return
+		base.albedo_color = Color(
+			original_albedo.r * color.r,
+			original_albedo.g * color.g,
+			original_albedo.b * color.b,
+			original_albedo.a
+		)
+		base.emission_enabled = emission != Color.BLACK or bool(baseline.get("emission_enabled", false))
+		base.emission = emission if emission != Color.BLACK else baseline.get("emission", Color.BLACK)
+		base.emission_energy_multiplier = 0.65 if emission != Color.BLACK else float(baseline.get("emission_energy_multiplier", 1.0))
+	elif material is ShaderMaterial and String(baseline.get("type", "")) == "shader":
+		# Preserve the original shader and give unsupported shaders light/column feedback instead of replacement.
+		(material as ShaderMaterial).shader = baseline.get("shader")
 
 func _on_body_entered(body: Node3D) -> void:
 	if not body.is_in_group("player") and not body.name.to_lower().contains("player"):

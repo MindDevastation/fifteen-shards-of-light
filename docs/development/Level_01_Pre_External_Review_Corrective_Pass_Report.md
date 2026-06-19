@@ -265,3 +265,102 @@ All logical lamp `LampMesh` placeholders are `visible = false`; beam endpoints u
 - Portal rotation sign is confirmed mathematically: COMPLETED.
 - Collision verdict is not overstated; rendered gameplay remains manual: COMPLETED.
 - Remote PR body verification: BLOCKED.
+
+## Follow-up Material and Barrier Reset Closure
+
+### Lantern Material Preservation
+
+- Status: COMPLETED.
+- `LightRouteLamp` no longer replaces each bound existing lantern mesh with one empty `StandardMaterial3D` material override.
+- Each bound lantern mesh is scanned per surface before state feedback is applied.
+- For every active source surface material, the original material reference is recorded, a deep runtime duplicate is assigned through `set_surface_override_material(surface_index, runtime)`, and baseline values are stored from that runtime duplicate.
+- Inactive/reset state restores the captured baseline for supported `BaseMaterial3D` values.
+- Unsupported or shader-backed materials are preserved as their duplicated material class and use light/selection-column feedback instead of being replaced with a standard material.
+
+### Surface-Level Runtime Material Duplication
+
+- Status: COMPLETED.
+- The implementation now stores:
+  - `_runtime_surface_materials` by mesh instance;
+  - `_original_surface_materials` by mesh instance;
+  - `_material_baselines` by runtime material.
+- This replaces the previous broad statement that existing lantern meshes receive duplicated runtime material overrides with the precise behavior: each active source surface material is duplicated and assigned as a surface override. Textures, shaders and material classes are preserved. Unsupported shader materials use light/column feedback without material replacement.
+
+### Shader/Texture Preservation Validation
+
+- Status: COMPLETED for the seven currently bound relay lantern meshes.
+- `/tmp/validate_lamp_material_preservation.gd` loaded `Level_01.tscn` after editor import and verified all seven relay visual bindings:
+  - `WarmRelay01` → `lantern_02`, 1 surface, `StandardMaterial3D` preserved;
+  - `WarmRelay02` → `lantern_03`, 1 surface, `StandardMaterial3D` preserved;
+  - `WarmRelay03` → `lantern_01`, 1 surface, `StandardMaterial3D` preserved;
+  - `WarmRelay04` → `lantern_07`, 1 surface, `StandardMaterial3D` preserved;
+  - `MoonRelay01` → `lantern_04`, 1 surface, `StandardMaterial3D` preserved;
+  - `MoonRelay02` → `lantern_05`, 1 surface, `StandardMaterial3D` preserved;
+  - `MoonRelay03` → `lantern_06`, 1 surface, `StandardMaterial3D` preserved.
+- Validation result: material classes preserved, texture references preserved, no mesh-wide empty `material_override`, state tint changes active state, and inactive/reset restores baseline.
+
+### Barrier Baseline Restoration
+
+- Status: COMPLETED.
+- `LightRouteBarrierGate` now captures initial mesh position, mesh transparency, barrier visibility, and collision disabled state in `_ready()`.
+- `reset_gate()` restores the captured baseline instead of hardcoding `mesh.position.y = 0.0` and `mesh.transparency = 0.0`.
+- The reset path also restores the original collision disabled state, so scene-authored baseline remains source of truth.
+
+### Barrier Reset During Active Tween
+
+- Status: COMPLETED.
+- `LightRouteBarrierGate` now stores the active dissolve tween in `_dissolve_tween`.
+- `open_gate()` kills any existing dissolve tween before creating a new one.
+- `reset_gate()` kills the active tween before restoring baseline, preventing stale `finished` callbacks from hiding a reset barrier.
+- `/tmp/validate_light_route_barrier_reset.gd` passed:
+  - reset before open;
+  - reset during dissolve;
+  - reset after full open;
+  - second open after reset.
+
+### Remote PR Body and Mergeability
+
+- Remote PR body update: BLOCKED in this checkout.
+- Mergeability re-check: BLOCKED in this checkout.
+- Reason: `git remote -v` reports no configured remote, so this environment cannot fetch `origin`, push `feature-uap0dw`, update PR #94, read PR metadata, or verify `mergeable`.
+- Required blocker text remains: `BLOCKER: existing PR #94 cannot be updated because origin is not configured.`
+
+### Follow-up Material/Barrier Validation Commands
+
+- `timeout 300s godot --headless --editor --path . --quit`: pass, exit code `0`.
+- `godot --headless --path . --quit --check-only`: pass.
+- `/tmp/validate_lamp_material_preservation.gd`: pass.
+- `/tmp/validate_light_route_barrier_reset.gd`: pass.
+- Graphical QA performed: no.
+- Performance measured: no.
+
+### Follow-up Material/Barrier Review Pass 1 — Requirements
+
+- Original lantern materials are not replaced by empty material: COMPLETED.
+- Surface count is preserved: COMPLETED.
+- Material classes are preserved: COMPLETED.
+- Texture references are preserved for current `BaseMaterial3D` lantern materials: COMPLETED.
+- Shader material replacement is avoided by design: COMPLETED.
+- State tint/emission applies from baseline and does not accumulate: COMPLETED.
+- Baseline restores after reset/inactive: COMPLETED.
+- Barrier reset restores initial position/transparency/visibility/collision: COMPLETED.
+- Barrier reset kills active tween: COMPLETED.
+- Remote PR body updated/read back: BLOCKED.
+- PR mergeability rechecked: BLOCKED.
+
+### Follow-up Material/Barrier Review Pass 2 — Actual Runtime Code
+
+- Reopened and verified `light_route_lamp.gd`, `light_route_barrier_gate.gd`, `light_route_puzzle_controller.gd`, `Level_01.tscn`, and this report.
+- Runtime material validation exercises actual Level_01 relay lantern meshes, not only presence of `duplicate()` calls.
+- Barrier validation exercises reset before open, during active dissolve, after dissolve, and second-open behavior.
+- Remote PR body could not be inspected because no remote is configured.
+
+### Follow-up Material/Barrier Review Pass 3 — Review the Review
+
+- Original surface material is read before assigning the runtime surface override: COMPLETED.
+- No mesh-wide empty `StandardMaterial3D` override is assigned to existing lantern meshes: COMPLETED.
+- Tint is computed from captured baseline color rather than previous tinted color: COMPLETED.
+- Reset returns baseline values: COMPLETED.
+- ShaderMaterial is not replaced with StandardMaterial3D: COMPLETED.
+- Old barrier dissolve tween cannot hide the reset barrier after `reset_gate()`: COMPLETED.
+- Remote body and mergeability claims are not overstated: COMPLETED; both remain BLOCKED/NOT VERIFIED from this checkout.
