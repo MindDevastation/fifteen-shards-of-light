@@ -19,6 +19,9 @@
 [ext_resource type="PackedScene" path="res://scenes/environment/vfx/LandmarkLightColumn.tscn" id="19_light_column"]
 [ext_resource type="PackedScene" path="res://scenes/ui/LevelFinaleOverlay.tscn" id="20_finale_overlay"]
 [ext_resource type="PackedScene" path="res://scenes/core/LevelPortal.tscn" id="21_level_portal"]
+[ext_resource type="Script" path="res://scripts/puzzles/light_route_puzzle_controller.gd" id="22_lamp_controller"]
+[ext_resource type="Script" path="res://scripts/puzzles/light_route_lamp.gd" id="23_lamp"]
+[ext_resource type="Script" path="res://scripts/puzzles/light_route_barrier_gate.gd" id="24_lamp_gate"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_finale_trigger"]
 size = Vector3(12.087067, 4, 5)
@@ -28,6 +31,41 @@ points = PackedVector3Array(-1.5, -0.02, -0.6, 1.5, -0.02, -0.6, -1.5, -0.02, 0.
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_step_assist_cap"]
 size = Vector3(3, 0.08, 0.35)
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_lamp_interaction"]
+radius = 2.8
+
+[sub_resource type="SphereMesh" id="SphereMesh_lamp"]
+radius = 0.34
+height = 0.68
+radial_segments = 16
+rings = 8
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_lamp_column"]
+top_radius = 0.18
+bottom_radius = 0.30
+height = 2.1
+radial_segments = 16
+
+[sub_resource type="StandardMaterial3D" id="LampColumnMat"]
+transparency = 1
+albedo_color = Color(1, 0.72, 0.32, 0.22)
+emission_enabled = true
+emission = Color(1, 0.72, 0.32, 1)
+emission_energy_multiplier = 0.75
+
+[sub_resource type="BoxMesh" id="LampBarrierMesh"]
+size = Vector3(4.8, 3.2, 0.35)
+
+[sub_resource type="StandardMaterial3D" id="LampBarrierMat"]
+transparency = 1
+albedo_color = Color(1, 0.68, 0.28, 0.38)
+emission_enabled = true
+emission = Color(1, 0.64, 0.24, 1)
+emission_energy_multiplier = 0.65
+
+[sub_resource type="BoxShape3D" id="LampBarrierShape"]
+size = Vector3(4.8, 3.2, 0.35)
 
 [sub_resource type="Sky" id="Sky_hhyrm"]
 
@@ -69,7 +107,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.956233, 1.8961711, -42.159
 up_direction = Vector3(0.009999501, 0.99995005, 0)
 floor_snap_length = 0.3
 safe_margin = 0.01
-step_debug_enabled = true
+step_debug_enabled = false
 
 [node name="CameraRoot" type="Node3D" parent="." unique_id=197258052]
 
@@ -187,6 +225,7 @@ shape = SubResource("ConvexPolygonShape3D_step_assist_ramp")
 [node name="StepAssistCapShape_04" type="CollisionShape3D" parent="StepAssistRoot/StepAssistRamp_04" unique_id=1169379228]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.32, 0.77)
 shape = SubResource("BoxShape3D_step_assist_cap")
+disabled = true
 
 [node name="WorldEnvironment_Block01" type="WorldEnvironment" parent="." unique_id=305389988]
 environment = SubResource("Environment_5mpa8")
@@ -235,6 +274,436 @@ transform = Transform3D(0.17364822, 0, 0.9848077, 0, 1, 0, -0.9848077, 0, 0.1736
 
 [node name="Ancient_Stone_Barrier_01" parent="Architecture" unique_id=538048969 instance=ExtResource("13_xg7sb")]
 transform = Transform3D(1.2226845, 0, -0.25988963, 0, 1.25, 0, 0.25988963, 0, 1.2226845, -40.65623, 2.2720172, 264.2825)
+
+[node name="SideIslandLampPuzzle" type="Node3D" parent="." unique_id=2088001001]
+script = ExtResource("22_lamp_controller")
+source_lamps = Array[NodePath]([NodePath("SourceWarm"), NodePath("SourceMoon")])
+relay_lamps = Array[NodePath]([NodePath("WarmRelay01"), NodePath("WarmRelay02"), NodePath("WarmRelay03"), NodePath("WarmRelay04"), NodePath("MoonRelay01"), NodePath("MoonRelay02"), NodePath("MoonRelay03")])
+destination_lamps = Array[NodePath]([NodePath("WarmDestination"), NodePath("MoonDestination")])
+channel_paths = [["SourceWarm", "WarmRelay01", "WarmRelay02", "WarmRelay03", "WarmRelay04", "WarmDestination"], ["SourceMoon", "MoonRelay01", "MoonRelay02", "MoonRelay03", "MoonDestination"]]
+channel_colors = Array[Color]([Color(1, 0.62, 0.24, 1), Color(0.62, 0.84, 1, 1)])
+barrier_path = NodePath("LampBarrierGate")
+
+[node name="SourceWarm" type="Node3D" parent="SideIslandLampPuzzle" unique_id=1776184541]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 2.15, 50)
+script = ExtResource("23_lamp")
+lamp_id = &"SourceWarm"
+visual_target_path = NodePath("../WarmSourceSocket")
+beam_anchor_path = NodePath("BeamAnchor")
+channel_id = 0
+role = 0
+
+[node name="LampMesh" type="MeshInstance3D" parent="SideIslandLampPuzzle/SourceWarm"]
+visible = false
+mesh = SubResource("SphereMesh_lamp")
+
+
+[node name="BeamAnchor" type="Marker3D" parent="SideIslandLampPuzzle/SourceWarm"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.72, 0)
+
+[node name="SelectionColumn" type="MeshInstance3D" parent="SideIslandLampPuzzle/SourceWarm"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
+visible = false
+cast_shadow = 0
+mesh = SubResource("CylinderMesh_lamp_column")
+material_override = SubResource("LampColumnMat")
+
+[node name="GlowLight" type="OmniLight3D" parent="SideIslandLampPuzzle/SourceWarm"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+light_energy = 0.0
+omni_range = 3.2
+shadow_enabled = false
+
+[node name="InteractionArea" type="Area3D" parent="SideIslandLampPuzzle/SourceWarm"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SideIslandLampPuzzle/SourceWarm/InteractionArea"]
+shape = SubResource("SphereShape3D_lamp_interaction")
+
+
+[node name="WarmRelay01" type="Node3D" parent="SideIslandLampPuzzle" unique_id=951700878]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21, 2.2, 70)
+script = ExtResource("23_lamp")
+lamp_id = &"WarmRelay01"
+visual_target_path = NodePath("../../LandmarkIsland01/Lantern/lantern_02")
+beam_anchor_path = NodePath("BeamAnchor")
+channel_id = -1
+role = 1
+
+[node name="LampMesh" type="MeshInstance3D" parent="SideIslandLampPuzzle/WarmRelay01"]
+visible = false
+mesh = SubResource("SphereMesh_lamp")
+
+
+[node name="BeamAnchor" type="Marker3D" parent="SideIslandLampPuzzle/WarmRelay01"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.72, 0)
+
+[node name="SelectionColumn" type="MeshInstance3D" parent="SideIslandLampPuzzle/WarmRelay01"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
+visible = false
+cast_shadow = 0
+mesh = SubResource("CylinderMesh_lamp_column")
+material_override = SubResource("LampColumnMat")
+
+[node name="GlowLight" type="OmniLight3D" parent="SideIslandLampPuzzle/WarmRelay01"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+light_energy = 0.0
+omni_range = 3.2
+shadow_enabled = false
+
+[node name="InteractionArea" type="Area3D" parent="SideIslandLampPuzzle/WarmRelay01"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SideIslandLampPuzzle/WarmRelay01/InteractionArea"]
+shape = SubResource("SphereShape3D_lamp_interaction")
+
+
+[node name="WarmRelay02" type="Node3D" parent="SideIslandLampPuzzle" unique_id=872677627]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -26, 2.25, 94)
+script = ExtResource("23_lamp")
+lamp_id = &"WarmRelay02"
+visual_target_path = NodePath("../../LandmarkIsland01/Lantern/lantern_03")
+beam_anchor_path = NodePath("BeamAnchor")
+channel_id = -1
+role = 1
+
+[node name="LampMesh" type="MeshInstance3D" parent="SideIslandLampPuzzle/WarmRelay02"]
+visible = false
+mesh = SubResource("SphereMesh_lamp")
+
+
+[node name="BeamAnchor" type="Marker3D" parent="SideIslandLampPuzzle/WarmRelay02"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.72, 0)
+
+[node name="SelectionColumn" type="MeshInstance3D" parent="SideIslandLampPuzzle/WarmRelay02"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
+visible = false
+cast_shadow = 0
+mesh = SubResource("CylinderMesh_lamp_column")
+material_override = SubResource("LampColumnMat")
+
+[node name="GlowLight" type="OmniLight3D" parent="SideIslandLampPuzzle/WarmRelay02"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+light_energy = 0.0
+omni_range = 3.2
+shadow_enabled = false
+
+[node name="InteractionArea" type="Area3D" parent="SideIslandLampPuzzle/WarmRelay02"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SideIslandLampPuzzle/WarmRelay02/InteractionArea"]
+shape = SubResource("SphereShape3D_lamp_interaction")
+
+
+[node name="WarmRelay03" type="Node3D" parent="SideIslandLampPuzzle" unique_id=733233732]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -31, 2.35, 120)
+script = ExtResource("23_lamp")
+lamp_id = &"WarmRelay03"
+visual_target_path = NodePath("../../LandmarkIsland01/Lantern/lantern_01")
+beam_anchor_path = NodePath("BeamAnchor")
+channel_id = -1
+role = 1
+
+[node name="LampMesh" type="MeshInstance3D" parent="SideIslandLampPuzzle/WarmRelay03"]
+visible = false
+mesh = SubResource("SphereMesh_lamp")
+
+
+[node name="BeamAnchor" type="Marker3D" parent="SideIslandLampPuzzle/WarmRelay03"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.72, 0)
+
+[node name="SelectionColumn" type="MeshInstance3D" parent="SideIslandLampPuzzle/WarmRelay03"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
+visible = false
+cast_shadow = 0
+mesh = SubResource("CylinderMesh_lamp_column")
+material_override = SubResource("LampColumnMat")
+
+[node name="GlowLight" type="OmniLight3D" parent="SideIslandLampPuzzle/WarmRelay03"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+light_energy = 0.0
+omni_range = 3.2
+shadow_enabled = false
+
+[node name="InteractionArea" type="Area3D" parent="SideIslandLampPuzzle/WarmRelay03"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SideIslandLampPuzzle/WarmRelay03/InteractionArea"]
+shape = SubResource("SphereShape3D_lamp_interaction")
+
+
+[node name="WarmRelay04" type="Node3D" parent="SideIslandLampPuzzle" unique_id=771989078]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, 2.45, 146)
+script = ExtResource("23_lamp")
+lamp_id = &"WarmRelay04"
+visual_target_path = NodePath("../../LandmarkIsland01/Lantern/lantern_07")
+beam_anchor_path = NodePath("BeamAnchor")
+channel_id = -1
+role = 1
+
+[node name="LampMesh" type="MeshInstance3D" parent="SideIslandLampPuzzle/WarmRelay04"]
+visible = false
+mesh = SubResource("SphereMesh_lamp")
+
+
+[node name="BeamAnchor" type="Marker3D" parent="SideIslandLampPuzzle/WarmRelay04"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.72, 0)
+
+[node name="SelectionColumn" type="MeshInstance3D" parent="SideIslandLampPuzzle/WarmRelay04"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
+visible = false
+cast_shadow = 0
+mesh = SubResource("CylinderMesh_lamp_column")
+material_override = SubResource("LampColumnMat")
+
+[node name="GlowLight" type="OmniLight3D" parent="SideIslandLampPuzzle/WarmRelay04"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+light_energy = 0.0
+omni_range = 3.2
+shadow_enabled = false
+
+[node name="InteractionArea" type="Area3D" parent="SideIslandLampPuzzle/WarmRelay04"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SideIslandLampPuzzle/WarmRelay04/InteractionArea"]
+shape = SubResource("SphereShape3D_lamp_interaction")
+
+
+[node name="WarmDestination" type="Node3D" parent="SideIslandLampPuzzle" unique_id=1273273971]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -41, 2.55, 172)
+script = ExtResource("23_lamp")
+lamp_id = &"WarmDestination"
+visual_target_path = NodePath("../WarmDestinationSocket")
+beam_anchor_path = NodePath("BeamAnchor")
+channel_id = -1
+role = 2
+
+[node name="LampMesh" type="MeshInstance3D" parent="SideIslandLampPuzzle/WarmDestination"]
+visible = false
+mesh = SubResource("SphereMesh_lamp")
+
+
+[node name="BeamAnchor" type="Marker3D" parent="SideIslandLampPuzzle/WarmDestination"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.72, 0)
+
+[node name="SelectionColumn" type="MeshInstance3D" parent="SideIslandLampPuzzle/WarmDestination"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
+visible = false
+cast_shadow = 0
+mesh = SubResource("CylinderMesh_lamp_column")
+material_override = SubResource("LampColumnMat")
+
+[node name="GlowLight" type="OmniLight3D" parent="SideIslandLampPuzzle/WarmDestination"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+light_energy = 0.0
+omni_range = 3.2
+shadow_enabled = false
+
+[node name="InteractionArea" type="Area3D" parent="SideIslandLampPuzzle/WarmDestination"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SideIslandLampPuzzle/WarmDestination/InteractionArea"]
+shape = SubResource("SphereShape3D_lamp_interaction")
+
+
+[node name="SourceMoon" type="Node3D" parent="SideIslandLampPuzzle" unique_id=32927626]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 2.1, 52)
+script = ExtResource("23_lamp")
+lamp_id = &"SourceMoon"
+visual_target_path = NodePath("../MoonSourceSocket")
+beam_anchor_path = NodePath("BeamAnchor")
+channel_id = 1
+role = 0
+
+[node name="LampMesh" type="MeshInstance3D" parent="SideIslandLampPuzzle/SourceMoon"]
+visible = false
+mesh = SubResource("SphereMesh_lamp")
+
+
+[node name="BeamAnchor" type="Marker3D" parent="SideIslandLampPuzzle/SourceMoon"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.72, 0)
+
+[node name="SelectionColumn" type="MeshInstance3D" parent="SideIslandLampPuzzle/SourceMoon"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
+visible = false
+cast_shadow = 0
+mesh = SubResource("CylinderMesh_lamp_column")
+material_override = SubResource("LampColumnMat")
+
+[node name="GlowLight" type="OmniLight3D" parent="SideIslandLampPuzzle/SourceMoon"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+light_energy = 0.0
+omni_range = 3.2
+shadow_enabled = false
+
+[node name="InteractionArea" type="Area3D" parent="SideIslandLampPuzzle/SourceMoon"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SideIslandLampPuzzle/SourceMoon/InteractionArea"]
+shape = SubResource("SphereShape3D_lamp_interaction")
+
+
+[node name="MoonRelay01" type="Node3D" parent="SideIslandLampPuzzle" unique_id=1346437650]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 2.2, 82)
+script = ExtResource("23_lamp")
+lamp_id = &"MoonRelay01"
+visual_target_path = NodePath("../../LandmarkIsland01/Lantern/lantern_04")
+beam_anchor_path = NodePath("BeamAnchor")
+channel_id = -1
+role = 1
+
+[node name="LampMesh" type="MeshInstance3D" parent="SideIslandLampPuzzle/MoonRelay01"]
+visible = false
+mesh = SubResource("SphereMesh_lamp")
+
+
+[node name="BeamAnchor" type="Marker3D" parent="SideIslandLampPuzzle/MoonRelay01"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.72, 0)
+
+[node name="SelectionColumn" type="MeshInstance3D" parent="SideIslandLampPuzzle/MoonRelay01"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
+visible = false
+cast_shadow = 0
+mesh = SubResource("CylinderMesh_lamp_column")
+material_override = SubResource("LampColumnMat")
+
+[node name="GlowLight" type="OmniLight3D" parent="SideIslandLampPuzzle/MoonRelay01"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+light_energy = 0.0
+omni_range = 3.2
+shadow_enabled = false
+
+[node name="InteractionArea" type="Area3D" parent="SideIslandLampPuzzle/MoonRelay01"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SideIslandLampPuzzle/MoonRelay01/InteractionArea"]
+shape = SubResource("SphereShape3D_lamp_interaction")
+
+
+[node name="MoonRelay02" type="Node3D" parent="SideIslandLampPuzzle" unique_id=1680345868]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17, 2.35, 114)
+script = ExtResource("23_lamp")
+lamp_id = &"MoonRelay02"
+visual_target_path = NodePath("../../LandmarkIsland01/Lantern/lantern_05")
+beam_anchor_path = NodePath("BeamAnchor")
+channel_id = -1
+role = 1
+
+[node name="LampMesh" type="MeshInstance3D" parent="SideIslandLampPuzzle/MoonRelay02"]
+visible = false
+mesh = SubResource("SphereMesh_lamp")
+
+
+[node name="BeamAnchor" type="Marker3D" parent="SideIslandLampPuzzle/MoonRelay02"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.72, 0)
+
+[node name="SelectionColumn" type="MeshInstance3D" parent="SideIslandLampPuzzle/MoonRelay02"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
+visible = false
+cast_shadow = 0
+mesh = SubResource("CylinderMesh_lamp_column")
+material_override = SubResource("LampColumnMat")
+
+[node name="GlowLight" type="OmniLight3D" parent="SideIslandLampPuzzle/MoonRelay02"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+light_energy = 0.0
+omni_range = 3.2
+shadow_enabled = false
+
+[node name="InteractionArea" type="Area3D" parent="SideIslandLampPuzzle/MoonRelay02"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SideIslandLampPuzzle/MoonRelay02/InteractionArea"]
+shape = SubResource("SphereShape3D_lamp_interaction")
+
+
+[node name="MoonRelay03" type="Node3D" parent="SideIslandLampPuzzle" unique_id=69249729]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, 2.45, 146)
+script = ExtResource("23_lamp")
+lamp_id = &"MoonRelay03"
+visual_target_path = NodePath("../../LandmarkIsland01/Lantern/lantern_06")
+beam_anchor_path = NodePath("BeamAnchor")
+channel_id = -1
+role = 1
+
+[node name="LampMesh" type="MeshInstance3D" parent="SideIslandLampPuzzle/MoonRelay03"]
+visible = false
+mesh = SubResource("SphereMesh_lamp")
+
+
+[node name="BeamAnchor" type="Marker3D" parent="SideIslandLampPuzzle/MoonRelay03"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.72, 0)
+
+[node name="SelectionColumn" type="MeshInstance3D" parent="SideIslandLampPuzzle/MoonRelay03"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
+visible = false
+cast_shadow = 0
+mesh = SubResource("CylinderMesh_lamp_column")
+material_override = SubResource("LampColumnMat")
+
+[node name="GlowLight" type="OmniLight3D" parent="SideIslandLampPuzzle/MoonRelay03"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+light_energy = 0.0
+omni_range = 3.2
+shadow_enabled = false
+
+[node name="InteractionArea" type="Area3D" parent="SideIslandLampPuzzle/MoonRelay03"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SideIslandLampPuzzle/MoonRelay03/InteractionArea"]
+shape = SubResource("SphereShape3D_lamp_interaction")
+
+
+[node name="MoonDestination" type="Node3D" parent="SideIslandLampPuzzle" unique_id=188365511]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -27, 2.6, 176)
+script = ExtResource("23_lamp")
+lamp_id = &"MoonDestination"
+visual_target_path = NodePath("../MoonDestinationSocket")
+beam_anchor_path = NodePath("BeamAnchor")
+channel_id = -1
+role = 2
+
+[node name="LampMesh" type="MeshInstance3D" parent="SideIslandLampPuzzle/MoonDestination"]
+visible = false
+mesh = SubResource("SphereMesh_lamp")
+
+
+[node name="BeamAnchor" type="Marker3D" parent="SideIslandLampPuzzle/MoonDestination"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.72, 0)
+
+[node name="SelectionColumn" type="MeshInstance3D" parent="SideIslandLampPuzzle/MoonDestination"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
+visible = false
+cast_shadow = 0
+mesh = SubResource("CylinderMesh_lamp_column")
+material_override = SubResource("LampColumnMat")
+
+[node name="GlowLight" type="OmniLight3D" parent="SideIslandLampPuzzle/MoonDestination"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+light_energy = 0.0
+omni_range = 3.2
+shadow_enabled = false
+
+[node name="InteractionArea" type="Area3D" parent="SideIslandLampPuzzle/MoonDestination"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SideIslandLampPuzzle/MoonDestination/InteractionArea"]
+shape = SubResource("SphereShape3D_lamp_interaction")
+
+
+[node name="WarmSourceSocket" type="Marker3D" parent="SideIslandLampPuzzle"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 2.15, 50)
+
+[node name="MoonSourceSocket" type="Marker3D" parent="SideIslandLampPuzzle"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -31, 2.15, 50)
+
+[node name="WarmDestinationSocket" type="Marker3D" parent="SideIslandLampPuzzle"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17, 2.6, 176)
+
+[node name="MoonDestinationSocket" type="Marker3D" parent="SideIslandLampPuzzle"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -27, 2.6, 176)
+
+
+[node name="LampBarrierGate" type="StaticBody3D" parent="SideIslandLampPuzzle" unique_id=2088001999]
+transform = Transform3D(0.9848077, 0, 0.1736482, 0, 1, 0, -0.1736482, 0, 0.9848077, -34, 3.2, 184)
+script = ExtResource("24_lamp_gate")
+
+[node name="BarrierMesh" type="MeshInstance3D" parent="SideIslandLampPuzzle/LampBarrierGate"]
+cast_shadow = 0
+mesh = SubResource("LampBarrierMesh")
+material_override = SubResource("LampBarrierMat")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SideIslandLampPuzzle/LampBarrierGate"]
+shape = SubResource("LampBarrierShape")
 
 [node name="Clouds" type="Node3D" parent="." unique_id=17556820]
 

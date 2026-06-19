@@ -26,9 +26,9 @@ void fragment() {
 	float oval = 1.0 - smoothstep(0.40, 0.48, r);
 	float center_open = smoothstep(0.055, 0.18, r);
 	float body = oval * center_open;
-	float clockwise_time = -TIME * rotation_speed + phase_offset;
-	float low_noise = texture(swirl_noise, vec2(r * 0.72 + phase_offset, angle + clockwise_time * 0.45)).r;
-	float arm_coordinate = angle * 6.0 + r * radial_density + clockwise_time + low_noise * 0.18;
+	float counterclockwise_time = TIME * rotation_speed + phase_offset;
+	float low_noise = texture(swirl_noise, vec2(r * 0.72 + phase_offset, angle + counterclockwise_time * 0.45)).r;
+	float arm_coordinate = angle * strand_density + r * radial_density + counterclockwise_time + low_noise * 0.18;
 	float sleeve_core = strand_mask(arm_coordinate, 0.38);
 	float sleeve_body = pow(sleeve_core, 0.82);
 	float veil_noise = 0.82 + low_noise * 0.18;

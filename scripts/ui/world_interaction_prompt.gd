@@ -53,6 +53,9 @@ func _process(delta: float) -> void:
 	_update_idle_breathe(delta)
 
 
+func set_action_text(text: String) -> void:
+	action_label.text = text
+
 func set_target(node: Node3D) -> void:
 	target_node = node
 	use_target_node = target_node != null

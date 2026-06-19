@@ -3,7 +3,7 @@ extends Node3D
 const PORTAL_LAYER_PHASE_OFFSETS: Array[float] = [0.000, 0.012, -0.012, 0.022, -0.022, 0.032]
 const PORTAL_LAYER_ROTATION_SPEEDS: Array[float] = [0.670, 0.680, 0.660, 0.690, 0.665, 0.675]
 const PORTAL_LAYER_ALPHAS: Array[float] = [0.30, 0.38, 0.48, 0.48, 0.38, 0.30]
-const PORTAL_LAYER_RADIAL_DENSITIES: Array[float] = [15.6, 15.9, 15.4, 16.1, 15.5, 15.8]
+const PORTAL_LAYER_RADIAL_DENSITIES: Array[float] = [12.8, 13.1, 12.6, 13.3, 12.9, 13.0]
 
 
 signal activation_started
@@ -145,7 +145,7 @@ func _duplicate_runtime_materials() -> void:
 			var material := layer.material_override as ShaderMaterial
 			_strand_materials.append(material)
 			material.set_shader_parameter("phase_offset", PORTAL_LAYER_PHASE_OFFSETS[index])
-			material.set_shader_parameter("strand_density", 6.0)
+			material.set_shader_parameter("strand_density", 5.0)
 			material.set_shader_parameter("radial_density", PORTAL_LAYER_RADIAL_DENSITIES[index])
 			material.set_shader_parameter("rotation_speed", PORTAL_LAYER_ROTATION_SPEEDS[index])
 			material.set_shader_parameter("layer_alpha", PORTAL_LAYER_ALPHAS[index])
