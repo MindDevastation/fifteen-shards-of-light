@@ -1,70 +1,89 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene format=3 uid="uid://xm215olcv6cg"]
 
-[ext_resource type="Script" path="res://scripts/ui/level_finale_overlay.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://ba77iykncsmii" path="res://scripts/ui/level_finale_overlay.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://scenes/ui/components/FoxConfirmButton.tscn" id="2_fox"]
 
-[node name="LevelFinaleOverlay" type="Control"]
+[node name="LevelFinaleOverlay" type="Control" unique_id=1966289460]
 visible = false
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-mouse_filter = 0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_script")
 
-[node name="Atmosphere" type="Control" parent="."]
+[node name="Atmosphere" type="Control" parent="." unique_id=29942174]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 
-[node name="MatteVeil" type="ColorRect" parent="Atmosphere"]
+[node name="MatteVeil" type="ColorRect" parent="Atmosphere" unique_id=1234468072]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 color = Color(0.032, 0.021, 0.018, 0.62)
 
-[node name="WarmWash" type="ColorRect" parent="Atmosphere"]
+[node name="WarmWash" type="ColorRect" parent="Atmosphere" unique_id=49600230]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 color = Color(0.34, 0.15, 0.075, 0.14)
 
-[node name="VineCanvas" type="Node2D" parent="."]
+[node name="VineCanvas" type="Node2D" parent="." unique_id=194037182]
 
-[node name="LeftVine" type="Node2D" parent="VineCanvas"]
-[node name="OuterGlow" type="Line2D" parent="VineCanvas/LeftVine"]
-antialiased = true
-[node name="MainGold" type="Line2D" parent="VineCanvas/LeftVine"]
-antialiased = true
-[node name="InnerIvory" type="Line2D" parent="VineCanvas/LeftVine"]
+[node name="LeftVine" type="Node2D" parent="VineCanvas" unique_id=289911385]
+
+[node name="OuterGlow" type="Line2D" parent="VineCanvas/LeftVine" unique_id=1191878937]
 antialiased = true
 
-[node name="RightVine" type="Node2D" parent="VineCanvas"]
-[node name="OuterGlow" type="Line2D" parent="VineCanvas/RightVine"]
-antialiased = true
-[node name="MainGold" type="Line2D" parent="VineCanvas/RightVine"]
-antialiased = true
-[node name="InnerIvory" type="Line2D" parent="VineCanvas/RightVine"]
+[node name="MainGold" type="Line2D" parent="VineCanvas/LeftVine" unique_id=1109790531]
 antialiased = true
 
-[node name="BranchLayer" type="Node2D" parent="VineCanvas"]
-[node name="LeafLayer" type="Node2D" parent="VineCanvas"]
-[node name="LeftTipGlow" type="Polygon2D" parent="VineCanvas"]
+[node name="InnerIvory" type="Line2D" parent="VineCanvas/LeftVine" unique_id=380508850]
+antialiased = true
+
+[node name="RightVine" type="Node2D" parent="VineCanvas" unique_id=1709366394]
+
+[node name="OuterGlow" type="Line2D" parent="VineCanvas/RightVine" unique_id=289519606]
+antialiased = true
+
+[node name="MainGold" type="Line2D" parent="VineCanvas/RightVine" unique_id=153065303]
+antialiased = true
+
+[node name="InnerIvory" type="Line2D" parent="VineCanvas/RightVine" unique_id=1270526214]
+antialiased = true
+
+[node name="BranchLayer" type="Node2D" parent="VineCanvas" unique_id=1931993115]
+
+[node name="LeafLayer" type="Node2D" parent="VineCanvas" unique_id=510106287]
+
+[node name="LeftTipGlow" type="Polygon2D" parent="VineCanvas" unique_id=153398745]
 color = Color(1, 0.74, 0.3, 0)
-[node name="RightTipGlow" type="Polygon2D" parent="VineCanvas"]
+
+[node name="RightTipGlow" type="Polygon2D" parent="VineCanvas" unique_id=1082458703]
 color = Color(1, 0.74, 0.3, 0)
 
-[node name="TextRoot" type="Control" parent="."]
+[node name="TextRoot" type="Control" parent="." unique_id=402552274]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 
-[node name="FoxConfirmButton" parent="." instance=ExtResource("2_fox")]
+[node name="FoxConfirmButton" parent="." unique_id=2094517544 instance=ExtResource("2_fox")]
+layout_mode = 0
