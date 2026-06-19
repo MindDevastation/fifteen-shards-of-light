@@ -31,6 +31,7 @@ const FRAME_COLORS := [
 	Color(0.96, 0.72, 0.28, 0.86),
 ]
 const VINE_LEAF_TEXTURE := preload("res://assets/ui/shard_reward_overlay/vine_leaf.png")
+const SHARD_REWARD_FONT_SIZE := 54
 const VINE_GROWTH_DURATION := 2.3
 const REWARD_FONT := preload("res://assets/fonts/cormorant_garamond/CormorantGaramond-SemiBoldItalic.otf")
 const FRAME_LIVING_UPDATE_INTERVAL := 0.033
@@ -908,10 +909,9 @@ func _apply_responsive_layout() -> void:
 	reward_text_label.add_theme_font_override("normal_font", REWARD_FONT)
 	reward_text_label.add_theme_font_override("italics_font", REWARD_FONT)
 	reward_text_label.add_theme_font_override("bold_italics_font", REWARD_FONT)
-	var reward_font_size := int(round(48.0 * scale_factor))
-	reward_text_label.add_theme_font_size_override("normal_font_size", reward_font_size)
-	reward_text_label.add_theme_font_size_override("italics_font_size", reward_font_size)
-	reward_text_label.add_theme_font_size_override("bold_italics_font_size", reward_font_size)
+	reward_text_label.add_theme_font_size_override("normal_font_size", SHARD_REWARD_FONT_SIZE)
+	reward_text_label.add_theme_font_size_override("italics_font_size", SHARD_REWARD_FONT_SIZE)
+	reward_text_label.add_theme_font_size_override("bold_italics_font_size", SHARD_REWARD_FONT_SIZE)
 	reward_text_label.add_theme_color_override("default_color", TEXT_COLOR)
 	reward_text_label.add_theme_color_override("font_outline_color", TEXT_OUTLINE_COLOR)
 	reward_text_label.add_theme_constant_override("outline_size", int(round(5.0 * scale_factor)))
