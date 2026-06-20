@@ -126,12 +126,12 @@
 - Old frame rect: `Rect2(Vector2(vp.x * 0.02, vp.y * 0.02), Vector2(vp.x * 0.96, vp.y * 0.88))`.
 - New frame rect: `Rect2(Vector2(vp.x * 0.045, vp.y * 0.045), Vector2(vp.x * 0.91, vp.y * 0.85))`.
 - Emblem reserved height: `maxf(90.0, vp.y * 0.14)`; validated values were `95.76 px` at `1216x684`, `100.8 px` at `1280x720`, and `151.2 px` at `1920x1080`.
-- Text vertical offset: `TEXT_BLOCK_VERTICAL_OFFSET_RATIO = -0.05`, clamped to keep the mask block inside the safe rect.
-- Line gap: `LINE_GAP_RATIO = -0.14`.
-- Horizontal italic margin: `ITALIC_VISUAL_MARGIN = 28.0`; horizontal padding also includes outline and shadow X offset.
-- Selected font size at `1216x684`: `60`.
-- Selected font size at `1280x720`: `60`.
-- Selected font size at `1920x1080`: `72`.
+- Text vertical offset: previous `TEXT_BLOCK_VERTICAL_OFFSET_RATIO = -0.05` is superseded by the real-metrics correction below, which uses `-0.02`.
+- Line gap: the previous `LINE_GAP_RATIO = -0.14` value is superseded by the real-metrics correction below; negative line gaps are no longer used.
+- Horizontal italic margin: `ITALIC_VISUAL_MARGIN = 28.0`; horizontal padding also includes outline and shadow X offset. The previous `MIN_TEXT_WIDTH_SCALE`/horizontal label scaling approach is superseded by the real-metrics correction below.
+- Previous selected font size at `1216x684`: `60`; superseded by the real-metrics correction below.
+- Previous selected font size at `1280x720`: `60`; superseded by the real-metrics correction below.
+- Previous selected font size at `1920x1080`: `72`; superseded by the real-metrics correction below.
 - Six line mask rects at `1216x684`:
   - line 1: `Rect2(Vector2(271.9062, 94.39201), Vector2(672.1877, 67.24))`
   - line 2: `Rect2(Vector2(249.3318, 152.2184), Vector2(717.3366, 67.24001))`
@@ -153,5 +153,25 @@
   - line 4: `Rect2(Vector2(290.9999, 372.225), Vector2(1338.0, 82.5))`
   - line 5: `Rect2(Vector2(514.9999, 443.175), Vector2(890.0001, 82.50003))`
   - line 6: `Rect2(Vector2(461.9999, 514.125), Vector2(996.0001, 82.5))`
-- Targeted geometry validation: passed for `1216x684`, `1280x720`, and `1920x1080`; each run used the real six-line `Level01FinaleController.finale_text`, selected a font size of at least `60`, kept all masks inside the text safe rect, and kept the text block out of the emblem reserved rect.
+- Previous targeted geometry validation with synthetic line-height/scaling assumptions is superseded by the real-metrics correction below.
 - Rendered screenshot QA performed: no. A headless screenshot attempt could not read a viewport texture in this environment because Godot used dummy rendering storage, so visual completion is not claimed.
+
+
+## Finale Real Font Metrics and Non-Overlapping Line Geometry
+- Removed horizontal scaling: `MIN_TEXT_WIDTH_SCALE`, `_text_width_scale()`, `width_scale`, and `label.scale = Vector2(width_scale, 1.0)` were removed from `LevelFinaleOverlay`.
+- Labels now use `label.scale = Vector2.ONE`; no line passes width fit by compressed font proportions.
+- Old visual line-height formula superseded: `float(font_size) + outline * 0.5 + shadow + reveal + padding`.
+- New font-height formula: `_glyph_visual_height(font_size, scale_factor)` uses `REWARD_FONT.get_height(font_size) + outline * 2.0 + abs(shadow_y) + vertical_padding * 2.0`.
+- Glyph visual height, mask height, and line advance are now separated:
+  - `glyph_height = _glyph_visual_height(font_size, scale_factor)`
+  - `mask_height = glyph_height + reveal_offset`
+  - `line_gap = maxf(1.0, glyph_height * LINE_GAP_RATIO)` with `LINE_GAP_RATIO = 0.02`
+  - `line_advance = glyph_height + line_gap`
+  - `total_mask_height = mask_height + line_advance * (line_count - 1)`
+- The approved Level 01 finale words/order were preserved, but line breaks were redistributed into six balanced lines to avoid width clipping without horizontal scaling.
+- Selected size at `1216x684`: no valid candidate under the combined constraints. At minimum font size `60`, real font metrics require a mask block taller than the current `0.80` safe rect after the fox-emblem reservation.
+- Selected size at `1280x720`: no valid candidate under the combined constraints. At minimum font size `60`, real font metrics require a mask block taller than the current `0.80` safe rect after the fox-emblem reservation.
+- Selected size at `1920x1080`: `60`; validation metrics: font height `74.00`, outline `6`, shadow `(3, 3)`, glyph visual height `92.00`, reveal offset `1.50`, mask height `93.50`, line gap `1.84`, line advance `93.84`, total mask height `562.70`, safe rect `Rect2(Vector2(276.48, 149.04), Vector2(1367.04, 565.92))`.
+- Mask overlap validation: passed at `1920x1080`; blocked at `1216x684` and `1280x720` because no valid six-line layout exists without violating the preserved safe-area/emblem/font-size/no-scaling constraints.
+- Rendered screenshot QA status: not performed. A normal graphical Godot editor/player renderer is not available in this non-interactive headless environment; visual completion is not claimed.
+- Screenshot path: none.
