@@ -196,3 +196,31 @@
 - Rendered QA status: PARTIAL. Responsive geometry validation passed; ordinary graphical Godot player screenshot QA was not performed because this container cannot initialize X11 or Wayland display drivers (`libXcursor.so.1` and `libwayland-client.so.0` are unavailable).
 - Screenshot paths: none.
 - Superseded earlier statements: the previous minimum font size `60`, fixed candidate list `[72, 68, 64, 60]`, and “layout impossible at 720p” conclusion no longer apply; `1216x684` and `1280x720` now select dynamic sizes `46` and `48` respectively and pass geometry validation.
+
+## Finale Resize-Safe Reveal State and Semantic Line Layout
+- `TextRevealState` now explicitly separates `HIDDEN`, `REVEALING`, and `REVEALED` states for the finale text reveal lifecycle.
+- Initial layout behavior: first show uses hidden labels, places each label at `settled_y + reveal_offset`, sets alpha to `0.0`, then starts the reveal sequence with a new generation id.
+- Resize behavior after `REVEALED`: relayout uses `initially_hidden = false`, restores each visible label to alpha `1.0`, and snaps each label to its stored `settled_y` without replaying the reveal animation.
+- Resize behavior during `REVEALING`: only text reveal tweens are cancelled, a new responsive layout is created hidden, and the text reveal sequence restarts from the beginning without restarting atmosphere, vine opening, fox button, portal, or any unrelated finale sequence.
+- Text tween cancellation: `_text_reveal_tweens` tracks text reveal tweens separately from general finale tweens; `_cancel_text_reveal_tweens()` kills only those tweens and advances `_text_reveal_generation`.
+- Generation/stale callback protection: `_start_text_reveal_sequence()` captures the active generation, and async continuations return early if their generation no longer matches `_text_reveal_generation`.
+- Deferred resize coalescing: `_on_viewport_size_changed()` sets `_resize_relayout_pending` and uses `_apply_deferred_viewport_relayout()` so repeated resize events collapse into one relayout per frame.
+- Semantic six-line text restored:
+  1. `Когда ты появилась в моей жизни,`
+  2. `мир не стал громче - он стал теплее.`
+  3. `В этом не было драмы или резкого поворота,`
+  4. `просто рядом с мыслью о тебе стало светлее.`
+  5. `Мне дорого это первое тепло,`
+  6. `потому что с него все и началось`
+- Words changed: no. Word order changed: no. Punctuation changed: no.
+- Superseded technical line breaks: the previous `В этом не было драмы или резкого / поворота...` and `стало светлее. Мне дорого... / тепло...` split is no longer used.
+- Selected font sizes after semantic-line restoration from `/tmp/validate_dynamic_finale_layout.gd`:
+  - `960x540`: responsive max `36`, selected `36`, widest line `просто рядом с мыслью о тебе стало светлее.`, visual width `661.00 px`, text safe width `677.38 px`.
+  - `1216x684`: responsive max `46`, selected `46`, widest visual width `837.24 px`, text safe width `858.01 px`.
+  - `1280x720`: responsive max `48`, selected `48`, widest visual width `877.12 px`, text safe width `903.17 px`.
+  - `1600x900`: responsive max `60`, selected `60`, widest visual width `1093.40 px`, text safe width `1128.96 px`.
+  - `1920x1080`: responsive max `72`, selected `72`, widest visual width `1311.68 px`, text safe width `1354.75 px`.
+  - `2560x1440`: responsive max `96`, selected `96`, widest visual width `1744.00 px`, text safe width `1806.34 px`.
+- Resize validation results: `/tmp/validate_finale_resize_state.gd` passed hidden-overlay resize, fully revealed resize to larger/smaller viewports, resize during reveal with text-only tween cancellation/restart, and rapid resize coalescing.
+- Reveal geometry validation: initial hidden layout keeps each label at `settled_y + reveal_offset`; fully revealed layout keeps each label at `settled_y`, alpha `1.0`, `label.scale = Vector2.ONE`, and non-overlapping masks.
+- Rendered QA status: PARTIAL. Responsive geometry and resize-state validation passed; ordinary graphical Godot player screenshot QA was not performed because this container cannot initialize X11 or Wayland display drivers.

@@ -7,6 +7,12 @@ const FoxConfirmButtonType = preload(
 
 signal closed
 
+enum TextRevealState {
+	HIDDEN,
+	REVEALING,
+	REVEALED,
+}
+
 const MATTE_VEIL_COLOR := Color(0.032, 0.021, 0.018, 0.62)
 const WARM_WASH_COLOR := Color(0.34, 0.15, 0.075, 0.14)
 const TEXT_COLOR := Color(1.0, 0.92, 0.72, 1.0)
@@ -58,7 +64,11 @@ var _text_safe_rect := Rect2()
 var _emblem_reserved_rect := Rect2()
 var _text_block_rect := Rect2()
 var _selected_font_size := 0
+var _text_reveal_state := TextRevealState.HIDDEN
+var _text_reveal_generation := 0
+var _resize_relayout_pending := false
 var _active_tweens: Array[Tween] = []
+var _text_reveal_tweens: Array[Tween] = []
 
 @onready var atmosphere: Control = $Atmosphere
 @onready var matte_veil: ColorRect = $Atmosphere/MatteVeil
@@ -98,14 +108,17 @@ func show_finale_text(text: String) -> bool:
 	_left_complete = false
 	_right_complete = false
 	_text_complete = false
+	_text_reveal_state = TextRevealState.HIDDEN
 	_kill_tweens()
 	_reset_visuals()
 	show()
 	mouse_filter = Control.MOUSE_FILTER_STOP
-	_apply_responsive_layout()
+	_apply_responsive_geometry()
+	if not _full_text.is_empty():
+		_layout_text_lines(_responsive_scale(), true)
 	_build_vines()
 	_start_opening_animation()
-	_reveal_text_async()
+	_start_text_reveal_sequence()
 	return true
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -121,14 +134,28 @@ func _start_opening_animation() -> void:
 	tween.tween_method(_set_right_progress, 0.0, 1.0, vine_duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	tween.finished.connect(func(): _left_complete = true; _right_complete = true; _try_enable_button())
 
-func _reveal_text_async() -> void:
-	await get_tree().create_timer(text_start_delay).timeout
+func _start_text_reveal_sequence(delay_before_start: float = text_start_delay) -> void:
+	_text_reveal_generation += 1
+	var generation := _text_reveal_generation
+	_text_reveal_state = TextRevealState.REVEALING
+	_text_complete = false
+	_can_confirm = false
+	fox_button.set_enabled(false)
+	_reveal_text_async(generation, delay_before_start)
+
+func _reveal_text_async(generation: int, delay_before_start: float) -> void:
+	if delay_before_start > 0.0:
+		await get_tree().create_timer(delay_before_start).timeout
+		if generation != _text_reveal_generation:
+			return
 	if not visible or _closed_emitted:
 		return
 	text_root.modulate.a = 1.0
-	var tween := _track_tween(create_tween())
+	var tween := _track_text_reveal_tween(create_tween())
 	tween.set_parallel(true)
 	for i in range(_line_masks.size()):
+		if generation != _text_reveal_generation:
+			return
 		var mask := _line_masks[i]
 		if not mask.visible:
 			continue
@@ -143,7 +170,11 @@ func _reveal_text_async() -> void:
 		tween.tween_property(label, "position:y", float(label.get_meta("settled_y", label.position.y)), line_reveal_duration * 0.72).set_delay(delay).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		tween.tween_property(label, "modulate:a", 1.0, line_reveal_duration * 0.86).set_delay(delay).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	await tween.finished
+	if generation != _text_reveal_generation:
+		return
+	_text_reveal_tweens.erase(tween)
 	_text_complete = true
+	_apply_fully_revealed_text_state()
 	_try_enable_button()
 
 func _try_enable_button() -> void:
@@ -179,6 +210,10 @@ func _close_once() -> void:
 	)
 
 func _reset_visuals() -> void:
+	_cancel_text_reveal_tweens()
+	_text_reveal_state = TextRevealState.HIDDEN
+	_selected_font_size = 0
+	_text_block_rect = Rect2()
 	atmosphere.modulate.a = 0.0
 	vine_canvas.modulate.a = 1.0
 	text_root.modulate.a = 0.0
@@ -187,45 +222,82 @@ func _reset_visuals() -> void:
 	fox_button.set_enabled(false)
 	_set_left_progress(0.0)
 	_set_right_progress(0.0)
-	for mask in _line_masks:
-		mask.visible = false
-		mask.size.x = 0.0
-	for label in _line_labels:
-		label.text = ""
-		label.modulate.a = 0.0
+	_reset_line_masks()
 	_clear_branches_and_leaves()
 
-func _apply_responsive_layout() -> void:
-	var vp := _viewport_size()
+func _apply_responsive_geometry() -> void:
 	_update_frame_and_text_safe_rect()
+	_update_button_layout()
+	_update_emblem_reserved_rect()
+
+func _update_button_layout() -> void:
+	var vp := _viewport_size()
 	var button_size := clampf(vp.y * 0.152, 96.0, 164.0)
 	fox_button.size = Vector2.ONE * button_size
 	fox_button.position = Vector2((vp.x - button_size) * 0.5, vp.y * 0.795)
 	fox_button.set_base_position(fox_button.position)
 	fox_button.pivot_offset = fox_button.size * 0.5
-	_update_emblem_reserved_rect()
+
+func _apply_responsive_layout_for_resize(previous_state: int) -> void:
+	_apply_responsive_geometry()
 	if _full_text.is_empty():
 		_reset_line_masks()
-	else:
-		_layout_text_lines(_responsive_scale())
+		_text_reveal_state = TextRevealState.HIDDEN
+		return
+	match previous_state:
+		TextRevealState.REVEALED:
+			if _layout_text_lines(_responsive_scale(), false):
+				_apply_fully_revealed_text_state()
+		TextRevealState.REVEALING:
+			if _layout_text_lines(_responsive_scale(), true):
+				_restart_text_reveal_after_resize()
+		TextRevealState.HIDDEN:
+			_layout_text_lines(_responsive_scale(), true)
 
 func _on_viewport_size_changed() -> void:
-	_apply_responsive_layout()
-	if visible and not _full_text.is_empty():
+	if _resize_relayout_pending:
+		return
+	_resize_relayout_pending = true
+	call_deferred("_apply_deferred_viewport_relayout")
+
+func _apply_deferred_viewport_relayout() -> void:
+	_resize_relayout_pending = false
+	var previous_state := _text_reveal_state
+	var had_text := not _full_text.is_empty()
+	if previous_state == TextRevealState.REVEALING:
+		_cancel_text_reveal_tweens()
+	_apply_responsive_layout_for_resize(previous_state)
+	if visible and had_text:
 		_build_vines()
 		queue_redraw()
+
+func _restart_text_reveal_after_resize() -> void:
+	_start_text_reveal_sequence(0.0)
+
+func _apply_fully_revealed_text_state() -> void:
+	for i in range(_line_labels.size()):
+		var label := _line_labels[i]
+		var mask := _line_masks[i]
+		if not mask.visible:
+			continue
+		label.visible = true
+		label.modulate.a = 1.0
+		label.position.y = float(label.get_meta("settled_y", label.position.y))
+	_text_reveal_state = TextRevealState.REVEALED
 
 func _responsive_scale() -> float:
 	return clampf(_viewport_size().y / BASE_VIEWPORT_HEIGHT, 0.5, 1.5)
 
-func _layout_text_lines(scale_factor: float) -> void:
+func _layout_text_lines(scale_factor: float, initially_hidden: bool = true) -> bool:
 	var layout := _layout_finale_text(_full_text, scale_factor)
 	var lines := layout["lines"] as Array[String]
 	var font_size := int(layout["font_size"])
 	if not bool(layout.get("valid", true)) or font_size < 0:
 		push_error("LevelFinaleOverlay: text cannot fit inside the responsive text area.")
+		_selected_font_size = 0
+		_text_block_rect = Rect2()
 		_reset_line_masks()
-		return
+		return false
 	var glyph_height := _glyph_visual_height(font_size)
 	var reveal_offset := _reveal_start_offset(font_size)
 	var mask_height := glyph_height + reveal_offset
@@ -244,12 +316,12 @@ func _layout_text_lines(scale_factor: float) -> void:
 		var horizontal_padding := _horizontal_text_padding(font_size)
 		var vertical_padding := _vertical_text_padding(font_size)
 		var mask_width := measured_width + horizontal_padding * 2.0
-		label.position = Vector2(horizontal_padding, vertical_padding + reveal_offset)
+		label.position = Vector2(horizontal_padding, vertical_padding + reveal_offset if initially_hidden else vertical_padding)
 		label.scale = Vector2.ONE
 		label.set_meta("settled_y", vertical_padding)
 		label.size = Vector2(maxf(1.0, measured_width), glyph_height)
 		label.visible = true
-		label.modulate.a = 0.0
+		label.modulate.a = 0.0 if initially_hidden else 1.0
 		var mask := _line_masks[i]
 		mask.visible = true
 		mask.clip_contents = true
@@ -258,6 +330,7 @@ func _layout_text_lines(scale_factor: float) -> void:
 			start_y + line_advance * float(i)
 		)
 		mask.size = Vector2(mask_width, mask_height)
+	return true
 
 func _layout_finale_text(text: String, scale_factor: float) -> Dictionary:
 	var normalized := _normalize_text(text)
@@ -427,6 +500,18 @@ func debug_text_block_rect() -> Rect2:
 
 func debug_emblem_reserved_rect() -> Rect2:
 	return _emblem_reserved_rect
+
+func debug_text_reveal_state() -> int:
+	return _text_reveal_state
+
+func debug_text_reveal_generation() -> int:
+	return _text_reveal_generation
+
+func debug_text_reveal_tween_count() -> int:
+	return _text_reveal_tweens.size()
+
+func debug_resize_relayout_pending() -> bool:
+	return _resize_relayout_pending
 
 func _build_vines() -> void:
 	_clear_branches_and_leaves()
@@ -687,11 +772,23 @@ func _track_tween(tween: Tween) -> Tween:
 	_active_tweens.append(tween)
 	return tween
 
+func _track_text_reveal_tween(tween: Tween) -> Tween:
+	_text_reveal_tweens.append(tween)
+	return _track_tween(tween)
+
+func _cancel_text_reveal_tweens() -> void:
+	for tween in _text_reveal_tweens:
+		if tween != null and tween.is_valid():
+			tween.kill()
+	_text_reveal_tweens.clear()
+	_text_reveal_generation += 1
+
 func _kill_tweens() -> void:
 	for tween in _active_tweens:
 		if tween != null and tween.is_valid():
 			tween.kill()
 	_active_tweens.clear()
+	_text_reveal_tweens.clear()
 
 func _normalize_text(value: String) -> String:
 	var result := ""
