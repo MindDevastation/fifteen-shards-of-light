@@ -23,6 +23,7 @@
 [ext_resource type="PackedScene" uid="uid://dticujw6n57ry" path="res://scenes/environment/assets/lantern_01.tscn" id="24_0k37p"]
 [ext_resource type="Script" path="res://scripts/puzzles/celestial_barrier_gate.gd" id="25_celestial_barrier"]
 [ext_resource type="Script" path="res://scripts/puzzles/sun_ray_puzzle_controller.gd" id="26_sun_ray_controller"]
+[ext_resource type="Script" path="res://scripts/levels/level_01_light_puzzle_coordinator.gd" id="27_light_coordinator"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_finale_trigger"]
 size = Vector3(12.087067, 4, 5)
@@ -86,6 +87,12 @@ target_path = NodePath("../../PlayerRoot/Player")
 max_zoom_distance = 5.0
 
 [node name="LevelRuntimeRoot" type="Node3D" parent="." unique_id=385295927]
+
+[node name="Level01LightPuzzleCoordinator" type="Node" parent="LevelRuntimeRoot"]
+script = ExtResource("27_light_coordinator")
+moon_ray_controller_path = NodePath("../../Moon Ray/MoonRayPuzzleController")
+sun_ray_controller_path = NodePath("../../Sun Ray/SunRayPuzzleController")
+celestial_barrier_path = NodePath("../../Moon Ray/moon_ray_celestial_barrier")
 
 [node name="ShardRewardSequenceController" parent="LevelRuntimeRoot" unique_id=892621520 instance=ExtResource("15_sequence_controller")]
 overlay_path = NodePath("../../UILayer/ShardRewardOverlay")
@@ -293,6 +300,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -39.835213, 0.05342567, 181.9
 script = ExtResource("22_moon_ray_controller")
 lantern_paths = Array[NodePath]([NodePath("../moon_ray_lantern_start"), NodePath("../moon_ray_lantern_node_1"), NodePath("../moon_ray_lantern_node_2"), NodePath("../moon_ray_lantern_node_3"), NodePath("../moon_ray_lantern_end")])
 barrier_path = NodePath("../moon_ray_celestial_barrier")
+open_barrier_on_completion = false
 
 [node name="moon_ray_celestial_barrier" type="StaticBody3D" parent="Moon Ray" unique_id=1736124002]
 transform = Transform3D(0.9947279, 0, -0.10254952, 0, 1, 0, 0.10254952, 0, 0.9947279, -36.61529, 2.3624349, 194.6155)

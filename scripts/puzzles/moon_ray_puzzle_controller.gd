@@ -10,6 +10,7 @@ const StreamScript := preload("res://scripts/puzzles/moon_ray_particle_stream.gd
 @export var ray_id: StringName = &"moon"
 @export var lantern_paths: Array[NodePath] = []
 @export var barrier_path: NodePath
+@export var open_barrier_on_completion: bool = true
 @export var wrong_segment_hold: float = 0.28
 @export var wrong_fade_duration: float = 0.82
 @export var particle_count: int = 48
@@ -89,6 +90,9 @@ func debug_streams() -> Array[MoonRayParticleStream]:
 
 func debug_interactions_locked() -> bool:
 	return _locked
+
+func debug_is_completed() -> bool:
+	return _completed
 
 func _bind_lanterns() -> void:
 	_lanterns.clear()
@@ -189,10 +193,15 @@ func _start_wrong_reset(_wrong_stream: MoonRayParticleStream) -> void:
 	_refresh_prompts()
 
 func _complete_puzzle() -> void:
+	if _completed:
+		return
+
 	_completed = true
 	_locked = true
-	if _barrier != null and _barrier.has_method("open_gate"):
+
+	if open_barrier_on_completion and _barrier != null and _barrier.has_method("open_gate"):
 		_barrier.call("open_gate")
+
 	puzzle_completed.emit()
 
 func _refresh_prompts() -> void:
