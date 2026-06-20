@@ -103,3 +103,99 @@ Rendered gameplay QA: PARTIAL. Headless validation was completed, but this envir
 
 - Golden-orange color and prompt readability were validated structurally but still need a real rendered gameplay QA pass.
 - The implementation is intentionally standalone; future dual completion/barrier coordination remains out of scope for this slice.
+
+## Slice 3 - Dual Light Completion Coordinator
+
+### Coordinator architecture
+
+Slice 3 adds `Level01LightPuzzleCoordinator` as the Level 01 runtime owner for the celestial light barrier unlock. The coordinator is signal-driven and does not use `_process()` polling or per-frame state checks.
+
+The coordinator node is added under `/root/Level_01/LevelRuntimeRoot` with these scene NodePaths:
+
+- `moon_ray_controller_path = NodePath("../../Moon Ray/MoonRayPuzzleController")`
+- `sun_ray_controller_path = NodePath("../../Sun Ray/SunRayPuzzleController")`
+- `celestial_barrier_path = NodePath("../../Moon Ray/moon_ray_celestial_barrier")`
+
+### Signals and state flags
+
+The coordinator listens to:
+
+- `MoonRayPuzzleController.puzzle_completed`
+- `SunRayPuzzleController.sun_ray_completed`
+
+It emits:
+
+- `barrier_unlock_requested`
+- `dual_light_completed`
+
+Runtime state is tracked with local flags:
+
+- `_moon_ray_completed`
+- `_sun_ray_completed`
+- `_barrier_unlock_requested`
+- `_configuration_valid`
+
+The barrier is opened only when Moon Ray and Sun Ray are both complete. `_barrier_unlock_requested` is set before `open_gate()` is called, which protects against reentrant duplicate unlock requests.
+
+### Deferred synchronization and validation
+
+During `_ready()`, the coordinator resolves all three exported NodePaths, verifies the required puzzle signals, verifies both controllers expose `debug_is_completed()`, verifies the barrier exposes `open_gate()`, connects signals once, marks configuration valid, then calls deferred `_synchronize_completion_state()`.
+
+Deferred synchronization reads each controller's actual completion state through `debug_is_completed()` to avoid sibling `_ready()` order assumptions. If required debug APIs are absent, the coordinator treats that as a configuration blocker instead of guessing state.
+
+### Completion orders
+
+Both supported orders are now coordinated centrally:
+
+- Moon first: Moon completion sets `_moon_ray_completed = true`, leaves `_sun_ray_completed = false`, keeps `_barrier_unlock_requested = false`, and does not open the barrier.
+- Sun second: Sun completion sets both completion flags true, requests the unlock once, calls `open_gate()`, and emits `dual_light_completed` once.
+- Sun first: Sun completion sets `_sun_ray_completed = true`, leaves `_moon_ray_completed = false`, keeps `_barrier_unlock_requested = false`, and does not open the barrier.
+- Moon second: Moon completion sets both completion flags true, requests the unlock once, calls `open_gate()`, and emits `dual_light_completed` once.
+
+Duplicate completion signals are ignored after their corresponding local completion flag is already true, and duplicate unlocks are blocked by `_barrier_unlock_requested`.
+
+### Moon backward compatibility
+
+`MoonRayPuzzleController` now exposes `open_barrier_on_completion: bool = true`. The default remains `true` so other scenes preserve the previous direct Moon-to-barrier behavior unless they opt out.
+
+The controller also exposes `debug_is_completed() -> bool` for coordinator synchronization and targeted validation. The Moon correct sequence, wrong reset lifecycle, lantern interaction behavior, particle streams, prompt text, and Moon visuals are otherwise unchanged.
+
+### Level 01 direct unlock disabled
+
+In `Level_01.tscn`, `MoonRayPuzzleController.open_barrier_on_completion` is serialized as `false`. The existing `barrier_path = NodePath("../moon_ray_celestial_barrier")` remains for backward compatibility and minimal scene diff, but Level 01 no longer lets Moon completion directly open the celestial barrier.
+
+### Barrier status
+
+`moon_ray_celestial_barrier` remains at `/root/Level_01/Moon Ray/moon_ray_celestial_barrier`. The barrier node name, parent, transform, script, mesh, shader/material, collision shape, dissolve timing, visibility style, and `scripts/puzzles/celestial_barrier_gate.gd` implementation are unchanged.
+
+### Transform preservation
+
+Before editing the scene, serialized transform lines for all Sun Ray lanterns, Moon Ray lanterns, and `moon_ray_celestial_barrier` were saved to `/tmp/level01_slice3_transform_before.txt`. After scene integration, the same serialized lines were captured and compared with no differences.
+
+### Validation results
+
+Static and targeted validation for Slice 3 covered:
+
+- coordinator node presence;
+- all three coordinator NodePaths resolving;
+- valid coordinator configuration;
+- Moon `debug_is_completed()` presence;
+- Moon `open_barrier_on_completion` presence and Level 01 value `false`;
+- Moon-first and Sun-first completion order behavior;
+- single-puzzle completion leaving the barrier closed/collidable;
+- second completion opening the barrier;
+- duplicate signal protection for unlock and `dual_light_completed` emission counts;
+- absence of `_process()` in the coordinator;
+- unchanged barrier script;
+- unchanged Sun scripts;
+- unchanged Moon lantern/stream behavior scripts;
+- new scene instance reset to closed initial state.
+
+### Rendered QA status
+
+Rendered gameplay QA: PARTIAL. Headless validation was completed, but this environment did not provide a reliable normal graphical gameplay renderer for manual rendered confirmation. A later in-editor pass should visually confirm the barrier remains visible/collidable after the first puzzle and dissolves only after the second puzzle in both completion orders.
+
+### Remaining risks
+
+- The coordinator validator exercises scene integration and actual controller signals, but full player-path manual rendered QA remains pending because no normal graphical renderer was available in this environment.
+- Barrier visibility polish, dual-color visual treatment, audio feedback, particle density changes, and finale changes remain intentionally out of scope for Slice 3.
