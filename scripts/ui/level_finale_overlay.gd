@@ -19,7 +19,10 @@ const REWARD_FONT: FontFile = preload("res://assets/fonts/cormorant_garamond/Cor
 const VINE_LEAF_TEXTURE: Texture2D = preload("res://assets/ui/shard_reward_overlay/vine_leaf.png")
 const LEAF_STEM_ANCHOR_UV := Vector2(0.235, 0.855)
 const MAX_TEXT_LINES := 6
-const FINALE_TEXT_SAFE_AREA_RATIO := 0.80
+const FINALE_TEXT_SAFE_AREA_RATIO := 0.98
+const FINALE_FONT_CANDIDATES: Array[int] = [72, 68, 64, 60]
+const FINALE_MIN_FONT_SIZE := 60
+const FINALE_LAYOUT_DIAGNOSTICS := false
 
 @export var text_start_delay: float = 0.72
 @export var line_reveal_duration: float = 4.6
@@ -196,6 +199,10 @@ func _layout_text_lines(scale_factor: float) -> void:
 	var layout := _layout_finale_text(_full_text, scale_factor)
 	var lines := layout["lines"] as Array[String]
 	var font_size := int(layout["font_size"])
+	if not bool(layout.get("valid", true)):
+		push_error("LevelFinaleOverlay: invalid finale layout; hiding text lines to avoid clipping.")
+		_reset_line_masks()
+		return
 	var line_height := _visual_line_height(font_size, scale_factor)
 	var total_height := line_height * float(lines.size())
 	var start_y := _text_safe_rect.position.y + (_text_safe_rect.size.y - total_height) * 0.5
@@ -220,32 +227,37 @@ func _layout_text_lines(scale_factor: float) -> void:
 		mask.position = Vector2(_text_safe_rect.position.x + (_text_safe_rect.size.x - width) * 0.5, start_y + line_height * float(i))
 		mask.size = Vector2(width, line_height)
 
-func _layout_finale_text(text: String, scale_factor: float) -> Dictionary:
+func _layout_finale_text(text: String, _scale_factor: float) -> Dictionary:
 	var normalized := _normalize_text(text)
-	for base_size in [60, 56, 52, 48, 44, 40, 36, 32, 28, 24, 20, 18, 16, 14, 12, 10]:
-		var font_size := int(round(float(base_size) * scale_factor))
+	for base_size in FINALE_FONT_CANDIDATES:
+		var font_size := base_size
 		var explicit := normalized.split("\n", false)
 		var result: Array[String] = []
 		if explicit.size() > 1:
 			for part in explicit:
-				result.append_array(_word_wrap(part, font_size, maxi(1, MAX_TEXT_LINES - result.size()), scale_factor))
+				result.append_array(_word_wrap(part, font_size, maxi(1, MAX_TEXT_LINES - result.size()), _scale_factor))
 		else:
-			result = _word_wrap(normalized.replace("\n", " "), font_size, MAX_TEXT_LINES, scale_factor)
-		if result.size() <= MAX_TEXT_LINES and _lines_fit(result, font_size, scale_factor):
-			return {"lines": result, "font_size": font_size}
-	var fallback_size := int(round(10.0 * scale_factor))
-	var fallback: Array[String] = []
-	var explicit_fallback := normalized.split("\n", false)
-	if explicit_fallback.size() > 1:
-		for part in explicit_fallback:
-			fallback.append_array(_word_wrap(part, fallback_size, maxi(1, MAX_TEXT_LINES - fallback.size()), scale_factor))
-	else:
-		fallback = _word_wrap(normalized.replace("\n", " "), fallback_size, MAX_TEXT_LINES, scale_factor)
-	while fallback.size() > MAX_TEXT_LINES:
-		fallback[MAX_TEXT_LINES - 1] = "%s %s" % [fallback[MAX_TEXT_LINES - 1], fallback.pop_back()]
-	for i in range(fallback.size()):
-		fallback[i] = fallback[i].strip_edges()
-	return {"lines": fallback, "font_size": fallback_size}
+			result = _word_wrap(normalized.replace("\n", " "), font_size, MAX_TEXT_LINES, _scale_factor)
+		var width_fit := _lines_fit_width(result, font_size, _scale_factor)
+		var height_fit := _lines_fit_height(result, font_size, _scale_factor)
+		_log_finale_layout_diagnostics(normalized.length(), font_size, result.size(), width_fit, height_fit, font_size if width_fit and height_fit else -1)
+		if result.size() <= MAX_TEXT_LINES and width_fit and height_fit:
+			return {"lines": result, "font_size": font_size, "valid": true}
+	var minimum_size := FINALE_MIN_FONT_SIZE
+	var minimum_lines := _word_wrap(normalized.replace("\n", " "), minimum_size, MAX_TEXT_LINES, _scale_factor)
+	push_error(
+		"LevelFinaleOverlay: finale text does not fit inside %d lines at minimum font size %d. Add explicit line breaks to the approved text."
+		% [MAX_TEXT_LINES, FINALE_MIN_FONT_SIZE]
+	)
+	_log_finale_layout_diagnostics(
+		normalized.length(),
+		minimum_size,
+		minimum_lines.size(),
+		_lines_fit_width(minimum_lines, minimum_size, _scale_factor),
+		_lines_fit_height(minimum_lines, minimum_size, _scale_factor),
+		-1
+	)
+	return {"lines": [], "font_size": FINALE_MIN_FONT_SIZE, "valid": false}
 
 func _word_wrap(text: String, font_size: int, max_lines: int, scale_factor: float) -> Array[String]:
 	var words: PackedStringArray = text.split(" ", false)
@@ -271,11 +283,10 @@ func _word_wrap(text: String, font_size: int, max_lines: int, scale_factor: floa
 	return lines
 
 func _lines_fit(lines: Array[String], font_size: int, scale_factor: float) -> bool:
+	return _lines_fit_width(lines, font_size, scale_factor) and _lines_fit_height(lines, font_size, scale_factor)
+
+func _lines_fit_width(lines: Array[String], font_size: int, scale_factor: float) -> bool:
 	if lines.size() > MAX_TEXT_LINES:
-		return false
-	var visual_line_height := _visual_line_height(font_size, scale_factor)
-	var total_visual_height := visual_line_height * float(lines.size())
-	if total_visual_height > _text_safe_rect.size.y:
 		return false
 	for line in lines:
 		var measured := REWARD_FONT.get_string_size(line, HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size).x
@@ -283,19 +294,29 @@ func _lines_fit(lines: Array[String], font_size: int, scale_factor: float) -> bo
 			return false
 	return true
 
+func _lines_fit_height(lines: Array[String], font_size: int, scale_factor: float) -> bool:
+	if lines.size() > MAX_TEXT_LINES:
+		return false
+	return _visual_line_height(font_size, scale_factor) * float(lines.size()) <= _text_safe_rect.size.y
+
+func _log_finale_layout_diagnostics(text_length: int, candidate_font_size: int, line_count: int, fit_by_width: bool, fit_by_height: bool, selected_font_size: int) -> void:
+	if not FINALE_LAYOUT_DIAGNOSTICS:
+		return
+	print("finale text length=%d candidate font size=%d line count=%d fit by width=%s fit by height=%s selected font size=%d" % [text_length, candidate_font_size, line_count, fit_by_width, fit_by_height, selected_font_size])
+
 func _visual_line_height(font_size: int, scale_factor: float) -> float:
 	var outline := _outline_size()
 	var shadow_y := _shadow_offset_y()
 	return REWARD_FONT.get_height(font_size) + float(outline) * 2.0 + absf(float(shadow_y)) + _reveal_start_offset(scale_factor) + _vertical_text_padding(scale_factor) * 2.0
 
 func _horizontal_text_padding(scale_factor: float) -> float:
-	return 18.0 * scale_factor + float(_outline_size()) + absf(float(_shadow_offset_x()))
+	return 6.0 * scale_factor + float(_outline_size()) + absf(float(_shadow_offset_x()))
 
 func _vertical_text_padding(scale_factor: float) -> float:
-	return 8.0 * scale_factor
+	return 3.0 * scale_factor
 
 func _reveal_start_offset(scale_factor: float) -> float:
-	return 10.0 * scale_factor
+	return 4.0 * scale_factor
 
 func _outline_size() -> int:
 	return int(round(7.0 * _viewport_size().y / 1080.0))
@@ -320,8 +341,8 @@ func _safe_text_width(scale_factor: float) -> float:
 
 func _update_frame_and_text_safe_rect() -> void:
 	var vp := _viewport_size()
-	_frame_rect = Rect2(Vector2(vp.x * 0.17, vp.y * 0.16), Vector2(vp.x * 0.66, vp.y * 0.56))
-	var inner_margin := Vector2(vp.x * 0.055, vp.y * 0.065)
+	_frame_rect = Rect2(Vector2(vp.x * 0.02, vp.y * 0.02), Vector2(vp.x * 0.96, vp.y * 0.88))
+	var inner_margin := Vector2(vp.x * 0.010, vp.y * 0.010)
 	var inner_rect := _frame_rect.grow_individual(-inner_margin.x, -inner_margin.y, -inner_margin.x, -inner_margin.y)
 	_text_safe_rect = Rect2(
 		inner_rect.position + inner_rect.size * 0.10,
