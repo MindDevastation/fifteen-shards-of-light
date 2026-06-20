@@ -22,6 +22,7 @@
 [ext_resource type="PackedScene" uid="uid://bbshbmlep0e44" path="res://scenes/environment/assets/lantern_02.tscn" id="23_0rjyr"]
 [ext_resource type="PackedScene" uid="uid://dticujw6n57ry" path="res://scenes/environment/assets/lantern_01.tscn" id="24_0k37p"]
 [ext_resource type="Script" path="res://scripts/puzzles/celestial_barrier_gate.gd" id="25_celestial_barrier"]
+[ext_resource type="Script" path="res://scripts/puzzles/sun_ray_puzzle_controller.gd" id="26_sun_ray_controller"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_finale_trigger"]
 size = Vector3(12.087067, 4, 5)
@@ -265,6 +266,11 @@ transform = Transform3D(0.87951577, 0, -0.4758698, 0, 1, 0, 0.4758698, 0, 0.8795
 
 [node name="sun_ray_lantern_node_5" parent="Sun Ray" unique_id=1930981530 instance=ExtResource("24_0k37p")]
 transform = Transform3D(0.91051054, 0, -0.4134858, 0, 1, 0, 0.4134858, 0, 0.91051054, -33.136993, -0.047822356, 186.34566)
+
+
+[node name="SunRayPuzzleController" type="Node3D" parent="Sun Ray" unique_id=1736124003]
+script = ExtResource("26_sun_ray_controller")
+lantern_paths = Array[NodePath]([NodePath("../sun_ray_lantern_start"), NodePath("../sun_ray_lantern_node_1"), NodePath("../sun_ray_lantern_node_2"), NodePath("../sun_ray_lantern_node_3"), NodePath("../sun_ray_lantern_node_4"), NodePath("../sun_ray_lantern_end")])
 
 [node name="Moon Ray" type="Node3D" parent="." unique_id=588521764]
 
