@@ -175,3 +175,24 @@
 - Mask overlap validation: passed at `1920x1080`; blocked at `1216x684` and `1280x720` because no valid six-line layout exists without violating the preserved safe-area/emblem/font-size/no-scaling constraints.
 - Rendered screenshot QA status: not performed. A normal graphical Godot editor/player renderer is not available in this non-interactive headless environment; visual completion is not claimed.
 - Screenshot path: none.
+
+## Dynamic Resolution-Based Finale Text Sizing
+- Removed fixed-size constraints superseded by this pass: `FINALE_FONT_CANDIDATES = [72, 68, 64, 60]`, `FINALE_MIN_FONT_SIZE = 60`, the whole-frame `FINALE_TEXT_SAFE_AREA_RATIO`, the full-width `FOX_EMBLEM_RESERVED_HEIGHT_RATIO` subtraction, the fixed `ITALIC_VISUAL_MARGIN`, and the ratio-based negative/legacy line-gap approach.
+- Responsive frame ratios: `FRAME_WIDTH_RATIO = 0.84`, `FRAME_HEIGHT_RATIO = 0.84`; the vine frame is centered and occupies `84%` of viewport width and height.
+- Responsive text-area ratios: `TEXT_AREA_WIDTH_RATIO = 0.84`, `TEXT_AREA_HEIGHT_RATIO = 0.82`, with `TEXT_AREA_VERTICAL_BIAS_RATIO = -0.025` to keep the text field slightly above the lower fox emblem without subtracting a hard `90-100 px` band from the whole text rectangle.
+- Font sizing base: `BASE_VIEWPORT_HEIGHT = 1080.0`, `BASE_MAX_FONT_SIZE = 72.0`, `ABSOLUTE_MIN_FONT_SIZE = 24`, `ABSOLUTE_MAX_FONT_SIZE = 96`.
+- Responsive maximum formula: `BASE_MAX_FONT_SIZE * min(viewport.x / 1920.0, viewport.y / BASE_VIEWPORT_HEIGHT)`, clamped to the absolute min/max.
+- Largest-fit search algorithm: starting at the responsive maximum, test every integer font size down to `ABSOLUTE_MIN_FONT_SIZE`; the first size whose real width and full mask-block height fit is selected.
+- Width fit uses real font metrics plus responsive italic/outline/shadow padding; horizontal text scaling remains removed and every finale label uses `label.scale = Vector2.ONE`.
+- Height fit uses `REWARD_FONT.get_height(font_size)`, responsive outline on both sides, shadow, vertical padding, reveal offset, and positive line gap. Mask height and line advance are separate and masks do not overlap.
+- Selected sizes from `/tmp/validate_dynamic_finale_layout.gd`:
+  - `960x540`: responsive max `36`, selected `36`, frame `84% x 84%`, text field `84% x 82%`, total mask block `336.30 px`.
+  - `1216x684`: responsive max `46`, selected `46`, frame `84% x 84%`, text field `84% x 82%`, total mask block `418.75 px`.
+  - `1280x720`: responsive max `48`, selected `48`, frame `84% x 84%`, text field `84% x 82%`, total mask block `444.00 px`.
+  - `1600x900`: responsive max `60`, selected `60`, frame `84% x 84%`, text field `84% x 82%`, total mask block `553.50 px`.
+  - `1920x1080`: responsive max `72`, selected `72`, frame `84% x 84%`, text field `84% x 82%`, total mask block `651.00 px`.
+  - `2560x1440`: responsive max `96`, selected `96`, frame `84% x 84%`, text field `84% x 82%`, total mask block `850.20 px`.
+- Resize handling: `get_viewport().size_changed` is connected in `LevelFinaleOverlay._ready()` and triggers responsive frame/text/button relayout, text relayout, vine rebuild while visible, and redraw.
+- Rendered QA status: PARTIAL. Responsive geometry validation passed; ordinary graphical Godot player screenshot QA was not performed because this container cannot initialize X11 or Wayland display drivers (`libXcursor.so.1` and `libwayland-client.so.0` are unavailable).
+- Screenshot paths: none.
+- Superseded earlier statements: the previous minimum font size `60`, fixed candidate list `[72, 68, 64, 60]`, and “layout impossible at 720p” conclusion no longer apply; `1216x684` and `1280x720` now select dynamic sizes `46` and `48` respectively and pass geometry validation.
