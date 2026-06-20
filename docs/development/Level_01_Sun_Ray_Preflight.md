@@ -270,3 +270,10 @@ This preflight intentionally does not change:
 
 ## 14. Final Recommendation
 Proceed to Slice 2 only after the remote/push blocker is resolved. Implement Sun Ray as an additive, separate controller under `/root/Level_01/Sun Ray`, configured with the six user-authored NodePaths and preserving their exact transforms. Keep Moon Ray behavior unchanged until dual completion has proven tests. If a shared barrier is introduced later, route `moon_ray_completed` and `sun_ray_completed` through a Level 01 coordinator with a single centralized unlock check rather than opening the barrier directly from either ray controller.
+
+## Remote Publication Resolution
+
+- PR #97 was successfully published and merged.
+- PR #97 head SHA: `cb3306f57658bf15aeba783ee5ba50a0b4ad5c9b`.
+- PR #97 merge commit: `1f6f6b8e8464ccbea4677c189deeca46e2805b4b`.
+- The earlier missing-origin publication blocker is historical and resolved.
