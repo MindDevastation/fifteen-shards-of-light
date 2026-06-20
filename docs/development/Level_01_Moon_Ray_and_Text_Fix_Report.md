@@ -54,7 +54,7 @@
 - Minimum finale font size: `60`.
 - No finale fallback below `60` remains.
 - Runtime diagnostics are available behind `FINALE_LAYOUT_DIAGNOSTICS = false` and print: text length, candidate font size, line count, fit by width, fit by height, selected font size.
-- Level 01 real finale text selected size in validation: `60` at `1920x1080` and `60` at `1280x720`.
+- Level 01 real finale text selected size in the earlier text-size-only validation was `60` at `1920x1080` and `60` at `1280x720`; the later safe-layout correction below supersedes the final layout metrics.
 
 ## Shard reward text sizing
 - Runtime call chain: `SoulShard.reward_sequence_requested` -> `ShardRewardSequenceController._on_reward_sequence_requested()` -> `ShardRewardOverlay.play_reward()` -> `$TextRoot/RewardText` (`RichTextLabel`) -> `_apply_responsive_layout()` font-size overrides.
@@ -112,10 +112,46 @@
 - The unsafe fallback that merged overflow text into a sixth line was removed.
 - `_layout_finale_text()` now returns a valid layout only when line count is at most `6` and both width and height fit.
 - Invalid oversized text returns `valid = false`, `lines = []`, and `font_size = 60`; it logs an error instead of returning a clipping layout.
-- Finale responsive safe-area proportions were widened/tallened and padding was reduced so the approved Level 01 text can fit while keeping font size in `[72, 68, 64, 60]`.
+- The earlier widened/tallened finale safe-area proportions were superseded by the later safe-layout correction below, which restores the safe-area ratio to `0.80` and reserves the fox-emblem zone.
 
 ### Real Level 01 Finale Line Breaks
 - Real text source: `scenes/levels/Level_01.tscn`, `Level01FinaleController.finale_text`.
 - The approved words were preserved and split into `6` meaningful lines.
-- Validation result at `1920x1080`: selected font size `72`, width fit `true`, height fit `true`.
-- Validation result at `1280x720`: selected font size `64`, width fit `true`, height fit `true`.
+- Earlier validation result at `1920x1080`: selected font size `72`, width fit `true`, height fit `true`; superseded by the safe-layout correction metrics below.
+- Earlier validation result at `1280x720`: selected font size `64`, width fit `true`, height fit `true`; superseded by the safe-layout correction metrics below.
+
+## Finale Rendered Safe Layout Correction
+- Old safe area ratio: `0.98`.
+- New safe area ratio: `0.80` of the vine-frame inner rect before the fox-emblem reserved zone is subtracted.
+- Old frame rect: `Rect2(Vector2(vp.x * 0.02, vp.y * 0.02), Vector2(vp.x * 0.96, vp.y * 0.88))`.
+- New frame rect: `Rect2(Vector2(vp.x * 0.045, vp.y * 0.045), Vector2(vp.x * 0.91, vp.y * 0.85))`.
+- Emblem reserved height: `maxf(90.0, vp.y * 0.14)`; validated values were `95.76 px` at `1216x684`, `100.8 px` at `1280x720`, and `151.2 px` at `1920x1080`.
+- Text vertical offset: `TEXT_BLOCK_VERTICAL_OFFSET_RATIO = -0.05`, clamped to keep the mask block inside the safe rect.
+- Line gap: `LINE_GAP_RATIO = -0.14`.
+- Horizontal italic margin: `ITALIC_VISUAL_MARGIN = 28.0`; horizontal padding also includes outline and shadow X offset.
+- Selected font size at `1216x684`: `60`.
+- Selected font size at `1280x720`: `60`.
+- Selected font size at `1920x1080`: `72`.
+- Six line mask rects at `1216x684`:
+  - line 1: `Rect2(Vector2(271.9062, 94.39201), Vector2(672.1877, 67.24))`
+  - line 2: `Rect2(Vector2(249.3318, 152.2184), Vector2(717.3366, 67.24001))`
+  - line 3: `Rect2(Vector2(180.078, 210.0448), Vector2(855.8441, 67.23999))`
+  - line 4: `Rect2(Vector2(175.104, 267.8712), Vector2(865.7921, 67.23999))`
+  - line 5: `Rect2(Vector2(318.2029, 325.6976), Vector2(579.5944, 67.23999))`
+  - line 6: `Rect2(Vector2(284.15, 383.524), Vector2(647.7003, 67.23999))`
+- Six line mask rects at `1280x720`:
+  - line 1: `Rect2(Vector2(286.5964, 99.36), Vector2(706.8073, 67.24001))`
+  - line 2: `Rect2(Vector2(262.7454, 157.1864), Vector2(754.5093, 67.23999))`
+  - line 3: `Rect2(Vector2(189.5753, 215.0128), Vector2(900.8495, 67.24001))`
+  - line 4: `Rect2(Vector2(184.32, 272.8392), Vector2(911.36, 67.23999))`
+  - line 5: `Rect2(Vector2(335.5112, 330.6656), Vector2(608.9777, 67.23999))`
+  - line 6: `Rect2(Vector2(299.5326, 388.492), Vector2(680.9349, 67.23999))`
+- Six line mask rects at `1920x1080`:
+  - line 1: `Rect2(Vector2(442.9999, 159.375), Vector2(1034.0, 82.5))`
+  - line 2: `Rect2(Vector2(407.4999, 230.325), Vector2(1105.0, 82.49998))`
+  - line 3: `Rect2(Vector2(299.4999, 301.275), Vector2(1321.0, 82.5))`
+  - line 4: `Rect2(Vector2(290.9999, 372.225), Vector2(1338.0, 82.5))`
+  - line 5: `Rect2(Vector2(514.9999, 443.175), Vector2(890.0001, 82.50003))`
+  - line 6: `Rect2(Vector2(461.9999, 514.125), Vector2(996.0001, 82.5))`
+- Targeted geometry validation: passed for `1216x684`, `1280x720`, and `1920x1080`; each run used the real six-line `Level01FinaleController.finale_text`, selected a font size of at least `60`, kept all masks inside the text safe rect, and kept the text block out of the emblem reserved rect.
+- Rendered screenshot QA performed: no. A headless screenshot attempt could not read a viewport texture in this environment because Godot used dummy rendering storage, so visual completion is not claimed.
