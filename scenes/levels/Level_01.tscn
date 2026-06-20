@@ -8,7 +8,6 @@
 [ext_resource type="PackedScene" uid="uid://drk14cdu82fdd" path="res://scenes/environment/assets/bridge_sector_01.tscn" id="7_dwcxj"]
 [ext_resource type="PackedScene" uid="uid://bhc65uunv3u80" path="res://scenes/environment/assets/bridge_sector_with_pylon_01.tscn" id="8_c83vx"]
 [ext_resource type="PackedScene" uid="uid://cvpylsb4dxhpm" path="res://scenes/environment/assets/bridge_sector_with_pylon_02.tscn" id="9_5dpfh"]
-[ext_resource type="PackedScene" uid="uid://bcw506sqv56hv" path="res://scenes/environment/assets/cloud_001.tscn" id="10_vlkw4"]
 [ext_resource type="PackedScene" uid="uid://1mmrgt43swb" path="res://scenes/levels/level_01/blocks/Landmark_Island_01.tscn" id="11_xpxa0"]
 [ext_resource type="PackedScene" uid="uid://bus15thti2c2s" path="res://scenes/environment/assets/Ancient_Stone_Barrier_01.tscn" id="13_xg7sb"]
 [ext_resource type="PackedScene" path="res://scenes/core/SoulShard.tscn" id="14_soul_shard"]
@@ -20,9 +19,9 @@
 [ext_resource type="PackedScene" uid="uid://xm215olcv6cg" path="res://scenes/ui/LevelFinaleOverlay.tscn" id="20_finale_overlay"]
 [ext_resource type="PackedScene" path="res://scenes/core/LevelPortal.tscn" id="21_level_portal"]
 [ext_resource type="Script" path="res://scripts/puzzles/moon_ray_puzzle_controller.gd" id="22_moon_ray_controller"]
-[ext_resource type="Script" path="res://scripts/puzzles/celestial_barrier_gate.gd" id="25_celestial_barrier"]
 [ext_resource type="PackedScene" uid="uid://bbshbmlep0e44" path="res://scenes/environment/assets/lantern_02.tscn" id="23_0rjyr"]
 [ext_resource type="PackedScene" uid="uid://dticujw6n57ry" path="res://scenes/environment/assets/lantern_01.tscn" id="24_0k37p"]
+[ext_resource type="Script" path="res://scripts/puzzles/celestial_barrier_gate.gd" id="25_celestial_barrier"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_finale_trigger"]
 size = Vector3(12.087067, 4, 5)
@@ -109,7 +108,12 @@ finale_overlay_path = NodePath("../../UILayer/LevelFinaleOverlay")
 portal_path = NodePath("../../LandmarkFinaleRoot/PortalAnchor/LevelPortal")
 minimum_entry_height = 0.4
 minimum_approach_dot = 0.2
-finale_text = "Когда ты появилась в моей жизни,\nмир не стал громче - он стал теплее.\nВ этом не было драмы или резкого поворота,\nпросто рядом с мыслью о тебе стало светлее.\nМне дорого это первое тепло,\nпотому что с него все и началось"
+finale_text = "Когда ты появилась в моей жизни,
+мир не стал громче - он стал теплее.
+В этом не было драмы или резкого поворота,
+просто рядом с мыслью о тебе стало светлее.
+Мне дорого это первое тепло,
+потому что с него все и началось"
 
 [node name="LandmarkFinaleRoot" type="Node3D" parent="." unique_id=1560038229]
 transform = Transform3D(0.9925461, 0, -0.12186927, 0, 1, 0, 0.12186927, 0, 0.9925461, -47.918728, 2.25, 306.05453)
@@ -239,7 +243,6 @@ transform = Transform3D(0.17364822, 0, 0.9848077, 0, 1, 0, -0.9848077, 0, 0.1736
 [node name="Ancient_Stone_Barrier_01" parent="Architecture" unique_id=538048969 instance=ExtResource("13_xg7sb")]
 transform = Transform3D(1.2226845, 0, -0.25988963, 0, 1.25, 0, 0.25988963, 0, 1.2226845, -40.65623, 2.2720172, 264.2825)
 
-
 [node name="Sun Ray" type="Node3D" parent="." unique_id=1711538893]
 
 [node name="sun_ray_lantern_end" parent="Sun Ray" unique_id=663829287 instance=ExtResource("23_0rjyr")]
@@ -247,6 +250,21 @@ transform = Transform3D(-0.9619084, 0, 0.27337173, 0, 1, 0, -0.27337173, 0, -0.9
 
 [node name="sun_ray_lantern_start" parent="Sun Ray" unique_id=819189819 instance=ExtResource("23_0rjyr")]
 transform = Transform3D(0.9631438, 0, -0.26898706, 0, 1, 0, 0.26898706, 0, 0.9631438, -29.130756, 3.4775624, 153.89972)
+
+[node name="sun_ray_lantern_node_1" parent="Sun Ray" unique_id=1925355688 instance=ExtResource("24_0k37p")]
+transform = Transform3D(0.90661734, 0, -0.4219538, 0, 1, 0, 0.4219538, 0, 0.90661734, -31.238493, 0.16439867, 165.80621)
+
+[node name="sun_ray_lantern_node_2" parent="Sun Ray" unique_id=10297893 instance=ExtResource("24_0k37p")]
+transform = Transform3D(0.9995763, 0, -0.029107958, 0, 1, 0, 0.029107958, 0, 0.9995763, -31.5257, 0.16439867, 167.29549)
+
+[node name="sun_ray_lantern_node_3" parent="Sun Ray" unique_id=1966994477 instance=ExtResource("24_0k37p")]
+transform = Transform3D(0.8579932, 0, 0.5136611, 0, 1, 0, -0.5136611, 0, 0.8579932, -31.5257, -0.007477641, 171.10173)
+
+[node name="sun_ray_lantern_node_4" parent="Sun Ray" unique_id=1378840578 instance=ExtResource("24_0k37p")]
+transform = Transform3D(0.87951577, 0, -0.4758698, 0, 1, 0, 0.4758698, 0, 0.87951577, -28.242622, -0.047822356, 181.99454)
+
+[node name="sun_ray_lantern_node_5" parent="Sun Ray" unique_id=1930981530 instance=ExtResource("24_0k37p")]
+transform = Transform3D(0.91051054, 0, -0.4134858, 0, 1, 0, 0.4134858, 0, 0.91051054, -33.136993, -0.047822356, 186.34566)
 
 [node name="Moon Ray" type="Node3D" parent="." unique_id=588521764]
 
@@ -256,7 +274,7 @@ transform = Transform3D(-0.9619084, 0, 0.27337173, 0, 1, 0, -0.27337173, 0, -0.9
 [node name="moon_ray_lantern_start" parent="Moon Ray" unique_id=1155759624 instance=ExtResource("23_0rjyr")]
 transform = Transform3D(0.9631438, 0, -0.26898706, 0, 1, 0, 0.26898706, 0, 0.9631438, -36.6754, 3.4775624, 152.58348)
 
-[node name="moon_ray_lantern_node_1" parent="Moon Ray" unique_id=1925355688 instance=ExtResource("24_0k37p")]
+[node name="moon_ray_lantern_node_1" parent="Moon Ray" unique_id=975084650 instance=ExtResource("24_0k37p")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36.654385, 0.08629632, 159.15382)
 
 [node name="moon_ray_lantern_node_2" parent="Moon Ray" unique_id=383787851 instance=ExtResource("24_0k37p")]
@@ -269,9 +287,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -39.835213, 0.05342567, 181.9
 script = ExtResource("22_moon_ray_controller")
 lantern_paths = Array[NodePath]([NodePath("../moon_ray_lantern_start"), NodePath("../moon_ray_lantern_node_1"), NodePath("../moon_ray_lantern_node_2"), NodePath("../moon_ray_lantern_node_3"), NodePath("../moon_ray_lantern_end")])
 barrier_path = NodePath("../moon_ray_celestial_barrier")
-particle_count = 48
 
 [node name="moon_ray_celestial_barrier" type="StaticBody3D" parent="Moon Ray" unique_id=1736124002]
-transform = Transform3D(-0.9619084, 0, 0.27337173, 0, 1, 0, -0.27337173, 0, -0.9619084, -38.8, 3.05, 189.6)
+transform = Transform3D(0.9947279, 0, -0.10254952, 0, 1, 0, 0.10254952, 0, 0.9947279, -36.61529, 2.3624349, 194.6155)
 script = ExtResource("25_celestial_barrier")
-dissolve_duration = 2.2
