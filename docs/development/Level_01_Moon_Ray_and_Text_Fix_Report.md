@@ -224,3 +224,18 @@
 - Resize validation results: `/tmp/validate_finale_resize_state.gd` passed hidden-overlay resize, fully revealed resize to larger/smaller viewports, resize during reveal with text-only tween cancellation/restart, and rapid resize coalescing.
 - Reveal geometry validation: initial hidden layout keeps each label at `settled_y + reveal_offset`; fully revealed layout keeps each label at `settled_y`, alpha `1.0`, `label.scale = Vector2.ONE`, and non-overlapping masks.
 - Rendered QA status: PARTIAL. Responsive geometry and resize-state validation passed; ordinary graphical Godot player screenshot QA was not performed because this container cannot initialize X11 or Wayland display drivers.
+
+## Finale Vine Progress Preservation and Tween Registry Cleanup
+- Old `_build_vines()` behavior: rebuilding responsive vine geometry always ended with `_set_left_progress(0.0)` and `_set_right_progress(0.0)`, so a viewport resize could make a fully open frame disappear or make opening/closing vines jump back to the start.
+- New progress-preserving behavior: `_build_vines()` snapshots `_left_progress` and `_right_progress` before clearing branch/leaf geometry, rebuilds the viewport-dependent paths, branches, and leaves, then reapplies each side's preserved progress to the new `Line2D` point arrays.
+- Initial build behavior: `_reset_visuals()` still sets both progress values to `0.0` before the first build, so the first opening sequence starts from the same hidden frame state.
+- Opening resize behavior: a partial opening state such as left/right `0.43` remains `0.43` after responsive geometry rebuild; the existing opening tween continues driving progress toward `1.0` without restarting the finale overlay or atmosphere.
+- Open resize behavior: fully open progress `1.0 / 1.0` remains fully visible after resizing to larger and smaller viewports; new left/right paths receive visible points immediately after rebuild.
+- Closing resize behavior: partial closing progress such as `0.58 / 0.58` is preserved across rebuild, and subsequent close values `0.40`, `0.20`, and `0.0` continue shortening the rebuilt paths.
+- Left/right asymmetric progress validation: independent values such as left `0.31` and right `0.67` remain independent after resize; one side's progress is not copied to the other.
+- Text tween cleanup behavior: completed reveal tweens are removed from both `_text_reveal_tweens` and `_active_tweens` via `_untrack_text_reveal_tween()` before reveal state transitions to `REVEALED`.
+- Active tween registry behavior: cancelled text reveal tweens are cancelled from a duplicate list, removed from `_active_tweens`, cleared from `_text_reveal_tweens`, and guarded by an incremented `_text_reveal_generation`; `_kill_tweens()` also clears both registries and invalidates stale reveal continuations.
+- Rapid resize validation: repeated viewport changes coalesce into one deferred relayout, preserve vine progress, and do not create unbounded branch, leaf, active tween, or text reveal tween growth.
+- Superseded resize-handling note: the earlier resize-safe text reveal section did not yet cover vine progress preservation or active registry cleanup for text reveal tweens; this section completes that remaining runtime fix.
+- Targeted validation status: `/tmp/validate_finale_vine_resize_progress.gd` passed open, opening, asymmetric, closing, and rapid-resize vine progress checks; `/tmp/validate_finale_tween_cleanup.gd` passed completed, cancelled, repeated-resize, and full-reset text reveal tween registry cleanup checks.
+- Rendered QA status: PARTIAL. Vine-progress and tween-registry validation passed headlessly; ordinary graphical resize QA was not performed because this container cannot initialize X11 or Wayland display drivers.

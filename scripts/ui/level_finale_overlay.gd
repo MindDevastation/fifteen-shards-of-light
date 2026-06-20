@@ -170,9 +170,9 @@ func _reveal_text_async(generation: int, delay_before_start: float) -> void:
 		tween.tween_property(label, "position:y", float(label.get_meta("settled_y", label.position.y)), line_reveal_duration * 0.72).set_delay(delay).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		tween.tween_property(label, "modulate:a", 1.0, line_reveal_duration * 0.86).set_delay(delay).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	await tween.finished
+	_untrack_text_reveal_tween(tween)
 	if generation != _text_reveal_generation:
 		return
-	_text_reveal_tweens.erase(tween)
 	_text_complete = true
 	_apply_fully_revealed_text_state()
 	_try_enable_button()
@@ -510,10 +510,33 @@ func debug_text_reveal_generation() -> int:
 func debug_text_reveal_tween_count() -> int:
 	return _text_reveal_tweens.size()
 
+func debug_active_tween_count() -> int:
+	return _active_tweens.size()
+
 func debug_resize_relayout_pending() -> bool:
 	return _resize_relayout_pending
 
+func debug_left_progress() -> float:
+	return _left_progress
+
+func debug_right_progress() -> float:
+	return _right_progress
+
+func debug_left_visible_point_count() -> int:
+	return left_lines[0].points.size()
+
+func debug_right_visible_point_count() -> int:
+	return right_lines[0].points.size()
+
+func debug_branch_count() -> int:
+	return branch_layer.get_child_count()
+
+func debug_leaf_count() -> int:
+	return leaf_layer.get_child_count()
+
 func _build_vines() -> void:
+	var preserved_left_progress := _left_progress
+	var preserved_right_progress := _right_progress
 	_clear_branches_and_leaves()
 	var vp := _viewport_size()
 	_update_frame_and_text_safe_rect()
@@ -529,8 +552,8 @@ func _build_vines() -> void:
 	_right_points = _build_side_curve(fox_top + overlap, Vector2(center_x + vp.x * 0.16, bottom), Vector2(right, bottom - radius), Vector2(right, top + radius), Vector2(center_x, top), 1)
 	_build_branch_geometry()
 	_build_leaf_geometry()
-	_set_left_progress(0.0)
-	_set_right_progress(0.0)
+	_set_left_progress(preserved_left_progress)
+	_set_right_progress(preserved_right_progress)
 
 func _build_side_curve(start: Vector2, lower_center: Vector2, lower_corner: Vector2, upper_corner: Vector2, top_center: Vector2, side: int) -> PackedVector2Array:
 	var curve := Curve2D.new()
@@ -776,11 +799,17 @@ func _track_text_reveal_tween(tween: Tween) -> Tween:
 	_text_reveal_tweens.append(tween)
 	return _track_tween(tween)
 
+func _untrack_text_reveal_tween(tween: Tween) -> void:
+	_text_reveal_tweens.erase(tween)
+	_active_tweens.erase(tween)
+
 func _cancel_text_reveal_tweens() -> void:
-	for tween in _text_reveal_tweens:
+	var tweens_to_cancel := _text_reveal_tweens.duplicate()
+	_text_reveal_tweens.clear()
+	for tween in tweens_to_cancel:
+		_active_tweens.erase(tween)
 		if tween != null and tween.is_valid():
 			tween.kill()
-	_text_reveal_tweens.clear()
 	_text_reveal_generation += 1
 
 func _kill_tweens() -> void:
@@ -789,6 +818,7 @@ func _kill_tweens() -> void:
 			tween.kill()
 	_active_tweens.clear()
 	_text_reveal_tweens.clear()
+	_text_reveal_generation += 1
 
 func _normalize_text(value: String) -> String:
 	var result := ""
