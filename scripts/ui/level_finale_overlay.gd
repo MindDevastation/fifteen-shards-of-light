@@ -7,6 +7,12 @@ const FoxConfirmButtonType = preload(
 
 signal closed
 
+enum TextRevealState {
+	HIDDEN,
+	REVEALING,
+	REVEALED,
+}
+
 const MATTE_VEIL_COLOR := Color(0.032, 0.021, 0.018, 0.62)
 const WARM_WASH_COLOR := Color(0.34, 0.15, 0.075, 0.14)
 const TEXT_COLOR := Color(1.0, 0.92, 0.72, 1.0)
@@ -19,9 +25,15 @@ const REWARD_FONT: FontFile = preload("res://assets/fonts/cormorant_garamond/Cor
 const VINE_LEAF_TEXTURE: Texture2D = preload("res://assets/ui/shard_reward_overlay/vine_leaf.png")
 const LEAF_STEM_ANCHOR_UV := Vector2(0.235, 0.855)
 const MAX_TEXT_LINES := 6
-const FINALE_TEXT_SAFE_AREA_RATIO := 0.98
-const FINALE_FONT_CANDIDATES: Array[int] = [72, 68, 64, 60]
-const FINALE_MIN_FONT_SIZE := 60
+const BASE_VIEWPORT_HEIGHT := 1080.0
+const BASE_MAX_FONT_SIZE := 72.0
+const ABSOLUTE_MIN_FONT_SIZE := 24
+const ABSOLUTE_MAX_FONT_SIZE := 96
+const FRAME_WIDTH_RATIO := 0.84
+const FRAME_HEIGHT_RATIO := 0.84
+const TEXT_AREA_WIDTH_RATIO := 0.84
+const TEXT_AREA_HEIGHT_RATIO := 0.82
+const TEXT_AREA_VERTICAL_BIAS_RATIO := -0.025
 const FINALE_LAYOUT_DIAGNOSTICS := false
 
 @export var text_start_delay: float = 0.72
@@ -49,7 +61,14 @@ var _line_masks: Array[Control] = []
 var _line_labels: Array[RichTextLabel] = []
 var _frame_rect := Rect2()
 var _text_safe_rect := Rect2()
+var _emblem_reserved_rect := Rect2()
+var _text_block_rect := Rect2()
+var _selected_font_size := 0
+var _text_reveal_state := TextRevealState.HIDDEN
+var _text_reveal_generation := 0
+var _resize_relayout_pending := false
 var _active_tweens: Array[Tween] = []
+var _text_reveal_tweens: Array[Tween] = []
 
 @onready var atmosphere: Control = $Atmosphere
 @onready var matte_veil: ColorRect = $Atmosphere/MatteVeil
@@ -76,6 +95,8 @@ func _ready() -> void:
 	_create_text_lines()
 	_configure_tip_glows()
 	fox_button.fox_confirmed.connect(_close_once)
+	if not get_viewport().size_changed.is_connected(_on_viewport_size_changed):
+		get_viewport().size_changed.connect(_on_viewport_size_changed)
 	_reset_visuals()
 
 func show_finale_text(text: String) -> bool:
@@ -87,14 +108,17 @@ func show_finale_text(text: String) -> bool:
 	_left_complete = false
 	_right_complete = false
 	_text_complete = false
+	_text_reveal_state = TextRevealState.HIDDEN
 	_kill_tweens()
 	_reset_visuals()
 	show()
 	mouse_filter = Control.MOUSE_FILTER_STOP
-	_apply_responsive_layout()
+	_apply_responsive_geometry()
+	if not _full_text.is_empty():
+		_layout_text_lines(_responsive_scale(), true)
 	_build_vines()
 	_start_opening_animation()
-	_reveal_text_async()
+	_start_text_reveal_sequence()
 	return true
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -110,14 +134,28 @@ func _start_opening_animation() -> void:
 	tween.tween_method(_set_right_progress, 0.0, 1.0, vine_duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	tween.finished.connect(func(): _left_complete = true; _right_complete = true; _try_enable_button())
 
-func _reveal_text_async() -> void:
-	await get_tree().create_timer(text_start_delay).timeout
+func _start_text_reveal_sequence(delay_before_start: float = text_start_delay) -> void:
+	_text_reveal_generation += 1
+	var generation := _text_reveal_generation
+	_text_reveal_state = TextRevealState.REVEALING
+	_text_complete = false
+	_can_confirm = false
+	fox_button.set_enabled(false)
+	_reveal_text_async(generation, delay_before_start)
+
+func _reveal_text_async(generation: int, delay_before_start: float) -> void:
+	if delay_before_start > 0.0:
+		await get_tree().create_timer(delay_before_start).timeout
+		if generation != _text_reveal_generation:
+			return
 	if not visible or _closed_emitted:
 		return
 	text_root.modulate.a = 1.0
-	var tween := _track_tween(create_tween())
+	var tween := _track_text_reveal_tween(create_tween())
 	tween.set_parallel(true)
 	for i in range(_line_masks.size()):
+		if generation != _text_reveal_generation:
+			return
 		var mask := _line_masks[i]
 		if not mask.visible:
 			continue
@@ -132,7 +170,11 @@ func _reveal_text_async() -> void:
 		tween.tween_property(label, "position:y", float(label.get_meta("settled_y", label.position.y)), line_reveal_duration * 0.72).set_delay(delay).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		tween.tween_property(label, "modulate:a", 1.0, line_reveal_duration * 0.86).set_delay(delay).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	await tween.finished
+	_untrack_text_reveal_tween(tween)
+	if generation != _text_reveal_generation:
+		return
 	_text_complete = true
+	_apply_fully_revealed_text_state()
 	_try_enable_button()
 
 func _try_enable_button() -> void:
@@ -168,6 +210,10 @@ func _close_once() -> void:
 	)
 
 func _reset_visuals() -> void:
+	_cancel_text_reveal_tweens()
+	_text_reveal_state = TextRevealState.HIDDEN
+	_selected_font_size = 0
+	_text_block_rect = Rect2()
 	atmosphere.modulate.a = 0.0
 	vine_canvas.modulate.a = 1.0
 	text_root.modulate.a = 0.0
@@ -176,88 +222,140 @@ func _reset_visuals() -> void:
 	fox_button.set_enabled(false)
 	_set_left_progress(0.0)
 	_set_right_progress(0.0)
-	for mask in _line_masks:
-		mask.visible = false
-		mask.size.x = 0.0
-	for label in _line_labels:
-		label.text = ""
-		label.modulate.a = 0.0
+	_reset_line_masks()
 	_clear_branches_and_leaves()
 
-func _apply_responsive_layout() -> void:
-	var vp := _viewport_size()
-	var scale_factor := clampf(vp.y / 1080.0, 0.72, 1.08)
+func _apply_responsive_geometry() -> void:
 	_update_frame_and_text_safe_rect()
-	var button_size := clampf(vp.y * 0.152, 120.0, 164.0)
+	_update_button_layout()
+	_update_emblem_reserved_rect()
+
+func _update_button_layout() -> void:
+	var vp := _viewport_size()
+	var button_size := clampf(vp.y * 0.152, 96.0, 164.0)
 	fox_button.size = Vector2.ONE * button_size
 	fox_button.position = Vector2((vp.x - button_size) * 0.5, vp.y * 0.795)
 	fox_button.set_base_position(fox_button.position)
 	fox_button.pivot_offset = fox_button.size * 0.5
-	_layout_text_lines(scale_factor)
 
-func _layout_text_lines(scale_factor: float) -> void:
+func _apply_responsive_layout_for_resize(previous_state: int) -> void:
+	_apply_responsive_geometry()
+	if _full_text.is_empty():
+		_reset_line_masks()
+		_text_reveal_state = TextRevealState.HIDDEN
+		return
+	match previous_state:
+		TextRevealState.REVEALED:
+			if _layout_text_lines(_responsive_scale(), false):
+				_apply_fully_revealed_text_state()
+		TextRevealState.REVEALING:
+			if _layout_text_lines(_responsive_scale(), true):
+				_restart_text_reveal_after_resize()
+		TextRevealState.HIDDEN:
+			_layout_text_lines(_responsive_scale(), true)
+
+func _on_viewport_size_changed() -> void:
+	if _resize_relayout_pending:
+		return
+	_resize_relayout_pending = true
+	call_deferred("_apply_deferred_viewport_relayout")
+
+func _apply_deferred_viewport_relayout() -> void:
+	_resize_relayout_pending = false
+	var previous_state := _text_reveal_state
+	var had_text := not _full_text.is_empty()
+	if previous_state == TextRevealState.REVEALING:
+		_cancel_text_reveal_tweens()
+	_apply_responsive_layout_for_resize(previous_state)
+	if visible and had_text:
+		_build_vines()
+		queue_redraw()
+
+func _restart_text_reveal_after_resize() -> void:
+	_start_text_reveal_sequence(0.0)
+
+func _apply_fully_revealed_text_state() -> void:
+	for i in range(_line_labels.size()):
+		var label := _line_labels[i]
+		var mask := _line_masks[i]
+		if not mask.visible:
+			continue
+		label.visible = true
+		label.modulate.a = 1.0
+		label.position.y = float(label.get_meta("settled_y", label.position.y))
+	_text_reveal_state = TextRevealState.REVEALED
+
+func _responsive_scale() -> float:
+	return clampf(_viewport_size().y / BASE_VIEWPORT_HEIGHT, 0.5, 1.5)
+
+func _layout_text_lines(scale_factor: float, initially_hidden: bool = true) -> bool:
 	var layout := _layout_finale_text(_full_text, scale_factor)
 	var lines := layout["lines"] as Array[String]
 	var font_size := int(layout["font_size"])
-	if not bool(layout.get("valid", true)):
-		push_error("LevelFinaleOverlay: invalid finale layout; hiding text lines to avoid clipping.")
+	if not bool(layout.get("valid", true)) or font_size < 0:
+		push_error("LevelFinaleOverlay: text cannot fit inside the responsive text area.")
+		_selected_font_size = 0
+		_text_block_rect = Rect2()
 		_reset_line_masks()
-		return
-	var line_height := _visual_line_height(font_size, scale_factor)
-	var total_height := line_height * float(lines.size())
+		return false
+	var glyph_height := _glyph_visual_height(font_size)
+	var reveal_offset := _reveal_start_offset(font_size)
+	var mask_height := glyph_height + reveal_offset
+	var line_gap := _line_gap(font_size)
+	var line_advance := mask_height + line_gap
+	var total_height := mask_height * float(lines.size()) + line_gap * float(maxi(0, lines.size() - 1))
 	var start_y := _text_safe_rect.position.y + (_text_safe_rect.size.y - total_height) * 0.5
+	_selected_font_size = font_size
+	_text_block_rect = Rect2(Vector2(_text_safe_rect.position.x, start_y), Vector2(_text_safe_rect.size.x, total_height))
 	_reset_line_masks()
 	for i in range(lines.size()):
 		var label := _line_labels[i]
 		_configure_label(label, font_size)
 		label.text = "[center][i]%s[/i][/center]" % _bbcode_escape(lines[i])
-		var measured: Vector2 = REWARD_FONT.get_string_size(lines[i], HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size)
-		var horizontal_padding := _horizontal_text_padding(scale_factor)
-		var vertical_padding := _vertical_text_padding(scale_factor)
-		var reveal_offset := _reveal_start_offset(scale_factor)
-		var width := minf(measured.x + horizontal_padding * 2.0, _safe_text_width(scale_factor))
-		label.position = Vector2(horizontal_padding, vertical_padding + reveal_offset)
+		var measured_width := REWARD_FONT.get_string_size(lines[i], HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size).x
+		var horizontal_padding := _horizontal_text_padding(font_size)
+		var vertical_padding := _vertical_text_padding(font_size)
+		var mask_width := measured_width + horizontal_padding * 2.0
+		label.position = Vector2(horizontal_padding, vertical_padding + reveal_offset if initially_hidden else vertical_padding)
+		label.scale = Vector2.ONE
 		label.set_meta("settled_y", vertical_padding)
-		label.size = Vector2(maxf(1.0, width - horizontal_padding * 2.0), line_height - vertical_padding * 2.0 - reveal_offset)
+		label.size = Vector2(maxf(1.0, measured_width), glyph_height)
 		label.visible = true
-		label.modulate.a = 0.0
+		label.modulate.a = 0.0 if initially_hidden else 1.0
 		var mask := _line_masks[i]
 		mask.visible = true
 		mask.clip_contents = true
-		mask.position = Vector2(_text_safe_rect.position.x + (_text_safe_rect.size.x - width) * 0.5, start_y + line_height * float(i))
-		mask.size = Vector2(width, line_height)
+		mask.position = Vector2(
+			_text_safe_rect.position.x + (_text_safe_rect.size.x - mask_width) * 0.5,
+			start_y + line_advance * float(i)
+		)
+		mask.size = Vector2(mask_width, mask_height)
+	return true
 
-func _layout_finale_text(text: String, _scale_factor: float) -> Dictionary:
+func _layout_finale_text(text: String, scale_factor: float) -> Dictionary:
 	var normalized := _normalize_text(text)
-	for base_size in FINALE_FONT_CANDIDATES:
-		var font_size := base_size
-		var explicit := normalized.split("\n", false)
-		var result: Array[String] = []
-		if explicit.size() > 1:
-			for part in explicit:
-				result.append_array(_word_wrap(part, font_size, maxi(1, MAX_TEXT_LINES - result.size()), _scale_factor))
-		else:
-			result = _word_wrap(normalized.replace("\n", " "), font_size, MAX_TEXT_LINES, _scale_factor)
-		var width_fit := _lines_fit_width(result, font_size, _scale_factor)
-		var height_fit := _lines_fit_height(result, font_size, _scale_factor)
-		_log_finale_layout_diagnostics(normalized.length(), font_size, result.size(), width_fit, height_fit, font_size if width_fit and height_fit else -1)
-		if result.size() <= MAX_TEXT_LINES and width_fit and height_fit:
-			return {"lines": result, "font_size": font_size, "valid": true}
-	var minimum_size := FINALE_MIN_FONT_SIZE
-	var minimum_lines := _word_wrap(normalized.replace("\n", " "), minimum_size, MAX_TEXT_LINES, _scale_factor)
-	push_error(
-		"LevelFinaleOverlay: finale text does not fit inside %d lines at minimum font size %d. Add explicit line breaks to the approved text."
-		% [MAX_TEXT_LINES, FINALE_MIN_FONT_SIZE]
-	)
+	var lines: Array[String] = []
+	if normalized.contains("\n"):
+		for part in normalized.split("\n", false):
+			lines.append(part)
+	else:
+		var wrap_size := _responsive_max_font_size(_viewport_size())
+		lines = _word_wrap(normalized.replace("\n", " "), wrap_size, MAX_TEXT_LINES, scale_factor)
+	if lines.is_empty() or lines.size() > MAX_TEXT_LINES:
+		_log_finale_layout_diagnostics(normalized.length(), -1, lines.size(), false, false, -1)
+		return {"lines": [], "font_size": -1, "valid": false}
+	var selected_size := _find_largest_fitting_font_size(lines, _viewport_size(), scale_factor)
 	_log_finale_layout_diagnostics(
 		normalized.length(),
-		minimum_size,
-		minimum_lines.size(),
-		_lines_fit_width(minimum_lines, minimum_size, _scale_factor),
-		_lines_fit_height(minimum_lines, minimum_size, _scale_factor),
-		-1
+		_responsive_max_font_size(_viewport_size()),
+		lines.size(),
+		selected_size >= 0 and _lines_fit_width(lines, selected_size, scale_factor),
+		selected_size >= 0 and _lines_fit_height(lines, selected_size, scale_factor),
+		selected_size
 	)
-	return {"lines": [], "font_size": FINALE_MIN_FONT_SIZE, "valid": false}
+	if selected_size < 0:
+		return {"lines": [], "font_size": -1, "valid": false}
+	return {"lines": lines, "font_size": selected_size, "valid": true}
 
 func _word_wrap(text: String, font_size: int, max_lines: int, scale_factor: float) -> Array[String]:
 	var words: PackedStringArray = text.split(" ", false)
@@ -267,65 +365,91 @@ func _word_wrap(text: String, font_size: int, max_lines: int, scale_factor: floa
 	var current := ""
 	for word in words:
 		var candidate := word if current.is_empty() else current + " " + word
-		if REWARD_FONT.get_string_size(candidate, HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size).x <= _safe_text_width(scale_factor) or current.is_empty():
+		if _line_visual_width(candidate, font_size) <= _text_safe_rect.size.x or current.is_empty():
 			current = candidate
 		else:
 			lines.append(current)
 			current = word
 	if not current.is_empty():
 		lines.append(current)
-	if lines.size() > max_lines:
-		var compact: Array[String] = []
-		var per_line := int(ceil(float(words.size()) / float(max_lines)))
-		for i in range(0, words.size(), per_line):
-			compact.append(" ".join(words.slice(i, mini(i + per_line, words.size()))))
-		return compact
-	return lines
+	if lines.size() <= max_lines:
+		return lines
+	var compact: Array[String] = []
+	var per_line := int(ceil(float(words.size()) / float(max_lines)))
+	for i in range(0, words.size(), per_line):
+		compact.append(" ".join(words.slice(i, mini(i + per_line, words.size()))))
+	return compact
+
+func _find_largest_fitting_font_size(lines: Array[String], viewport_size: Vector2, scale_factor: float) -> int:
+	var maximum_size := _responsive_max_font_size(viewport_size)
+	for font_size in range(maximum_size, ABSOLUTE_MIN_FONT_SIZE - 1, -1):
+		if _lines_fit(lines, font_size, scale_factor):
+			return font_size
+	return -1
+
+func _responsive_max_font_size(viewport_size: Vector2) -> int:
+	var resolution_scale := minf(viewport_size.x / 1920.0, viewport_size.y / BASE_VIEWPORT_HEIGHT)
+	return clampi(int(round(BASE_MAX_FONT_SIZE * resolution_scale)), ABSOLUTE_MIN_FONT_SIZE, ABSOLUTE_MAX_FONT_SIZE)
 
 func _lines_fit(lines: Array[String], font_size: int, scale_factor: float) -> bool:
 	return _lines_fit_width(lines, font_size, scale_factor) and _lines_fit_height(lines, font_size, scale_factor)
 
-func _lines_fit_width(lines: Array[String], font_size: int, scale_factor: float) -> bool:
-	if lines.size() > MAX_TEXT_LINES:
+func _lines_fit_width(lines: Array[String], font_size: int, _scale_factor: float) -> bool:
+	if lines.is_empty() or lines.size() > MAX_TEXT_LINES:
 		return false
 	for line in lines:
-		var measured := REWARD_FONT.get_string_size(line, HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size).x
-		if measured + _horizontal_text_padding(scale_factor) * 2.0 > _safe_text_width(scale_factor):
+		if _line_visual_width(line, font_size) > _text_safe_rect.size.x:
 			return false
 	return true
 
-func _lines_fit_height(lines: Array[String], font_size: int, scale_factor: float) -> bool:
-	if lines.size() > MAX_TEXT_LINES:
+func _lines_fit_height(lines: Array[String], font_size: int, _scale_factor: float) -> bool:
+	if lines.is_empty() or lines.size() > MAX_TEXT_LINES:
 		return false
-	return _visual_line_height(font_size, scale_factor) * float(lines.size()) <= _text_safe_rect.size.y
+	var glyph_height := _glyph_visual_height(font_size)
+	var reveal_offset := _reveal_start_offset(font_size)
+	var mask_height := glyph_height + reveal_offset
+	var line_gap := _line_gap(font_size)
+	var total_height := mask_height * float(lines.size()) + line_gap * float(maxi(0, lines.size() - 1))
+	return total_height <= _text_safe_rect.size.y
 
 func _log_finale_layout_diagnostics(text_length: int, candidate_font_size: int, line_count: int, fit_by_width: bool, fit_by_height: bool, selected_font_size: int) -> void:
 	if not FINALE_LAYOUT_DIAGNOSTICS:
 		return
 	print("finale text length=%d candidate font size=%d line count=%d fit by width=%s fit by height=%s selected font size=%d" % [text_length, candidate_font_size, line_count, fit_by_width, fit_by_height, selected_font_size])
 
-func _visual_line_height(font_size: int, scale_factor: float) -> float:
-	var outline := _outline_size()
-	var shadow_y := _shadow_offset_y()
-	return REWARD_FONT.get_height(font_size) + float(outline) * 2.0 + absf(float(shadow_y)) + _reveal_start_offset(scale_factor) + _vertical_text_padding(scale_factor) * 2.0
+func _line_visual_width(line: String, font_size: int) -> float:
+	var measured := REWARD_FONT.get_string_size(line, HORIZONTAL_ALIGNMENT_LEFT, -1.0, font_size).x
+	return measured + _horizontal_text_padding(font_size) * 2.0
 
-func _horizontal_text_padding(scale_factor: float) -> float:
-	return 6.0 * scale_factor + float(_outline_size()) + absf(float(_shadow_offset_x()))
+func _glyph_visual_height(font_size: int) -> float:
+	return (
+		REWARD_FONT.get_height(font_size)
+		+ float(_outline_size(font_size)) * 2.0
+		+ absf(float(_shadow_offset_y(font_size)))
+		+ _vertical_text_padding(font_size) * 2.0
+	)
 
-func _vertical_text_padding(scale_factor: float) -> float:
-	return 3.0 * scale_factor
+func _horizontal_text_padding(font_size: int) -> float:
+	var italic_margin := clampf(float(font_size) * 0.22, 10.0, 20.0)
+	return italic_margin + float(_outline_size(font_size)) + absf(float(_shadow_offset_x(font_size)))
 
-func _reveal_start_offset(scale_factor: float) -> float:
-	return 4.0 * scale_factor
+func _vertical_text_padding(font_size: int) -> float:
+	return clampf(float(font_size) * 0.025, 1.0, 3.0)
 
-func _outline_size() -> int:
-	return int(round(7.0 * _viewport_size().y / 1080.0))
+func _reveal_start_offset(font_size: int) -> float:
+	return clampf(float(font_size) * 0.025, 1.0, 3.0)
 
-func _shadow_offset_x() -> int:
-	return int(round(2.0 * _viewport_size().y / 1080.0))
+func _line_gap(font_size: int) -> float:
+	return clampf(float(font_size) * 0.035, 1.0, 3.0)
 
-func _shadow_offset_y() -> int:
-	return int(round(3.0 * _viewport_size().y / 1080.0))
+func _outline_size(font_size: int) -> int:
+	return clampi(int(round(float(font_size) * 0.075)), 2, 6)
+
+func _shadow_offset_x(font_size: int) -> int:
+	return clampi(int(round(float(font_size) * 0.035)), 1, 3)
+
+func _shadow_offset_y(font_size: int) -> int:
+	return clampi(int(round(float(font_size) * 0.035)), 1, 3)
 
 func _visible_line_mask_count() -> int:
 	var count := 0
@@ -334,22 +458,85 @@ func _visible_line_mask_count() -> int:
 			count += 1
 	return count
 
-func _safe_text_width(scale_factor: float) -> float:
-	if _text_safe_rect.size.x > 1.0:
-		return _text_safe_rect.size.x
-	return clampf(_viewport_size().x * 0.40, 600.0 * scale_factor, 760.0 * scale_factor)
+func _calculate_frame_rect(viewport_size: Vector2) -> Rect2:
+	var frame_size := Vector2(viewport_size.x * FRAME_WIDTH_RATIO, viewport_size.y * FRAME_HEIGHT_RATIO)
+	return Rect2((viewport_size - frame_size) * 0.5, frame_size)
+
+func _calculate_text_safe_rect(frame_rect: Rect2) -> Rect2:
+	var text_area_size := Vector2(
+		frame_rect.size.x * TEXT_AREA_WIDTH_RATIO,
+		frame_rect.size.y * TEXT_AREA_HEIGHT_RATIO
+	)
+	var centered_position := frame_rect.position + (frame_rect.size - text_area_size) * 0.5
+	centered_position.y += frame_rect.size.y * TEXT_AREA_VERTICAL_BIAS_RATIO
+	return Rect2(centered_position, text_area_size)
 
 func _update_frame_and_text_safe_rect() -> void:
-	var vp := _viewport_size()
-	_frame_rect = Rect2(Vector2(vp.x * 0.02, vp.y * 0.02), Vector2(vp.x * 0.96, vp.y * 0.88))
-	var inner_margin := Vector2(vp.x * 0.010, vp.y * 0.010)
-	var inner_rect := _frame_rect.grow_individual(-inner_margin.x, -inner_margin.y, -inner_margin.x, -inner_margin.y)
-	_text_safe_rect = Rect2(
-		inner_rect.position + inner_rect.size * 0.10,
-		inner_rect.size * FINALE_TEXT_SAFE_AREA_RATIO
+	_frame_rect = _calculate_frame_rect(_viewport_size())
+	_text_safe_rect = _calculate_text_safe_rect(_frame_rect)
+	_update_emblem_reserved_rect()
+
+func _update_emblem_reserved_rect() -> void:
+	var emblem_size := Vector2(_frame_rect.size.x * 0.28, _frame_rect.size.y * 0.16)
+	_emblem_reserved_rect = Rect2(
+		Vector2(_frame_rect.position.x + (_frame_rect.size.x - emblem_size.x) * 0.5, _frame_rect.end.y - emblem_size.y),
+		emblem_size
 	)
 
+func debug_frame_rect() -> Rect2:
+	return _frame_rect
+
+func debug_text_safe_rect() -> Rect2:
+	return _text_safe_rect
+
+func debug_line_masks() -> Array[Control]:
+	return _line_masks
+
+func debug_selected_font_size() -> int:
+	return _selected_font_size
+
+func debug_text_block_rect() -> Rect2:
+	return _text_block_rect
+
+func debug_emblem_reserved_rect() -> Rect2:
+	return _emblem_reserved_rect
+
+func debug_text_reveal_state() -> int:
+	return _text_reveal_state
+
+func debug_text_reveal_generation() -> int:
+	return _text_reveal_generation
+
+func debug_text_reveal_tween_count() -> int:
+	return _text_reveal_tweens.size()
+
+func debug_active_tween_count() -> int:
+	return _active_tweens.size()
+
+func debug_resize_relayout_pending() -> bool:
+	return _resize_relayout_pending
+
+func debug_left_progress() -> float:
+	return _left_progress
+
+func debug_right_progress() -> float:
+	return _right_progress
+
+func debug_left_visible_point_count() -> int:
+	return left_lines[0].points.size()
+
+func debug_right_visible_point_count() -> int:
+	return right_lines[0].points.size()
+
+func debug_branch_count() -> int:
+	return branch_layer.get_child_count()
+
+func debug_leaf_count() -> int:
+	return leaf_layer.get_child_count()
+
 func _build_vines() -> void:
+	var preserved_left_progress := _left_progress
+	var preserved_right_progress := _right_progress
 	_clear_branches_and_leaves()
 	var vp := _viewport_size()
 	_update_frame_and_text_safe_rect()
@@ -365,8 +552,8 @@ func _build_vines() -> void:
 	_right_points = _build_side_curve(fox_top + overlap, Vector2(center_x + vp.x * 0.16, bottom), Vector2(right, bottom - radius), Vector2(right, top + radius), Vector2(center_x, top), 1)
 	_build_branch_geometry()
 	_build_leaf_geometry()
-	_set_left_progress(0.0)
-	_set_right_progress(0.0)
+	_set_left_progress(preserved_left_progress)
+	_set_right_progress(preserved_right_progress)
 
 func _build_side_curve(start: Vector2, lower_center: Vector2, lower_corner: Vector2, upper_corner: Vector2, top_center: Vector2, side: int) -> PackedVector2Array:
 	var curve := Curve2D.new()
@@ -573,7 +760,7 @@ func _reset_line_masks() -> void:
 		_line_masks[i].size.x = 0.0
 		_line_labels[i].text = ""
 		_line_labels[i].visible = false
-		_line_labels[i].position.y = _reveal_start_offset(1.0)
+		_line_labels[i].position.y = _reveal_start_offset(ABSOLUTE_MIN_FONT_SIZE)
 		_line_labels[i].modulate.a = 0.0
 
 func _configure_label(label: RichTextLabel, font_size: int) -> void:
@@ -585,10 +772,10 @@ func _configure_label(label: RichTextLabel, font_size: int) -> void:
 	label.add_theme_font_size_override("bold_italics_font_size", font_size)
 	label.add_theme_color_override("default_color", TEXT_COLOR)
 	label.add_theme_color_override("font_outline_color", TEXT_OUTLINE_COLOR)
-	label.add_theme_constant_override("outline_size", _outline_size())
+	label.add_theme_constant_override("outline_size", _outline_size(font_size))
 	label.add_theme_color_override("font_shadow_color", Color(0.55, 0.24, 0.08, 0.42))
-	label.add_theme_constant_override("shadow_offset_x", _shadow_offset_x())
-	label.add_theme_constant_override("shadow_offset_y", _shadow_offset_y())
+	label.add_theme_constant_override("shadow_offset_x", _shadow_offset_x(font_size))
+	label.add_theme_constant_override("shadow_offset_y", _shadow_offset_y(font_size))
 
 func _configure_tip_glows() -> void:
 	var poly := PackedVector2Array([Vector2(0, -10), Vector2(10, 0), Vector2(0, 10), Vector2(-10, 0)])
@@ -608,11 +795,30 @@ func _track_tween(tween: Tween) -> Tween:
 	_active_tweens.append(tween)
 	return tween
 
+func _track_text_reveal_tween(tween: Tween) -> Tween:
+	_text_reveal_tweens.append(tween)
+	return _track_tween(tween)
+
+func _untrack_text_reveal_tween(tween: Tween) -> void:
+	_text_reveal_tweens.erase(tween)
+	_active_tweens.erase(tween)
+
+func _cancel_text_reveal_tweens() -> void:
+	var tweens_to_cancel := _text_reveal_tweens.duplicate()
+	_text_reveal_tweens.clear()
+	for tween in tweens_to_cancel:
+		_active_tweens.erase(tween)
+		if tween != null and tween.is_valid():
+			tween.kill()
+	_text_reveal_generation += 1
+
 func _kill_tweens() -> void:
 	for tween in _active_tweens:
 		if tween != null and tween.is_valid():
 			tween.kill()
 	_active_tweens.clear()
+	_text_reveal_tweens.clear()
+	_text_reveal_generation += 1
 
 func _normalize_text(value: String) -> String:
 	var result := ""
