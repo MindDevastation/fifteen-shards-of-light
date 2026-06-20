@@ -25,15 +25,38 @@ var _shape: CollisionShape3D
 var _prompt: CanvasLayer
 
 func _ready() -> void:
-	_visual_target = get_node_or_null(visual_target_path) as Node3D
-	if _visual_target != null:
-		global_position = _visual_target.global_position
+	if _visual_target == null and not visual_target_path.is_empty():
+		_visual_target = get_node_or_null(visual_target_path) as Node3D
+	_sync_to_visual_target()
 	_build_runtime_nodes()
 	add_to_group("player_interactable")
 	_area.body_entered.connect(_on_body_entered)
 	_area.body_exited.connect(_on_body_exited)
 	_prompt.call("set_target", self)
 	_apply_state()
+
+func bind_visual_target(target: Node3D) -> void:
+	_visual_target = target
+	if is_inside_tree():
+		_sync_to_visual_target()
+
+func get_visual_target() -> Node3D:
+	return _visual_target
+
+func get_interaction_area() -> Area3D:
+	return _area
+
+func get_prompt() -> CanvasLayer:
+	return _prompt
+
+func get_selected_particle_stream() -> GPUParticles3D:
+	return _selected_stream
+
+func _sync_to_visual_target() -> void:
+	if _visual_target == null:
+		push_error("MoonRayLanternNode %s has no visual target." % [lantern_id])
+		return
+	global_position = _visual_target.global_position
 
 func configure(controller: Node, id: StringName) -> void:
 	_controller = controller
@@ -47,6 +70,8 @@ func set_lantern_state(next_state: LanternState) -> void:
 	refresh_prompt()
 
 func get_beam_anchor_position() -> Vector3:
+	if _visual_target != null:
+		return _visual_target.global_position + beam_anchor_offset
 	return global_position + beam_anchor_offset
 
 func can_player_interact(player: Node) -> bool:
@@ -111,10 +136,37 @@ func _build_runtime_nodes() -> void:
 	_selected_stream = GPUParticles3D.new()
 	_selected_stream.name = "MoonRaySelectedVerticalParticles"
 	_selected_stream.amount = 24
-	_selected_stream.lifetime = 0.8
+	_selected_stream.lifetime = 0.85
+	_selected_stream.randomness = 0.35
+	_selected_stream.explosiveness = 0.0
 	_selected_stream.emitting = false
-	_selected_stream.draw_pass_1 = SphereMesh.new()
 	_selected_stream.position = beam_anchor_offset
+	var process := ParticleProcessMaterial.new()
+	process.direction = Vector3.UP
+	process.spread = 10.0
+	process.initial_velocity_min = 0.55
+	process.initial_velocity_max = 0.95
+	process.gravity = Vector3.ZERO
+	process.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
+	process.emission_sphere_radius = 0.10
+	process.scale_min = 0.45
+	process.scale_max = 1.20
+	process.color = Color(0.82, 0.88, 0.96, 0.78)
+	_selected_stream.process_material = process
+	var particle_mesh := SphereMesh.new()
+	particle_mesh.radius = 0.025
+	particle_mesh.height = 0.05
+	particle_mesh.radial_segments = 8
+	particle_mesh.rings = 4
+	var particle_material := StandardMaterial3D.new()
+	particle_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	particle_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	particle_material.albedo_color = Color(0.84, 0.90, 0.98, 0.72)
+	particle_material.emission_enabled = true
+	particle_material.emission = Color(0.86, 0.92, 1.0, 1.0)
+	particle_material.emission_energy_multiplier = 0.85
+	particle_mesh.material = particle_material
+	_selected_stream.draw_pass_1 = particle_mesh
 	add_child(_selected_stream)
 
 func _apply_state() -> void:
@@ -133,6 +185,7 @@ func _apply_state() -> void:
 			alpha = 0.72
 			scale_value = 1.22
 			_selected_stream.emitting = true
+			_selected_stream.restart()
 		LanternState.COMPLETED:
 			alpha = 0.30
 		LanternState.RESETTING:

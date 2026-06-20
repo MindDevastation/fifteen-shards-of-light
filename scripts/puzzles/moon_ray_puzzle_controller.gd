@@ -59,8 +59,8 @@ func can_lantern_be_interacted(lantern: MoonRayLanternNode) -> bool:
 	if _selected == lantern:
 		return true
 	if _selected == null:
-		return index == _current_index
-	return index > 0 and index != _current_index
+		return index == _current_index and lantern.state == MoonRayLanternNode.LanternState.ACTIVE_ENDPOINT
+	return index != _current_index and lantern.state == MoonRayLanternNode.LanternState.INACTIVE
 
 func get_prompt_text_for_lantern(lantern: MoonRayLanternNode) -> String:
 	if _selected == lantern:
@@ -81,6 +81,15 @@ func debug_current_endpoint_index() -> int:
 func debug_barrier_closed() -> bool:
 	return _barrier != null and _barrier.has_method("is_collision_enabled") and bool(_barrier.call("is_collision_enabled"))
 
+func debug_lanterns() -> Array[MoonRayLanternNode]:
+	return _lanterns.duplicate()
+
+func debug_streams() -> Array[MoonRayParticleStream]:
+	return _streams.duplicate()
+
+func debug_interactions_locked() -> bool:
+	return _locked
+
 func _bind_lanterns() -> void:
 	_lanterns.clear()
 	for path in lantern_paths:
@@ -90,7 +99,7 @@ func _bind_lanterns() -> void:
 			continue
 		var wrapper := LanternScript.new() as MoonRayLanternNode
 		wrapper.name = "%s_interaction_anchor" % visual.name
-		wrapper.visual_target_path = get_path_to(visual)
+		wrapper.bind_visual_target(visual)
 		add_child(wrapper)
 		wrapper.configure(self, StringName(visual.name))
 		wrapper.interaction_requested.connect(_on_lantern_interaction)
@@ -115,7 +124,16 @@ func _on_lantern_interaction(lantern: MoonRayLanternNode, _player: Node) -> void
 	_try_connect(lantern)
 
 func _try_connect(target: MoonRayLanternNode) -> void:
+	if target == null or target.state != MoonRayLanternNode.LanternState.INACTIVE:
+		if target != null:
+			target.play_invalid_feedback()
+		_refresh_prompts()
+		return
 	var target_index := _lanterns.find(target)
+	if target_index < 0 or target_index == _current_index or target_index == 0:
+		target.play_invalid_feedback()
+		_refresh_prompts()
+		return
 	var source_index := _current_index
 	if _selected == null:
 		_selected = _lanterns[source_index]

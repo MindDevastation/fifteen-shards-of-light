@@ -74,3 +74,48 @@
 - Graphical QA performed: no screenshot/video capture; headless validation only.
 - Performance measured: not with a profiler; particle count is documented at `48` per stream and runtime test passed.
 - Remaining manual QA: inspect in Godot/player for exact barrier placement, readability inside vine frame, and subjective silver-particle look near puzzle island.
+
+## Corrective review update
+
+### Visual Target Binding Fix
+- The controller now creates each `MoonRayLanternNode` wrapper and binds it with a direct `Node3D` reference via `bind_visual_target(visual)` instead of passing a controller-relative `NodePath` that would later be resolved from the wrapper's reference frame.
+- `visual_target_path` remains only as an inspector/debug fallback; runtime wrappers use `_visual_target` for global position sync and beam-anchor calculation.
+- The five validated visual target paths are:
+  - `/root/Level_01/Moon Ray/moon_ray_lantern_start`
+  - `/root/Level_01/Moon Ray/moon_ray_lantern_node_1`
+  - `/root/Level_01/Moon Ray/moon_ray_lantern_node_2`
+  - `/root/Level_01/Moon Ray/moon_ray_lantern_node_3`
+  - `/root/Level_01/Moon Ray/moon_ray_lantern_end`
+
+### Wrapper and Lantern Position Validation
+- `moon_ray_lantern_start_interaction_anchor`: position delta `0.0`, beam anchor `(-36.6754, 4.727562, 152.5835)`.
+- `moon_ray_lantern_node_1_interaction_anchor`: position delta `0.0`, beam anchor `(-36.65438, 1.336296, 159.1538)`.
+- `moon_ray_lantern_node_2_interaction_anchor`: position delta `0.0`, beam anchor `(-36.74087, 1.303426, 173.7254)`.
+- `moon_ray_lantern_node_3_interaction_anchor`: position delta `0.0`, beam anchor `(-39.83521, 1.303426, 181.9941)`.
+- `moon_ray_lantern_end_interaction_anchor`: position delta `0.0`, beam anchor `(-38.28106, 2.81885, 193.0053)`.
+- Initial stream length: `7.39395236968994` world units.
+- Validation confirmed all five `Area3D` interaction nodes share their wrapper global positions and all prompt targets point at the real wrapper nodes.
+
+### Completed Node Reuse Prevention
+- `can_lantern_be_interacted()` now requires the current endpoint to be in `ACTIVE_ENDPOINT` state before selection and requires a selected target to be `INACTIVE`.
+- `_try_connect()` repeats the inactive-target check so completed nodes cannot be reused through direct calls or stale prompts.
+- Forbidden reuse validation passed for `node_2 -> node_1`, `node_3 -> node_1`, `node_3 -> node_2`, and start-as-target.
+- Wrong forward route validation remains allowed for `node_1 -> node_3`, `node_1 -> end`, and `node_2 -> end`; these routes still trigger the soft reset with the barrier closed.
+
+### Selected Vertical Particle Configuration
+- `MoonRaySelectedVerticalParticles` now has a real `ParticleProcessMaterial`.
+- Configuration: amount `24`, lifetime `0.85`, direction `Vector3.UP`, spread `10.0`, initial velocity `0.55-0.95`, gravity `Vector3.ZERO`, sphere emission radius `0.10`, scale `0.45-1.20`, silver color `Color(0.82, 0.88, 0.96, 0.78)`.
+- Draw pass: small `SphereMesh` with transparent unshaded emissive silver material; no `Light3D` was added.
+- State validation confirmed `SELECTED -> emitting true`, cancel/success/reset -> `emitting false`.
+
+### Finale Invalid Layout Rejection
+- The unsafe fallback that merged overflow text into a sixth line was removed.
+- `_layout_finale_text()` now returns a valid layout only when line count is at most `6` and both width and height fit.
+- Invalid oversized text returns `valid = false`, `lines = []`, and `font_size = 60`; it logs an error instead of returning a clipping layout.
+- Finale responsive safe-area proportions were widened/tallened and padding was reduced so the approved Level 01 text can fit while keeping font size in `[72, 68, 64, 60]`.
+
+### Real Level 01 Finale Line Breaks
+- Real text source: `scenes/levels/Level_01.tscn`, `Level01FinaleController.finale_text`.
+- The approved words were preserved and split into `6` meaningful lines.
+- Validation result at `1920x1080`: selected font size `72`, width fit `true`, height fit `true`.
+- Validation result at `1280x720`: selected font size `64`, width fit `true`, height fit `true`.

@@ -109,7 +109,7 @@ finale_overlay_path = NodePath("../../UILayer/LevelFinaleOverlay")
 portal_path = NodePath("../../LandmarkFinaleRoot/PortalAnchor/LevelPortal")
 minimum_entry_height = 0.4
 minimum_approach_dot = 0.2
-finale_text = "Когда ты появилась в моей жизни, мир не стал громче - он стал теплее. В этом не было драмы или резкого поворота, просто рядом с мыслью о тебе стало светлее. Мне дорого это первое тепло, потому что с него все и началось"
+finale_text = "Когда ты появилась в моей жизни,\nмир не стал громче - он стал теплее.\nВ этом не было драмы или резкого поворота,\nпросто рядом с мыслью о тебе стало светлее.\nМне дорого это первое тепло,\nпотому что с него все и началось"
 
 [node name="LandmarkFinaleRoot" type="Node3D" parent="." unique_id=1560038229]
 transform = Transform3D(0.9925461, 0, -0.12186927, 0, 1, 0, 0.12186927, 0, 0.9925461, -47.918728, 2.25, 306.05453)
