@@ -233,3 +233,34 @@ Static validation completed with `git diff --check`, Godot editor parse, and God
 Rendered gameplay QA: PARTIAL. Headless validation passed, but this environment did not provide a reliable normal graphical gameplay renderer for manual visual confirmation. A later in-editor rendered pass should confirm Moon Ray and Sun Ray look approximately twice as dense without becoming solid opaque tubes, without color overexposure, without visible speed change, and without hitching during stream creation or wrong-stream fade cleanup.
 
 Performance risks: each main light stream now allocates `96` instances instead of `48`, doubling per-stream MultiMesh instance work. The implementation keeps one `MultiMeshInstance3D` per logical stream, does not create duplicate overlay streams, and targeted validation confirmed `instance_count` is `96`, not `192`.
+
+## Slice 5 - Visually Readable Celestial Barrier
+
+Slice 5 improves the runtime-only visual readability of `moon_ray_celestial_barrier` without changing Level 01 scene serialization, puzzle completion logic, collision sizing, or coordinator ownership. The previous runtime structure was `CelestialMistWall`, `ClockwiseSunMoonSigil`, and one `CollisionShape3D`; the final runtime structure is `CelestialBarrierAura`, `CelestialMistWall`, `ClockwiseSunMoonSigil`, and one `CollisionShape3D`.
+
+The new `CelestialBarrierAura` is created inside `CelestialBarrierGate._build_nodes()` before the base wall. It uses a programmatic unshaded spatial shader with `blend_mix`, `cull_disabled`, `depth_draw_never`, built-in `TIME`, no textures, no noise resources, and no external assets. The aura quad is `barrier_size * 1.06`, sits at local `z = -0.012`, blends silver-blue Moon color on the left into gold-orange Sun color on the right, includes a soft full-area mist fill, a stronger but still transparent outer frame, two slow diagonal/vertical energy waves, and a gentle pulse.
+
+`CelestialMistWall` remains a `QuadMesh` at exact `barrier_size` and keeps unshaded two-sided alpha transparency. Its closed defaults are now `Color(0.58, 0.66, 0.82, closed_wall_alpha)` with emission `Color(0.62, 0.74, 0.98, 1.0)` and `closed_wall_emission`, making the barrier read as a visible ethereal volume without becoming an opaque wall or covering the sigil.
+
+`ClockwiseSunMoonSigil` remains a runtime quad at `barrier_size * 0.72`, local `z = 0.012`, with the existing clockwise rotation speed and geometry masks for the sun ring, 12 sun rays, crescent moon, and outer celestial circle. Its shader now separates the Moon and Sun palettes: the moon mask is silver-blue, the sun mask is gold-orange, and the outer circle uses a smooth Moon-to-Sun gradient. The sigil stays transparent outside its masks and uses `alpha` plus `emission_boost` for readability against the mist wall.
+
+Exact visual export defaults added in this slice:
+
+- `closed_wall_alpha = 0.52`
+- `closed_wall_emission = 1.05`
+- `closed_aura_alpha = 0.44`
+- `closed_symbol_alpha = 0.95`
+- `aura_pulse_speed = 1.10`
+- `aura_pulse_strength = 0.12`
+
+The barrier node remains at `/root/Level_01/Moon Ray/moon_ray_celestial_barrier`, and the serialized Level 01 scene was not changed. The required barrier transform remains `Transform3D(0.9947279, 0, -0.10254952, 0, 1, 0, 0.10254952, 0, 0.9947279, -36.61529, 2.3624349, 194.6155)`. The collision contract is unchanged: the gate remains a `StaticBody3D`, keeps exactly one `CollisionShape3D`, and the `BoxShape3D` size remains `Vector3(barrier_size.x, barrier_size.y, 0.36)`.
+
+The Level 01 coordinator contract is unchanged. The coordinator remains the sole Level 01 owner of opening the barrier, still requires Moon completed AND Sun completed, does not use barrier polling, and no Moon/Sun controller direct connection was added. Single-puzzle completion leaves the barrier visible, closed, and collidable. Dual completion disables collision immediately, starts the dissolve on all three visual layers, lowers the aura, mist wall, and sigil by `0.45`, hides the barrier at the end of `dissolve_duration`, and emits `dissolved` exactly once. Duplicate `open_gate()` calls still return immediately after the first open, so they do not create another tween, do not duplicate children, and do not emit a second signal.
+
+Targeted validation was performed with `/tmp/validate_readable_celestial_barrier.gd`. The validator covered Level 01 loading, barrier NodePath, exact transform, `barrier_size`, collision depth, one collision shape, one aura, one mist wall, one sigil, closed material/export alpha and emission values, aura and symbol shader/material presence, distinct Moon/Sun shader colors, Moon-only and Sun-only closed state, dual-completion open state, immediate collision disable, visual alpha tweening to zero, hidden barrier after a shortened dissolve, single `dissolved` emission, duplicate-open safety, reload closed-state restoration, and unchanged scene/coordinator/Moon/Sun/progression/finale files.
+
+Static validation completed with `git diff --check`, Godot headless editor parse, Godot `--check-only`, the targeted validator, and zero-diff checks for `Level_01.tscn`, the Level 01 coordinator, Moon/Sun controllers, Moon/Sun particle streams, Moon/Sun lantern scripts, progression controller, and finale controller. Shader validation was covered by the Godot headless editor/check-only runs and the targeted runtime material checks; both shaders are spatial, unshaded, two-sided, transparent, depth-draw-never, and resource-free.
+
+Rendered gameplay QA: PARTIAL. Headless validation passed, but this environment did not provide a normal graphical gameplay renderer for manual visual confirmation. A later in-editor rendered pass should confirm the barrier is immediately readable as a closed passage, remains ethereal and transparent, shows silver-blue Moon and gold-orange Sun halves with a soft center blend, keeps the sigil distinct, dissolves all three layers synchronously after the second puzzle, remains visible from both sides, and has no distracting depth-sorting or performance artifacts.
+
+Visual and performance risks: the aura uses a few lightweight shader math operations and one additional quad, so the expected runtime cost is low. The main visual risk is subjective brightness/readability tuning in the real renderer: the current defaults are intentionally stronger than the previous grey quad while keeping alpha capped and preserving transparency. Full rendered QA remains pending outside this headless environment.
