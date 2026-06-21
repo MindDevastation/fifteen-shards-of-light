@@ -11,7 +11,7 @@ const StreamScript := preload("res://scripts/puzzles/sun_ray_particle_stream.gd"
 @export var lantern_paths: Array[NodePath] = []
 @export var wrong_segment_hold: float = 0.28
 @export var wrong_fade_duration: float = 0.82
-@export var particle_count: int = 48
+@export var particle_count: int = 96
 
 var _lanterns: Array[SunRayLanternNode] = []
 var _streams: Array[SunRayParticleStream] = []

@@ -13,7 +13,7 @@ const StreamScript := preload("res://scripts/puzzles/moon_ray_particle_stream.gd
 @export var open_barrier_on_completion: bool = true
 @export var wrong_segment_hold: float = 0.28
 @export var wrong_fade_duration: float = 0.82
-@export var particle_count: int = 48
+@export var particle_count: int = 96
 
 var _lanterns: Array[MoonRayLanternNode] = []
 var _streams: Array[MoonRayParticleStream] = []

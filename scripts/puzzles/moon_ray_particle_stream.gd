@@ -1,7 +1,7 @@
 extends Node3D
 class_name MoonRayParticleStream
 
-@export var particle_count: int = 48
+@export var particle_count: int = 96
 @export var arc_height: float = 0.82
 @export var visibility_range: float = 38.0
 @export var fade_duration: float = 0.8
