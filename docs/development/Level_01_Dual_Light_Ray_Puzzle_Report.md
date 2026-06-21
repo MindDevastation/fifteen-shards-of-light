@@ -299,3 +299,73 @@ Static validation for this slice includes `git diff --check`, Godot headless edi
 Rendered gameplay QA: PARTIAL. Headless validation can confirm runtime structure and state lifecycle, but this environment did not provide a reliable normal graphical gameplay renderer for manual visual confirmation. A later in-editor rendered pass should confirm the rings sit around the lantern bases, are horizontal, do not sink below terrain or float too high, remain readable from the gameplay camera, do not overlap prompts, do not conflict with spherical halos or selected vertical particles, do not make active endpoints look completed, and do not show depth flicker.
 
 Visual and performance risks: the rings add one static unshaded transparent `TorusMesh` per configured wrapper, so runtime cost should remain low. The main remaining risk is subjective visual tuning in a real renderer: base height, brightness, and transparency may need polish after manual QA, but no animation, lights, audio, particles, or extra resources were added in Slice 6.
+
+## Slice 7 - Selected Lantern Beacons
+
+### Scope and existing wrapper VFX
+
+Slice 7 adds a fourth, separate runtime VFX layer for the currently selected source lantern only. Existing wrapper VFX remain intact:
+
+- Moon wrapper: `MoonRaySilverHalo`, `MoonRaySelectedVerticalParticles`, and `MoonRayActivatedRing`.
+- Sun wrapper: `SunRayGoldenHalo`, `SunRaySelectedVerticalParticles`, and `SunRayActivatedRing`.
+
+The halo remains the local state indicator, selected vertical particles remain the dynamic local selection feedback, and activated rings remain the permanent `COMPLETED` marker.
+
+### Runtime beacon nodes
+
+Each configured Moon wrapper now creates exactly one direct child named `MoonRaySelectedBeacon` in `_build_runtime_nodes()`. Each configured Sun wrapper creates exactly one direct child named `SunRaySelectedBeacon` in `_build_runtime_nodes()`. The beacons are not serialized into `Level_01.tscn`, are not placed under the visual target, selected particles, or activated ring, and do not add collision or Light3D nodes.
+
+### CylinderMesh geometry and placement
+
+Both Moon and Sun beacons use a runtime `CylinderMesh` with the exported defaults:
+
+- `top_radius = 0.10`
+- `bottom_radius = 0.10`
+- `height = 4.20`
+- `radial_segments = 24`
+- `rings = 2`
+- `cap_top = false`
+- `cap_bottom = false`
+
+Shadows are disabled. The beacon position is `beam_anchor_offset + Vector3(0.0, selected_beacon_height * 0.5, 0.0)`, so the lower edge starts at the beam anchor and extends upward without changing the wrapper, visual target, lantern model, or anchor transforms.
+
+### Materials, colors, and shader behavior
+
+Each beacon receives a runtime `ShaderMaterial` from a local wrapper shader function. Moon uses `Color(0.70, 0.84, 1.0, 1.0)` for a silver-blue column; Sun uses `Color(1.0, 0.64, 0.18, 1.0)` for a golden-orange column. Both wrappers expose matching defaults:
+
+- `selected_beacon_height = 4.20`
+- `selected_beacon_radius = 0.10`
+- `selected_beacon_alpha = 0.34`
+- `selected_beacon_emission = 1.30`
+- `selected_beacon_pulse_speed = 1.35`
+- `selected_beacon_pulse_strength = 0.10`
+
+The shader is `spatial` with `render_mode unshaded, blend_add, cull_disabled, depth_draw_never`. It uses `TIME` for a soft upward-flowing band and gentle pulse, fades in from the bottom, dissolves near the top, does not use external textures/resources, and clamps final alpha to `0.58`.
+
+### Selected-only visibility and lifecycle results
+
+The beacon visibility matrix is selected-only for both puzzles:
+
+| State | Beacon | Selected particles | Activated ring |
+| --- | ---: | ---: | ---: |
+| `INACTIVE` | hidden | off | hidden |
+| `ACTIVE_ENDPOINT` | hidden | off | hidden |
+| `SELECTED` | visible | on | hidden |
+| `COMPLETED` | hidden | off | visible |
+| `RESETTING` | hidden | off | hidden |
+
+Initial Level 01 beacon counts remain `0` for Moon and `0` for Sun because the start lantern is `COMPLETED`, node 1 is `ACTIVE_ENDPOINT`, and all remaining configured lanterns are `INACTIVE`. Selecting the current active endpoint produces exactly one visible beacon, keeps the selected particles emitting, and keeps the completion ring hidden. Repeating interaction with the selected source cancels selection and returns the visible beacon count to `0` with selected particles off. Correct connections hide the source beacon, switch the source to its completion ring, and leave the new target without a beacon until it is explicitly selected. Wrong target cleanup hides the source beacon immediately after leaving `SELECTED`, keeps visible beacon count at `0` during the wrong hold/fade/reset, and does not leave stale beacons. Full Moon completion ends with `0` visible Moon beacons and `5` visible Moon completion rings; full Sun completion ends with `0` visible Sun beacons and `6` visible Sun completion rings.
+
+### Regression notes
+
+Selected particle regression was preserved: amount remains `24`, lifetime `0.85`, randomness `0.35`, and direction `Vector3.UP`. Completion ring geometry, material setup, and completed-only visibility from Slice 6 remain unchanged. Halo constants remain unchanged: `ACTIVE_ENDPOINT` alpha `0.42` / scale `1.08`, `SELECTED` alpha `0.72` / scale `1.22`, `COMPLETED` alpha `0.30`, and `RESETTING` alpha `0.14`.
+
+Scene/controller/stream/barrier/coordinator regression was kept in scope: `Level_01.tscn`, both puzzle controllers, both ray particle stream scripts, the celestial barrier gate, the light puzzle coordinator, progression controller, and finale controller were not modified. `sun_ray_lantern_node_5` remains outside the configured Sun sequence and receives no wrapper or beacon.
+
+### Validation and QA
+
+Static validation for this slice includes `git diff --check`, Godot editor parse, Godot check-only, the targeted selected beacon validator, and explicit zero-diff checks for the scene, controllers, stream scripts, barrier, coordinator, progression controller, and finale controller.
+
+Targeted validation covers Level 01 loading, configured wrapper discovery, one direct beacon child per wrapper, CylinderMesh geometry, disabled caps/shadows, ShaderMaterial uniforms and `TIME`, Moon/Sun colors, state visibility matrix, initial counts, selection/cancel, correct connection cleanup, wrong reset cleanup, full completion ring counts, duplicate prevention, maximum simultaneous beacon count, particle/halo/ring regressions, and excluded Sun node 5.
+
+Rendered gameplay QA is `PARTIAL` in headless validation environments. Visual risks to verify in a normal renderer are beacon height/readability, blend strength, edge softness, and whether particles remain distinguishable inside the column. Performance risk is low because each configured wrapper adds one simple unlit cylinder mesh and shader-driven animation only; no CPU `_process()`, recurring tweens, timers, signals, external textures, or real Light3D nodes were added.

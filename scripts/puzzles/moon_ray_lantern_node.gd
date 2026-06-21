@@ -17,6 +17,12 @@ const SILVER := Color(0.78, 0.84, 0.90, 1.0)
 @export_range(-1.0, 2.0, 0.01) var activated_ring_height: float = 0.18
 @export_range(0.0, 1.0, 0.01) var activated_ring_alpha: float = 0.78
 @export_range(0.0, 4.0, 0.05) var activated_ring_emission: float = 1.20
+@export_range(0.5, 8.0, 0.05) var selected_beacon_height: float = 4.20
+@export_range(0.01, 0.5, 0.01) var selected_beacon_radius: float = 0.10
+@export_range(0.0, 1.0, 0.01) var selected_beacon_alpha: float = 0.34
+@export_range(0.0, 4.0, 0.05) var selected_beacon_emission: float = 1.30
+@export_range(0.0, 4.0, 0.05) var selected_beacon_pulse_speed: float = 1.35
+@export_range(0.0, 0.5, 0.01) var selected_beacon_pulse_strength: float = 0.10
 
 var state := LanternState.INACTIVE
 var _controller: Node
@@ -27,6 +33,8 @@ var _halo: MeshInstance3D
 var _selected_stream: GPUParticles3D
 var _activated_ring: MeshInstance3D
 var _activated_ring_material: StandardMaterial3D
+var _selected_beacon: MeshInstance3D
+var _selected_beacon_material: ShaderMaterial
 var _area: Area3D
 var _shape: CollisionShape3D
 var _prompt: CanvasLayer
@@ -61,6 +69,9 @@ func get_selected_particle_stream() -> GPUParticles3D:
 
 func get_activated_ring() -> MeshInstance3D:
 	return _activated_ring
+
+func get_selected_beacon() -> MeshInstance3D:
+	return _selected_beacon
 
 func _sync_to_visual_target() -> void:
 	if _visual_target == null:
@@ -179,6 +190,32 @@ func _build_runtime_nodes() -> void:
 	_selected_stream.draw_pass_1 = particle_mesh
 	add_child(_selected_stream)
 
+	_selected_beacon = MeshInstance3D.new()
+	_selected_beacon.name = "MoonRaySelectedBeacon"
+	_selected_beacon.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	var beacon_height := maxf(selected_beacon_height, 0.10)
+	var beacon_radius := maxf(selected_beacon_radius, 0.01)
+	var beacon_mesh := CylinderMesh.new()
+	beacon_mesh.top_radius = beacon_radius
+	beacon_mesh.bottom_radius = beacon_radius
+	beacon_mesh.height = beacon_height
+	beacon_mesh.radial_segments = 24
+	beacon_mesh.rings = 2
+	beacon_mesh.cap_top = false
+	beacon_mesh.cap_bottom = false
+	_selected_beacon.mesh = beacon_mesh
+	_selected_beacon.position = beam_anchor_offset + Vector3(0.0, beacon_height * 0.5, 0.0)
+	_selected_beacon_material = ShaderMaterial.new()
+	_selected_beacon_material.shader = _make_selected_beacon_shader()
+	_selected_beacon_material.set_shader_parameter("beacon_color", Color(0.70, 0.84, 1.0, 1.0))
+	_selected_beacon_material.set_shader_parameter("alpha", selected_beacon_alpha)
+	_selected_beacon_material.set_shader_parameter("emission_boost", selected_beacon_emission)
+	_selected_beacon_material.set_shader_parameter("pulse_speed", selected_beacon_pulse_speed)
+	_selected_beacon_material.set_shader_parameter("pulse_strength", selected_beacon_pulse_strength)
+	_selected_beacon.material_override = _selected_beacon_material
+	_selected_beacon.visible = false
+	add_child(_selected_beacon)
+
 	_activated_ring = MeshInstance3D.new()
 	_activated_ring.name = "MoonRayActivatedRing"
 	_activated_ring.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
@@ -209,6 +246,33 @@ func _build_runtime_nodes() -> void:
 	_activated_ring.visible = false
 	add_child(_activated_ring)
 
+func _make_selected_beacon_shader() -> Shader:
+	var shader := Shader.new()
+	shader.code = """
+shader_type spatial;
+render_mode unshaded, blend_add, cull_disabled, depth_draw_never;
+
+uniform vec3 beacon_color = vec3(0.70, 0.84, 1.0);
+uniform float alpha = 0.34;
+uniform float emission_boost = 1.30;
+uniform float pulse_speed = 1.35;
+uniform float pulse_strength = 0.10;
+
+void fragment() {
+	float vertical = clamp(UV.y, 0.0, 1.0);
+	float lower_fade = smoothstep(0.0, 0.08, vertical);
+	float upper_fade = 1.0 - smoothstep(0.68, 1.0, vertical);
+	float flowing_band = 0.86 + 0.14 * sin(vertical * 18.0 - TIME * pulse_speed * 1.4);
+	float pulse = 1.0 + sin(TIME * pulse_speed) * pulse_strength;
+	float beam_alpha = alpha * lower_fade * upper_fade * flowing_band * pulse;
+
+	ALBEDO = beacon_color;
+	EMISSION = beacon_color * emission_boost * (0.85 + 0.15 * flowing_band);
+	ALPHA = clamp(beam_alpha, 0.0, 0.58);
+}
+"""
+	return shader
+
 func _apply_state() -> void:
 	if _halo == null:
 		return
@@ -216,6 +280,7 @@ func _apply_state() -> void:
 	var scale_value := 1.0
 	_selected_stream.emitting = false
 	_activated_ring.visible = false
+	_selected_beacon.visible = false
 	match state:
 		LanternState.INACTIVE:
 			alpha = 0.0
@@ -227,6 +292,7 @@ func _apply_state() -> void:
 			scale_value = 1.22
 			_selected_stream.emitting = true
 			_selected_stream.restart()
+			_selected_beacon.visible = true
 		LanternState.COMPLETED:
 			alpha = 0.30
 			_activated_ring.visible = true
