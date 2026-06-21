@@ -199,3 +199,37 @@ Rendered gameplay QA: PARTIAL. Headless validation was completed, but this envir
 
 - The coordinator validator exercises scene integration and actual controller signals, but full player-path manual rendered QA remains pending because no normal graphical renderer was available in this environment.
 - Barrier visibility polish, dual-color visual treatment, audio feedback, particle density changes, and finale changes remain intentionally out of scope for Slice 3.
+
+## Slice 4 - Double Light Ray Particle Density
+
+Slice 4 doubles the real particle density of the main Moon Ray and Sun Ray streams by changing the exported `particle_count` defaults from `48` to `96` in both puzzle controllers and both standalone particle stream scripts.
+
+Changed defaults:
+
+- `MoonRayPuzzleController.particle_count`: `48 → 96`
+- `SunRayPuzzleController.particle_count`: `48 → 96`
+- `MoonRayParticleStream.particle_count`: `48 → 96`
+- `SunRayParticleStream.particle_count`: `48 → 96`
+
+The controllers still assign `stream.particle_count = particle_count` before `_stream_root.add_child(stream)`, so initial streams, correct permanent streams, and temporary wrong streams receive the same configured density before each stream enters `_ready()`.
+
+The actual runtime density remains tied to the particle stream `MultiMesh` allocation: both stream scripts continue to use `multimesh.instance_count = particle_count` in `_ready()`. Targeted validation confirmed the Moon `SilverParticleMultiMesh` and Sun `GoldenParticleMultiMesh` each allocate `96` instances for initial streams, newly created correct streams, and temporary wrong streams. The validator also confirmed each stream contains one `MultiMeshInstance3D`; density was not simulated with a second overlapping stream or a second `MultiMesh`.
+
+Logical stream counts were not doubled. The initial stream count remains one per puzzle after load, one correct connection adds one logical stream, one wrong connection adds one temporary logical stream, and wrong reset cleanup returns each puzzle to the initial stream only. Reset did not revert either stream back to `48`.
+
+Unchanged visual and timing parameters:
+
+- flow speed remains `_age * 0.105`;
+- `arc_height` remains `0.82`;
+- `visibility_range` remains `38.0`;
+- particle mesh radius and height remain unchanged;
+- Moon silver and Sun golden-orange color palettes remain unchanged;
+- alpha, sparkle, camera-distance fading, fade duration, wrong reset timing, stream naming, `source_id`, `target_id`, and `is_initial` behavior remain unchanged.
+
+Coordinator and barrier regression status: the dual-light coordinator, celestial barrier gate, progression controller, finale controller, and Moon/Sun lantern scripts were not modified. Targeted validation confirmed coordinator state and barrier gating behavior remain unchanged: the barrier stays gated until both puzzles are complete.
+
+Static validation completed with `git diff --check`, Godot editor parse, and Godot `--check-only`. Targeted validation completed with `/tmp/validate_light_ray_particle_density.gd`, covering Level 01 load, controller defaults, stream defaults through runtime instance counts, correct streams, wrong streams, wrong reset cleanup, logical stream counts, coordinator/barrier state, and single-MultiMesh-per-stream density implementation.
+
+Rendered gameplay QA: PARTIAL. Headless validation passed, but this environment did not provide a reliable normal graphical gameplay renderer for manual visual confirmation. A later in-editor rendered pass should confirm Moon Ray and Sun Ray look approximately twice as dense without becoming solid opaque tubes, without color overexposure, without visible speed change, and without hitching during stream creation or wrong-stream fade cleanup.
+
+Performance risks: each main light stream now allocates `96` instances instead of `48`, doubling per-stream MultiMesh instance work. The implementation keeps one `MultiMeshInstance3D` per logical stream, does not create duplicate overlay streams, and targeted validation confirmed `instance_count` is `96`, not `192`.
