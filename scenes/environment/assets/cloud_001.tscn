@@ -1,5 +1,7 @@
-[gd_scene format=3 uid="uid://bcw506sqv56hv"]
+[gd_scene load_steps=3 format=3 uid="uid://bcw506sqv56hv"]
 
 [ext_resource type="PackedScene" uid="uid://de3fy88xee7hd" path="res://assets/nature/cloud_01/cloud_001.glb" id="1_gsfyy"]
+[ext_resource type="Script" path="res://scripts/environment/stylized_cloud_volume_cluster.gd" id="2_cloud_volume_cluster"]
 
 [node name="cloud_001" unique_id=2009177077 instance=ExtResource("1_gsfyy")]
+script = ExtResource("2_cloud_volume_cluster")

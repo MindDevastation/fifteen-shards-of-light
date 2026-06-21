@@ -1,6 +1,5 @@
 [gd_scene format=3 uid="uid://dlnxbfldy6yg3"]
 
-[ext_resource type="Script" uid="uid://c3dnc4tgsuwbs" path="res://scripts/core/level_manager.gd" id="1_level_manager"]
 [ext_resource type="PackedScene" uid="uid://sqpwvxehf3t7" path="res://scenes/levels/level_01/blocks/Block_01_01_StartClearing.tscn" id="2_block"]
 [ext_resource type="PackedScene" uid="uid://buybh0c880w1y" path="res://scenes/core/Player.tscn" id="3_player"]
 [ext_resource type="Script" uid="uid://b5fastfa3rppc" path="res://scripts/player/camera_controller.gd" id="4_camera_controller"]
@@ -9,12 +8,25 @@
 [ext_resource type="PackedScene" uid="uid://drk14cdu82fdd" path="res://scenes/environment/assets/bridge_sector_01.tscn" id="7_dwcxj"]
 [ext_resource type="PackedScene" uid="uid://bhc65uunv3u80" path="res://scenes/environment/assets/bridge_sector_with_pylon_01.tscn" id="8_c83vx"]
 [ext_resource type="PackedScene" uid="uid://cvpylsb4dxhpm" path="res://scenes/environment/assets/bridge_sector_with_pylon_02.tscn" id="9_5dpfh"]
-[ext_resource type="PackedScene" uid="uid://bcw506sqv56hv" path="res://scenes/environment/assets/cloud_001.tscn" id="10_vlkw4"]
 [ext_resource type="PackedScene" uid="uid://1mmrgt43swb" path="res://scenes/levels/level_01/blocks/Landmark_Island_01.tscn" id="11_xpxa0"]
 [ext_resource type="PackedScene" uid="uid://bus15thti2c2s" path="res://scenes/environment/assets/Ancient_Stone_Barrier_01.tscn" id="13_xg7sb"]
 [ext_resource type="PackedScene" path="res://scenes/core/SoulShard.tscn" id="14_soul_shard"]
 [ext_resource type="PackedScene" path="res://scenes/core/ShardRewardSequenceController.tscn" id="15_sequence_controller"]
 [ext_resource type="PackedScene" path="res://scenes/ui/ShardRewardOverlay.tscn" id="16_reward_overlay"]
+[ext_resource type="Script" uid="uid://d3khxl17l24c2" path="res://scripts/levels/level_01_progression_controller.gd" id="17_progression"]
+[ext_resource type="Script" uid="uid://dyabenfqicta8" path="res://scripts/levels/level_01_finale_controller.gd" id="18_finale"]
+[ext_resource type="PackedScene" path="res://scenes/environment/vfx/LandmarkLightColumn.tscn" id="19_light_column"]
+[ext_resource type="PackedScene" uid="uid://xm215olcv6cg" path="res://scenes/ui/LevelFinaleOverlay.tscn" id="20_finale_overlay"]
+[ext_resource type="PackedScene" path="res://scenes/core/LevelPortal.tscn" id="21_level_portal"]
+[ext_resource type="Script" path="res://scripts/puzzles/moon_ray_puzzle_controller.gd" id="22_moon_ray_controller"]
+[ext_resource type="PackedScene" uid="uid://bbshbmlep0e44" path="res://scenes/environment/assets/lantern_02.tscn" id="23_0rjyr"]
+[ext_resource type="PackedScene" uid="uid://dticujw6n57ry" path="res://scenes/environment/assets/lantern_01.tscn" id="24_0k37p"]
+[ext_resource type="Script" path="res://scripts/puzzles/celestial_barrier_gate.gd" id="25_celestial_barrier"]
+[ext_resource type="Script" path="res://scripts/puzzles/sun_ray_puzzle_controller.gd" id="26_sun_ray_controller"]
+[ext_resource type="Script" path="res://scripts/levels/level_01_light_puzzle_coordinator.gd" id="27_light_coordinator"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_finale_trigger"]
+size = Vector3(12.087067, 4, 5)
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_step_assist_ramp"]
 points = PackedVector3Array(-1.5, -0.02, -0.6, 1.5, -0.02, -0.6, -1.5, -0.02, 0.6, 1.5, -0.02, 0.6, -1.5, 0.32, 0.6, 1.5, 0.32, 0.6)
@@ -39,10 +51,6 @@ fog_density = 0.012
 
 [node name="Level_01" type="Node3D" unique_id=389746896]
 
-[node name="LevelManager" type="Node" parent="." unique_id=682181116]
-script = ExtResource("1_level_manager")
-reward_text = "Ты появилась как тёплый первый свет"
-
 [node name="BlockRoot" type="Node3D" parent="." unique_id=1489238210]
 
 [node name="SoulOrb_World" parent="BlockRoot" unique_id=237478893 instance=ExtResource("5_soul_orb_world")]
@@ -66,7 +74,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.956233, 1.8961711, -42.159
 up_direction = Vector3(0.009999501, 0.99995005, 0)
 floor_snap_length = 0.3
 safe_margin = 0.01
-step_debug_enabled = true
 
 [node name="CameraRoot" type="Node3D" parent="." unique_id=197258052]
 
@@ -81,14 +88,77 @@ max_zoom_distance = 5.0
 
 [node name="LevelRuntimeRoot" type="Node3D" parent="." unique_id=385295927]
 
+[node name="Level01LightPuzzleCoordinator" type="Node" parent="LevelRuntimeRoot"]
+script = ExtResource("27_light_coordinator")
+moon_ray_controller_path = NodePath("../../Moon Ray/MoonRayPuzzleController")
+sun_ray_controller_path = NodePath("../../Sun Ray/SunRayPuzzleController")
+celestial_barrier_path = NodePath("../../Moon Ray/moon_ray_celestial_barrier")
+
 [node name="ShardRewardSequenceController" parent="LevelRuntimeRoot" unique_id=892621520 instance=ExtResource("15_sequence_controller")]
 overlay_path = NodePath("../../UILayer/ShardRewardOverlay")
 player_path = NodePath("../../PlayerRoot/Player")
 shard_search_root_path = NodePath("../..")
 
+[node name="Level01ProgressionController" type="Node" parent="LevelRuntimeRoot" unique_id=1371682820]
+script = ExtResource("17_progression")
+required_shard_paths = Array[NodePath]([NodePath("../../Shard_01"), NodePath("../../Shard_02")])
+barrier_path = NodePath("../../Architecture/Ancient_Stone_Barrier_01")
+
+[node name="Level01FinaleController" type="Node" parent="LevelRuntimeRoot" unique_id=1179719514]
+script = ExtResource("18_finale")
+progression_controller_path = NodePath("../Level01ProgressionController")
+player_path = NodePath("../../PlayerRoot/Player")
+trigger_area_path = NodePath("../../LandmarkFinaleRoot/FinaleTrigger")
+trigger_collision_path = NodePath("../../LandmarkFinaleRoot/FinaleTrigger/CollisionShape3D")
+approach_marker_path = NodePath("../../LandmarkFinaleRoot/FinaleApproachMarker")
+light_column_path = NodePath("../../LandmarkFinaleRoot/LandmarkLightAnchor/LandmarkLightColumn")
+finale_overlay_path = NodePath("../../UILayer/LevelFinaleOverlay")
+portal_path = NodePath("../../LandmarkFinaleRoot/PortalAnchor/LevelPortal")
+minimum_entry_height = 0.4
+minimum_approach_dot = 0.2
+finale_text = "Когда ты появилась в моей жизни,
+мир не стал громче - он стал теплее.
+В этом не было драмы или резкого поворота,
+просто рядом с мыслью о тебе стало светлее.
+Мне дорого это первое тепло,
+потому что с него все и началось"
+
+[node name="LandmarkFinaleRoot" type="Node3D" parent="." unique_id=1560038229]
+transform = Transform3D(0.9925461, 0, -0.12186927, 0, 1, 0, 0.12186927, 0, 0.9925461, -47.918728, 2.25, 306.05453)
+
+[node name="FinaleApproachMarker" type="Marker3D" parent="LandmarkFinaleRoot" unique_id=459859679]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.3, -7.5)
+
+[node name="LandmarkLightAnchor" type="Marker3D" parent="LandmarkFinaleRoot" unique_id=552980164]
+transform = Transform3D(1.0000001, 0, 0, 0, 1, 0, 0, 0, 1.0000001, 1.9385338, 0, -0.23800659)
+
+[node name="LandmarkLightColumn" parent="LandmarkFinaleRoot/LandmarkLightAnchor" unique_id=2029807248 instance=ExtResource("19_light_column")]
+transform = Transform3D(0.99999917, 0, 0, 0, 1, 0, 0, 0, 0.99999917, -1.2782097, 4.6118784, 10.119812)
+
+[node name="PortalAnchor" type="Marker3D" parent="LandmarkFinaleRoot" unique_id=298717810]
+transform = Transform3D(0.99555427, 0, 0.094195336, 0, 1, 0, -0.094195336, 0, 0.99555427, 0.32615662, 2.1427035, -0.5040283)
+
+[node name="LevelPortal" parent="LandmarkFinaleRoot/PortalAnchor" unique_id=185985983 instance=ExtResource("21_level_portal")]
+target_scene_path = "res://scenes/levels/Level_02.tscn"
+entry_mode = 1
+require_entry_confirmation = true
+
+[node name="FinaleTrigger" type="Area3D" parent="LandmarkFinaleRoot" unique_id=1063440564]
+transform = Transform3D(1.0000006, 0, 0, 0, 1, 0, 0, 0, 1.0000006, 1.0066376, -0.22679043, -1.1806335)
+monitoring = false
+monitorable = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="LandmarkFinaleRoot/FinaleTrigger" unique_id=169886065]
+transform = Transform3D(1.0000001, 0, 0, 0, 1, 0, 0, 0, 1.0000001, -0.62854385, 3.119627, -5.8865967)
+shape = SubResource("BoxShape3D_finale_trigger")
+disabled = true
+
 [node name="UILayer" type="CanvasLayer" parent="." unique_id=1319326164]
 
 [node name="ShardRewardOverlay" parent="UILayer" unique_id=2119356460 instance=ExtResource("16_reward_overlay")]
+
+[node name="LevelFinaleOverlay" parent="UILayer" unique_id=1723095977 instance=ExtResource("20_finale_overlay")]
+vine_duration = 3.0
 
 [node name="StepAssistRoot" type="Node3D" parent="." unique_id=1562224144]
 
@@ -131,6 +201,7 @@ shape = SubResource("ConvexPolygonShape3D_step_assist_ramp")
 [node name="StepAssistCapShape_04" type="CollisionShape3D" parent="StepAssistRoot/StepAssistRamp_04" unique_id=1169379228]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.32, 0.77)
 shape = SubResource("BoxShape3D_step_assist_cap")
+disabled = true
 
 [node name="WorldEnvironment_Block01" type="WorldEnvironment" parent="." unique_id=305389988]
 environment = SubResource("Environment_5mpa8")
@@ -142,14 +213,14 @@ transform = Transform3D(-0.98480767, 0, 0.17364828, 0, 1, 0, -0.17364828, 0, -0.
 transform = Transform3D(-0.9925461, 0, 0.12186927, 0, 1, 0, -0.12186927, 0, -0.9925461, -47.918728, -1.9413855, 306.05453)
 
 [node name="Shard_01" parent="." unique_id=1867435069 instance=ExtResource("14_soul_shard")]
-transform = Transform3D(-0.6197755, 0, -0.32538947, 0, 0.7, 0, 0.32538947, 0, -0.6197755, -14.59278, 5.957037, -32.56049)
+transform = Transform3D(-0.88539356, 0, -0.4648421, 0, 1, 0, 0.4648421, 0, -0.88539356, -24.818441, 2.3674388, 118.77108)
 shard_id = &"Shard_01"
-reward_text = "С тобой в моем мире стало теплее...С тобой в моем мире стало теплееС тобой в моем мире стало теплее"
+reward_text = "С тобой в моем мире стало теплее..."
 
 [node name="Shard_02" parent="." unique_id=690272596 instance=ExtResource("14_soul_shard")]
-transform = Transform3D(-0.6977452, 0, -0.056139253, 0, 0.7, 0, 0.056139253, 0, -0.6977452, -40.980263, 3.5240073, 254.95113)
+transform = Transform3D(-0.99677885, 0, -0.080199, 0, 1, 0, 0.080199, 0, -0.99677885, -40.980263, 3.5240073, 254.95113)
 shard_id = &"Shard_02"
-reward_text = "Test_2"
+reward_text = "Ты появилась и в моем мире стало светло..."
 
 [node name="Architecture" type="Node3D" parent="." unique_id=563144666]
 
@@ -180,64 +251,57 @@ transform = Transform3D(0.17364822, 0, 0.9848077, 0, 1, 0, -0.9848077, 0, 0.1736
 [node name="Ancient_Stone_Barrier_01" parent="Architecture" unique_id=538048969 instance=ExtResource("13_xg7sb")]
 transform = Transform3D(1.2226845, 0, -0.25988963, 0, 1.25, 0, 0.25988963, 0, 1.2226845, -40.65623, 2.2720172, 264.2825)
 
-[node name="Clouds" type="Node3D" parent="." unique_id=17556820]
+[node name="Sun Ray" type="Node3D" parent="." unique_id=1711538893]
 
-[node name="cloud_001" parent="Clouds" unique_id=2009177077 instance=ExtResource("10_vlkw4")]
-transform = Transform3D(0.7489557, 0, -0.66262007, 0, 1, 0, 0.66262007, 0, 0.7489557, -31.99489, -22.605297, 70.25153)
+[node name="sun_ray_lantern_end" parent="Sun Ray" unique_id=663829287 instance=ExtResource("23_0rjyr")]
+transform = Transform3D(-0.9619084, 0, 0.27337173, 0, 1, 0, -0.27337173, 0, -0.9619084, -33.670456, 1.5921514, 193.8144)
 
-[node name="cloud_002" parent="Clouds" unique_id=1951914416 instance=ExtResource("10_vlkw4")]
-transform = Transform3D(0.27899107, 0, -0.9602937, 0, 1, 0, 0.9602937, 0, 0.27899107, -31.99489, -22.605297, 113.59696)
+[node name="sun_ray_lantern_start" parent="Sun Ray" unique_id=819189819 instance=ExtResource("23_0rjyr")]
+transform = Transform3D(0.9631438, 0, -0.26898706, 0, 1, 0, 0.26898706, 0, 0.9631438, -29.130756, 3.4775624, 153.89972)
 
-[node name="cloud_003" parent="Clouds" unique_id=1021546910 instance=ExtResource("10_vlkw4")]
-transform = Transform3D(0.89493436, 0, -0.4461978, 0, 1, 0, 0.4461978, 0, 0.89493436, 15.25112, -16.701153, 144.44016)
+[node name="sun_ray_lantern_node_1" parent="Sun Ray" unique_id=1925355688 instance=ExtResource("24_0k37p")]
+transform = Transform3D(0.90661734, 0, -0.4219538, 0, 1, 0, 0.4219538, 0, 0.90661734, -31.238493, 0.16439867, 165.80621)
 
-[node name="cloud_008" parent="Clouds" unique_id=1454641892 instance=ExtResource("10_vlkw4")]
-transform = Transform3D(0.27731472, 0, 0.96077913, 0, 1, 0, -0.96077913, 0, 0.27731472, -93.526146, -16.701153, 144.44016)
+[node name="sun_ray_lantern_node_2" parent="Sun Ray" unique_id=10297893 instance=ExtResource("24_0k37p")]
+transform = Transform3D(0.9995763, 0, -0.029107958, 0, 1, 0, 0.029107958, 0, 0.9995763, -31.5257, 0.16439867, 167.29549)
 
-[node name="cloud_009" parent="Clouds" unique_id=1336038607 instance=ExtResource("10_vlkw4")]
-transform = Transform3D(-0.0401318, 0, -0.9991944, 0, 1, 0, 0.9991944, 0, -0.0401318, -93.526146, -16.701153, 231.75087)
+[node name="sun_ray_lantern_node_3" parent="Sun Ray" unique_id=1966994477 instance=ExtResource("24_0k37p")]
+transform = Transform3D(0.8579932, 0, 0.5136611, 0, 1, 0, -0.5136611, 0, 0.8579932, -31.5257, -0.007477641, 171.10173)
 
-[node name="cloud_010" parent="Clouds" unique_id=2119149194 instance=ExtResource("10_vlkw4")]
-transform = Transform3D(0.79863554, 0, 0.601815, 0, 1, 0, -0.601815, 0, 0.79863554, -80.622055, -16.701153, 181.11578)
+[node name="sun_ray_lantern_node_4" parent="Sun Ray" unique_id=1378840578 instance=ExtResource("24_0k37p")]
+transform = Transform3D(0.87951577, 0, -0.4758698, 0, 1, 0, 0.4758698, 0, 0.87951577, -28.242622, -0.047822356, 181.99454)
 
-[node name="cloud_011" parent="Clouds" unique_id=1681130093 instance=ExtResource("10_vlkw4")]
-transform = Transform3D(0.98685575, 0, 0.16160382, 0, 1, 0, -0.16160382, 0, 0.98685575, 40.02912, -29.586235, 181.11578)
+[node name="sun_ray_lantern_node_5" parent="Sun Ray" unique_id=1930981530 instance=ExtResource("24_0k37p")]
+transform = Transform3D(0.91051054, 0, -0.4134858, 0, 1, 0, 0.4134858, 0, 0.91051054, -33.136993, -0.047822356, 186.34566)
 
-[node name="cloud_012" parent="Clouds" unique_id=1014754057 instance=ExtResource("10_vlkw4")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25.206306, -61.09138, 205.79993)
 
-[node name="cloud_013" parent="Clouds" unique_id=1538114071 instance=ExtResource("10_vlkw4")]
-transform = Transform3D(0.8853936, 0, 0.46484205, 0, 1, 0, -0.46484205, 0, 0.8853936, -62.148285, -41.53988, 279.4137)
+[node name="SunRayPuzzleController" type="Node3D" parent="Sun Ray" unique_id=1736124003]
+script = ExtResource("26_sun_ray_controller")
+lantern_paths = Array[NodePath]([NodePath("../sun_ray_lantern_start"), NodePath("../sun_ray_lantern_node_1"), NodePath("../sun_ray_lantern_node_2"), NodePath("../sun_ray_lantern_node_3"), NodePath("../sun_ray_lantern_node_4"), NodePath("../sun_ray_lantern_end")])
 
-[node name="cloud_014" parent="Clouds" unique_id=424678495 instance=ExtResource("10_vlkw4")]
-transform = Transform3D(0.8853936, 0, 0.46484205, 0, 1, 0, -0.46484205, 0, 0.8853936, 33.73761, -41.53988, 279.4137)
+[node name="Moon Ray" type="Node3D" parent="." unique_id=588521764]
 
-[node name="cloud_015" parent="Clouds" unique_id=834133376 instance=ExtResource("10_vlkw4")]
-transform = Transform3D(0.7489557, 0, -0.66262007, 0, 1, 0, 0.66262007, 0, 0.7489557, 118.61871, -41.53988, 225.97968)
+[node name="moon_ray_lantern_end" parent="Moon Ray" unique_id=1092578508 instance=ExtResource("23_0rjyr")]
+transform = Transform3D(-0.9619084, 0, 0.27337173, 0, 1, 0, -0.27337173, 0, -0.9619084, -38.281055, 1.5688503, 193.00533)
 
-[node name="cloud_016" parent="Clouds" unique_id=1554780809 instance=ExtResource("10_vlkw4")]
-transform = Transform3D(0.27899107, 0, -0.9602937, 0, 1, 0, 0.9602937, 0, 0.27899107, 118.61871, -41.53988, 323.22388)
+[node name="moon_ray_lantern_start" parent="Moon Ray" unique_id=1155759624 instance=ExtResource("23_0rjyr")]
+transform = Transform3D(0.9631438, 0, -0.26898706, 0, 1, 0, 0.26898706, 0, 0.9631438, -36.6754, 3.4775624, 152.58348)
 
-[node name="cloud_017" parent="Clouds" unique_id=521505692 instance=ExtResource("10_vlkw4")]
-transform = Transform3D(0.7489557, 0, -0.66262007, 0, 1, 0, 0.66262007, 0, 0.7489557, -74.288666, -44.567986, 315.7661)
+[node name="moon_ray_lantern_node_1" parent="Moon Ray" unique_id=975084650 instance=ExtResource("24_0k37p")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36.654385, 0.08629632, 159.15382)
 
-[node name="cloud_018" parent="Clouds" unique_id=902606864 instance=ExtResource("10_vlkw4")]
-transform = Transform3D(0.56784374, 0, 0.8231363, 0, 1, 0, -0.8231363, 0, 0.56784374, 34.51905, -44.567986, 398.3733)
+[node name="moon_ray_lantern_node_2" parent="Moon Ray" unique_id=383787851 instance=ExtResource("24_0k37p")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36.74087, 0.05342567, 173.7254)
 
-[node name="cloud_019" parent="Clouds" unique_id=104236548 instance=ExtResource("10_vlkw4")]
-transform = Transform3D(0.7489557, 0, -0.66262007, 0, 1, 0, 0.66262007, 0, 0.7489557, -27.43151, -44.567986, 385.04327)
+[node name="moon_ray_lantern_node_3" parent="Moon Ray" unique_id=472852518 instance=ExtResource("24_0k37p")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -39.835213, 0.05342567, 181.99411)
 
-[node name="cloud_020" parent="Clouds" unique_id=1352041992 instance=ExtResource("10_vlkw4")]
-transform = Transform3D(0.27899107, 0, -0.9602937, 0, 1, 0, 0.9602937, 0, 0.27899107, -76.5696, -44.567986, 350.23053)
+[node name="MoonRayPuzzleController" type="Node3D" parent="Moon Ray" unique_id=1736124001]
+script = ExtResource("22_moon_ray_controller")
+lantern_paths = Array[NodePath]([NodePath("../moon_ray_lantern_start"), NodePath("../moon_ray_lantern_node_1"), NodePath("../moon_ray_lantern_node_2"), NodePath("../moon_ray_lantern_node_3"), NodePath("../moon_ray_lantern_end")])
+barrier_path = NodePath("../moon_ray_celestial_barrier")
+open_barrier_on_completion = false
 
-[node name="cloud_004" parent="Clouds" unique_id=1237458932 instance=ExtResource("10_vlkw4")]
-transform = Transform3D(0.7489557, 0, -0.66262007, 0, 1, 0, 0.66262007, 0, 0.7489557, 15.25112, -22.605297, 20.157776)
-
-[node name="cloud_005" parent="Clouds" unique_id=972241507 instance=ExtResource("10_vlkw4")]
-transform = Transform3D(0.7489557, 0, -0.66262007, 0, 1, 0, 0.66262007, 0, 0.7489557, -49.659904, -22.605297, 20.157776)
-
-[node name="cloud_006" parent="Clouds" unique_id=338319067 instance=ExtResource("10_vlkw4")]
-transform = Transform3D(0.7489557, 0, -0.66262007, 0, 1, 0, 0.66262007, 0, 0.7489557, -13.108768, -22.605297, -65.13305)
-
-[node name="cloud_007" parent="Clouds" unique_id=1538122889 instance=ExtResource("10_vlkw4")]
-transform = Transform3D(0.7489557, 0, -0.66262007, 0, 1, 0, 0.66262007, 0, 0.7489557, 35.36883, -22.605297, 92.26162)
+[node name="moon_ray_celestial_barrier" type="StaticBody3D" parent="Moon Ray" unique_id=1736124002]
+transform = Transform3D(0.9947279, 0, -0.10254952, 0, 1, 0, 0.10254952, 0, 0.9947279, -36.61529, 2.3624349, 194.6155)
+script = ExtResource("25_celestial_barrier")

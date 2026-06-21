@@ -64,7 +64,7 @@ func _process(delta: float) -> void:
 	if not emission_enabled:
 		return
 
-	var time_sec := Time.get_ticks_msec() * 0.001
+	var time_sec: float = Time.get_ticks_msec() * 0.001
 	for firefly_data in _fireflies:
 		var node: MeshInstance3D = firefly_data["node"]
 		if node == null:
@@ -81,8 +81,8 @@ func _process(delta: float) -> void:
 		var flicker_speed: float = firefly_data["flicker_speed"]
 		var size_scale: float = firefly_data["size_scale"]
 
-		var angle := time_sec * orbit_speed + orbit_phase
-		var bob := sin(time_sec * bob_speed + bob_phase) * bob_amount
+		var angle: float = time_sec * orbit_speed + orbit_phase
+		var bob: float = sin(time_sec * bob_speed + bob_phase) * bob_amount
 
 		node.position = center + Vector3(
 			cos(angle) * radius,
@@ -90,9 +90,9 @@ func _process(delta: float) -> void:
 			sin(angle) * radius
 		)
 
-		var flicker_wave := 0.5 + 0.5 * sin(time_sec * flicker_speed + flicker_phase)
-		var flicker_scale := 1.0 + (flicker_wave - 0.5) * 2.0 * flicker_strength
-		node.scale = Vector3.ONE * max(0.01, firefly_size * size_scale * flicker_scale)
+		var flicker_wave: float = 0.5 + 0.5 * sin(time_sec * flicker_speed + flicker_phase)
+		var flicker_scale: float = 1.0 + (flicker_wave - 0.5) * 2.0 * flicker_strength
+		node.scale = Vector3.ONE * maxf(0.01, firefly_size * size_scale * flicker_scale)
 
 func _ensure_visual_resources() -> void:
 	if _shared_mesh == null:
@@ -120,17 +120,17 @@ func _rebuild_fireflies() -> void:
 		child.queue_free()
 
 	_fireflies.clear()
-	var count := max(1, firefly_count)
+	var count: int = maxi(1, firefly_count)
 
 	for i in count:
-		var firefly := MeshInstance3D.new()
+		var firefly: MeshInstance3D = MeshInstance3D.new()
 		firefly.name = "Firefly_%02d" % i
 		firefly.mesh = _shared_mesh
 		firefly.material_override = _shared_material
 		_firefly_root.add_child(firefly)
 
-		var radius := randf_range(cluster_radius * 0.2, cluster_radius)
-		var center := Vector3(
+		var radius: float = randf_range(cluster_radius * 0.2, cluster_radius)
+		var center: Vector3 = Vector3(
 			randf_range(-cluster_radius * 0.45, cluster_radius * 0.45),
 			randf_range(-height_range * 0.5, height_range * 0.5),
 			randf_range(-cluster_radius * 0.45, cluster_radius * 0.45)
@@ -146,7 +146,7 @@ func _rebuild_fireflies() -> void:
 			"orbit_speed": drift_speed * randf_range(0.7, 1.25),
 			"bob_speed": drift_speed * randf_range(0.9, 1.7),
 			"flicker_speed": drift_speed * randf_range(2.0, 3.2),
-			"bob_amount": randf_range(0.03, max(0.05, height_range * 0.18)),
+			"bob_amount": randf_range(0.03, maxf(0.05, height_range * 0.18)),
 			"size_scale": randf_range(0.85, 1.15)
 		})
 
@@ -164,9 +164,9 @@ func _apply_material_to_fireflies() -> void:
 	if _shared_material == null:
 		return
 
-	var color := base_color
+	var color: Color = base_color
 	color.a = clamp(base_color.a, 0.05, 1.0)
-	var lit_color := Color(
+	var lit_color: Color = Color(
 		clamp(base_color.r * brightness_multiplier, 0.0, 1.0),
 		clamp(base_color.g * brightness_multiplier, 0.0, 1.0),
 		clamp(base_color.b * brightness_multiplier, 0.0, 1.0),

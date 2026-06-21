@@ -1,7 +1,8 @@
 extends Camera3D
 
 @export var target_path: NodePath
-@export var mouse_sensitivity: float = 0.003
+@export_range(0.0005, 0.005, 0.0001)
+var mouse_sensitivity: float = 0.002
 @export_range(-89.0, 89.0, 0.1) var min_pitch_degrees: float = -35.0
 @export_range(-89.0, 89.0, 0.1) var max_pitch_degrees: float = 60.0
 @export var min_zoom_distance: float = 1.625
@@ -145,7 +146,7 @@ func _is_blocking_ui_open() -> bool:
 		return true
 	if _is_ending_overlay_visible():
 		return true
-	if _is_shard_reward_overlay_visible():
+	if _has_visible_mouse_blocking_ui():
 		return true
 	return false
 
@@ -170,8 +171,11 @@ func _is_ending_overlay_visible() -> bool:
 
 
 
-func _is_shard_reward_overlay_visible() -> bool:
-	return _has_visible_control_named(get_tree().current_scene, "ShardRewardOverlay")
+func _has_visible_mouse_blocking_ui() -> bool:
+	for node in get_tree().get_nodes_in_group(&"mouse_blocking_ui"):
+		if node is Control and node.visible:
+			return true
+	return false
 
 func _has_visible_control_named(node: Node, target_name: String) -> bool:
 	if node == null:

@@ -1,6 +1,10 @@
 extends Control
 class_name ShardRewardOverlay
 
+const FoxConfirmButtonType = preload(
+	"res://scripts/ui/fox_confirm_button.gd"
+)
+
 signal confirmation_requested
 signal return_completed
 
@@ -27,11 +31,12 @@ const FRAME_COLORS := [
 	Color(0.96, 0.72, 0.28, 0.86),
 ]
 const VINE_LEAF_TEXTURE := preload("res://assets/ui/shard_reward_overlay/vine_leaf.png")
+const SHARD_REWARD_FONT_SIZE := 54
 const VINE_GROWTH_DURATION := 2.3
 const REWARD_FONT := preload("res://assets/fonts/cormorant_garamond/CormorantGaramond-SemiBoldItalic.otf")
 const FRAME_LIVING_UPDATE_INTERVAL := 0.033
-const TEXT_REVEAL_LINE_DURATION := 1.25
-const TEXT_REVEAL_LINE_STAGGER := 0.55
+const TEXT_REVEAL_LINE_DURATION := 1.85
+const TEXT_REVEAL_LINE_STAGGER := 0.72
 const TEXT_REVEAL_DEFAULT_FONT_SIZE := 48
 const TEXT_REVEAL_FALLBACK_FONT_SIZE := 44
 const TEXT_LINE_WIDTHS := [720.0, 650.0, 560.0]
@@ -67,8 +72,6 @@ var _text_line_masks: Array[Control] = []
 var _text_line_labels: Array[RichTextLabel] = []
 var _text_line_glints: Array[ColorRect] = []
 var _current_text_font_size := TEXT_REVEAL_DEFAULT_FONT_SIZE
-var _button_mouse_inside := false
-var _button_has_focus := false
 var _last_geometry_viewport_size := Vector2.ZERO
 var _frame_targets_cache: Array[Vector2] = []
 
@@ -90,20 +93,17 @@ var _frame_targets_cache: Array[Vector2] = []
 @onready var text_root: Control = $TextRoot
 @onready var reward_text_label: RichTextLabel = $TextRoot/RewardText
 @onready var button_root: Control = $ButtonRoot
-@onready var confirm_button: TextureButton = $ButtonRoot/ConfirmButton
+@onready var confirm_button: FoxConfirmButtonType = (
+	$ButtonRoot/ConfirmButton as FoxConfirmButtonType
+)
 
 
 func _ready() -> void:
+	add_to_group(&"mouse_blocking_ui")
 	visible = false
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	set_process(false)
-	confirm_button.pressed.connect(_on_confirm_button_pressed)
-	confirm_button.mouse_entered.connect(_on_confirm_button_mouse_entered)
-	confirm_button.mouse_exited.connect(_on_confirm_button_mouse_exited)
-	confirm_button.button_down.connect(_on_confirm_button_down)
-	confirm_button.button_up.connect(_on_confirm_button_up)
-	confirm_button.focus_entered.connect(_on_confirm_button_focus_entered)
-	confirm_button.focus_exited.connect(_on_confirm_button_focus_exited)
+	confirm_button.fox_confirmed.connect(_on_confirm_button_pressed)
 	_create_text_reveal_nodes()
 	_create_frame_particle_pool()
 	_configure_vine_line_styles()
@@ -156,7 +156,7 @@ func _play_reward_async(display_text: String, origin_screen_position: Vector2, g
 	matte_veil.color = MATTE_VEIL_COLOR
 	warm_wash.color = WARM_WASH_COLOR
 	button_root.modulate.a = BUTTON_DISABLED_ALPHA
-	confirm_button.disabled = true
+	confirm_button.set_enabled(false)
 	_build_vine_geometry()
 	_build_frame_particles(origin_screen_position)
 	_animate_atmosphere_in()
@@ -169,7 +169,7 @@ func _play_return_to_async(target_screen_position: Vector2, generation: int) -> 
 	if not visible:
 		_emit_return_completed_once()
 		return
-	confirm_button.disabled = true
+	confirm_button.set_enabled(false)
 	set_process(false)
 	await get_tree().create_timer(0.10).timeout
 	if generation != _sequence_generation:
@@ -200,15 +200,10 @@ func _reset_visual_state(reset_signals: bool = true) -> void:
 	reward_text_label.text = ""
 	reward_text_label.visible_ratio = 1.0
 	_reset_text_reveal_nodes()
-	confirm_button.disabled = true
-	confirm_button.scale = Vector2.ONE
-	confirm_button.position = _button_base_position
-	confirm_button.modulate = Color(1.0, 1.0, 1.0, 1.0)
-	_button_mouse_inside = false
-	_button_has_focus = false
+	confirm_button.set_enabled(false)
+	confirm_button.reset_visuals()
 	confirm_button.button_pressed = false
 	confirm_button.release_focus()
-	_apply_button_visual_state()
 	_vine_progress = 0.0
 	_clear_line_points()
 	_reset_frame_particles()
@@ -275,7 +270,7 @@ func _reveal_text() -> void:
 		var target_width := label.size.x + 18.0
 		var delay := float(i) * TEXT_REVEAL_LINE_STAGGER
 		tween.tween_property(mask, "size:x", target_width, TEXT_REVEAL_LINE_DURATION).set_delay(delay).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-		tween.tween_property(label, "modulate:a", 1.0, 0.25).set_delay(delay).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		tween.tween_property(label, "modulate:a", 1.0, 0.55).set_delay(delay).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		tween.tween_property(glint, "position:x", target_width - glint.size.x * 0.5, TEXT_REVEAL_LINE_DURATION).set_delay(delay).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 		tween.tween_property(glint, "modulate:a", 0.62, 0.18).set_delay(delay).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		tween.tween_property(glint, "modulate:a", 0.0, 0.28).set_delay(delay + TEXT_REVEAL_LINE_DURATION - 0.18).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
@@ -289,11 +284,8 @@ func _try_enable_button(generation: int) -> void:
 	if not _text_complete or not _vine_complete:
 		return
 	button_root.modulate.a = BUTTON_ENABLED_ALPHA
-	confirm_button.disabled = false
-	_update_button_mouse_inside()
-	_apply_button_visual_state()
+	confirm_button.set_enabled(true)
 	confirm_button.grab_focus()
-	_apply_button_visual_state()
 
 
 func _animate_return_sequence(target_screen_position: Vector2, generation: int) -> void:
@@ -865,55 +857,11 @@ func _emit_return_completed_once() -> void:
 	return_completed.emit()
 
 
-func _on_confirm_button_mouse_entered() -> void:
-	_button_mouse_inside = true
-	_apply_button_visual_state()
-
-
-func _on_confirm_button_mouse_exited() -> void:
-	_button_mouse_inside = false
-	_apply_button_visual_state()
-
-
-func _on_confirm_button_down() -> void:
-	_apply_button_visual_state()
-
-
-func _on_confirm_button_up() -> void:
-	_update_button_mouse_inside()
-	_apply_button_visual_state()
-
-
-func _on_confirm_button_focus_entered() -> void:
-	_button_has_focus = true
-	_apply_button_visual_state()
-
-
-func _on_confirm_button_focus_exited() -> void:
-	_button_has_focus = false
-	_apply_button_visual_state()
-
-
-func _update_button_mouse_inside() -> void:
-	var mouse_pos := confirm_button.get_local_mouse_position()
-	_button_mouse_inside = Rect2(Vector2.ZERO, confirm_button.size).has_point(mouse_pos)
-
-
-func _apply_button_visual_state() -> void:
-	confirm_button.texture_focused = confirm_button.texture_normal
-	if confirm_button.disabled:
-		confirm_button.modulate = Color(1.0, 1.0, 1.0, BUTTON_DISABLED_ALPHA)
-		return
-	var focus_boost := 1.04 if _button_has_focus and not _button_mouse_inside else 1.0
-	confirm_button.scale = Vector2.ONE * focus_boost
-	confirm_button.modulate = Color(1.0, 0.96 if _button_has_focus and not _button_mouse_inside else 1.0, 0.88 if _button_has_focus and not _button_mouse_inside else 1.0, BUTTON_ENABLED_ALPHA)
-
-
 func _on_confirm_button_pressed() -> void:
 	if _confirmation_emitted or confirm_button.disabled:
 		return
 	_confirmation_emitted = true
-	confirm_button.disabled = true
+	confirm_button.set_enabled(false)
 	_play_button_press_feedback()
 	confirmation_requested.emit()
 
@@ -961,10 +909,9 @@ func _apply_responsive_layout() -> void:
 	reward_text_label.add_theme_font_override("normal_font", REWARD_FONT)
 	reward_text_label.add_theme_font_override("italics_font", REWARD_FONT)
 	reward_text_label.add_theme_font_override("bold_italics_font", REWARD_FONT)
-	var reward_font_size := int(round(48.0 * scale_factor))
-	reward_text_label.add_theme_font_size_override("normal_font_size", reward_font_size)
-	reward_text_label.add_theme_font_size_override("italics_font_size", reward_font_size)
-	reward_text_label.add_theme_font_size_override("bold_italics_font_size", reward_font_size)
+	reward_text_label.add_theme_font_size_override("normal_font_size", SHARD_REWARD_FONT_SIZE)
+	reward_text_label.add_theme_font_size_override("italics_font_size", SHARD_REWARD_FONT_SIZE)
+	reward_text_label.add_theme_font_size_override("bold_italics_font_size", SHARD_REWARD_FONT_SIZE)
 	reward_text_label.add_theme_color_override("default_color", TEXT_COLOR)
 	reward_text_label.add_theme_color_override("font_outline_color", TEXT_OUTLINE_COLOR)
 	reward_text_label.add_theme_constant_override("outline_size", int(round(5.0 * scale_factor)))
@@ -974,6 +921,7 @@ func _apply_responsive_layout() -> void:
 	confirm_button.offset_top = -button_size - 44.0 * scale_factor
 	confirm_button.offset_bottom = -44.0 * scale_factor
 	_button_base_position = confirm_button.position
+	confirm_button.set_base_position(_button_base_position)
 	confirm_button.pivot_offset = Vector2(button_size, button_size) * 0.5
 	_configure_button_hit_area()
 
@@ -981,12 +929,6 @@ func _apply_responsive_layout() -> void:
 func _configure_button_hit_area() -> void:
 	confirm_button.mouse_filter = Control.MOUSE_FILTER_STOP
 	confirm_button.ignore_texture_size = true
-	if confirm_button.texture_normal != null and confirm_button.texture_normal is Texture2D:
-		var image := confirm_button.texture_normal.get_image()
-		if image != null:
-			var click_mask := BitMap.new()
-			click_mask.create_from_image_alpha(image, 0.12)
-			confirm_button.texture_click_mask = click_mask
 
 
 func _sample_main_tangent_rotation(points: PackedVector2Array, progress: float) -> float:
