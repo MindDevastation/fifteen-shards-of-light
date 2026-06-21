@@ -5,6 +5,8 @@ class_name SunRayParticleStream
 @export var arc_height: float = 0.82
 @export var visibility_range: float = 38.0
 @export var fade_duration: float = 0.8
+@export_range(15.0, 120.0, 1.0)
+var visual_update_fps: float = 60.0
 
 var source_id: StringName
 var target_id: StringName
@@ -16,6 +18,9 @@ var _material: StandardMaterial3D
 var _alpha := 1.0
 var _age := 0.0
 var _fade_tween: Tween
+var _visual_update_accumulator := 0.0
+var _distance_culled := false
+var _visual_update_count := 0
 
 func _ready() -> void:
 	_multimesh_instance = MultiMeshInstance3D.new()
@@ -57,10 +62,27 @@ func fade_out_and_free(duration := -1.0) -> void:
 	_fade_tween.tween_property(self, "_alpha", 0.0, fade_duration if duration < 0.0 else duration)
 	_fade_tween.finished.connect(queue_free)
 
+func debug_visual_update_count() -> int:
+	return _visual_update_count
+
+func debug_is_distance_culled() -> bool:
+	return _distance_culled
+
 func _process(delta: float) -> void:
 	_age += delta
+	var range_alpha := _update_distance_visibility()
+	if range_alpha <= 0.001:
+		_distance_culled = true
+		_visual_update_accumulator = 0.0
+		return
+	_distance_culled = false
+	_visual_update_accumulator += delta
+	var update_interval := 1.0 / maxf(visual_update_fps, 1.0)
+	if _visual_update_accumulator + 0.000001 < update_interval:
+		return
+	_visual_update_accumulator = fmod(_visual_update_accumulator, update_interval)
 	_update_instances(delta)
-	_update_distance_visibility()
+	_visual_update_count += 1
 
 func _update_instances(_delta: float) -> void:
 	if _source == null or _target == null or _multimesh_instance == null or _multimesh_instance.multimesh == null:
@@ -85,13 +107,15 @@ func _update_instances(_delta: float) -> void:
 			color = Color(1.0, 0.82, 0.34, _alpha * taper * sparkle)
 		_multimesh_instance.multimesh.set_instance_color(i, color)
 
-func _update_distance_visibility() -> void:
+func _update_distance_visibility() -> float:
 	var camera := get_viewport().get_camera_3d()
-	if camera == null or _source == null:
-		return
+	if camera == null or _source == null or _multimesh_instance == null:
+		return 1.0
 	var distance := camera.global_position.distance_to(_source.global_position)
 	var range_alpha := clampf(1.0 - smoothstep(visibility_range, visibility_range + 14.0, distance), 0.0, 1.0)
 	_multimesh_instance.transparency = 1.0 - range_alpha
+	_multimesh_instance.visible = range_alpha > 0.001
+	return range_alpha
 
 func _anchor_position(node: Node3D) -> Vector3:
 	if node.has_method("get_beam_anchor_position"):
