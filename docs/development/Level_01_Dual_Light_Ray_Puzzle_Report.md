@@ -264,3 +264,38 @@ Static validation completed with `git diff --check`, Godot headless editor parse
 Rendered gameplay QA: PARTIAL. Headless validation passed, but this environment did not provide a normal graphical gameplay renderer for manual visual confirmation. A later in-editor rendered pass should confirm the barrier is immediately readable as a closed passage, remains ethereal and transparent, shows silver-blue Moon and gold-orange Sun halves with a soft center blend, keeps the sigil distinct, dissolves all three layers synchronously after the second puzzle, remains visible from both sides, and has no distracting depth-sorting or performance artifacts.
 
 Visual and performance risks: the aura uses a few lightweight shader math operations and one additional quad, so the expected runtime cost is low. The main visual risk is subjective brightness/readability tuning in the real renderer: the current defaults are intentionally stronger than the previous grey quad while keeping alpha capped and preserving transparency. Full rendered QA remains pending outside this headless environment.
+
+## Slice 6 - Activated Lantern Completion Rings
+
+Slice 6 adds a third runtime-only VFX layer to every configured Level 01 Moon Ray and Sun Ray lantern wrapper: a static emissive completion ring that appears only when the wrapper state is `LanternState.COMPLETED`. The previous wrapper VFX remain unchanged: Moon keeps `MoonRaySilverHalo` for state feedback and `MoonRaySelectedVerticalParticles` for selection feedback; Sun keeps `SunRayGoldenHalo` for state feedback and `SunRaySelectedVerticalParticles` for selection feedback.
+
+New runtime node names:
+
+- Moon wrappers create one direct child named `MoonRayActivatedRing`.
+- Sun wrappers create one direct child named `SunRayActivatedRing`.
+
+Both rings are created exactly once in each wrapper's `_build_runtime_nodes()` method. They are not added to custom lantern scenes, are not parented under `visual_target_path`, do not use collisions, and do not require serialized Level 01 scene hierarchy edits.
+
+The activated rings use `TorusMesh` geometry with default exports `activated_ring_inner_radius = 0.48`, `activated_ring_outer_radius = 0.62`, `activated_ring_height = 0.18`, `activated_ring_alpha = 0.78`, and `activated_ring_emission = 1.20`. Runtime mesh defaults are `rings = 48` and `ring_segments = 16`; shadow casting is disabled. Invalid inner/outer radius ordering is handled locally at mesh creation so the wrapper does not fail with a runtime error.
+
+Moon rings use a silver-blue transparent unshaded two-sided material with albedo `Color(0.78, 0.84, 0.90, activated_ring_alpha)`, emission `Color(0.86, 0.92, 1.0, 1.0)`, and emission energy from `activated_ring_emission`. Sun rings use a gold-orange transparent unshaded two-sided material with albedo `Color(1.0, 0.58, 0.16, activated_ring_alpha)`, emission `Color(1.0, 0.82, 0.34, 1.0)`, and the same emission default.
+
+Completed-only visibility contract:
+
+- `INACTIVE`: ring hidden; selected particles off; halo behavior unchanged.
+- `ACTIVE_ENDPOINT`: ring hidden; selected particles off; endpoint halo remains unchanged.
+- `SELECTED`: ring hidden; selected vertical particles still emit/restart; selected halo remains unchanged.
+- `COMPLETED`: ring visible; selected particles off; completed halo remains unchanged.
+- `RESETTING`: ring hidden; selected particles off; resetting halo remains unchanged.
+
+Initial Level 01 integration: the configured Moon and Sun start lanterns are `COMPLETED`, node 1 is `ACTIVE_ENDPOINT`, and the remaining configured lanterns are `INACTIVE`, so targeted validation expects one visible Moon activated ring and one visible Sun activated ring immediately after load. Correct route progression accumulates one visible ring per completed configured node: after one correct connection each puzzle has two visible rings, full Moon completion has five visible rings, and full Sun completion has six visible rings. The excluded `sun_ray_lantern_node_5` remains outside the configured Sun sequence and does not receive a wrapper or activated ring.
+
+Wrong-route behavior follows the existing controller lifecycle without controller changes. During the short wrong-segment hold, the selected source may briefly show a completed ring because the controller already transitions that source to `COMPLETED`; after `RESETTING` and full reset, targeted validation expects only the start ring to remain visible for each puzzle, with no stale false rings.
+
+Regression notes: `MoonRaySelectedVerticalParticles.amount` and `SunRaySelectedVerticalParticles.amount` remain `24`; selected particles still emit only in `SELECTED`, and completed state does not start them. Existing halo node names, colors, alpha values, scale values, and selected particle behavior were preserved. The Level 01 scene, Moon/Sun puzzle controllers, Moon/Sun particle streams, celestial barrier gate, Level 01 light puzzle coordinator, progression controller, and finale controller were not modified.
+
+Static validation for this slice includes `git diff --check`, Godot headless editor parse, Godot `--check-only`, zero-diff checks for the protected scene/controller/stream/barrier/coordinator/progression/finale files, and the targeted validator `/tmp/validate_activated_lantern_rings.gd`. The validator covers Level 01 loading, configured wrapper presence, single ring child counts, TorusMesh geometry, material colors, alpha/emission defaults, shadow settings, state visibility matrix, initial counts, correct path counts, full completion counts, wrong reset cleanup, duplicate ring prevention, selected particle amount/emission regression, halo constants, excluded Sun lantern safety, and protected-file cleanliness.
+
+Rendered gameplay QA: PARTIAL. Headless validation can confirm runtime structure and state lifecycle, but this environment did not provide a reliable normal graphical gameplay renderer for manual visual confirmation. A later in-editor rendered pass should confirm the rings sit around the lantern bases, are horizontal, do not sink below terrain or float too high, remain readable from the gameplay camera, do not overlap prompts, do not conflict with spherical halos or selected vertical particles, do not make active endpoints look completed, and do not show depth flicker.
+
+Visual and performance risks: the rings add one static unshaded transparent `TorusMesh` per configured wrapper, so runtime cost should remain low. The main remaining risk is subjective visual tuning in a real renderer: base height, brightness, and transparency may need polish after manual QA, but no animation, lights, audio, particles, or extra resources were added in Slice 6.
