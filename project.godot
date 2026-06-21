@@ -14,6 +14,7 @@ config/name="Fifteen Shards of Light"
 run/main_scene="res://scenes/core/StartScene.tscn"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
+run/max_fps=60
 
 [autoload]
 
@@ -22,7 +23,7 @@ DevLevelMenu="*res://scenes/dev/DevLevelMenu.tscn"
 
 [debug]
 
-settings/stdout/print_fps=true
+settings/stdout/print_fps=false
 
 [display]
 
@@ -30,7 +31,7 @@ window/size/viewport_width=1280
 window/size/viewport_height=720
 window/size/mode=3
 window/stretch/mode="canvas_items"
-window/vsync/vsync_mode=0
+window/vsync/vsync_mode=1
 
 [input]
 

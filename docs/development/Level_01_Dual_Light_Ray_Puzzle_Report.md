@@ -369,3 +369,30 @@ Static validation for this slice includes `git diff --check`, Godot editor parse
 Targeted validation covers Level 01 loading, configured wrapper discovery, one direct beacon child per wrapper, CylinderMesh geometry, disabled caps/shadows, ShaderMaterial uniforms and `TIME`, Moon/Sun colors, state visibility matrix, initial counts, selection/cancel, correct connection cleanup, wrong reset cleanup, full completion ring counts, duplicate prevention, maximum simultaneous beacon count, particle/halo/ring regressions, and excluded Sun node 5.
 
 Rendered gameplay QA is `PARTIAL` in headless validation environments. Visual risks to verify in a normal renderer are beacon height/readability, blend strength, edge softness, and whether particles remain distinguishable inside the column. Performance risk is low because each configured wrapper adds one simple unlit cylinder mesh and shader-driven animation only; no CPU `_process()`, recurring tweens, timers, signals, external textures, or real Light3D nodes were added.
+
+## Slice 8 - Integration QA and Runtime Performance Optimization
+
+Slice 8 used baseline `5c4202679b224d2ca8269b4e5c60610c57643097` and investigated the user-reported symptom that launching through the Godot Editor created unusually high system load. The baseline audit confirmed `window/vsync/vsync_mode=0`, no explicit `application/run/max_fps`, and `settings/stdout/print_fps=true`, so the project could render without a default FPS cap.
+
+The static audit also confirmed that `MoonRayParticleStream` and `SunRayParticleStream` were CPU-side frame-scaled work: each active stream updated 96 `MultiMesh` instance transforms and colors every rendered frame, and distance-faded streams did that work before checking whether the camera had fully culled them. Full dual completion keeps 4 Moon stream segments plus 5 Sun stream segments active, for 864 light-stream instances.
+
+Root-cause classification for this environment is `MIXED`: `UNCAPPED_RENDER_LOOP` and `CPU_SCRIPT_HOTSPOT` are confirmed; `EDITOR_OVERHEAD` is plausible but not isolated; `GPU_RENDER_HOTSPOT`, `TRANSPARENT_OVERDRAW`, `PARTICLE_OVERLOAD`, and `SHADOW_OVERLOAD` remain inconclusive because the container only provided headless runtime measurements.
+
+Implemented fixes:
+
+- `project.godot` now sets `application/run/max_fps=60`.
+- `project.godot` now sets `display/window/vsync/vsync_mode=1`.
+- `project.godot` disables permanent stdout FPS printing.
+- Moon and Sun stream scripts now expose `visual_update_fps = 60.0`, count visual updates for validation, evaluate distance visibility before full instance updates, skip the 96-instance loop while fully distance-culled, and keep `_age` advancing so visual motion resumes at the correct time position when the stream becomes visible again.
+
+Before/after results are documented in `docs/development/Level_01_Dual_Light_Performance_Audit.md`. Baseline headless StartScene sampling observed about 145 FPS, which confirms the baseline runtime was not capped to 60 in this environment. Post-fix policy validation confirms VSync setting `1`, project max FPS `60`, runtime `Engine.max_fps` set to `60`, and StartScene headless sampling at 60.00 FPS. Headless render counters remain zero and are not treated as GPU evidence.
+
+Full integration QA covered Moon-first and Sun-first completion orders, selection/cancel lifecycle, correct route progression, 10 wrong resets for each puzzle, completion ring and selected beacon lifecycle, particle density remaining at 96, barrier collision/dissolve lifecycle, duplicate signal prevention, five Level 01 reloads, orphan/node stability, and protected main Level 01 progression paths. No gameplay route, narrative, scene transform, particle count, stream color, arc height, fade timing, completion ring, selected beacon, barrier aura, progression condition, finale condition, or portal transition was intentionally changed.
+
+Rendered/GPU QA status remains PARTIAL. The project no longer defaults to unlimited FPS, but GPU utilization and editor-vs-standalone process split must be verified on the user's machine with the protocol in the performance audit.
+
+Remaining risks:
+
+- The container cannot prove GPU/overdraw/shadow cost because it has no normal renderer or OS GPU telemetry.
+- Editor overhead must be measured separately from the game process on the user's hardware.
+- Existing Level 01 inherited-scene warnings and unrelated player animation-controller null warnings appear during headless scene instantiation and were not changed in Slice 8.
