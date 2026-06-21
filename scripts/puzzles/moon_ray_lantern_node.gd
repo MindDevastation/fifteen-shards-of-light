@@ -12,6 +12,11 @@ const SILVER := Color(0.78, 0.84, 0.90, 1.0)
 @export var visual_target_path: NodePath
 @export var interaction_radius: float = 3.0
 @export var beam_anchor_offset := Vector3(0.0, 1.25, 0.0)
+@export_range(0.1, 2.0, 0.01) var activated_ring_inner_radius: float = 0.48
+@export_range(0.1, 2.0, 0.01) var activated_ring_outer_radius: float = 0.62
+@export_range(-1.0, 2.0, 0.01) var activated_ring_height: float = 0.18
+@export_range(0.0, 1.0, 0.01) var activated_ring_alpha: float = 0.78
+@export_range(0.0, 4.0, 0.05) var activated_ring_emission: float = 1.20
 
 var state := LanternState.INACTIVE
 var _controller: Node
@@ -20,6 +25,8 @@ var _player_in_range := false
 var _current_player: Node
 var _halo: MeshInstance3D
 var _selected_stream: GPUParticles3D
+var _activated_ring: MeshInstance3D
+var _activated_ring_material: StandardMaterial3D
 var _area: Area3D
 var _shape: CollisionShape3D
 var _prompt: CanvasLayer
@@ -51,6 +58,9 @@ func get_prompt() -> CanvasLayer:
 
 func get_selected_particle_stream() -> GPUParticles3D:
 	return _selected_stream
+
+func get_activated_ring() -> MeshInstance3D:
+	return _activated_ring
 
 func _sync_to_visual_target() -> void:
 	if _visual_target == null:
@@ -169,12 +179,43 @@ func _build_runtime_nodes() -> void:
 	_selected_stream.draw_pass_1 = particle_mesh
 	add_child(_selected_stream)
 
+	_activated_ring = MeshInstance3D.new()
+	_activated_ring.name = "MoonRayActivatedRing"
+	_activated_ring.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	var ring_mesh := TorusMesh.new()
+	var ring_inner_radius := activated_ring_inner_radius
+	var ring_outer_radius := activated_ring_outer_radius
+	if ring_inner_radius >= ring_outer_radius:
+		var original_inner_radius := ring_inner_radius
+		ring_inner_radius = min(ring_inner_radius, ring_outer_radius)
+		ring_outer_radius = max(original_inner_radius, ring_outer_radius)
+		if ring_inner_radius == ring_outer_radius:
+			ring_outer_radius = ring_inner_radius + 0.01
+	ring_mesh.inner_radius = ring_inner_radius
+	ring_mesh.outer_radius = ring_outer_radius
+	ring_mesh.rings = 48
+	ring_mesh.ring_segments = 16
+	_activated_ring.mesh = ring_mesh
+	_activated_ring.position = Vector3(0.0, activated_ring_height, 0.0)
+	_activated_ring_material = StandardMaterial3D.new()
+	_activated_ring_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_activated_ring_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	_activated_ring_material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	_activated_ring_material.albedo_color = Color(0.78, 0.84, 0.90, activated_ring_alpha)
+	_activated_ring_material.emission_enabled = true
+	_activated_ring_material.emission = Color(0.86, 0.92, 1.0, 1.0)
+	_activated_ring_material.emission_energy_multiplier = activated_ring_emission
+	_activated_ring.material_override = _activated_ring_material
+	_activated_ring.visible = false
+	add_child(_activated_ring)
+
 func _apply_state() -> void:
 	if _halo == null:
 		return
 	var alpha := 0.0
 	var scale_value := 1.0
 	_selected_stream.emitting = false
+	_activated_ring.visible = false
 	match state:
 		LanternState.INACTIVE:
 			alpha = 0.0
@@ -188,6 +229,7 @@ func _apply_state() -> void:
 			_selected_stream.restart()
 		LanternState.COMPLETED:
 			alpha = 0.30
+			_activated_ring.visible = true
 		LanternState.RESETTING:
 			alpha = 0.14
 	_halo.visible = alpha > 0.0
