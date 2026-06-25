@@ -1,11 +1,11 @@
-[gd_scene load_steps=3 format=3 uid="uid://csfl8x4m5vwdf"]
+[gd_scene format=3 uid="uid://csfl8x4m5vwdf"]
 
-[ext_resource type="PackedScene" path="res://scenes/core/SoulOrb_Base.tscn" id="1_base"]
-[ext_resource type="Script" path="res://scripts/soul/soul_orb_follow.gd" id="2_script"]
+[ext_resource type="PackedScene" uid="uid://c3ujhyl8kfxso" path="res://scenes/core/SoulOrb_Base.tscn" id="1_base"]
+[ext_resource type="Script" uid="uid://dbcwycc501t71" path="res://scripts/soul/soul_orb_follow.gd" id="2_script"]
 
-[node name="SoulOrb_Follow" type="Node3D"]
+[node name="SoulOrb_Follow" type="Node3D" unique_id=1068685770]
 script = ExtResource("2_script")
 
-[node name="HoverRoot" type="Node3D" parent="."]
+[node name="HoverRoot" type="Node3D" parent="." unique_id=1494468257]
 
-[node name="SoulOrb_Base" parent="HoverRoot" instance=ExtResource("1_base")]
+[node name="SoulOrb_Base" parent="HoverRoot" unique_id=2017839090 instance=ExtResource("1_base")]

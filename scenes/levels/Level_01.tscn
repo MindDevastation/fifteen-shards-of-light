@@ -18,12 +18,12 @@
 [ext_resource type="PackedScene" path="res://scenes/environment/vfx/LandmarkLightColumn.tscn" id="19_light_column"]
 [ext_resource type="PackedScene" uid="uid://xm215olcv6cg" path="res://scenes/ui/LevelFinaleOverlay.tscn" id="20_finale_overlay"]
 [ext_resource type="PackedScene" path="res://scenes/core/LevelPortal.tscn" id="21_level_portal"]
-[ext_resource type="Script" path="res://scripts/puzzles/moon_ray_puzzle_controller.gd" id="22_moon_ray_controller"]
+[ext_resource type="Script" uid="uid://b02kfr7m0bqwe" path="res://scripts/puzzles/moon_ray_puzzle_controller.gd" id="22_moon_ray_controller"]
 [ext_resource type="PackedScene" uid="uid://bbshbmlep0e44" path="res://scenes/environment/assets/lantern_02.tscn" id="23_0rjyr"]
 [ext_resource type="PackedScene" uid="uid://dticujw6n57ry" path="res://scenes/environment/assets/lantern_01.tscn" id="24_0k37p"]
-[ext_resource type="Script" path="res://scripts/puzzles/celestial_barrier_gate.gd" id="25_celestial_barrier"]
-[ext_resource type="Script" path="res://scripts/puzzles/sun_ray_puzzle_controller.gd" id="26_sun_ray_controller"]
-[ext_resource type="Script" path="res://scripts/levels/level_01_light_puzzle_coordinator.gd" id="27_light_coordinator"]
+[ext_resource type="Script" uid="uid://dqo7jl6ms4srk" path="res://scripts/puzzles/celestial_barrier_gate.gd" id="25_celestial_barrier"]
+[ext_resource type="Script" uid="uid://cla26jhfbnv6t" path="res://scripts/puzzles/sun_ray_puzzle_controller.gd" id="26_sun_ray_controller"]
+[ext_resource type="Script" uid="uid://dtpxs7dig6g72" path="res://scripts/levels/level_01_light_puzzle_coordinator.gd" id="27_light_coordinator"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_finale_trigger"]
 size = Vector3(12.087067, 4, 5)
@@ -53,8 +53,8 @@ fog_density = 0.012
 
 [node name="BlockRoot" type="Node3D" parent="." unique_id=1489238210]
 
-[node name="SoulOrb_World" parent="BlockRoot" unique_id=237478893 instance=ExtResource("5_soul_orb_world")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.477822, 2.512011, -23.541904)
+[node name="SoulOrb_World" parent="BlockRoot" unique_id=1820851300 instance=ExtResource("5_soul_orb_world")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.477822, 3.101977, -23.541904)
 
 [node name="Block_01_01_StartClearing" parent="BlockRoot" unique_id=1456202776 instance=ExtResource("2_block")]
 
@@ -88,7 +88,7 @@ max_zoom_distance = 5.0
 
 [node name="LevelRuntimeRoot" type="Node3D" parent="." unique_id=385295927]
 
-[node name="Level01LightPuzzleCoordinator" type="Node" parent="LevelRuntimeRoot"]
+[node name="Level01LightPuzzleCoordinator" type="Node" parent="LevelRuntimeRoot" unique_id=1092459470]
 script = ExtResource("27_light_coordinator")
 moon_ray_controller_path = NodePath("../../Moon Ray/MoonRayPuzzleController")
 sun_ray_controller_path = NodePath("../../Sun Ray/SunRayPuzzleController")
@@ -163,7 +163,7 @@ vine_duration = 3.0
 [node name="StepAssistRoot" type="Node3D" parent="." unique_id=1562224144]
 
 [node name="StepAssistRamp_01" type="StaticBody3D" parent="StepAssistRoot" unique_id=445137816]
-transform = Transform3D(0.5547002, 0, 0.8320503, 0, 1, 0, -0.8320503, 0, 0.5547002, -9.9, 4.45, -35.15)
+transform = Transform3D(0.8980128, 0, 0.43996954, 0, 1, 0, -0.43996954, 0, 0.8980128, -11.99956, 3.5056705, -30.781376)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StepAssistRoot/StepAssistRamp_01" unique_id=210795539]
 shape = SubResource("ConvexPolygonShape3D_step_assist_ramp")
@@ -173,7 +173,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.32, 0.77)
 shape = SubResource("BoxShape3D_step_assist_cap")
 
 [node name="StepAssistRamp_02" type="StaticBody3D" parent="StepAssistRoot" unique_id=559333642]
-transform = Transform3D(0.9635179, 0, -0.2676439, 0, 1, 0, 0.2676439, 0, 0.9635179, -2.9, 2, -26.25)
+transform = Transform3D(-0.3303972, 0, 0.94384193, 0, 1, 0, -0.94384193, 0, -0.3303972, -2.9069362, 1.5116103, -26.883577)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StepAssistRoot/StepAssistRamp_02" unique_id=1718514809]
 shape = SubResource("ConvexPolygonShape3D_step_assist_ramp")
@@ -183,7 +183,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.32, 0.77)
 shape = SubResource("BoxShape3D_step_assist_cap")
 
 [node name="StepAssistRamp_03" type="StaticBody3D" parent="StepAssistRoot" unique_id=2393323]
-transform = Transform3D(0.7071068, 0, -0.7071068, 0, 1, 0, 0.7071068, 0, 0.7071068, 8.25, 2.08, -25.1)
+transform = Transform3D(0.2769459, 0, 0.96088564, 0, 1, 0, -0.96088564, 0, 0.2769459, 9.120842, 1.7717733, -24.53069)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StepAssistRoot/StepAssistRamp_03" unique_id=1815155845]
 shape = SubResource("ConvexPolygonShape3D_step_assist_ramp")
@@ -193,12 +193,45 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.32, 0.77)
 shape = SubResource("BoxShape3D_step_assist_cap")
 
 [node name="StepAssistRamp_04" type="StaticBody3D" parent="StepAssistRoot" unique_id=2115381252]
-transform = Transform3D(0.190809, 0, 0.9816272, 0, 1, 0, -0.9816272, 0, 0.190809, -7.25, 1.9, 6.15)
+transform = Transform3D(0.9853455, 0, -0.17057069, 0, 1, 0, 0.17057069, 0, 0.9853455, -10.271063, 1.3706387, 26.436796)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StepAssistRoot/StepAssistRamp_04" unique_id=1889998081]
 shape = SubResource("ConvexPolygonShape3D_step_assist_ramp")
 
 [node name="StepAssistCapShape_04" type="CollisionShape3D" parent="StepAssistRoot/StepAssistRamp_04" unique_id=1169379228]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.32, 0.77)
+shape = SubResource("BoxShape3D_step_assist_cap")
+disabled = true
+
+[node name="StepAssistRamp_05" type="StaticBody3D" parent="StepAssistRoot" unique_id=906093654]
+transform = Transform3D(0.9853455, 0, -0.17057069, 0, 1, 0, 0.17057069, 0, 0.9853455, -13.44213, 1.257975, 44.479187)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StepAssistRoot/StepAssistRamp_05" unique_id=1946876297]
+shape = SubResource("ConvexPolygonShape3D_step_assist_ramp")
+
+[node name="StepAssistCapShape_04" type="CollisionShape3D" parent="StepAssistRoot/StepAssistRamp_05" unique_id=510112957]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.32, 0.77)
+shape = SubResource("BoxShape3D_step_assist_cap")
+disabled = true
+
+[node name="StepAssistRamp_06" type="StaticBody3D" parent="StepAssistRoot" unique_id=331015666]
+transform = Transform3D(0.9830347, 0, -0.18341951, 0, 1, 0, 0.18341951, 0, 0.9830347, -22.657976, 0.36294377, 91.93021)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StepAssistRoot/StepAssistRamp_06" unique_id=1873039375]
+shape = SubResource("ConvexPolygonShape3D_step_assist_ramp")
+
+[node name="StepAssistCapShape_04" type="CollisionShape3D" parent="StepAssistRoot/StepAssistRamp_06" unique_id=952362590]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.32, 0.77)
+shape = SubResource("BoxShape3D_step_assist_cap")
+disabled = true
+
+[node name="StepAssistRamp_07" type="StaticBody3D" parent="StepAssistRoot" unique_id=2013415341]
+transform = Transform3D(0.9830347, 0, -0.18341951, 0, 1, 0, 0.18341951, 0, 0.9830347, -26.293163, 0.20069712, 109.753006)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StepAssistRoot/StepAssistRamp_07" unique_id=1425174833]
+shape = SubResource("ConvexPolygonShape3D_step_assist_ramp")
+
+[node name="StepAssistCapShape_04" type="CollisionShape3D" parent="StepAssistRoot/StepAssistRamp_07" unique_id=380380853]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.32, 0.77)
 shape = SubResource("BoxShape3D_step_assist_cap")
 disabled = true
@@ -273,7 +306,6 @@ transform = Transform3D(0.87951577, 0, -0.4758698, 0, 1, 0, 0.4758698, 0, 0.8795
 
 [node name="sun_ray_lantern_node_5" parent="Sun Ray" unique_id=1930981530 instance=ExtResource("24_0k37p")]
 transform = Transform3D(0.91051054, 0, -0.4134858, 0, 1, 0, 0.4134858, 0, 0.91051054, -33.136993, -0.047822356, 186.34566)
-
 
 [node name="SunRayPuzzleController" type="Node3D" parent="Sun Ray" unique_id=1736124003]
 script = ExtResource("26_sun_ray_controller")

@@ -107,7 +107,7 @@ transform = Transform3D(0.19936794, 0, -0.9799247, 0, 1, 0, 0.9799247, 0, 0.1993
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.962332, 1.970154, -25.113602)
 
 [node name="Tree_03" parent="." unique_id=565349851 instance=ExtResource("6_ehekv")]
-transform = Transform3D(0.9, 0, 0, 0, 0.9, 0, 0, 0, 0.9, 8.548562, 1.5430133, -6.98282)
+transform = Transform3D(0.7881836, 0, 0.43447277, 0, 0.9, 0, -0.43447277, 0, 0.7881836, 8.548562, 7.3911486, -6.98282)
 
 [node name="Stone_Block_01" parent="." unique_id=2030852333 instance=ExtResource("7_a0wkp")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.661475, 1.7063637, -26.683296)
@@ -125,7 +125,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.622618, 2.1366532, -13.8459
 transform = Transform3D(0.04013183, 0, -0.9991944, 0, 1, 0, 0.9991944, 0, 0.04013183, -14.14802, 2.1638436, -23.491764)
 
 [node name="Stone_Cliff_01" parent="." unique_id=1886241262 instance=ExtResource("11_h2i4i")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.380001, 1.518333, 6.7241144)
+transform = Transform3D(2.905541, 0, 0.74688107, 0, 3, 0, -0.74688107, 0, 2.905541, 2.314507, 2.8863971, 8.3148365)
 
 [node name="Ruin_Pillar_03" parent="." unique_id=1047669497 instance=ExtResource("12_vp2r1")]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -1.9118509, 2.7896311, 7.610876)
@@ -161,16 +161,16 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1545675, 2.1406438, 2.73775
 transform = Transform3D(1.6905237, 0, -1.0687046, 0, 2, 0, 1.0687046, 0, 1.6905237, -15.047602, 1.5012196, 2.8291092)
 
 [node name="Medium_Rock_01" parent="." unique_id=2064208800 instance=ExtResource("15_h2i4i")]
-transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, -18.378242, 1.9597206, -0.46114296)
+transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, -18.378242, 3.218577, -0.46114296)
 
 [node name="Medium_Rock_02" parent="." unique_id=846880097 instance=ExtResource("15_h2i4i")]
-transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, -17.58378, 1.5618365, 2.4246635)
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, -16.39085, 2.9166899, 2.4246635)
 
 [node name="Medium_Rock_03" parent="." unique_id=2125729139 instance=ExtResource("15_h2i4i")]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 8.049374, 1.3342432, -35.638527)
+transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 8.049374, 2.651153, -35.6284)
 
 [node name="Stone_Cliff_02" parent="." unique_id=1585960570 instance=ExtResource("11_h2i4i")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.69496, 2.3623762, -2.2347894)
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 13.69496, 2.9083076, -2.2347894)
 
 [node name="moss_02" parent="." unique_id=192707120 instance=ExtResource("16_a6edq")]
 transform = Transform3D(5, 0, 0, 0, 5, 0, 0, 0, 5, 1.1287692, 1.818471, -22.590073)
@@ -398,7 +398,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.924088, 2.8771534, -11.658
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.434349, 3.1182637, -5.373394)
 
 [node name="Bush_38" parent="." unique_id=8285747 instance=ExtResource("33_6yrva")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.319962, 7.019493, -29.458223)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.319962, 6.654714, -29.630112)
 
 [node name="Bush_39" parent="." unique_id=82875943 instance=ExtResource("33_6yrva")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.974934, 2.526, -16.262857)
@@ -410,7 +410,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.712076, 7.311186, -8.33017
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.7798266, 2.6666222, -1.3575628)
 
 [node name="Bush_42" parent="." unique_id=1394208414 instance=ExtResource("34_a18xv")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.969051, 6.0899463, -2.260383)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.686413, 4.376578, -2.260383)
 
 [node name="Bush_43" parent="." unique_id=1290074922 instance=ExtResource("34_a18xv")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.458562, 6.157368, -6.847679)

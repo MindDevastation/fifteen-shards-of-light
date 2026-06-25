@@ -3,7 +3,7 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://tiams3c8p2fy"
+uid="uid://dm37pnvivetpg"
 path="res://.godot/imported/SoulOrb_Petal.glb-f085d75c5689c1f365cdce878005c096.scn"
 
 [deps]
@@ -17,7 +17,7 @@ nodes/root_type=""
 nodes/root_name=""
 nodes/root_script=null
 nodes/apply_root_scale=true
-nodes/root_scale=1.0
+nodes/root_scale=0.12
 nodes/import_as_skeleton_bones=false
 nodes/use_name_suffixes=true
 nodes/use_node_type_suffixes=true
