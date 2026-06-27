@@ -2,17 +2,31 @@
 
 **Project:** Fifteen Shards of Light  
 **Level:** Level_04 - «Ты сама»  
-**Reference version:** 1.2  
+**Reference version:** 1.3  
 **Mode:** Documentation only - no runtime files, branches, commits or pull requests are authorized by this task  
 **Repository:** `MindDevastation/fifteen-shards-of-light`  
-**Target repository Markdown:** `docs/design/Level_04_Greybox_Development_Reference.md`  
-**Target Producer DOCX:** `Level_04_Greybox_Development_Reference_v1.2.docx`  
+**Target repository Markdown:** `docs/design/Level_04_Greybox_Development_Reference_v1.3.md`  
+**Target Producer DOCX:** `Level_04_Greybox_Development_Reference_v1.3.docx`  
 **Target runtime scene:** `res://scenes/levels/Level_04.tscn`  
 **Portal target:** `res://scenes/levels/Level_05.tscn`  
 **Engine baseline:** Godot 4.6 / Forward Plus / Jolt Physics / GDScript  
-**Prepared:** 26 June 2026
+**Prepared:** 27 June 2026
 
 > **Documentation verdict:** READY FOR PRODUCER REVIEW AS A GREYBOX IMPLEMENTATION REFERENCE. This document consolidates the five approved Level_04 source packages into one Codex-ready, slice-by-slice implementation contract. It does not authorize runtime implementation. Slice 0 must be executed later as a fresh inspection-only preflight and must end with `WAITING FOR APPLY`.
+
+## Version 1.3 Change Log
+
+| ID | Version 1.3 result |
+|---|---|
+| V13-01 | Updated the canonical repository reference path to `docs/design/Level_04_Greybox_Development_Reference_v1.3.md` and the Producer artifact name to `Level_04_Greybox_Development_Reference_v1.3.docx` across the header, proposed tree, source traceability, final Codex prompt requirements and all other filename references. |
+| V13-02 | Resolved the Slice 11 file-scope contradiction by granting one exact `CREATE - USER ARTIFACT OUTSIDE REPOSITORY WORKTREE` authority for mandatory `Level_04_Greybox_Implementation_Summary.docx`; the artifact remains uncommitted unless a separate explicit PR-scope decision authorizes it and grants no authority over any other file. |
+| V13-03 | Repaired the P0/P1 matrix to one three-column schema by merging the test action and expected result for P0-41 through P0-47 into complete `Expected evidence` cells without removing any recovery evidence or outcome. |
+| V13-04 | Added P0-53 for repeated backtracking across Crossing Tree, Braided Crossing and both route contexts before and after the first reward, with matching softlock, Slice 11 and Definition of Done coverage. |
+| V13-05 | Added P0-54 for completing both approved sequences through continuous grounded traversal only, proving no mandatory jump, gap, precision edge placement, timing gate, waiting challenge or audio dependency, with matching softlock, Slice 11 and Definition of Done coverage. |
+| V13-06 | Expanded the mandatory Markdown/DOCX implementation-summary schema to enumerate base/PR/prerequisite evidence, one commit per Slice 1-11, created/modified files, matching `.gd.uid` mapping, complete test results, grounded root-Y evidence, recovery/AABB evidence, both sequence traces, exact-copy/finale/portal evidence, warnings, limitations, blockers, remaining Art Bible production work and final Definition of Done verdict. |
+| V13-07 | Preserved the canonical `OOB_SouthPerimeter` contract exactly: position `Vector3(0.00, 1.00, -65.00)`, rotation `Vector3(0,0,0)`, extents `Vector3(39.00, 10.00, 4.00)`, inner face `Z=-61.00`, Arrival legal south edge `Z=-59.00`, separation `2.00 m`, mandatory shoulder `1.25 m` and residual Player-collider allowance `0.75 m`; all obsolete normative center values were removed. |
+| V13-08 | Re-generated Markdown and DOCX from one Version 1.3 semantic source and verified equivalent version, paths, values, APIs, slice scopes, UID rules, tests, matrices, Definition of Done and final-summary requirements. |
+| V13-09 | Completed full-page DOCX render QA with focused inspection of all tables, the repaired P0/P1 matrix, recovery registry, AABB proof, Slice 1-11 file scopes, long IDs/NodePaths, headers, footers, page numbers, page breaks, clipping, overlap, table overflow and orphaned headings. |
 
 ## Version 1.2 Change Log
 
@@ -459,7 +473,7 @@ scripts/levels/level_04/
 # Matching sidecars are allowed only beside approved scripts:
 scripts/levels/level_04/*.gd.uid
 
-docs/design/Level_04_Greybox_Development_Reference.md
+docs/design/Level_04_Greybox_Development_Reference_v1.3.md
 
 # Created by Slice 11:
 docs/development/Level_04_Greybox_Implementation_Summary.md
@@ -1253,7 +1267,7 @@ No wildcard grants write authority. A defect requiring any other path must stop 
 2. Set each RA root to the exact approved floor coordinate; keep FloorAnchor identity-local.
 3. Implement grounded ArrivalZone generation and one-physics-frame current-overlap reevaluation.
 4. Instantiate exactly the five recovery volumes from Section 8.8 with exact node names, IDs, parents, BoxShape3D transforms and extents. `OOB_SouthPerimeter` must use `Vector3(0.00, 1.00, -65.00)`, `Vector3(0,0,0)` and `Vector3(39.00, 10.00, 4.00)`.
-5. Serialize the exact five owner-relative volume paths and all 12 RA paths on RecoveryController; validate exact registry equality and reject the obsolete south-perimeter center `Z=-63.00`.
+5. Serialize the exact five owner-relative volume paths and all 12 RA paths on RecoveryController; validate exact registry equality and reject every noncanonical south-perimeter center.
 6. Implement internally owned fall token, active overlap set, latch, pending suspension and one-frame rearm.
 7. Use latest valid registered RA transform as destination.
 8. Apply `Player.velocity = Vector3.ZERO` after recovery. Clear additional transient movement only through a proven public Player API; otherwise stop for a separately approved narrow shared prerequisite.
@@ -2234,6 +2248,7 @@ Run complete static and runtime acceptance, remove diagnostics/harness residue, 
 | Authority | Exact path / rule |
 |---|---|
 | CREATE | `docs/development/Level_04_Greybox_Implementation_Summary.md` |
+| CREATE - USER ARTIFACT OUTSIDE REPOSITORY WORKTREE | `Level_04_Greybox_Implementation_Summary.docx` |
 | MODIFY | None. |
 | READ ONLY | `scenes/levels/Level_04.tscn` |
 | READ ONLY | `scenes/levels/level_04/blocks/Block_04_00_Arrival.tscn` |
@@ -2272,6 +2287,8 @@ Run complete static and runtime acceptance, remove diagnostics/harness residue, 
 
 No wildcard grants write authority. A defect requiring any other path must stop the slice and reopen the owning slice or use a separately approved explicit defect-fix whitelist.
 
+`Level_04_Greybox_Implementation_Summary.docx` is mandatory, is generated outside the repository worktree, and is not committed unless a separate explicit PR-scope decision authorizes it. This one external-artifact authority grants no write permission to any other external file or repository path.
+
 ### Slice 11.5 Nodes, scenes and scripts
 
 - All Level_04-local systems as integrated.
@@ -2285,15 +2302,45 @@ No wildcard grants write authority. A defect requiring any other path must stop 
 
 ### Slice 11.7 Implementation steps
 
-- Run full UT/static/P0/P1 matrices.
-- Complete both routes from clean reload.
-- Verify exact copy, route timing, CP0-CP9, RA0-RA11, pre-overlap, recovery, failure paths and portal transition.
-- Remove temporary harnesses from worktree.
-- Remove unrelated import/UID churn.
-- Clean warnings/errors.
-- Record final base, branch, commits and changed-file whitelist.
-- Create implementation summary Markdown and content-equivalent user DOCX.
-- Verify summary DOCX render outside runtime worktree.
+1. Run the complete UT, ST, P0 and P1 matrices and record every result as `PASS`, `FAIL` or `NOT VERIFIED`.
+2. Complete both routes from a clean reload and preserve full Sequence A and Sequence B execution traces.
+3. Execute P0-53 repeated backtracking before and after the first reward across Crossing Tree, Braided Crossing and both branch route contexts.
+4. Execute P0-54 for both sequences using continuous grounded traversal only.
+5. Verify exact copy, route timing, CP0-CP9, RA0-RA11, pre-overlap, recovery, failure paths and portal transition.
+6. Remove temporary harnesses from the worktree and remove unrelated import/UID churn.
+7. Clean warnings/errors without editing outside the active literal whitelist; reopen the owning slice or obtain an explicit defect-fix whitelist for any runtime correction.
+8. Create `docs/development/Level_04_Greybox_Implementation_Summary.md` inside the repository.
+9. Create mandatory `Level_04_Greybox_Implementation_Summary.docx` outside the repository worktree. Do not commit it unless a separate explicit PR-scope decision authorizes that exact file. This does not authorize any other external or repository write.
+10. Generate both summaries from one semantic source and verify content equivalence.
+11. Populate both summaries with every mandatory field below, explicitly rather than through a generic “complete results” statement:
+    - exact implementation base SHA;
+    - active PR/base decision;
+    - every shared prerequisite, its status and exact approved head SHA;
+    - branch and PR;
+    - one commit entry for each Slice 1 through Slice 11;
+    - exact files created;
+    - exact files modified;
+    - exact matching `.gd.uid` mapping;
+    - complete UT/ST/P0/P1 results with `PASS`, `FAIL` or `NOT VERIFIED` for every ID;
+    - proven Player spawn and RA root-Y values;
+    - exact recovery registry evidence;
+    - corrected `OOB_SouthPerimeter` AABB proof;
+    - full Sequence A execution trace;
+    - full Sequence B execution trace;
+    - exact-copy evidence for Shard_08, Shard_09 and `LEVEL_04_MAIN_TEXT`;
+    - finale fail-closed evidence;
+    - shared LevelPortal ownership evidence;
+    - stationary portal early-overlap evidence;
+    - one-transition evidence;
+    - final node tree and every API deviation, if any;
+    - performance and timing evidence;
+    - known warnings;
+    - known limitations;
+    - blockers and every `NOT VERIFIED` item;
+    - explicit confirmation that shared files, `project.godot`, other levels and final assets were not changed;
+    - remaining art-stage work, explicitly enumerating every still-unimplemented Art Bible family and all post-greybox production work;
+    - final Definition of Done verdict.
+12. Render the summary DOCX outside the runtime worktree and verify its complete layout before user handoff.
 
 ### Slice 11.8 Automated or static checks
 
@@ -2310,7 +2357,7 @@ No wildcard grants write authority. A defect requiring any other path must stop 
 
 - Sequence A clean run.
 - Sequence B clean run.
-- All P0 tests.
+- All P0 tests, explicitly including P0-53 repeated backtracking and P0-54 continuous grounded traversal in both approved sequences.
 - Blind-play timing if tester available; otherwise mark NOT VERIFIED and block final acceptance where mandatory.
 - 16:9 CP0-CP9 camera review.
 - Muted/reduced-color readability.
@@ -2318,12 +2365,33 @@ No wildcard grants write authority. A defect requiring any other path must stop 
 
 ### Slice 11.10 Acceptance criteria
 
-- No unresolved P0 failure.
-- All mandatory evidence verified.
+- No unresolved P0 failure and no mandatory evidence reported as PASS when it is `NOT VERIFIED`.
+- All mandatory evidence is verified, including P0-53 repeated backtracking and P0-54 continuous grounded traversal for both sequences.
 - No parser errors or unexpected warnings.
-- Both orders converge on same E2/main text/portal target.
-- No softlock, duplicate reward or duplicate scene transition.
-- Final summaries complete and content-equivalent.
+- Both orders converge on the same E2, exact main text and Level_05 portal target.
+- No softlock, duplicate puzzle terminal, duplicate shard reveal, duplicate reward or duplicate scene transition.
+- `docs/development/Level_04_Greybox_Implementation_Summary.md` exists in the repository.
+- Mandatory `Level_04_Greybox_Implementation_Summary.docx` exists outside the repository worktree and remains uncommitted unless a separate explicit PR-scope decision authorizes it.
+- The Markdown and DOCX summaries are content-equivalent and each explicitly contains:
+    - exact implementation base SHA;
+    - active PR/base decision;
+    - every shared prerequisite, its status and exact approved head SHA;
+    - branch and PR;
+    - one commit entry for each Slice 1 through Slice 11;
+    - exact files created and exact files modified;
+    - exact matching `.gd.uid` mapping;
+    - every UT/ST/P0/P1 result as `PASS`, `FAIL` or `NOT VERIFIED`;
+    - proven Player spawn and RA root-Y values;
+    - exact recovery registry evidence and the corrected south AABB proof;
+    - full Sequence A and Sequence B execution traces;
+    - exact-copy evidence for Shard_08, Shard_09 and `LEVEL_04_MAIN_TEXT`;
+    - finale fail-closed evidence;
+    - portal ownership, stationary early-overlap and one-transition evidence;
+    - final node tree, API deviations, performance and timing evidence;
+    - known warnings, known limitations, blockers and all `NOT VERIFIED` items;
+    - confirmation of unchanged shared files, `project.godot`, other levels and final assets;
+    - every still-unimplemented Art Bible family and all remaining post-greybox production work;
+    - final Definition of Done verdict.
 - Definition of Done satisfied.
 
 ### Slice 11.11 Rollback plan
@@ -2348,14 +2416,37 @@ No wildcard grants write authority. A defect requiring any other path must stop 
 
 ### Slice 11.14 Handoff format
 
-- Final status PASS / BLOCKED.
-- Base SHA, branch, ordered commit list and PR link.
-- Exact changed files and UID mapping.
-- Complete acceptance and softlock results.
-- Proven Player root-Y values.
-- Warnings and NOT VERIFIED items.
-- Implementation summary Markdown path.
-- User DOCX path and content-equivalence confirmation.
+- Final status: `PASS` or `BLOCKED`.
+- Exact implementation base SHA.
+- Active PR/base decision.
+- Every shared prerequisite, its status and exact approved head SHA.
+- Branch and PR.
+- One commit entry for each Slice 1 through Slice 11.
+- Exact files created.
+- Exact files modified.
+- Exact matching `.gd.uid` mapping.
+- Complete UT/ST/P0/P1 results with `PASS`, `FAIL` or `NOT VERIFIED` for every ID, including P0-53 and P0-54.
+- Proven Player spawn and RA root-Y values.
+- Exact recovery registry evidence.
+- Corrected `OOB_SouthPerimeter` AABB proof.
+- Full Sequence A execution trace.
+- Full Sequence B execution trace.
+- Exact-copy evidence for Shard_08, Shard_09 and `LEVEL_04_MAIN_TEXT`.
+- Finale fail-closed evidence.
+- Shared LevelPortal ownership evidence.
+- Stationary portal early-overlap evidence.
+- One-transition evidence.
+- Final node tree and API deviations, if any.
+- Performance and timing evidence.
+- Known warnings.
+- Known limitations.
+- Blockers and every `NOT VERIFIED` item.
+- Confirmation that shared files, `project.godot`, other levels and final assets were not changed.
+- Remaining art-stage work, explicitly listing every still-unimplemented Art Bible family and all post-greybox production work.
+- Final Definition of Done verdict.
+- Repository summary path: `docs/development/Level_04_Greybox_Implementation_Summary.md`.
+- Mandatory user artifact path: `Level_04_Greybox_Implementation_Summary.docx`, generated outside the repository worktree and uncommitted unless separately authorized.
+- Markdown/DOCX content-equivalence confirmation.
 
 # 22. Master file ownership and changed-file whitelist
 
@@ -2397,7 +2488,7 @@ The following exact paths are the complete planned runtime file inventory. This 
 | `scripts/levels/level_04/ripple_conversation_controller.gd` | Slice 5 Ripple | Write only in the literal slice tables that list this exact path. |
 | `scripts/levels/level_04/<approved_script>.gd.uid` | Matching sidecar only | Allowed only when the exact sidecar is named in the active slice and its sibling `.gd` is CREATE or MODIFY in that slice. |
 | `docs/development/Level_04_Greybox_Implementation_Summary.md` | Slice 11 | Mandatory committed summary. |
-| `Level_04_Greybox_Implementation_Summary.docx` | Slice 11 user artifact | Generated outside runtime worktree unless explicitly requested in the PR. |
+| `Level_04_Greybox_Implementation_Summary.docx` | Slice 11 mandatory user artifact | Exact `CREATE - USER ARTIFACT OUTSIDE REPOSITORY WORKTREE` authority only. Generate outside the repository worktree; do not commit unless a separate explicit PR-scope decision authorizes it; this grants no authority to any other external or repository file. |
 
 ### 22.1 Changed-file whitelist enforcement
 
@@ -2441,7 +2532,7 @@ The following exact paths are the complete planned runtime file inventory. This 
 | UT-24 | RouteContext typing | All ten mappings explicit; wrong types rejected. |
 | UT-25 | E1 failure continuity | Remaining branch still fixed and REMAINING_DEFERRED reached. |
 | UT-26 | Exact recovery-volume registry | Serialized path list equals the five literal paths and IDs in Section 8.8, including `RV_OOB_SOUTH_PERIMETER`; missing, extra, duplicate, wrong-type or wrong-ID entries fail startup. |
-| UT-27 | Recovery transform registry | All five BoxShape3D positions, rotations and extents equal Section 8.8; south is exactly `Vector3(0.00, 1.00, -65.00)` / `Vector3(0,0,0)` / `Vector3(39.00, 10.00, 4.00)` and no obsolete `Z=-63.00` value is accepted. |
+| UT-27 | Recovery transform registry | All five BoxShape3D positions, rotations and extents equal Section 8.8; south is exactly `Vector3(0.00, 1.00, -65.00)` / `Vector3(0,0,0)` / `Vector3(39.00, 10.00, 4.00)` and no noncanonical south-perimeter center is accepted. |
 | UT-28 | Recovery legal-space exclusions | Analytic AABB checks prove no volume intersects legal side spaces, shallow water, shard alcoves, pavilion overlook, either Braided Crossing lane, mandatory shoulder or camera corridor. The south proof uses actual Arrival bounds: edge `Z=-59.00`, inner face `Z=-61.00`, separation `2.00 m`, shoulder `1.25 m`, collider allowance `0.75 m`, PASS. |
 | UT-29 | Duplicate body-enter | One registered source creates one token and one recovery path. |
 | UT-30 | Intentional corner overlap | Simultaneous overlap of two perimeter volumes shares one token and one recovery. |
@@ -2525,18 +2616,20 @@ The following exact paths are the complete planned runtime file inventory. This 
 | P0-38 | Both rewards in both orders | One SoulOrb; normal return and one absorb pulse each. |
 | P0-39 | Malformed RouteContext mappings | Rejected without progress. |
 | P0-40 | E1 request failure | First reward committed and REMAINING_DEFERRED reached. |
-| P0-41 | Recovery registry audit | Enumerate the exact five paths/IDs/nodes and compare to serialized registry, including `RV_OOB_SOUTH_PERIMETER` | Exact equality; each registered once; no extra or omitted source. |
-| P0-42 | Recovery transform/exclusion audit | Inspect every volume at runtime and compare Section 8.8; for south, verify Arrival edge `Z=-59.00`, recovery center `Z=-65.00`, half-extent `4.00 m`, inner face `Z=-61.00`, separation `2.00 m`, shoulder `1.25 m` and collider allowance `0.75 m` | Exact shape/transform; AABB proof PASS; legal Arrival movement never overlaps; falls before the perimeter remain covered by `SoftReturnVolume`; zero overlap with every listed legal-space exclusion. |
-| P0-43 | Duplicate body-enter | Re-emit entry from one registered volume | One token, one pending/recovery path. |
-| P0-44 | Intentional exterior-corner overlap | Enter overlap of two perimeter volumes | Both sources tracked; one token and one recovery only. |
-| P0-45 | Suspended exit before unlock | Enter any exact registry volume during reward/main text, then leave all volumes | Pending clears after one physics frame; no delayed teleport. |
-| P0-46 | Suspended remain / destination overlap | Remain invalid through unlock, then temporarily keep destination inside a registered volume | Same token recovers once; latch stays closed until zero-overlap frame. |
-| P0-47 | Wrong source/non-Player/mismatched ID/stale continuation | Invoke each invalid case | Rejected without anchor, token, progress or teleport mutation. |
+| P0-41 | Recovery registry audit | Enumerate the exact five paths/IDs/nodes and compare them to the serialized registry, including `RV_OOB_SOUTH_PERIMETER`; expected result: exact equality, each source registered once, and no extra or omitted source. |
+| P0-42 | Recovery transform/exclusion audit | Inspect every volume at runtime and compare it with Section 8.8. For the south perimeter verify Arrival edge `Z=-59.00`, recovery center `Z=-65.00`, half-extent `4.00 m`, inner face `Z=-61.00`, separation `2.00 m`, shoulder `1.25 m` and collider allowance `0.75 m`; expected result: exact shape/transform, AABB proof PASS, legal Arrival movement never overlaps, falls before the perimeter remain covered by `SoftReturnVolume`, and every listed legal-space exclusion has zero overlap. |
+| P0-43 | Duplicate body-enter | Re-emit entry from one registered volume; expected result: one token and one pending/recovery path. |
+| P0-44 | Intentional exterior-corner overlap | Enter the overlap of two perimeter volumes; expected result: both sources are tracked while only one token and one recovery are created. |
+| P0-45 | Suspended exit before unlock | Enter any exact registry volume during reward/main text and then leave all volumes; expected result: pending recovery clears after one physics frame and no delayed teleport occurs. |
+| P0-46 | Suspended remain / destination overlap | Remain invalid through unlock and temporarily keep the destination inside a registered volume; expected result: the same token recovers once and the latch stays closed until a zero-overlap physics frame. |
+| P0-47 | Wrong source/non-Player/mismatched ID/stale continuation | Invoke every invalid case; expected result: each is rejected without anchor, token, progress or teleport mutation. |
 | P0-48 | RA transform audit | Root exact, FloorAnchor identity-local, global transform exact. |
 | P0-49 | All footprint paths | Same shared Player. |
 | P0-50 | Other CharacterBody3D in footprint | No progress. |
 | P0-51 | Configured Player airborne | No completion until grounded dwell. |
 | P0-52 | Portal scene syntax | Omitted identity transform parses and validates. |
+| P0-53 | Repeated backtracking across Crossing Tree, Braided Crossing and both branch route contexts before and after the first reward | Immutable candidate does not change; no duplicate puzzle terminal, shard reveal or reward occurs; stored partial/completed puzzle state remains valid; remaining-zone occupancy is reevaluated correctly; no reset, route closure, forced replay or softlock occurs; both approved sequences remain completable. |
+| P0-54 | Complete Sequence A and Sequence B using continuous grounded traversal only | No mandatory jump, mandatory gap crossing, precision edge placement, timing gate, waiting challenge or required audio use; all mandatory route widths, slopes, steps and clearances remain valid. |
 | P1-01 | Blind first plays | 5:00-6:30, no UI arrows needed. |
 | P1-02 | Repeat optimal both orders | 3:00-4:00 and order difference <=10%. |
 | P1-03 | CP0-CP9 at 16:9 | Required landmarks/targets readable. |
@@ -2566,12 +2659,14 @@ The following exact paths are the complete planned runtime file inventory. This 
 | Duplicate close | One close latch and one portal request. | Multiple activate calls. |
 | Portal early overlap | Shared portal reevaluation/behavior proven by P0. | Player must exit/re-enter or local adapter loads scene. |
 | Portal activation callback missing | Diagnostic timeout only, no success fabrication. | Adapter treats timeout as activated. |
-| Recovery registry omitted/misplaced or overlaps legal space | Exact five-volume registry, exact transforms and analytic/runtime exclusion checks from Section 8.8. South placement uses actual Arrival floor bounds: legal edge `Z=-59.00`, recovery inner face `Z=-61.00`, separation `2.00 m`, shoulder `1.25 m`, residual current-Player-collider allowance `0.75 m`; pre-perimeter falls remain covered by `SoftReturnVolume` and no invisible catch floor exists. | Any extra/missing source; obsolete south center `Z=-63.00`; south separation below `2.00 m`; or overlap with legal side space, Arrival floor/shoulder, shallow water, shard alcove, pavilion overlook, either crossing lane, mandatory shoulder or camera corridor. |
+| Recovery registry omitted/misplaced or overlaps legal space | Exact five-volume registry, exact transforms and analytic/runtime exclusion checks from Section 8.8. South placement uses actual Arrival floor bounds: legal edge `Z=-59.00`, recovery inner face `Z=-61.00`, separation `2.00 m`, shoulder `1.25 m`, residual current-Player-collider allowance `0.75 m`; pre-perimeter falls remain covered by `SoftReturnVolume` and no invisible catch floor exists. | Any extra/missing source; any noncanonical south center; south separation below `2.00 m`; or overlap with legal side space, Arrival floor/shoulder, shallow water, shard alcove, pavilion overlook, either crossing lane, mandatory shoulder or camera corridor. |
 | Recovery volume duplicates/intentional corner overlaps | Controller-owned token and overlap set. | More than one teleport per fall. |
 | Recovery while reward/text active | Source-key suspension and pending reevaluation. | Teleport occurs during lock or never occurs after valid unlock. |
 | Player exits invalid area before unlock | One-frame reevaluation clears pending. | Delayed teleport after safe exit. |
 | Recovery destination still overlaps | Latch waits for zero-overlap frame. | Immediate retrigger loop. |
 | Recovery keeps stale movement | Set `Player.velocity = Vector3.ZERO`; clear any additional transient movement only through a proven public Player API. | Private fields required or stale motion persists. |
+| Repeated backtracking corrupts progression | P0-53 repeatedly crosses Crossing Tree, Braided Crossing and both route contexts before and after the first reward while preserving immutable candidate, unique terminals/rewards, stored puzzle state and current remaining-zone reevaluation. | Any candidate mutation, duplicate terminal/reveal/reward, reset, route closure, forced replay or softlock; either approved sequence becomes incompletable. |
+| Mandatory jump or precision traversal enters the critical path | P0-54 completes Sequence A and Sequence B through continuous grounded traversal while validating route widths, slopes, steps and clearances. | Any mandatory jump, gap crossing, precision edge placement, timing gate, waiting challenge or required audio dependency. |
 | Reload retains state | No GameState/save; fresh scene initializes hidden slots/E0. | Any state leaks across reload. |
 | UID/import churn | Exact per-slice whitelist and sibling rule. | Unrelated generated files remain. |
 | Temporary harness committed | Harness outside worktree or removed. | Any harness remains at final diff. |
@@ -2607,7 +2702,7 @@ Level_04 greybox is done only when all conditions below are true:
 
 1. Slice 0 was inspection-only, zero diff and explicit APPLY preceded runtime implementation.
 2. After APPLY, `feature/implement-level-04-greybox` was created from the exact Slice 0 approved base, branch/HEAD were verified, and no runtime implementation occurred directly on `main`.
-3. Slices 1-11 each have a scoped validation handoff and commit.
+3. Slices 1-11 each have a scoped validation handoff and one commit entry.
 4. Only master-whitelisted files changed.
 5. `project.godot`, shared systems and other levels remain unchanged unless a separately approved prerequisite exists.
 6. Matching `scripts/levels/level_04/<approved_script>.gd.uid` sidecars correspond one-to-one with approved sibling scripts; no unrelated UID/import churn exists.
@@ -2618,15 +2713,45 @@ Level_04 greybox is done only when all conditions below are true:
 11. Canopy 3/3 and Ripple 2/2 work in any order and either route context without duplicate counting.
 12. First-pass and remaining-pass shard anchors are correct, exclusive and immutable.
 13. Shard and portal pre-overlap P0 tests PASS without exit/re-entry.
-14. Recovery performs one teleport per fall event, preserves progress, respects locks, sets `Player.velocity = Vector3.ZERO` and uses no private movement state. The exact south registry is `Vector3(0.00, 1.00, -65.00)` / `Vector3(0,0,0)` / `Vector3(39.00, 10.00, 4.00)`; actual Arrival edge `Z=-59.00`, inner face `Z=-61.00`, exact separation `2.00 m`, `1.25 m` shoulder and `0.75 m` current-Player-collider allowance are proven PASS, with pre-perimeter falls covered by `SoftReturnVolume` and no invisible catch floor.
+14. Recovery performs one teleport per fall event, preserves progress, respects locks, sets `Player.velocity = Vector3.ZERO` and uses no private movement state. The exact south registry is `Vector3(0.00, 1.00, -65.00)` / `Vector3(0,0,0)` / `Vector3(39.00, 10.00, 4.00)`; actual Arrival edge `Z=-59.00`, inner face `Z=-61.00`, exact separation `2.00 m`, `1.25 m` shoulder and `0.75 m` residual Player-collider allowance are proven PASS, with pre-perimeter falls covered by `SoftReturnVolume` and no invisible catch floor.
 15. Environment transitions are non-blocking, preserve branch equality, use the dedicated controller child and exact NodePaths, and never own portal accent.
 16. Main text is exact, shown once and fail-closed on UI error.
-17. Portal activates only after actual text close; adapter calls shared activate once and never loads a scene.
+17. Portal activates only after actual text close; adapter calls shared `activate()` once and never loads a scene.
 18. All UT checks, ST-01 through ST-22 and mandatory P0/P1 tests PASS. The exact recovery registry and actual-floor south AABB proof are present in UT-26 through UT-32 where relevant, ST-13 and P0-41 through P0-47 where relevant.
-19. No temporary harness remains in repository.
-20. Final `Level04ProgressController.configuration_mode` is `PRODUCTION`; full startup validation passes; no unresolved parser errors, unexpected warnings, P0 failures or mandatory NOT VERIFIED evidence remains.
-21. `docs/development/Level_04_Greybox_Implementation_Summary.md` exists and accurately matches the final commit set.
-22. `Level_04_Greybox_Implementation_Summary.docx` exists as a content-equivalent user-facing artifact generated outside runtime worktree unless explicitly requested in the PR.
+19. P0-53 PASS proves repeated backtracking before and after the first reward does not mutate the candidate, duplicate a terminal/reveal/reward, invalidate stored puzzle state, break remaining-zone reevaluation, reset/close routes, force replay or softlock either approved sequence.
+20. P0-54 PASS proves Sequence A and Sequence B require no mandatory jump, gap, precision edge placement, timing gate, waiting challenge or audio use and preserve all mandatory widths, slopes, steps and clearances.
+21. No temporary harness remains in the repository.
+22. Final `Level04ProgressController.configuration_mode` is `PRODUCTION`; full startup validation passes; no unresolved parser errors, unexpected warnings, P0 failures or mandatory `NOT VERIFIED` evidence remains.
+23. `docs/development/Level_04_Greybox_Implementation_Summary.md` exists in the repository and accurately matches the final implementation evidence.
+24. Mandatory `Level_04_Greybox_Implementation_Summary.docx` exists outside the repository worktree, is content-equivalent to the Markdown summary and is not committed unless a separate explicit PR-scope decision authorizes that exact artifact. Its creation grants no authority over any other file.
+25. Both final summaries explicitly contain every field below:
+    - exact implementation base SHA;
+    - active PR/base decision;
+    - every shared prerequisite, its status and exact approved head SHA;
+    - branch and PR;
+    - one commit entry for each Slice 1 through Slice 11;
+    - exact files created;
+    - exact files modified;
+    - exact matching `.gd.uid` mapping;
+    - complete UT/ST/P0/P1 results with `PASS`, `FAIL` or `NOT VERIFIED` for every ID;
+    - proven Player spawn and RA root-Y values;
+    - exact recovery registry evidence;
+    - corrected `OOB_SouthPerimeter` AABB proof;
+    - full Sequence A execution trace;
+    - full Sequence B execution trace;
+    - exact-copy evidence for Shard_08, Shard_09 and `LEVEL_04_MAIN_TEXT`;
+    - finale fail-closed evidence;
+    - shared LevelPortal ownership evidence;
+    - stationary portal early-overlap evidence;
+    - one-transition evidence;
+    - final node tree and API deviations, if any;
+    - performance and timing evidence;
+    - known warnings;
+    - known limitations;
+    - blockers and every `NOT VERIFIED` item;
+    - confirmation that shared files, `project.godot`, other levels and final assets were not changed;
+    - remaining art-stage work, explicitly enumerating every still-unimplemented Art Bible family and all post-greybox production work;
+    - final Definition of Done verdict.
 
 
 # 27. Suggested branch, commit and PR naming
@@ -2656,7 +2781,7 @@ PR body must state exact base SHA, slice commits, changed-file whitelist, P0/P1 
 
 The implementation prompt generated from this reference must instruct Codex to:
 
-1. Treat this Markdown as the primary implementation reference and the five approved Level_04 source documents as design authority.
+1. Treat `docs/design/Level_04_Greybox_Development_Reference_v1.3.md` as the primary implementation reference, `Level_04_Greybox_Development_Reference_v1.3.docx` as its content-equivalent Producer artifact, and the five approved Level_04 source documents as design authority.
 2. Execute Slice 0 first with zero changes and end `WAITING FOR APPLY`.
 3. Wait for one explicit APPLY only.
 4. After APPLY and before Slice 1 writes, reconfirm clean status/base, create and switch to `feature/implement-level-04-greybox` from the exact approved base, verify branch/HEAD and record evidence; never implement on `main`.
@@ -2670,30 +2795,51 @@ The implementation prompt generated from this reference must instruct Codex to:
 12. Never use global name scanning, private Player/SoulShard/Portal state or local scene-loading hacks.
 13. Run and report required static, automated and manual checks after every slice.
 14. Provide commit SHA, branch, changed files, checks, risks and NOT VERIFIED items in every handoff.
-15. Produce the final Markdown implementation summary and content-equivalent user DOCX in Slice 11.
-16. Never claim PASS when mandatory evidence was not verified.
+15. Produce `docs/development/Level_04_Greybox_Implementation_Summary.md` in the repository and mandatory `Level_04_Greybox_Implementation_Summary.docx` outside the repository worktree in Slice 11. Do not commit the DOCX unless a separate explicit PR-scope decision authorizes that exact artifact; this grants no authority over any other file.
+16. Populate both summaries with the complete explicit schema in Sections 26 and 29, including every test result as `PASS`, `FAIL` or `NOT VERIFIED`, both full sequence traces, P0-53/P0-54 evidence and remaining Art Bible/post-greybox work.
+17. Never claim PASS when mandatory evidence was not verified.
 
 
 # 29. Final implementation handoff requirements
 
-Slice 11 must create:
+Slice 11 must create exactly:
 
-- `docs/development/Level_04_Greybox_Implementation_Summary.md` - committed runtime PR evidence;
-- `Level_04_Greybox_Implementation_Summary.docx` - content-equivalent user-facing artifact, generated outside runtime worktree unless explicitly requested in the PR.
+- `docs/development/Level_04_Greybox_Implementation_Summary.md` - mandatory committed runtime-PR evidence;
+- `Level_04_Greybox_Implementation_Summary.docx` - mandatory content-equivalent user-facing artifact created under the exact `CREATE - USER ARTIFACT OUTSIDE REPOSITORY WORKTREE` authority.
 
-Both summaries must contain:
+The DOCX must be generated outside the repository worktree and must not be committed unless a separate explicit PR-scope decision authorizes that exact file. Creating it grants no write authority to any other external file or repository path.
 
-- exact implementation base SHA and active-PR decision;
-- branch, PR and ordered commit list;
-- exact changed files and `.gd.uid` mapping;
-- proven Player spawn/RA root-Y values;
-- final node tree and API deviations, if any;
-- complete UT/ST/P0/P1 results, including the corrected south-perimeter transform and actual-floor AABB proof;
-- no-softlock results for both orders;
+Both summaries must explicitly contain:
+
+- exact implementation base SHA;
+- active PR/base decision;
+- every shared prerequisite, its status and exact approved head SHA;
+- branch and PR;
+- one commit entry for each Slice 1 through Slice 11;
+- exact files created;
+- exact files modified;
+- exact matching `.gd.uid` mapping;
+- complete UT/ST/P0/P1 results with `PASS`, `FAIL` or `NOT VERIFIED` for every ID, including P0-53 and P0-54;
+- proven Player spawn and RA root-Y values;
+- exact recovery registry evidence;
+- corrected `OOB_SouthPerimeter` AABB proof with position `Vector3(0.00, 1.00, -65.00)`, rotation `Vector3(0,0,0)`, extents `Vector3(39.00, 10.00, 4.00)`, inner face `Z=-61.00`, Arrival legal south edge `Z=-59.00`, separation `2.00 m`, mandatory shoulder `1.25 m` and residual Player-collider allowance `0.75 m`;
+- full Sequence A execution trace;
+- full Sequence B execution trace;
+- exact-copy evidence for Shard_08, Shard_09 and `LEVEL_04_MAIN_TEXT`;
+- finale fail-closed evidence;
+- shared LevelPortal ownership evidence;
+- stationary portal early-overlap evidence;
+- one-transition evidence;
+- final node tree and every API deviation, if any;
 - performance and timing evidence;
-- warnings, blockers and NOT VERIFIED items;
+- known warnings;
+- known limitations;
+- blockers and every `NOT VERIFIED` item;
 - explicit confirmation that shared files, `project.godot`, other levels and final assets were not changed;
+- remaining art-stage work, explicitly enumerating every still-unimplemented Art Bible family and all post-greybox production work;
 - final Definition of Done verdict.
+
+The Markdown and DOCX summaries must be generated from one semantic source and remain content-equivalent.
 
 # Appendix A. Source traceability
 
@@ -2705,6 +2851,8 @@ Both summaries must contain:
 | Nodes, APIs, signals, state models and shared ownership | Technical Architecture v1.2 |
 | Layer ownership and greybox/final-art boundary | Art Production Bible v1.1 |
 | Current shared compatibility and base | Fresh Slice 0 repository inspection |
+| Codex implementation reference | `docs/design/Level_04_Greybox_Development_Reference_v1.3.md` |
+| Content-equivalent Producer reference | `Level_04_Greybox_Development_Reference_v1.3.docx` |
 
 # Appendix B. Controller property and startup wiring contract
 
@@ -2724,4 +2872,4 @@ Startup validation is fail-closed in `PRODUCTION` for incorrect IDs, missing pat
 
 ---
 
-**End of Level_04 Greybox Development Reference v1.2**
+**End of Level_04 Greybox Development Reference v1.3**
