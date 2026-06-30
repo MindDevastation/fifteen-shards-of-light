@@ -1,0 +1,12 @@
+[gd_scene load_steps=3 format=3]
+[ext_resource type="Script" path="res://scripts/levels/level_02/trial_a_beam_statue.gd" id="1"]
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_1"]
+radius = 0.8
+height = 2.2
+[node name="TrialA_BeamStatue" type="Area3D"]
+monitoring = false
+script = ExtResource("1")
+[node name="Collision" type="CollisionShape3D" parent="."]
+shape = SubResource("CylinderShape3D_1")
+[node name="GreyboxPillar" type="MeshInstance3D" parent="."]
+mesh = CylinderMesh.new()
