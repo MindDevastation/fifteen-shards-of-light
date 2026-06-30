@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=29 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/core/Player.tscn" id="1_player"]
 [ext_resource type="Script" path="res://scripts/player/camera_controller.gd" id="2_camera"]
@@ -24,8 +24,8 @@
 [ext_resource type="Script" path="res://scripts/levels/level_02/level_02_reward_gate.gd" id="22_reward_gate"]
 [ext_resource type="PackedScene" path="res://scenes/core/ShardRewardSequenceController.tscn" id="23_reward_controller"]
 [ext_resource type="PackedScene" path="res://scenes/ui/ShardRewardOverlay.tscn" id="24_reward_overlay"]
-[ext_resource type="PackedScene" path="res://scenes/core/LevelPortal.tscn" id="23_portal"]
-[ext_resource type="PackedScene" path="res://scenes/ui/LevelFinaleOverlay.tscn" id="24_finale"]
+[ext_resource type="PackedScene" path="res://scenes/core/LevelPortal.tscn" id="27_portal"]
+[ext_resource type="PackedScene" path="res://scenes/ui/LevelFinaleOverlay.tscn" id="28_finale"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_02/gameplay/Level02PortalAdapter.tscn" id="25_portal_adapter"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_02/vfx/Level02PortalVFX.tscn" id="26_portal_vfx"]
 
@@ -96,9 +96,9 @@ script = ExtResource("22_reward_gate")
 [node name="Level02EnvironmentState" parent="." instance=ExtResource("20_env_state")]
 [node name="Level02EnvironmentVFX" parent="." instance=ExtResource("21_env_vfx")]
 
-[node name="LevelFinaleOverlay" parent="." instance=ExtResource("24_finale")]
+[node name="LevelFinaleOverlay" parent="." instance=ExtResource("28_finale")]
 visible = false
-[node name="LevelPortal" parent="." instance=ExtResource("23_portal")]
+[node name="LevelPortal" parent="." instance=ExtResource("27_portal")]
 transform = Transform3D(1,0,0,0,1,0,0,0,1,4,0,0)
 target_scene_path = "res://scenes/levels/Level_03.tscn"
 entry_mode = 0
@@ -116,3 +116,10 @@ player_path = NodePath("../Player")
 shard_search_root_path = NodePath("../ShardRegistrationScope")
 [node name="UILayer" type="CanvasLayer" parent="."]
 [node name="ShardRewardOverlay" parent="UILayer" instance=ExtResource("24_reward_overlay")]
+[node name="WorldInteractionPrompt" type="CanvasLayer" parent="LevelPortal"]
+[node name="Root" type="Control" parent="LevelPortal/WorldInteractionPrompt"]
+[node name="TrackingRoot" type="Control" parent="LevelPortal/WorldInteractionPrompt/Root"]
+[node name="AnimationRoot" type="Control" parent="LevelPortal/WorldInteractionPrompt/Root/TrackingRoot"]
+[node name="PromptRoot" type="Control" parent="LevelPortal/WorldInteractionPrompt/Root/TrackingRoot/AnimationRoot"]
+[node name="PromptBox" type="Control" parent="LevelPortal/WorldInteractionPrompt/Root/TrackingRoot/AnimationRoot/PromptRoot"]
+[node name="ActionLabel" type="Label" parent="LevelPortal/WorldInteractionPrompt/Root/TrackingRoot/AnimationRoot/PromptRoot/PromptBox"]
