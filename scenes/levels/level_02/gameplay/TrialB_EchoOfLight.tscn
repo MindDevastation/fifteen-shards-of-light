@@ -7,16 +7,16 @@ script = ExtResource("1")
 shard_slot_path = NodePath("Shard04Slot")
 [node name="Leaf" parent="." instance=ExtResource("2")]
 transform = Transform3D(1,0,0,0,1,0,0,0,1,-3,1,0)
-pad_id = &"Leaf"
+pad_id = &"leaf"
 [node name="Sun" parent="." instance=ExtResource("2")]
 transform = Transform3D(1,0,0,0,1,0,0,0,1,-1,1,0)
-pad_id = &"Sun"
+pad_id = &"sun"
 [node name="Wave" parent="." instance=ExtResource("2")]
 transform = Transform3D(1,0,0,0,1,0,0,0,1,1,1,0)
-pad_id = &"Wave"
+pad_id = &"wave"
 [node name="Star" parent="." instance=ExtResource("2")]
 transform = Transform3D(1,0,0,0,1,0,0,0,1,3,1,0)
-pad_id = &"Star"
+pad_id = &"star"
 [node name="Shard04Slot" parent="." instance=ExtResource("3")]
 transform = Transform3D(1,0,0,0,1,0,0,0,1,0,1.5,3)
 shard_id = &"Shard_04"

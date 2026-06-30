@@ -22,6 +22,8 @@
 [ext_resource type="PackedScene" path="res://scenes/levels/level_02/state/Level02EnvironmentState.tscn" id="20_env_state"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_02/vfx/Level02EnvironmentVFX.tscn" id="21_env_vfx"]
 [ext_resource type="Script" path="res://scripts/levels/level_02/level_02_reward_gate.gd" id="22_reward_gate"]
+[ext_resource type="PackedScene" path="res://scenes/core/ShardRewardSequenceController.tscn" id="23_reward_controller"]
+[ext_resource type="PackedScene" path="res://scenes/ui/ShardRewardOverlay.tscn" id="24_reward_overlay"]
 [ext_resource type="PackedScene" path="res://scenes/core/LevelPortal.tscn" id="23_portal"]
 [ext_resource type="PackedScene" path="res://scenes/ui/LevelFinaleOverlay.tscn" id="24_finale"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_02/gameplay/Level02PortalAdapter.tscn" id="25_portal_adapter"]
@@ -40,18 +42,18 @@
 [node name="Center" type="Marker3D" parent="SafeAnchors"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 [node name="Arrival" type="Marker3D" parent="SafeAnchors"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -22)
 [node name="TrialA" type="Marker3D" parent="SafeAnchors"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -18)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -34.64, 1, 20)
 [node name="TrialB" type="Marker3D" parent="SafeAnchors"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 18)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.64, 1, 20)
 
 [node name="Player" parent="." instance=ExtResource("1_player")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -22)
 controls_enabled = false
 
 [node name="FollowCamera" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.906308, -0.422618, 0, 0.422618, 0.906308, -22, 8, 10)
+transform = Transform3D(1, 0, 0, 0, 0.906308, -0.422618, 0, 0.422618, 0.906308, 0, 10, -30)
 current = true
 script = ExtResource("2_camera")
 target_path = NodePath("../Player")
@@ -63,7 +65,7 @@ target_path = NodePath("../Player")
 
 [node name="Level02ProgressController" parent="." instance=ExtResource("10_progress")]
 [node name="Level02ArrivalGameplay" parent="." instance=ExtResource("11_arrival_gameplay")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -22)
 [node name="Level02CentralArenaGameplay" parent="." instance=ExtResource("12_central_gameplay")]
 [node name="Level02ArrivalVFX" parent="." instance=ExtResource("13_arrival_vfx")]
 [node name="Level02CentralLightVFX" parent="." instance=ExtResource("14_central_vfx")]
@@ -73,6 +75,13 @@ player_path = NodePath("../Player")
 progress_path = NodePath("../Level02ProgressController")
 arrival_path = NodePath("../Level02ArrivalGameplay")
 soft_return_path = NodePath("../Level02SoftReturnVolume")
+trial_a_path = NodePath("../TrialA_ThreeBeams")
+trial_b_path = NodePath("../TrialB_EchoOfLight")
+reward_gate_path = NodePath("../Level02RewardGate")
+environment_state_path = NodePath("../Level02EnvironmentState")
+central_presence_path = NodePath("../Level02CentralArenaGameplay")
+portal_adapter_path = NodePath("../Level02PortalAdapter")
+shared_reward_controller_path = NodePath("../ShardRewardSequenceController")
 
 [node name="TrialA_ThreeBeams" parent="." instance=ExtResource("16_trial_a")]
 transform = Transform3D(1,0,0,0,1,0,0,0,1,0,1,-18)
@@ -97,4 +106,13 @@ require_entry_confirmation = false
 [node name="Level02PortalAdapter" parent="." instance=ExtResource("25_portal_adapter")]
 portal_path = NodePath("../LevelPortal")
 finale_overlay_path = NodePath("../LevelFinaleOverlay")
+player_path = NodePath("../Player")
 [node name="Level02PortalVFX" parent="." instance=ExtResource("26_portal_vfx")]
+
+[node name="ShardRegistrationScope" type="Node" parent="."]
+[node name="ShardRewardSequenceController" parent="." instance=ExtResource("23_reward_controller")]
+overlay_path = NodePath("../UILayer/ShardRewardOverlay")
+player_path = NodePath("../Player")
+shard_search_root_path = NodePath("../ShardRegistrationScope")
+[node name="UILayer" type="CanvasLayer" parent="."]
+[node name="ShardRewardOverlay" parent="UILayer" instance=ExtResource("24_reward_overlay")]

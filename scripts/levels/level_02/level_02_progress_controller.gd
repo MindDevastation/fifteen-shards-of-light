@@ -7,8 +7,7 @@ signal finale_requested
 signal portal_unlock_requested
 
 var armed := false
-var trial_a_complete := false
-var trial_b_complete := false
+var completed_trials: Dictionary = {}
 var admitted: Dictionary = {}
 var fog_ready := false
 var center_present := false
@@ -18,9 +17,11 @@ func arm() -> void:
 	armed = true
 	_check_final()
 
+func disarm() -> void:
+	armed = false
+
 func set_trial_complete(trial_id: StringName) -> void:
-	if trial_id == &"TrialA": trial_a_complete = true
-	if trial_id == &"TrialB": trial_b_complete = true
+	completed_trials[trial_id] = true
 
 func admitted_shard_collected(shard_id: StringName) -> void:
 	if not armed: return
