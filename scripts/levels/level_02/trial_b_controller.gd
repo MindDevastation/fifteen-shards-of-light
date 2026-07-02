@@ -30,17 +30,39 @@ func arm() -> void:
 func disarm() -> void:
 	armed = false
 	for pad in pads.values():
-		if pad.has_method("disarm"):
-			pad.disarm()
+		pad.disarm()
+
+func validate_pad_registry() -> bool:
+	var expected: Array[StringName] = [&"leaf", &"sun", &"wave", &"star"]
+	var found: Dictionary = {}
+	for child in get_children():
+		if not (child.name in ["Leaf", "Sun", "Wave", "Star"]):
+			continue
+		if not child.has_signal("pad_pressed"):
+			return false
+		if not child.has_method("arm") or not child.has_method("disarm") or not child.has_method("interact"):
+			return false
+		var child_id: Variant = child.get("pad_id")
+		if not (child_id in expected):
+			return false
+		if found.has(child_id):
+			return false
+		found[child_id] = child
+	return found.size() == expected.size()
 
 func _register_pads() -> void:
 	pads.clear()
+	if not validate_pad_registry():
+		push_error("Trial B pad registry is invalid.")
+		return
 	for child in get_children():
-		if child is TrialBSymbolPad:
-			pads[child.pad_id] = child
-			var c := Callable(self, "_on_pad")
-			if not child.is_connected("pad_pressed", c):
-				child.pad_pressed.connect(c)
+		if not (child.name in ["Leaf", "Sun", "Wave", "Star"]):
+			continue
+		var child_id: StringName = child.get("pad_id")
+		pads[child_id] = child
+		var c := Callable(self, "_on_pad")
+		if not child.is_connected("pad_pressed", c):
+			child.pad_pressed.connect(c)
 
 func _present_sequence() -> void:
 	presenting = true
@@ -52,9 +74,9 @@ func _present_sequence() -> void:
 
 func _set_pads_armed(value: bool) -> void:
 	for pad in pads.values():
-		if value and pad.has_method("arm"):
+		if value:
 			pad.arm()
-		elif not value and pad.has_method("disarm"):
+		else:
 			pad.disarm()
 
 func _on_pad(pad_id: StringName) -> void:

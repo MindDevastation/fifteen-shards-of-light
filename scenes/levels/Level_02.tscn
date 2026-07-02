@@ -84,12 +84,14 @@ portal_adapter_path = NodePath("../Level02PortalAdapter")
 shared_reward_controller_path = NodePath("../ShardRewardSequenceController")
 
 [node name="TrialA_ThreeBeams" parent="." instance=ExtResource("16_trial_a")]
-transform = Transform3D(1,0,0,0,1,0,0,0,1,0,1,-18)
+transform = Transform3D(1,0,0,0,1,0,0,0,1,-34.64,1,20)
 [node name="Level02TrialAVFX" parent="." instance=ExtResource("17_trial_a_vfx")]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,-34.64,1,20)
 
 [node name="TrialB_EchoOfLight" parent="." instance=ExtResource("18_trial_b")]
-transform = Transform3D(1,0,0,0,1,0,0,0,1,0,1,18)
+transform = Transform3D(1,0,0,0,1,0,0,0,1,34.64,1,20)
 [node name="Level02TrialBVFX" parent="." instance=ExtResource("19_trial_b_vfx")]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,34.64,1,20)
 
 [node name="Level02RewardGate" type="Node" parent="."]
 script = ExtResource("22_reward_gate")
@@ -116,10 +118,3 @@ player_path = NodePath("../Player")
 shard_search_root_path = NodePath("../ShardRegistrationScope")
 [node name="UILayer" type="CanvasLayer" parent="."]
 [node name="ShardRewardOverlay" parent="UILayer" instance=ExtResource("24_reward_overlay")]
-[node name="WorldInteractionPrompt" type="CanvasLayer" parent="LevelPortal"]
-[node name="Root" type="Control" parent="LevelPortal/WorldInteractionPrompt"]
-[node name="TrackingRoot" type="Control" parent="LevelPortal/WorldInteractionPrompt/Root"]
-[node name="AnimationRoot" type="Control" parent="LevelPortal/WorldInteractionPrompt/Root/TrackingRoot"]
-[node name="PromptRoot" type="Control" parent="LevelPortal/WorldInteractionPrompt/Root/TrackingRoot/AnimationRoot"]
-[node name="PromptBox" type="Control" parent="LevelPortal/WorldInteractionPrompt/Root/TrackingRoot/AnimationRoot/PromptRoot"]
-[node name="ActionLabel" type="Label" parent="LevelPortal/WorldInteractionPrompt/Root/TrackingRoot/AnimationRoot/PromptRoot/PromptBox"]

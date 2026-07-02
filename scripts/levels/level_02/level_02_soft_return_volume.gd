@@ -17,13 +17,21 @@ func _ready() -> void:
 	_auto_register_scene_anchors()
 
 func _auto_register_scene_anchors() -> void:
-	var root := get_tree().current_scene
-	var safe := root.get_node_or_null("SafeAnchors") if root else null
-	if safe:
-		for child in safe.get_children():
-			if child is Node3D:
-				register_anchor(StringName(child.name.to_snake_case()), child)
-				register_anchor(StringName(child.name), child)
+	var roots: Array[Node] = []
+	if get_tree().current_scene != null:
+		roots.append(get_tree().current_scene)
+	var parent_root := get_parent()
+	while parent_root != null and parent_root.get_parent() != null and parent_root.get_parent() != get_tree().root:
+		parent_root = parent_root.get_parent()
+	if parent_root != null and not roots.has(parent_root):
+		roots.append(parent_root)
+	for root in roots:
+		var safe := root.get_node_or_null("SafeAnchors")
+		if safe:
+			for child in safe.get_children():
+				if child is Node3D:
+					register_anchor(StringName(child.name.to_snake_case()), child)
+					register_anchor(StringName(child.name), child)
 
 func register_anchor(anchor_id: StringName, anchor: Node3D) -> void:
 	if anchor != null:

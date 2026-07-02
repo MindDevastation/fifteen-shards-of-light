@@ -13,8 +13,17 @@ signal transition_finished(index: int)
 var admitted_count := 0
 var _color_tween: Tween
 var _fog_tween: Tween
+var armed := false
+
+func commit_domain() -> void:
+	armed = true
+
+func disarm() -> void:
+	armed = false
 
 func on_admitted_shard(_shard_id: StringName) -> void:
+	if not armed:
+		return
 	admitted_count += 1
 	transition_started.emit(admitted_count)
 	if admitted_count == 1:
