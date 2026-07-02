@@ -4,7 +4,7 @@ signal center_presence_changed(present: bool)
 var armed := false
 
 func commit_domain() -> void:
-	disarm()
+	arm()
 
 func arm() -> void:
 	armed = true
