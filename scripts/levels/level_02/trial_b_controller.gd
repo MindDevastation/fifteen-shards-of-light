@@ -10,6 +10,7 @@ signal sequence_presented(stage: int)
 @export var display_duration := 0.65
 @export var display_gap := 0.25
 const SEQUENCE: Array[StringName] = [&"leaf", &"sun", &"wave", &"star"]
+enum TrialBState { INERT, SHOWING_SEQUENCE, WAITING_FOR_INPUT, COMPLETED }
 var armed := false
 var completed := false
 var stage := 1
@@ -18,17 +19,26 @@ var failures := 0
 var presenting := false
 var completed_stages: Dictionary = {}
 var pads: Dictionary = {}
+var state := TrialBState.INERT
+var presentation_generation := 0
+var completion_count := 0
+var shard_reveal_count := 0
 
 func commit_domain() -> void:
 	arm()
 
 func arm() -> void:
+	if completed:
+		return
 	armed = true
 	_register_pads()
-	_present_sequence()
+	_begin_presentation()
 
 func disarm() -> void:
 	armed = false
+	state = TrialBState.INERT
+	presenting = false
+	presentation_generation += 1
 	for pad in pads.values():
 		pad.disarm()
 
@@ -64,11 +74,22 @@ func _register_pads() -> void:
 		if not child.is_connected("pad_pressed", c):
 			child.pad_pressed.connect(c)
 
-func _present_sequence() -> void:
+func _begin_presentation() -> void:
+	if not armed or completed:
+		return
+	presentation_generation += 1
+	var generation := presentation_generation
 	presenting = true
+	state = TrialBState.SHOWING_SEQUENCE
 	_set_pads_armed(false)
+	_present_sequence_async(generation)
+
+func _present_sequence_async(generation: int) -> void:
 	await get_tree().create_timer((display_duration + display_gap) * float(stage)).timeout
+	if generation != presentation_generation or not armed or completed or state != TrialBState.SHOWING_SEQUENCE:
+		return
 	presenting = false
+	state = TrialBState.WAITING_FOR_INPUT
 	_set_pads_armed(true)
 	sequence_presented.emit(stage)
 
@@ -80,7 +101,7 @@ func _set_pads_armed(value: bool) -> void:
 			pad.disarm()
 
 func _on_pad(pad_id: StringName) -> void:
-	if not armed or completed or presenting:
+	if not armed or completed or state != TrialBState.WAITING_FOR_INPUT:
 		return
 	input.append(pad_id)
 	var expected := SEQUENCE[input.size() - 1]
@@ -91,23 +112,37 @@ func _on_pad(pad_id: StringName) -> void:
 			assistance_requested.emit("Сначала лист, потом солнце")
 		elif failures >= 3:
 			assistance_requested.emit("Путь света: лист, солнце, волна, звезда")
-		_present_sequence()
+		_begin_presentation()
 		return
 	if input.size() == stage:
 		completed_stages[stage] = true
 		stage_completed.emit(stage)
 		input.clear()
 		if stage >= 4:
-			completed = true
-			_set_pads_armed(false)
-			var slot := get_node_or_null(shard_slot_path)
-			if slot and slot.has_method("reveal"):
-				slot.reveal()
-			trial_completed.emit(&"trial_b")
+			_complete_trial()
 		else:
 			stage += 1
-			_present_sequence()
+			_begin_presentation()
+
+func _complete_trial() -> void:
+	if completed:
+		return
+	completed = true
+	armed = false
+	presenting = false
+	state = TrialBState.COMPLETED
+	presentation_generation += 1
+	_set_pads_armed(false)
+	completion_count += 1
+	var slot := get_node_or_null(shard_slot_path)
+	if slot and slot.has_method("reveal"):
+		shard_reveal_count += 1
+		slot.reveal()
+	trial_completed.emit(&"trial_b")
 
 func replay() -> void:
-	if armed and not completed:
-		_present_sequence()
+	if not armed or completed:
+		return
+	if state == TrialBState.SHOWING_SEQUENCE:
+		return
+	_begin_presentation()
