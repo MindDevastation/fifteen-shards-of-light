@@ -9,18 +9,21 @@ script = ExtResource("1_controller")
 transform = Transform3D(1,0,0,0,1,0,0,0,1,1.5,1.05,-7)
 script = ExtResource("2_perch")
 perch_id = &"Perch_A"
+[node name="LandingMarker" type="Marker3D" parent="Perch_A"]
 [node name="Collision" type="CollisionShape3D" parent="Perch_A"]
 shape = SubResource("SphereShape3D_perch")
 [node name="Perch_B" type="Area3D" parent="."]
 transform = Transform3D(1,0,0,0,1,0,0,0,1,10.5,1.05,-3)
 script = ExtResource("2_perch")
 perch_id = &"Perch_B"
+[node name="LandingMarker" type="Marker3D" parent="Perch_B"]
 [node name="Collision" type="CollisionShape3D" parent="Perch_B"]
 shape = SubResource("SphereShape3D_perch")
 [node name="Perch_C" type="Area3D" parent="."]
 transform = Transform3D(1,0,0,0,1,0,0,0,1,4,1.05,3)
 script = ExtResource("2_perch")
 perch_id = &"Perch_C"
+[node name="LandingMarker" type="Marker3D" parent="Perch_C"]
 [node name="Collision" type="CollisionShape3D" parent="Perch_C"]
 shape = SubResource("SphereShape3D_perch")
 [connection signal="perch_entered" from="Perch_A" to="." method="accept_perch"]

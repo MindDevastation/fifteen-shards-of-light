@@ -12,3 +12,12 @@ script = ExtResource("1_script")
 [node name="SparkHint" type="MeshInstance3D" parent="."]
 mesh = SubResource("SphereMesh_spark")
 material_override = SubResource("StandardMaterial3D_spark")
+
+[node name="SparkVisual" type="MeshInstance3D" parent="."]
+visible = false
+mesh = SubResource("SphereMesh_spark")
+material_override = SubResource("StandardMaterial3D_spark")
+[node name="DestinationTelegraph" type="MeshInstance3D" parent="."]
+visible = false
+mesh = SubResource("SphereMesh_spark")
+material_override = SubResource("StandardMaterial3D_spark")

@@ -9,3 +9,47 @@ script = ExtResource("1_script")
 [node name="PetalHint" type="MeshInstance3D" parent="."]
 mesh = SubResource("PlaneMesh_petal")
 material_override = SubResource("StandardMaterial3D_petal")
+
+[node name="PetalChannels" type="Node3D" parent="."]
+[node name="Petal_W" type="MeshInstance3D" parent="PetalChannels"]
+visible = false
+mesh = SubResource("PlaneMesh_petal")
+material_override = SubResource("StandardMaterial3D_petal")
+[node name="Petal_SE" type="MeshInstance3D" parent="PetalChannels"]
+visible = false
+mesh = SubResource("PlaneMesh_petal")
+material_override = SubResource("StandardMaterial3D_petal")
+[node name="Petal_NE" type="MeshInstance3D" parent="PetalChannels"]
+visible = false
+mesh = SubResource("PlaneMesh_petal")
+material_override = SubResource("StandardMaterial3D_petal")
+[node name="TeachingIndicators" type="Node3D" parent="."]
+[node name="Petal_W" type="MeshInstance3D" parent="TeachingIndicators"]
+visible = false
+mesh = SubResource("PlaneMesh_petal")
+material_override = SubResource("StandardMaterial3D_petal")
+[node name="Petal_SE" type="MeshInstance3D" parent="TeachingIndicators"]
+visible = false
+mesh = SubResource("PlaneMesh_petal")
+material_override = SubResource("StandardMaterial3D_petal")
+[node name="Petal_NE" type="MeshInstance3D" parent="TeachingIndicators"]
+visible = false
+mesh = SubResource("PlaneMesh_petal")
+material_override = SubResource("StandardMaterial3D_petal")
+[node name="RestProgressVisuals" type="Node3D" parent="."]
+[node name="Segment_01" type="MeshInstance3D" parent="RestProgressVisuals"]
+visible = false
+mesh = SubResource("PlaneMesh_petal")
+material_override = SubResource("StandardMaterial3D_petal")
+[node name="Segment_02" type="MeshInstance3D" parent="RestProgressVisuals"]
+visible = false
+mesh = SubResource("PlaneMesh_petal")
+material_override = SubResource("StandardMaterial3D_petal")
+[node name="Segment_03" type="MeshInstance3D" parent="RestProgressVisuals"]
+visible = false
+mesh = SubResource("PlaneMesh_petal")
+material_override = SubResource("StandardMaterial3D_petal")
+[node name="Convergence" type="MeshInstance3D" parent="RestProgressVisuals"]
+visible = false
+mesh = SubResource("PlaneMesh_petal")
+material_override = SubResource("StandardMaterial3D_petal")

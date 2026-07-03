@@ -5,6 +5,7 @@ signal perch_entered(perch_id: StringName)
 signal perch_exited(perch_id: StringName)
 
 @export var perch_id: StringName = &""
+@export var landing_marker_path: NodePath = NodePath("LandingMarker")
 
 var _registered_player: Node = null
 var _acceptance_enabled := false
@@ -27,6 +28,12 @@ func is_player_inside() -> bool:
 
 func is_registered_player_inside() -> bool:
 	return _occupied
+
+func get_landing_world_position() -> Vector3:
+	var marker := get_node_or_null(landing_marker_path)
+	if marker is Marker3D:
+		return marker.global_position
+	return Vector3.INF
 
 func reevaluate_registered_player_overlap() -> void:
 	if not _acceptance_enabled or _registered_player == null:

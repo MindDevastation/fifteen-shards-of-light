@@ -13,6 +13,8 @@ signal petal_presentation_completed(petal_id: StringName, generation: int, via_f
 @export var progress_controller_path: NodePath = NodePath("../../../LevelRuntimeRoot/Level03ProgressController")
 @export var player_path: NodePath = NodePath("../../../PlayerRoot/Player")
 @export var vfx_path: NodePath = NodePath("../../../VFXRoot/Level03BreathingMeadowVFX")
+@export var petal_pivots_path: NodePath = NodePath("PetalPivots")
+@export var rest_point_root_path: NodePath = NodePath("RestPointRoot")
 @export var dwell_seconds: float = 0.65
 @export var presentation_seconds: float = 1.45
 @export var fallback_deadline_seconds: float = 1.80
@@ -35,6 +37,8 @@ var _active_dwell_id: StringName = &""
 var _hint_generation := 0
 var _vfx: Node = null
 var _completed_this_physics_frame := false
+var _petal_positions: Dictionary = {}
+var _rest_segments: Array[Node3D] = []
 
 func _ready() -> void:
 	_collect_petals()
@@ -51,6 +55,7 @@ func arm() -> bool:
 	generation += 1
 	_hint_generation += 1
 	_set_all_petals_enabled(true)
+	_show_teaching_preglow()
 	_start_hint_timer(_hint_generation, first_hint_seconds, 1)
 	_start_hint_timer(_hint_generation, second_hint_seconds, 2)
 	return true
@@ -123,12 +128,21 @@ func _physics_process(delta: float) -> void:
 func _prepare_runtime_contract() -> bool:
 	_player = get_node_or_null(player_path)
 	_vfx = get_node_or_null(vfx_path)
-	if _vfx != null and _vfx.has_signal("petal_presentation_finished") and not _vfx.petal_presentation_finished.is_connected(_on_vfx_petal_presentation_finished):
-		_vfx.petal_presentation_finished.connect(_on_vfx_petal_presentation_finished)
+	if _vfx != null:
+		if not _vfx.has_signal("petal_presentation_finished"):
+			return false
+		for required_method in [&"show_teaching_preglow", &"play_petal_presentation", &"set_rest_progress"]:
+			if not _vfx.has_method(required_method):
+				return false
+		if not _vfx.petal_presentation_finished.is_connected(_on_vfx_petal_presentation_finished):
+			_vfx.petal_presentation_finished.connect(_on_vfx_petal_presentation_finished)
 	if _player == null or not _player.has_method("is_on_floor"):
 		return false
 	_collect_petals()
 	_records.clear()
+	_petal_positions.clear()
+	if not _prepare_presentation_nodes():
+		return false
 	for id in REQUIRED:
 		if not _petals.has(id):
 			return false
@@ -139,10 +153,44 @@ func _prepare_runtime_contract() -> bool:
 		_records[id] = _new_record()
 	return true
 
+
+func _prepare_presentation_nodes() -> bool:
+	var pivots := get_node_or_null(petal_pivots_path)
+	var rest_root := get_node_or_null(rest_point_root_path)
+	if pivots == null or rest_root == null:
+		return false
+	for id in REQUIRED:
+		var pivot_name := String(id) + "_Pivot"
+		var pivot := pivots.get_node_or_null(pivot_name)
+		if not (pivot is Marker3D):
+			return false
+		_petal_positions[id] = pivot.global_position
+	_rest_segments = []
+	for segment_name in ["Segment_01", "Segment_02", "Segment_03"]:
+		var segment := rest_root.get_node_or_null(segment_name)
+		if not (segment is Node3D):
+			return false
+		segment.visible = false
+		_rest_segments.append(segment)
+	if not (rest_root.get_node_or_null("ConvergenceMarker") is Marker3D):
+		return false
+	return true
+
+func _show_teaching_preglow() -> void:
+	if _vfx != null and _vfx.has_method("show_teaching_preglow"):
+		_vfx.show_teaching_preglow(_petal_positions.duplicate(), generation)
+
+func _set_rest_progress(unique_count: int) -> void:
+	for i in range(_rest_segments.size()):
+		if i < unique_count:
+			_rest_segments[i].visible = true
+	if _vfx != null and _vfx.has_method("set_rest_progress"):
+		_vfx.set_rest_progress(unique_count, generation)
+
 func _collect_petals() -> void:
 	_petals.clear()
 	for child in get_children():
-		if child is BreathingMeadowPetal:
+		if child.has_method("register_player") and child.has_signal("petal_entered"):
 			_petals[child.petal_id] = child
 
 func _new_record() -> Dictionary:
@@ -169,6 +217,7 @@ func _complete_petal(petal_id: StringName) -> void:
 	petal_completed.emit(petal_id)
 	meadow_progress_changed.emit(visited.duplicate())
 	_start_petal_presentation(petal_id)
+	_set_rest_progress(visited.size())
 	if visited.size() == REQUIRED.size():
 		_complete()
 
