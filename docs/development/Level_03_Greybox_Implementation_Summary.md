@@ -1,43 +1,138 @@
 # Level_03 Greybox Implementation Summary
 
-## Identity
-- Level: `Level_03 «После наших разговоров»`
-- Approved base: `2635524c3d2b3a39487d07a399a98cf8f95bfb5e`
-- Branch: `feature/level-03-after-our-conversations-greybox`
-- Producer-resolved GitHub facts: `main` identical to approved base, ahead `0`, behind `0`, open PR count `0`, no active Level_03 PR, and no active shared-system PR conflict.
+## Correction Identity
 
-## Slice commits
-- Slice 1: `4c3b75af6a2dbaedaa0000c13af3da3a1a299c68`
-- Slice 2: `46947f1efe787999a98c84110c882fb47e9c86d6`
-- Slice 3: `405bfcbb03ca16789d804db3b2a9feb094048640`
-- Slice 4: `170f4cf572455c0ac3d9d86b71eac5eeac2ca1c7`
-- Slice 5: `c76ff67633db2ec6a149834b685dbff2655fe161`
-- Slice 6: `01543c659e21ccb87be5a65cb20bd6601d7aab88`
-- Slice 7: `1ec5cabfae49322c12cebc8ba10eedf2b1b025fc`
-- Slice 8: `a5cf96a72e8a5a1ad9b1baca4a62769edfc4d71d`
-- Slice 9: `39a0a2de1ae169d0301415b72ffc7d6ebdaf1cc0`
-- Slice 10: `818b852c626b1484c47836b946cec77e572f7341`
-- Slice 11: recorded in final handoff after commit.
+- Branch: `work`
+- Current PR: `#108`
+- Base PR: `#107`
+- Correction path chosen: `Path B — make PR #108 truthful`
+- Previous summary commit corrected by this document: `eb659b71d6a9887c13c5e634ad48b20bd4bde176`
+- Approved Reference: `docs/design/Level_03_Greybox_Development_Reference_v1.1.md`
+- Production scene under review: `res://scenes/levels/Level_03.tscn`
 
-## Architecture
-The scene replaces the legacy Level_03 placeholder with a primitive-only broad S-route, seven greybox block scenes, Level_03-local puzzle controllers, Level_03-local recovery, progress, environment, finale, and portal adapter scripts, and a Level_03-local portal core fallback to keep this repository loadable in the current headless environment.
+## Producer Correction
 
-## Canonical texts
-- `Shard_05`: `После наших разговоров я ещё долго вспоминаю твою интонацию.`
-- `Shard_06`: `Мне особенно нравится, как ты вдруг смеёшься над какой-нибудь полной ерундой.`
-- `Shard_07`: `Рядом с тобой я и сам чаще смеюсь и ненадолго перестаю быть таким серьёзным.`
-- Main finale text: `Сначала я просто заметил, что жду наших разговоров. Потом понял, что после них ещё долго вспоминаю твою интонацию, а когда ты внезапно смеёшься над какой-нибудь ерундой, я и сам перестаю быть таким серьёзным. Мне дорого не только то, как легко мне бывает рядом с тобой. Мне дорога ты.`
-- Portal target: `res://scenes/levels/Level_04.tscn`
+The previous Group 7 summary incorrectly recorded `ST-01–ST-19` as `19/19 PASS` and `T01–T52` as `52/52 PASS` using one repeated startup/static-contract evidence string. That evidence is not factual runtime proof for route traversal, camera readability, recovery volumes, puzzle matrices, natural reward lifecycles, environment transitions, finale behavior, portal failure/retry, Level_04 transition, reload matrix, or duration. Those false PASS claims are withdrawn.
 
-## Route and systems
-- Route order: Wind Trace -> Shard_05 -> Playful Spark -> Shard_06 -> Breathing Meadow -> Shard_07 -> finale -> portal.
-- Wind Trace requires `Arch_01`, `Arch_02`, `Arch_03` in order.
-- Playful Spark requires `Perch_A`, `Perch_B`, `Perch_C` in order.
-- Breathing Meadow accepts `Petal_W`, `Petal_SE`, and `Petal_NE` in any order.
-- Recovery anchors are implemented as RA0-RA6 with frozen Player root Y values: RA0 `0.65`, RA1 `1.45`, RA2 `1.55`, RA3 `1.65`, RA4 `1.93`, RA5 `1.95`, RA6 `2.25`.
+## Current Status Counts
 
-## Evidence and limitations
-- Static scene load check was run headlessly with Godot 4.6.2.
-- Manual P0 runtime playthrough, pacing, emotional readability from play, DOCX office-render page inspection, forced portal transition failure, and full reload matrix are NOT VERIFIED in this non-interactive environment.
-- The shared Player, SoulOrb, LevelFinaleOverlay, and LevelPortal scenes currently trigger unrelated missing import/font issues in headless loading; Level_03 uses primitive local placeholders/fallbacks to preserve Level_03 loadability without modifying forbidden shared files.
-- No temporary harness files are intentionally left in the repository.
+- Startup/static smoke checks: `PASS`.
+- ST table status: `0 PASS`, `0 FAIL`, `19 NOT VERIFIED`.
+- T table status: `0 PASS`, `0 FAIL`, `52 NOT VERIFIED`.
+- Group 6 factual P0: `NOT COMPLETE`.
+- Group 6 closure commit as final acceptance evidence: `NOT VALID`.
+- Rendered runtime evidence: `NOT VERIFIED — renderer/display backend unavailable`.
+- DOCX page-render inspection: `NOT VERIFIED — office/page renderer unavailable`.
+- Final status: `CORRECTION REQUIRED — GROUP 6 FACTUAL P0 NOT COMPLETE`.
+
+## Exact Commands and Evidence
+
+| Command | Result | Evidence |
+|---|---:|---|
+| `godot --headless --version` | PASS | Exit `0`; output `4.6.2.stable.official.71f334935`. |
+| `godot --headless --path . --quit` | PASS | Exit `0`; validates only headless project startup/static smoke, not ST/T runtime behavior. |
+
+## ST-01–ST-19 Table
+
+| Test ID | Status | Expected | Actual | Evidence |
+|---|---|---|---|---|
+| ST-01 | NOT VERIFIED | Test-specific structural/runtime evidence required by reference | Not executed with test-specific assertions in this correction | Previous startup/static evidence is insufficient and has been withdrawn. |
+| ST-02 | NOT VERIFIED | Test-specific structural/runtime evidence required by reference | Not executed with test-specific assertions in this correction | Previous startup/static evidence is insufficient and has been withdrawn. |
+| ST-03 | NOT VERIFIED | Test-specific structural/runtime evidence required by reference | Not executed with test-specific assertions in this correction | Previous startup/static evidence is insufficient and has been withdrawn. |
+| ST-04 | NOT VERIFIED | Test-specific structural/runtime evidence required by reference | Not executed with test-specific assertions in this correction | Previous startup/static evidence is insufficient and has been withdrawn. |
+| ST-05 | NOT VERIFIED | Test-specific structural/runtime evidence required by reference | Not executed with test-specific assertions in this correction | Previous startup/static evidence is insufficient and has been withdrawn. |
+| ST-06 | NOT VERIFIED | Test-specific structural/runtime evidence required by reference | Not executed with test-specific assertions in this correction | Previous startup/static evidence is insufficient and has been withdrawn. |
+| ST-07 | NOT VERIFIED | Test-specific structural/runtime evidence required by reference | Not executed with test-specific assertions in this correction | Previous startup/static evidence is insufficient and has been withdrawn. |
+| ST-08 | NOT VERIFIED | Test-specific structural/runtime evidence required by reference | Not executed with test-specific assertions in this correction | Previous startup/static evidence is insufficient and has been withdrawn. |
+| ST-09 | NOT VERIFIED | Test-specific structural/runtime evidence required by reference | Not executed with test-specific assertions in this correction | Previous startup/static evidence is insufficient and has been withdrawn. |
+| ST-10 | NOT VERIFIED | Test-specific structural/runtime evidence required by reference | Not executed with test-specific assertions in this correction | Previous startup/static evidence is insufficient and has been withdrawn. |
+| ST-11 | NOT VERIFIED | Test-specific structural/runtime evidence required by reference | Not executed with test-specific assertions in this correction | Previous startup/static evidence is insufficient and has been withdrawn. |
+| ST-12 | NOT VERIFIED | Test-specific structural/runtime evidence required by reference | Not executed with test-specific assertions in this correction | Previous startup/static evidence is insufficient and has been withdrawn. |
+| ST-13 | NOT VERIFIED | Test-specific structural/runtime evidence required by reference | Not executed with test-specific assertions in this correction | Previous startup/static evidence is insufficient and has been withdrawn. |
+| ST-14 | NOT VERIFIED | Test-specific structural/runtime evidence required by reference | Not executed with test-specific assertions in this correction | Previous startup/static evidence is insufficient and has been withdrawn. |
+| ST-15 | NOT VERIFIED | Test-specific structural/runtime evidence required by reference | Not executed with test-specific assertions in this correction | Previous startup/static evidence is insufficient and has been withdrawn. |
+| ST-16 | NOT VERIFIED | Test-specific structural/runtime evidence required by reference | Not executed with test-specific assertions in this correction | Previous startup/static evidence is insufficient and has been withdrawn. |
+| ST-17 | NOT VERIFIED | Test-specific structural/runtime evidence required by reference | Not executed with test-specific assertions in this correction | Previous startup/static evidence is insufficient and has been withdrawn. |
+| ST-18 | NOT VERIFIED | Test-specific structural/runtime evidence required by reference | Not executed with test-specific assertions in this correction | Previous startup/static evidence is insufficient and has been withdrawn. |
+| ST-19 | NOT VERIFIED | Test-specific structural/runtime evidence required by reference | Not executed with test-specific assertions in this correction | Previous startup/static evidence is insufficient and has been withdrawn. |
+
+## T01–T52 Table
+
+| Test ID | Status | Expected | Actual | Evidence |
+|---|---|---|---|---|
+| T01 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T02 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T03 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T04 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T05 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T06 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T07 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T08 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T09 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T10 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T11 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T12 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T13 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T14 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T15 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T16 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T17 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T18 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T19 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T20 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T21 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T22 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T23 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T24 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T25 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T26 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T27 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T28 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T29 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T30 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T31 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T32 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T33 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T34 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T35 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T36 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T37 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T38 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T39 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T40 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T41 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T42 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T43 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T44 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T45 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T46 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T47 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T48 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T49 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T50 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T51 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+| T52 | NOT VERIFIED | Test-specific production runtime behavior required | Not executed with a factual production harness in this correction | Previous generic startup/static evidence is insufficient and has been withdrawn. |
+
+## Scope Not Executed as Factual Group 6
+
+The following remain `NOT VERIFIED` because no production harness was implemented and run in this correction: actual Player P00–P16 traversal, CP0–CP4 geometry/camera readability, RA0–RA6 recovery through actual fall/OOB volumes, Wind runtime matrix, Spark runtime matrix, Meadow runtime matrix including all six permutations, natural Shard_05/Shard_06/Shard_07 reward lifecycle, E0–E6 environment runtime behavior, finale runtime matrix, portal failure/retry, actual Level_04 transition/load, reload matrix, and duration run.
+
+## DOCX Integrity / Semantic Status
+
+The DOCX at `/workspace/Level_03_Greybox_Implementation_Summary.docx` was regenerated from this Markdown semantic source. Integrity checks performed without an office renderer: ZIP integrity, `[Content_Types].xml`, relationships, `word/document.xml`, styles, heading/table-marker presence, extracted text, and semantic comparison with Markdown. Office page inspection remains `NOT VERIFIED — renderer unavailable`.
+
+## Changed Files
+
+- `docs/development/Level_03_Greybox_Implementation_Summary.md`
+- `/workspace/Level_03_Greybox_Implementation_Summary.docx` regenerated outside the repository as requested.
+
+## Handoff
+
+- Gameplay implemented in this correction: `No`.
+- Godot project structure preserved: `Yes`.
+- Repository harness files added: `No`.
+- Push proof: `NOT VERIFIED`.
+
+## Final Status
+
+`CORRECTION REQUIRED — GROUP 6 FACTUAL P0 NOT COMPLETE`
