@@ -2,20 +2,23 @@
 
 ## Correction Identity
 
-- Branch: `codex/classify-level03-load-blocker`
+- Branch: `work`
 - Predecessor PR: `#109`
-- New PR for this task: `created from this branch after commit`
+- New PR for this task: `NOT CREATED — manual publication required; Codex did not branch, push, or publish`
 - Implementation PR: `#107`
 - Truthful summary correction PR: `#108`
 - Approved Reference: `docs/design/Level_03_Greybox_Development_Reference_v1.1.md`
 - Production scene under review: `res://scenes/levels/Level_03.tscn`
 - Temporary harness location: `/tmp/level03_group6` (outside repository)
 
+- Current checkout preflight: branch `work`; starting HEAD `a0c91c5` (`Merge pull request #109 from MindDevastation/feature/execute-real-factual-group-6`); worktree clean before task; summary file exists; production Level_03 scene exists.
+- Current task rerun date: `2026-07-03 UTC`.
+
 ## Classification After Full Import Regeneration
 
 Classification: **A. IMPORT CACHE RESOLVED**.
 
-The PR #109 blocker is reclassified as an environment/import-cache blocker rather than a proven source/resource defect. The required full editor import regeneration completed with exit `0`. After regeneration, the production `Level_03.tscn` smoke load, `check-only` command, and startup command emitted zero `ERROR:`, zero `SCRIPT ERROR:`, zero parse errors, zero script-load errors, and zero failed-resource loads. The previous missing `.godot/imported/...` resources disappeared from the post-import production load logs.
+The PR #109 blocker is reclassified as an environment/import-cache blocker rather than a proven source/resource defect. The required full editor import regeneration was rerun from the current checkout and completed with exit `0`. After regeneration, the production `Level_03.tscn` smoke load, `check-only` command, and startup command emitted zero `ERROR:`, zero `SCRIPT ERROR:`, zero parse errors, zero script-load errors, and zero failed-resource loads. The previous missing `.godot/imported/...` resources disappeared from the post-import production load logs.
 
 No source fix was applied. Because the import-cache blocker resolved but the full ST-02 and T01 factual assertion sets were not executed, `ST-02` and `T01` are reclassified from `FAIL` to `NOT_VERIFIED`, not PASS.
 
@@ -34,10 +37,10 @@ No source fix was applied. Because the import-cache blocker resolved but the ful
 - ST table status: `1 PASS`, `0 FAIL`, `18 NOT VERIFIED`.
 - T table status: `0 PASS`, `0 FAIL`, `52 NOT VERIFIED`.
 - Group 6 factual P0: `NOT COMPLETE`.
-- Group 6 continued after import classification: `No`; this task stopped at blocker classification and did not execute the full factual ST/T matrices.
+- Group 6 continued after import classification: `No`; although the import-cache blocker resolved, the mandatory full factual ST/T matrices were not executed in this local rerun, so Group 6 remains incomplete.
 - Rendered runtime evidence: `NOT VERIFIED — renderer unavailable`.
 - DOCX page-render inspection: `NOT VERIFIED — office/page renderer unavailable`.
-- Final status: `CORRECTION REQUIRED — IMPORT CACHE RESOLVED, GROUP 6 FACTUAL P0 NOT COMPLETE`.
+- Final status: `CORRECTION REQUIRED — GROUP 6 FACTUAL P0 NOT COMPLETE`.
 
 ## Required Commands Run
 
@@ -141,7 +144,7 @@ Checks after import regeneration observed empty `DISPLAY` and `WAYLAND_DISPLAY`;
 
 ## DOCX Integrity / Semantic Status
 
-The DOCX at `/workspace/Level_03_Greybox_Implementation_Summary.docx` was regenerated from this Markdown semantic source after the import-cache classification. ZIP integrity, `[Content_Types].xml`, package relationships, `word/document.xml`, styles, extracted text, and semantic marker checks passed. Office/page rendering remains `DOCX PAGE RENDER: NOT VERIFIED — renderer unavailable`.
+The DOCX at `/workspace/Level_03_Greybox_Implementation_Summary.docx` was regenerated from this Markdown semantic source after the import-cache classification. ZIP integrity, `[Content_Types].xml`, package relationships, `word/document.xml`, styles, extracted text, and semantic marker checks passed. Office/page rendering remains `DOCX PAGE RENDER: NOT VERIFIED — renderer unavailable`. DOCX was regenerated outside the repository at `/workspace/Level_03_Greybox_Implementation_Summary.docx` from the Markdown semantic source using a minimal local DOCX package writer because `pandoc`/office tooling is unavailable.
 
 ## Changed Files
 
@@ -155,8 +158,9 @@ The DOCX at `/workspace/Level_03_Greybox_Implementation_Summary.docx` was regene
 - Godot project structure preserved: `Yes`.
 - Repository harness files added: `No`.
 - Predecessor PR: `#109`.
-- Push proof: `NOT VERIFIED`.
+- Push proof: `NOT VERIFIED — no push performed per Producer instruction`.
+- Manual publication handoff: commit locally, then Producer may create branch/PR/push outside Codex if desired.
 
 ## Final Status
 
-`CORRECTION REQUIRED — IMPORT CACHE RESOLVED, GROUP 6 FACTUAL P0 NOT COMPLETE`
+`CORRECTION REQUIRED — GROUP 6 FACTUAL P0 NOT COMPLETE`
