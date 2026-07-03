@@ -32,6 +32,44 @@ No source fix was applied. Because the import-cache blocker resolved but the ful
 | After import Level_03 check-only | `godot --headless --path . --quit --check-only scenes/levels/Level_03.tscn` | `0` | `0` | `0` | `0` | `0` | `0` | `/tmp/level03_after_import_check_stdout.log`, `/tmp/level03_after_import_check_stderr.log` |
 | After import startup | `timeout 60s godot --headless --path . --quit` | `0` | `0` | `0` | `0` | `0` | `0` | `/tmp/level03_after_import_startup_stdout.log`, `/tmp/level03_after_import_startup_stderr.log` |
 
+
+## Real Factual Group 6 Execution Attempt After PR #110
+
+- Branch: `work`.
+- Starting HEAD: `17173e8` (`Merge pull request #110 from MindDevastation/feature/re-run-import-regeneration-for-group-6`).
+- Import regeneration command: `timeout 600s godot --headless --editor --quit --path .`; result `exit 0`; stderr empty; stdout completed import regeneration.
+- Post-import `Level_03.tscn` check-only: `exit 0`.
+- Post-import project startup smoke: `exit 0`.
+- Temporary harness remained outside the repository at `/tmp/level03_group6`.
+
+### Factual source blocker found and corrected
+
+During static portal-config verification, the production `PortalCore` instance serialized the canonical `Level_04` target, `AUTO_ENTER` enum value, and disabled confirmation, but did not serialize the required `activation_duration = 1.8`. The Level_03 portal adapter also enforced target, confirmation, and entry mode at activation time, but did not enforce activation duration. This was a Level_03-local factual blocker for the portal exact-config requirement.
+
+Corrective source commit created locally:
+
+- `b410199` — `fix: correct Level 03 factual group 6 blocker`
+
+Corrected files:
+
+- `scenes/levels/Level_03.tscn` — serializes `activation_duration = 1.8` on `PortalCore`.
+- `scripts/levels/level_03/level_03_portal_adapter.gd` — enforces `portal.activation_duration = 1.8` before calling shared `activate()`.
+
+### Current factual status after source fix
+
+- ST count: `19 total`; executed static/import subset contains `9 PASS`, `0 FAIL after the source fix`, `10 NOT_VERIFIED`.
+- T count: `52 total`; `0 PASS`, `0 FAIL`, `52 NOT_VERIFIED`.
+- Failed tests before source fix: `ST-06` exact portal config failed because `activation_duration = 1.8` was absent from the production portal instance and adapter enforcement.
+- Failed tests after source fix: `None confirmed by the rerun subset`.
+- NOT_VERIFIED tests: runtime Group 6 matrices remain NOT_VERIFIED because no completed production-movement/runtime harness executed ST/T rows T01-T52 with test-specific runtime evidence.
+- Group 6 factual P0: `NOT COMPLETE`.
+- Rendering: `RENDERED RUNTIME EVIDENCE: NOT VERIFIED — renderer unavailable`; no synthetic screenshots created.
+- DOCX: regenerated outside repository at `/workspace/Level_03_Greybox_Implementation_Summary.docx`; ZIP/package/semantic checks passed; page-render visual inspection remains NOT_VERIFIED.
+
+### Final status for this handoff
+
+`CORRECTION REQUIRED — GROUP 6 FACTUAL P0 NOT COMPLETE`
+
 ## Current Status Counts
 
 - ST table status: `1 PASS`, `0 FAIL`, `18 NOT VERIFIED`.

@@ -28,6 +28,8 @@ func request_portal_activation() -> bool:
 		portal.require_entry_confirmation = false
 	if "entry_mode" in portal:
 		portal.entry_mode = 0
+	if "activation_duration" in portal:
+		portal.activation_duration = 1.8
 	portal.activate()
 	return true
 

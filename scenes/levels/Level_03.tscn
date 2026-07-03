@@ -155,6 +155,7 @@ transform = Transform3D(1,0,0,0,1,0,0,0,1,10,1.6,50.5)
 target_scene_path = "res://scenes/levels/Level_04.tscn"
 entry_mode = 0
 require_entry_confirmation = false
+activation_duration = 1.8
 
 
 [node name="Puzzles" type="Node3D" parent="GameplayRoot"]
