@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3]
+[ext_resource type="PackedScene" path="res://scenes/core/SoulShard.tscn" id="1"]
+[ext_resource type="Script" path="res://scripts/levels/level_02/level_02_shard_slot.gd" id="2"]
+[node name="Level02ShardSlot" type="Node3D"]
+script = ExtResource("2")
+shard_path = NodePath("SoulShard")
+[node name="SoulShard" parent="." instance=ExtResource("1")]
+visible = false

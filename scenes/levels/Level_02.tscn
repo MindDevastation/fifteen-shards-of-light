@@ -1,75 +1,120 @@
-[gd_scene load_steps=20 format=3]
+[gd_scene load_steps=29 format=3]
 
-[ext_resource type="Script" path="res://scripts/core/level_manager.gd" id="1_level_manager"]
-[ext_resource type="PackedScene" path="res://scenes/core/Player.tscn" id="2_player"]
-[ext_resource type="Script" path="res://scripts/player/camera_controller.gd" id="3_camera_controller"]
-[ext_resource type="PackedScene" path="res://scenes/core/SoulShard.tscn" id="4_soul_shard"]
-[ext_resource type="PackedScene" path="res://scenes/ui/PoemRewardUI.tscn" id="5_poem_reward_ui"]
-[ext_resource type="PackedScene" path="res://scenes/core/LevelPortal.tscn" id="6_level_portal"]
-
-[sub_resource type="StandardMaterial3D" id="m_safe"]
-albedo_color = Color(0.32, 0.35, 0.39, 1)
-[sub_resource type="StandardMaterial3D" id="m_ice"]
-albedo_color = Color(0.65, 0.82, 0.95, 0.85)
-transparency = 1
-[sub_resource type="BoxMesh" id="mesh_main"]
-material = SubResource("m_safe")
-size = Vector3(22, 0.2, 16)
-[sub_resource type="BoxShape3D" id="shape_main"]
-size = Vector3(22, 0.2, 16)
-[sub_resource type="BoxMesh" id="mesh_path"]
-material = SubResource("m_safe")
-size = Vector3(3, 0.2, 10)
-[sub_resource type="BoxShape3D" id="shape_path"]
-size = Vector3(3, 0.2, 10)
-[sub_resource type="BoxMesh" id="mesh_ice"]
-material = SubResource("m_ice")
-size = Vector3(7, 0.08, 6)
+[ext_resource type="PackedScene" path="res://scenes/core/Player.tscn" id="1_player"]
+[ext_resource type="Script" path="res://scripts/player/camera_controller.gd" id="2_camera"]
+[ext_resource type="PackedScene" path="res://scenes/core/SoulOrb_Follow.tscn" id="3_orb"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_02/blocks/Block_02_00_CentralArena.tscn" id="4_center"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_02/blocks/Block_02_01_Arrival.tscn" id="5_arrival"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_02/blocks/Block_02_02_TrialA.tscn" id="6_a"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_02/blocks/Block_02_03_TrialB.tscn" id="7_b"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_02/blocks/Block_02_04_RoutesAndBoundaries.tscn" id="8_routes"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_02/gameplay/Level02SoftReturnVolume.tscn" id="9_return"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_02/gameplay/Level02ProgressController.tscn" id="10_progress"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_02/gameplay/Level02ArrivalGameplay.tscn" id="11_arrival_gameplay"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_02/gameplay/Level02CentralArenaGameplay.tscn" id="12_central_gameplay"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_02/vfx/Level02ArrivalVFX.tscn" id="13_arrival_vfx"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_02/vfx/Level02CentralLightVFX.tscn" id="14_central_vfx"]
+[ext_resource type="Script" path="res://scripts/levels/level_02/level_02_runtime_contract_validator.gd" id="15_validator"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_02/gameplay/TrialA_ThreeBeams.tscn" id="16_trial_a"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_02/vfx/Level02TrialAVFX.tscn" id="17_trial_a_vfx"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_02/gameplay/TrialB_EchoOfLight.tscn" id="18_trial_b"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_02/vfx/Level02TrialBVFX.tscn" id="19_trial_b_vfx"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_02/state/Level02EnvironmentState.tscn" id="20_env_state"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_02/vfx/Level02EnvironmentVFX.tscn" id="21_env_vfx"]
+[ext_resource type="Script" path="res://scripts/levels/level_02/level_02_reward_gate.gd" id="22_reward_gate"]
+[ext_resource type="PackedScene" path="res://scenes/core/ShardRewardSequenceController.tscn" id="23_reward_controller"]
+[ext_resource type="PackedScene" path="res://scenes/ui/ShardRewardOverlay.tscn" id="24_reward_overlay"]
+[ext_resource type="PackedScene" path="res://scenes/core/LevelPortal.tscn" id="27_portal"]
+[ext_resource type="PackedScene" path="res://scenes/ui/LevelFinaleOverlay.tscn" id="28_finale"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_02/gameplay/Level02PortalAdapter.tscn" id="25_portal_adapter"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_02/vfx/Level02PortalVFX.tscn" id="26_portal_vfx"]
 
 [node name="Level_02" type="Node3D"]
-[node name="LevelManager" type="Node" parent="."]
-script = ExtResource("1_level_manager")
-level_id = 2
-reward_text = "Не обязательно продолжать хрупкий путь, если рядом есть безопасный"
-soul_shard_path = NodePath("../SoulShard")
-poem_reward_ui_path = NodePath("../UILayer/PoemRewardUI")
-level_portal_path = NodePath("../LevelPortal")
-[node name="MainGround" type="StaticBody3D" parent="."]
-[node name="Mesh" type="MeshInstance3D" parent="MainGround"]
-mesh = SubResource("mesh_main")
-[node name="Collision" type="CollisionShape3D" parent="MainGround"]
-shape = SubResource("shape_main")
-[node name="CrackedIceVisual" type="MeshInstance3D" parent="."]
-transform = Transform3D(1,0,0,0,1,0,0,0,1,-0.8,0.08,0)
-mesh = SubResource("mesh_ice")
-[node name="SafeBypass" type="StaticBody3D" parent="."]
-transform = Transform3D(1,0,0,0,1,0,0,0,1,4.7,0.16,-3.2)
-[node name="Mesh" type="MeshInstance3D" parent="SafeBypass"]
-mesh = SubResource("mesh_path")
-[node name="Collision" type="CollisionShape3D" parent="SafeBypass"]
-shape = SubResource("shape_path")
-[node name="SafeBypass2" type="StaticBody3D" parent="."]
-transform = Transform3D(1,0,0,0,1,0,0,0,1,8.4,0.16,-1.0)
-[node name="Mesh" type="MeshInstance3D" parent="SafeBypass2"]
-mesh = SubResource("mesh_path")
-[node name="Collision" type="CollisionShape3D" parent="SafeBypass2"]
-shape = SubResource("shape_path")
-[node name="SpawnPoint" type="Marker3D" parent="."]
-transform = Transform3D(1,0,0,0,1,0,0,0,1,-9,1,0)
-[node name="Player" parent="." instance=ExtResource("2_player")]
-transform = Transform3D(1,0,0,0,1,0,0,0,1,-9,1,0)
+
+[node name="Blocks" type="Node3D" parent="."]
+[node name="Block_02_00_CentralArena" parent="Blocks" instance=ExtResource("4_center")]
+[node name="Block_02_01_Arrival" parent="Blocks" instance=ExtResource("5_arrival")]
+[node name="Block_02_02_TrialA" parent="Blocks" instance=ExtResource("6_a")]
+[node name="Block_02_03_TrialB" parent="Blocks" instance=ExtResource("7_b")]
+[node name="Block_02_04_RoutesAndBoundaries" parent="Blocks" instance=ExtResource("8_routes")]
+
+[node name="SafeAnchors" type="Node3D" parent="."]
+[node name="Center" type="Marker3D" parent="SafeAnchors"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+[node name="Arrival" type="Marker3D" parent="SafeAnchors"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -22)
+[node name="TrialA" type="Marker3D" parent="SafeAnchors"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -34.64, 1, 20)
+[node name="TrialB" type="Marker3D" parent="SafeAnchors"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.64, 1, 20)
+
+[node name="Player" parent="." instance=ExtResource("1_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -22)
+controls_enabled = false
+
 [node name="FollowCamera" type="Camera3D" parent="."]
-transform = Transform3D(1,0,0,0,0.906308,-0.422618,0,0.422618,0.906308,-6,7,10)
+transform = Transform3D(1, 0, 0, 0, 0.906308, -0.422618, 0, 0.422618, 0.906308, 0, 10, -30)
 current = true
-script = ExtResource("3_camera_controller")
+script = ExtResource("2_camera")
 target_path = NodePath("../Player")
-[node name="SunLight" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.707107,-0.353553,0.612372,0,0.866025,0.5,-0.707107,-0.353553,0.612372,0,6,0)
-light_energy = 1.45
-[node name="SoulShard" parent="." instance=ExtResource("4_soul_shard")]
-transform = Transform3D(1,0,0,0,1,0,0,0,1,10.8,1,0.5)
-[node name="LevelPortal" parent="." instance=ExtResource("6_level_portal")]
-transform = Transform3D(1,0,0,0,1,0,0,0,1,12.8,0,-0.8)
+
+[node name="SoulOrb" parent="." instance=ExtResource("3_orb")]
+target_path = NodePath("../Player")
+
+[node name="Level02SoftReturnVolume" parent="." instance=ExtResource("9_return")]
+
+[node name="Level02ProgressController" parent="." instance=ExtResource("10_progress")]
+[node name="Level02ArrivalGameplay" parent="." instance=ExtResource("11_arrival_gameplay")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -22)
+[node name="Level02CentralArenaGameplay" parent="." instance=ExtResource("12_central_gameplay")]
+[node name="Level02ArrivalVFX" parent="." instance=ExtResource("13_arrival_vfx")]
+[node name="Level02CentralLightVFX" parent="." instance=ExtResource("14_central_vfx")]
+[node name="Level02RuntimeContractValidator" type="Node" parent="."]
+script = ExtResource("15_validator")
+player_path = NodePath("../Player")
+progress_path = NodePath("../Level02ProgressController")
+arrival_path = NodePath("../Level02ArrivalGameplay")
+soft_return_path = NodePath("../Level02SoftReturnVolume")
+trial_a_path = NodePath("../TrialA_ThreeBeams")
+trial_b_path = NodePath("../TrialB_EchoOfLight")
+reward_gate_path = NodePath("../Level02RewardGate")
+environment_state_path = NodePath("../Level02EnvironmentState")
+central_presence_path = NodePath("../Level02CentralArenaGameplay")
+portal_adapter_path = NodePath("../Level02PortalAdapter")
+shared_reward_controller_path = NodePath("../ShardRewardSequenceController")
+
+[node name="TrialA_ThreeBeams" parent="." instance=ExtResource("16_trial_a")]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,-34.64,1,20)
+[node name="Level02TrialAVFX" parent="." instance=ExtResource("17_trial_a_vfx")]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,-34.64,1,20)
+
+[node name="TrialB_EchoOfLight" parent="." instance=ExtResource("18_trial_b")]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,34.64,1,20)
+[node name="Level02TrialBVFX" parent="." instance=ExtResource("19_trial_b_vfx")]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,34.64,1,20)
+
+[node name="Level02RewardGate" type="Node" parent="."]
+script = ExtResource("22_reward_gate")
+[node name="Level02EnvironmentState" parent="." instance=ExtResource("20_env_state")]
+[node name="Level02EnvironmentVFX" parent="." instance=ExtResource("21_env_vfx")]
+
+[node name="LevelFinaleOverlay" parent="." instance=ExtResource("28_finale")]
+visible = false
+[node name="LevelPortal" parent="." instance=ExtResource("27_portal")]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,4,0,0)
 target_scene_path = "res://scenes/levels/Level_03.tscn"
+entry_mode = 0
+require_entry_confirmation = false
+[node name="Level02PortalAdapter" parent="." instance=ExtResource("25_portal_adapter")]
+portal_path = NodePath("../LevelPortal")
+finale_overlay_path = NodePath("../LevelFinaleOverlay")
+player_path = NodePath("../Player")
+[node name="Level02PortalVFX" parent="." instance=ExtResource("26_portal_vfx")]
+
+[node name="ShardRegistrationScope" type="Node" parent="."]
+[node name="ShardRewardSequenceController" parent="." instance=ExtResource("23_reward_controller")]
+overlay_path = NodePath("../UILayer/ShardRewardOverlay")
+player_path = NodePath("../Player")
+shard_search_root_path = NodePath("../ShardRegistrationScope")
 [node name="UILayer" type="CanvasLayer" parent="."]
-[node name="PoemRewardUI" parent="UILayer" instance=ExtResource("5_poem_reward_ui")]
+[node name="ShardRewardOverlay" parent="UILayer" instance=ExtResource("24_reward_overlay")]

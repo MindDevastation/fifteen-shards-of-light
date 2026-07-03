@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3]
+[ext_resource type="Script" path="res://scripts/levels/level_02/level_02_environment_vfx_adapter.gd" id="1"]
+[sub_resource type="Environment" id="Environment_1"]
+background_mode = 1
+background_color = Color(0.08, 0.08, 0.1, 1)
+fog_enabled = true
+fog_density = 0.08
+[node name="Level02EnvironmentVFX" type="WorldEnvironment"]
+environment = SubResource("Environment_1")
+script = ExtResource("1")
