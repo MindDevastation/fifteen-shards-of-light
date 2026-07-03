@@ -26,3 +26,6 @@ shape = SubResource("SphereShape3D_perch")
 [connection signal="perch_entered" from="Perch_A" to="." method="accept_perch"]
 [connection signal="perch_entered" from="Perch_B" to="." method="accept_perch"]
 [connection signal="perch_entered" from="Perch_C" to="." method="accept_perch"]
+[connection signal="perch_exited" from="Perch_A" to="." method="clear_occupancy"]
+[connection signal="perch_exited" from="Perch_B" to="." method="clear_occupancy"]
+[connection signal="perch_exited" from="Perch_C" to="." method="clear_occupancy"]

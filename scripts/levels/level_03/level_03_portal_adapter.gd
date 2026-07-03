@@ -17,19 +17,18 @@ func _ready() -> void:
 func request_portal_activation() -> bool:
 	if activation_requested:
 		return false
+	var portal := get_node_or_null(portal_core_path)
+	if portal == null or not portal.has_method("activate"):
+		return false
 	activation_requested = true
 	portal_activation_requested.emit()
-	var portal := get_node_or_null(portal_core_path)
-	if portal == null:
-		return false
 	if "target_scene_path" in portal:
 		portal.target_scene_path = "res://scenes/levels/Level_04.tscn"
 	if "require_entry_confirmation" in portal:
 		portal.require_entry_confirmation = false
 	if "entry_mode" in portal:
 		portal.entry_mode = 0
-	if portal.has_method("activate"):
-		portal.activate()
+	portal.activate()
 	return true
 
 func _on_activation_completed() -> void:

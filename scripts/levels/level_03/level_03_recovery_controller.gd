@@ -8,6 +8,8 @@ signal recovery_completed(anchor_id: StringName)
 @export var fade_overlay_path: NodePath = NodePath("../../UILayer/RecoveryFadeOverlay")
 @export var debug_enabled: bool = false
 
+const SUSPEND_SHARD_REWARD := &"shard_reward"
+const SUSPEND_MAIN_TEXT := &"main_text"
 const ANCHORS := {
 	&"RA0": Vector3(-6.0, 0.65, -49.0),
 	&"RA1": Vector3(-3.5, 1.45, -23.5),
@@ -20,6 +22,7 @@ const ANCHORS := {
 
 var current_anchor: StringName = &"RA0"
 var suspended_sources: Dictionary = {}
+var pending_recovery := false
 
 func set_current_anchor(anchor_id: StringName) -> bool:
 	if not ANCHORS.has(anchor_id):
@@ -28,13 +31,26 @@ func set_current_anchor(anchor_id: StringName) -> bool:
 	return true
 
 func suspend_recovery(source_id: StringName, suspended: bool) -> void:
+	if not [SUSPEND_SHARD_REWARD, SUSPEND_MAIN_TEXT].has(source_id):
+		return
 	if suspended:
 		suspended_sources[source_id] = true
 	else:
 		suspended_sources.erase(source_id)
+		if pending_recovery and can_recover():
+			pending_recovery = false
+			recover_to_current_anchor()
 
 func can_recover() -> bool:
 	return suspended_sources.is_empty()
+
+func request_recovery(anchor_id: StringName = &"") -> bool:
+	if anchor_id != &"" and ANCHORS.has(anchor_id):
+		current_anchor = anchor_id
+	if not can_recover():
+		pending_recovery = true
+		return false
+	return recover_to_current_anchor()
 
 func recover_to_current_anchor() -> bool:
 	return recover_to_anchor(current_anchor)
@@ -46,9 +62,14 @@ func recover_to_anchor(anchor_id: StringName) -> bool:
 	if player == null:
 		return false
 	recovery_started.emit(anchor_id)
+	var fade := get_node_or_null(fade_overlay_path) as CanvasItem
+	if fade != null:
+		fade.visible = true
 	player.global_position = ANCHORS[anchor_id]
 	if "velocity" in player:
 		player.velocity = Vector3.ZERO
 	current_anchor = anchor_id
+	if fade != null:
+		fade.visible = false
 	recovery_completed.emit(anchor_id)
 	return true

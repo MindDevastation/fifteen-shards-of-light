@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3]
+[gd_scene load_steps=35 format=3]
 
 [ext_resource type="Script" path="res://scripts/player/camera_controller.gd" id="2_camera"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_03/ui/RecoveryFadeOverlay.tscn" id="11_recovery_fade"]
@@ -15,8 +15,14 @@
 [ext_resource type="Script" path="res://scripts/levels/level_03/level_03_finale_controller.gd" id="22_finale"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_03/vfx/Level03SynthesisVFX.tscn" id="23_synthesis_vfx"]
 [ext_resource type="Script" path="res://scripts/levels/level_03/level_03_portal_adapter.gd" id="24_portal_adapter"]
-[ext_resource type="Script" path="res://scripts/levels/level_03/level_03_local_portal_core.gd" id="25_portal_core"]
+[ext_resource type="PackedScene" path="res://scenes/core/LevelPortal.tscn" id="25_portal"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_03/vfx/Level03PortalAccentVFX.tscn" id="26_portal_vfx"]
+[ext_resource type="PackedScene" path="res://scenes/core/Player.tscn" id="27_player"]
+[ext_resource type="PackedScene" path="res://scenes/core/SoulOrb_Follow.tscn" id="28_soul_orb_follow"]
+[ext_resource type="PackedScene" path="res://scenes/core/ShardRewardSequenceController.tscn" id="29_reward_controller"]
+[ext_resource type="PackedScene" path="res://scenes/ui/ShardRewardOverlay.tscn" id="30_reward_overlay"]
+[ext_resource type="PackedScene" path="res://scenes/ui/LevelFinaleOverlay.tscn" id="31_finale_overlay"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_03/environment/Level03EnvironmentState.tscn" id="32_env_state"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_03/blocks/Block_03_00_QuietInlet.tscn" id="4_b00"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_03/blocks/Block_03_01_WindTraceRoute.tscn" id="5_b01"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_03/blocks/Block_03_02_Shard05Overlook.tscn" id="6_b02"]
@@ -25,61 +31,115 @@
 [ext_resource type="PackedScene" path="res://scenes/levels/level_03/blocks/Block_03_05_BreathingMeadow.tscn" id="9_b05"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_03/blocks/Block_03_06_FinalOverlook.tscn" id="10_b06"]
 
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
-radius = 0.35
-height = 1.3
+[sub_resource type="BoxShape3D" id="BoxShape3D_final_gate"]
+size = Vector3(9, 4, 9)
 
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_player"]
-radius = 0.35
-height = 1.3
+[sub_resource type="BoxShape3D" id="BoxShape3D_soft_return"]
+size = Vector3(80, 8, 120)
 
-[sub_resource type="SphereMesh" id="SphereMesh_orb"]
-radius = 0.18
-height = 0.36
+[sub_resource type="BoxShape3D" id="BoxShape3D_oob"]
+size = Vector3(120, 12, 160)
 
 [node name="Level_03" type="Node3D"]
 metadata/title = "Level_03 «После наших разговоров»"
 metadata/approved_base = "2635524c3d2b3a39487d07a399a98cf8f95bfb5e"
 
-[node name="EnvironmentStateRoot" type="Node3D" parent="."]
+[node name="EnvironmentRoot" type="Node3D" parent="."]
+[node name="BaseGeometry" type="Node3D" parent="EnvironmentRoot"]
+[node name="BoundaryRoot" type="Node3D" parent="EnvironmentRoot"]
+[node name="LandmarkRoot" type="Node3D" parent="EnvironmentRoot"]
+[node name="DressingRoot" type="Node3D" parent="EnvironmentRoot"]
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="EnvironmentStateRoot"]
-
-[node name="LightingRoot" type="Node3D" parent="EnvironmentStateRoot"]
-[node name="SunLight" type="DirectionalLight3D" parent="EnvironmentStateRoot/LightingRoot"]
-transform = Transform3D(0.906308, 0.144544, -0.397131, 0, 0.939693, 0.34202, 0.422618, -0.309976, 0.851651, 0, 16, -12)
-light_energy = 1.15
-
-[node name="GlobalFogRoot" type="Node3D" parent="EnvironmentStateRoot"]
-[node name="LocalHazeRoot" type="Node3D" parent="EnvironmentStateRoot"]
+[node name="EnvironmentStateRoot" parent="." instance=ExtResource("32_env_state")]
 
 [node name="GameplayRoot" type="Node3D" parent="."]
-[node name="Blocks" type="Node3D" parent="GameplayRoot"]
-[node name="Block_03_00_QuietInlet" parent="GameplayRoot/Blocks" instance=ExtResource("4_b00")]
+[node name="Blocks" type="Node3D" parent="EnvironmentRoot/BaseGeometry"]
+[node name="Block_03_00_QuietInlet" parent="EnvironmentRoot/BaseGeometry" instance=ExtResource("4_b00")]
 transform = Transform3D(1,0,0,0,1,0,0,0,1,-6,0,-47)
-[node name="Block_03_01_WindTraceRoute" parent="GameplayRoot/Blocks" instance=ExtResource("5_b01")]
+[node name="Block_03_01_WindTraceRoute" parent="EnvironmentRoot/BaseGeometry" instance=ExtResource("5_b01")]
 transform = Transform3D(1,0,0,0,1,0,0,0,1,-2,0.4,-33)
-[node name="Block_03_02_Shard05Overlook" parent="GameplayRoot/Blocks" instance=ExtResource("6_b02")]
+[node name="Block_03_02_Shard05Overlook" parent="EnvironmentRoot/BaseGeometry" instance=ExtResource("6_b02")]
 transform = Transform3D(1,0,0,0,1,0,0,0,1,-8,0.9,-16)
-[node name="Block_03_03_PlayfulGlade" parent="GameplayRoot/Blocks" instance=ExtResource("7_b03")]
+[node name="Block_03_03_PlayfulGlade" parent="EnvironmentRoot/BaseGeometry" instance=ExtResource("7_b03")]
 transform = Transform3D(1,0,0,0,1,0,0,0,1,7,1,-3)
-[node name="Block_03_04_Connector" parent="GameplayRoot/Blocks" instance=ExtResource("8_b04")]
+[node name="Block_03_04_Connector" parent="EnvironmentRoot/BaseGeometry" instance=ExtResource("8_b04")]
 transform = Transform3D(1,0,0,0,1,0,0,0,1,-1,1.15,13)
-[node name="Block_03_05_BreathingMeadow" parent="GameplayRoot/Blocks" instance=ExtResource("9_b05")]
+[node name="Block_03_05_BreathingMeadow" parent="EnvironmentRoot/BaseGeometry" instance=ExtResource("9_b05")]
 transform = Transform3D(1,0,0,0,1,0,0,0,1,-7,1.3,28.5)
-[node name="Block_03_06_FinalOverlook" parent="GameplayRoot/Blocks" instance=ExtResource("10_b06")]
+[node name="Block_03_06_FinalOverlook" parent="EnvironmentRoot/BaseGeometry" instance=ExtResource("10_b06")]
 transform = Transform3D(1,0,0,0,1,0,0,0,1,6,1.6,47)
-[node name="Markers" type="Node3D" parent="GameplayRoot"]
-[node name="P00_Spawn" type="Marker3D" parent="GameplayRoot/Markers"]
+[node name="MarkerRoot" type="Node3D" parent="."]
+[node name="RouteMarkers" type="Node3D" parent="MarkerRoot"]
+[node name="P00_Spawn" type="Marker3D" parent="MarkerRoot/RouteMarkers"]
 transform = Transform3D(1,0,0,0,1,0,0,0,1,-6,0,-49)
-[node name="P16_LevelPortalRoot" type="Marker3D" parent="GameplayRoot/Markers"]
+[node name="P01_InletExit" type="Marker3D" parent="MarkerRoot/RouteMarkers"]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,-5.8,0.08,-43)
+[node name="P02_Arch01" type="Marker3D" parent="MarkerRoot/RouteMarkers"]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,-5.5,0.15,-40.5)
+[node name="P03_CurveEast" type="Marker3D" parent="MarkerRoot/RouteMarkers"]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,1,0.35,-35)
+[node name="P04_Arch02" type="Marker3D" parent="MarkerRoot/RouteMarkers"]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,2,0.45,-32)
+[node name="P05_CurveWest" type="Marker3D" parent="MarkerRoot/RouteMarkers"]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,-1,0.65,-27)
+[node name="P06_Arch03" type="Marker3D" parent="MarkerRoot/RouteMarkers"]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,-3.5,0.8,-23.5)
+[node name="P07_Shard05Overlook" type="Marker3D" parent="MarkerRoot/RouteMarkers"]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,-8,0.9,-16)
+[node name="P08_GladeApproach" type="Marker3D" parent="MarkerRoot/RouteMarkers"]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,-1,0.95,-9)
+[node name="P09_PlayfulGladeCenter" type="Marker3D" parent="MarkerRoot/RouteMarkers"]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,7,1,-3)
+[node name="P10_GladeExit" type="Marker3D" parent="MarkerRoot/RouteMarkers"]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,4,1.05,7)
+[node name="P11_ExhaleBend" type="Marker3D" parent="MarkerRoot/RouteMarkers"]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,-1,1.15,13)
+[node name="P12_MeadowEntry" type="Marker3D" parent="MarkerRoot/RouteMarkers"]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,-4,1.28,18)
+[node name="P13_MeadowCenter" type="Marker3D" parent="MarkerRoot/RouteMarkers"]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,-7,1.3,28.5)
+[node name="P14_FinalApproach" type="Marker3D" parent="MarkerRoot/RouteMarkers"]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,-1.5,1.45,38)
+[node name="P15_FinalOverlook" type="Marker3D" parent="MarkerRoot/RouteMarkers"]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,6,1.6,47)
+[node name="P16_LevelPortalRoot" type="Marker3D" parent="MarkerRoot/RouteMarkers"]
 transform = Transform3D(1,0,0,0,1,0,0,0,1,10,1.6,50.5)
+[node name="CameraQAMarkers" type="Node3D" parent="MarkerRoot"]
+[node name="CP0" type="Marker3D" parent="MarkerRoot/CameraQAMarkers"]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,-6,2.2,-47)
+[node name="CP1" type="Marker3D" parent="MarkerRoot/CameraQAMarkers"]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,-3,2.4,-35)
+[node name="CP2" type="Marker3D" parent="MarkerRoot/CameraQAMarkers"]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,7,2.7,-3)
+[node name="CP3" type="Marker3D" parent="MarkerRoot/CameraQAMarkers"]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,-7,3,28.5)
+[node name="CP4" type="Marker3D" parent="MarkerRoot/CameraQAMarkers"]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,6,3.2,47)
+[node name="RecoveryAnchors" type="Node3D" parent="MarkerRoot"]
+[node name="PlayerFloorSpawnMarker" type="Marker3D" parent="MarkerRoot"]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,-6,0,-49)
+[node name="RA0" type="Marker3D" parent="MarkerRoot/RecoveryAnchors"]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,-6,0.65,-49)
+[node name="RA1" type="Marker3D" parent="MarkerRoot/RecoveryAnchors"]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,-3.5,1.45,-23.5)
+[node name="RA2" type="Marker3D" parent="MarkerRoot/RecoveryAnchors"]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,-8,1.55,-16)
+[node name="RA3" type="Marker3D" parent="MarkerRoot/RecoveryAnchors"]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,7,1.65,-3)
+[node name="RA4" type="Marker3D" parent="MarkerRoot/RecoveryAnchors"]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,-4,1.93,18)
+[node name="RA5" type="Marker3D" parent="MarkerRoot/RecoveryAnchors"]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,-7,1.95,28.5)
+[node name="RA6" type="Marker3D" parent="MarkerRoot/RecoveryAnchors"]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,6,2.25,47)
 [node name="FinalOverlook" type="Node3D" parent="GameplayRoot"]
+[node name="FinalOverlookGate" type="Area3D" parent="GameplayRoot/FinalOverlook"]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,6,1.6,47)
+[node name="Collision" type="CollisionShape3D" parent="GameplayRoot/FinalOverlook/FinalOverlookGate"]
+shape = SubResource("BoxShape3D_final_gate")
 [node name="LevelPortalRoot" type="Node3D" parent="GameplayRoot/FinalOverlook"]
 transform = Transform3D(1,0,0,0,1,0,0,0,1,10,1.6,50.5)
-[node name="PortalCore" type="Node3D" parent="GameplayRoot/FinalOverlook/LevelPortalRoot"]
-visible = false
-script = ExtResource("25_portal_core")
+[node name="PortalCore" parent="GameplayRoot/FinalOverlook/LevelPortalRoot" instance=ExtResource("25_portal")]
 target_scene_path = "res://scenes/levels/Level_04.tscn"
 entry_mode = 0
 require_entry_confirmation = false
@@ -93,14 +153,17 @@ require_entry_confirmation = false
 [node name="ShardSlots" type="Node3D" parent="GameplayRoot"]
 [node name="Slot_05" parent="GameplayRoot/ShardSlots" instance=ExtResource("13_shard_slot")]
 transform = Transform3D(1,0,0,0,1,0,0,0,1,-8,2,-15)
+[node name="SoulShard" parent="GameplayRoot/ShardSlots/Slot_05" index="0"]
 shard_id = &"Shard_05"
 reward_text = "После наших разговоров я ещё долго вспоминаю твою интонацию."
 [node name="Slot_06" parent="GameplayRoot/ShardSlots" instance=ExtResource("13_shard_slot")]
 transform = Transform3D(1,0,0,0,1,0,0,0,1,4,2,4.2)
+[node name="SoulShard" parent="GameplayRoot/ShardSlots/Slot_06" index="0"]
 shard_id = &"Shard_06"
 reward_text = "Мне особенно нравится, как ты вдруг смеёшься над какой-нибудь полной ерундой."
 [node name="Slot_07" parent="GameplayRoot/ShardSlots" instance=ExtResource("13_shard_slot")]
 transform = Transform3D(1,0,0,0,1,0,0,0,1,-7,2.2,28.5)
+[node name="SoulShard" parent="GameplayRoot/ShardSlots/Slot_07" index="0"]
 shard_id = &"Shard_07"
 reward_text = "Рядом с тобой я и сам чаще смеюсь и ненадолго перестаю быть таким серьёзным."
 
@@ -114,18 +177,9 @@ transform = Transform3D(1,0,0,0,1,0,0,0,1,6,2.4,47)
 [node name="Level03PortalAccentVFX" parent="VFXRoot" instance=ExtResource("26_portal_vfx")]
 transform = Transform3D(1,0,0,0,1,0,0,0,1,10,1.8,50.5)
 [node name="PlayerRoot" type="Node3D" parent="."]
-[node name="Player" type="CharacterBody3D" parent="PlayerRoot"]
+[node name="Player" parent="PlayerRoot" instance=ExtResource("27_player")]
 transform = Transform3D(1,0,0,0,1,0,0,0,1,-6,0.65,-49)
-metadata/placeholder_for_shared_player = true
-
-[node name="Collision" type="CollisionShape3D" parent="PlayerRoot/Player"]
-shape = SubResource("CapsuleShape3D_player")
-
-[node name="Mesh" type="MeshInstance3D" parent="PlayerRoot/Player"]
-mesh = SubResource("CapsuleMesh_player")
-[node name="SoulOrb_Follow" type="MeshInstance3D" parent="PlayerRoot/Player"]
-transform = Transform3D(1,0,0,0,1,0,0,0,1,0,1.6,-0.8)
-mesh = SubResource("SphereMesh_orb")
+[node name="SoulOrb_Follow" parent="PlayerRoot" instance=ExtResource("28_soul_orb_follow")]
 [node name="CameraRoot" type="Node3D" parent="."]
 [node name="FollowCamera" type="Camera3D" parent="CameraRoot"]
 transform = Transform3D(1,0,0,0,1,0,0,0,1,-6,4,-55)
@@ -134,6 +188,10 @@ target_path = NodePath("../../PlayerRoot/Player")
 [node name="LevelRuntimeRoot" type="Node" parent="."]
 [node name="Level03RecoveryController" type="Node" parent="LevelRuntimeRoot"]
 script = ExtResource("12_recovery")
+[node name="ShardRewardSequenceController" parent="LevelRuntimeRoot" instance=ExtResource("29_reward_controller")]
+overlay_path = NodePath("../../UILayer/ShardRewardOverlay")
+player_path = NodePath("../../PlayerRoot/Player")
+shard_search_root_path = NodePath("../../GameplayRoot/ShardSlots")
 [node name="Level03ProgressController" type="Node" parent="LevelRuntimeRoot"]
 script = ExtResource("17_progress")
 [node name="Level03FinaleController" type="Node" parent="LevelRuntimeRoot"]
@@ -142,17 +200,7 @@ script = ExtResource("22_finale")
 script = ExtResource("24_portal_adapter")
 [node name="UILayer" type="CanvasLayer" parent="."]
 [node name="RecoveryFadeOverlay" parent="UILayer" instance=ExtResource("11_recovery_fade")]
-[node name="LevelFinaleOverlay" type="Control" parent="UILayer"]
-visible = false
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-metadata/mouse_blocking_ui = true
-[node name="Text" type="Label" parent="UILayer/LevelFinaleOverlay"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-autowrap_mode = 3
-text = ""
+[node name="ShardRewardOverlay" parent="UILayer" instance=ExtResource("30_reward_overlay")]
+[node name="LevelFinaleOverlay" parent="UILayer" instance=ExtResource("31_finale_overlay")]
+[connection signal="body_entered" from="GameplayRoot/FinalOverlook/FinalOverlookGate" to="LevelRuntimeRoot/Level03FinaleController" method="on_final_overlook_body_entered"]
+[connection signal="body_exited" from="GameplayRoot/FinalOverlook/FinalOverlookGate" to="LevelRuntimeRoot/Level03FinaleController" method="on_final_overlook_body_exited"]
