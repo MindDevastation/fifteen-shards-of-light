@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/levels/level_03/level_03_environment_state_controller.gd" id="1_env"]
+
+[node name="EnvironmentStateRoot" type="Node3D"]
+script = ExtResource("1_env")
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="LightingRoot" type="Node3D" parent="."]
+[node name="GlobalFogRoot" type="Node3D" parent="."]
+[node name="LocalHazeRoot" type="Node3D" parent="."]

@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3]
+[sub_resource type="PlaneMesh" id="PlaneMesh_petal"]
+size = Vector2(2, 2)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_petal"]
+albedo_color = Color(0.62, 0.82, 0.62, 0.8)
+[node name="Level03BreathingMeadowVFX" type="Node3D"]
+[node name="PetalHint" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_petal")
+material_override = SubResource("StandardMaterial3D_petal")
