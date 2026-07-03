@@ -9,6 +9,7 @@ signal spark_hop_settled(to_id: StringName, generation: int)
 
 @export var progress_controller_path: NodePath = NodePath("../../../LevelRuntimeRoot/Level03ProgressController")
 @export var player_path: NodePath = NodePath("../../../PlayerRoot/Player")
+@export var vfx_path: NodePath = NodePath("../../../VFXRoot/Level03PlayfulSparkVFX")
 @export var intro_seconds: float = 0.10
 @export var pre_glow_seconds: float = 0.55
 @export var hop_seconds: float = 0.80
@@ -31,6 +32,7 @@ var _perches: Dictionary = {}
 var _completed_perches: Array[StringName] = []
 var _armed_once := false
 var _hint_generation := 0
+var _vfx: Node = null
 
 func _ready() -> void:
 	_collect_perches()
@@ -59,8 +61,12 @@ func accept_perch(perch_id: StringName) -> void:
 	state = SparkState.PRE_GLOW
 	presentation_generation += 1
 	accepted_terminal_generation = -1
-	var target_id: StringName = ORDER[index]
-	_start_hop_sequence(target_id, presentation_generation)
+	var source_id: StringName = ORDER[index]
+	if index >= ORDER.size() - 1:
+		_complete()
+		return
+	var target_id: StringName = ORDER[index + 1]
+	_start_hop_sequence(source_id, target_id, presentation_generation)
 
 func clear_occupancy(_perch_id: StringName) -> void:
 	# Leave/re-enter persistence: logical stage remains untouched.
@@ -71,7 +77,8 @@ func spark_hop_terminal(to_id: StringName, generation: int, via_fallback: bool) 
 		return false
 	if accepted_terminal_generation == generation:
 		return false
-	if index >= ORDER.size() or to_id != ORDER[index]:
+	var expected_terminal_id: StringName = ORDER[index + 1] if index < ORDER.size() - 1 else ORDER[index]
+	if to_id != expected_terminal_id:
 		return false
 	accepted_terminal_generation = generation
 	state = SparkState.SETTLING
@@ -91,6 +98,9 @@ func get_completed_perches() -> Array[StringName]:
 
 func _prepare_runtime_contract() -> bool:
 	_player = get_node_or_null(player_path)
+	_vfx = get_node_or_null(vfx_path)
+	if _vfx != null and _vfx.has_signal("hop_finished") and not _vfx.hop_finished.is_connected(_on_vfx_hop_finished):
+		_vfx.hop_finished.connect(_on_vfx_hop_finished)
 	if _player == null:
 		return false
 	_collect_perches()
@@ -124,17 +134,21 @@ func _start_hint_timer(source_generation: int, delay: float, level: int) -> void
 		return
 	spark_hint_requested.emit(index, level)
 
-func _start_hop_sequence(to_id: StringName, generation: int) -> void:
+func _start_hop_sequence(from_id: StringName, to_id: StringName, generation: int) -> void:
 	await get_tree().create_timer(pre_glow_seconds).timeout
 	if state != SparkState.PRE_GLOW or generation != presentation_generation:
 		return
 	state = SparkState.HOPPING
-	spark_hop_started.emit(to_id, to_id, generation)
-	_start_real_terminal_timer(to_id, generation)
+	spark_hop_started.emit(from_id, to_id, generation)
+	_start_vfx_hop(from_id, to_id, generation)
 	_start_fallback_terminal_timer(to_id, generation)
 
-func _start_real_terminal_timer(to_id: StringName, generation: int) -> void:
-	await get_tree().create_timer(hop_seconds).timeout
+func _start_vfx_hop(from_id: StringName, to_id: StringName, generation: int) -> bool:
+	if _vfx == null or not _vfx.has_method("play_hop"):
+		return false
+	return _vfx.play_hop(from_id, to_id, generation, hop_seconds)
+
+func _on_vfx_hop_finished(_from_id: StringName, to_id: StringName, generation: int) -> void:
 	spark_hop_terminal(to_id, generation, false)
 
 func _start_fallback_terminal_timer(to_id: StringName, generation: int) -> void:
@@ -152,7 +166,13 @@ func _settle_after_delay(to_id: StringName, generation: int, _via_fallback: bool
 		return
 	state = SparkState.WAITING_FOR_PERCH
 	_enable_expected_perch()
-	var perch: Node = _perches.get(ORDER[index])
+	_defer_expected_overlap_reevaluation(ORDER[index], generation)
+
+func _defer_expected_overlap_reevaluation(expected_id: StringName, source_generation: int) -> void:
+	await get_tree().physics_frame
+	if completed or state != SparkState.WAITING_FOR_PERCH or source_generation != presentation_generation or index >= ORDER.size() or ORDER[index] != expected_id:
+		return
+	var perch: Node = _perches.get(expected_id)
 	if perch != null and perch.has_method("reevaluate_registered_player_overlap"):
 		perch.reevaluate_registered_player_overlap()
 

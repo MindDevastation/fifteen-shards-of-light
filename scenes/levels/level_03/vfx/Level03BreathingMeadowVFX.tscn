@@ -1,9 +1,11 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
+[ext_resource type="Script" path="res://scripts/levels/level_03/level_03_breathing_meadow_vfx_controller.gd" id="1_script"]
 [sub_resource type="PlaneMesh" id="PlaneMesh_petal"]
 size = Vector2(2, 2)
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_petal"]
 albedo_color = Color(0.62, 0.82, 0.62, 0.8)
 [node name="Level03BreathingMeadowVFX" type="Node3D"]
+script = ExtResource("1_script")
 [node name="PetalHint" type="MeshInstance3D" parent="."]
 mesh = SubResource("PlaneMesh_petal")
 material_override = SubResource("StandardMaterial3D_petal")

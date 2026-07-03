@@ -25,6 +25,9 @@ func set_acceptance_enabled(enabled: bool) -> void:
 func is_player_inside() -> bool:
 	return _occupied
 
+func is_registered_player_inside() -> bool:
+	return _occupied
+
 func _on_body_entered(body: Node) -> void:
 	if not _acceptance_enabled or body != _registered_player or _occupied:
 		return

@@ -12,6 +12,7 @@ signal petal_presentation_completed(petal_id: StringName, generation: int, via_f
 
 @export var progress_controller_path: NodePath = NodePath("../../../LevelRuntimeRoot/Level03ProgressController")
 @export var player_path: NodePath = NodePath("../../../PlayerRoot/Player")
+@export var vfx_path: NodePath = NodePath("../../../VFXRoot/Level03BreathingMeadowVFX")
 @export var dwell_seconds: float = 0.65
 @export var presentation_seconds: float = 1.45
 @export var fallback_deadline_seconds: float = 1.80
@@ -32,6 +33,8 @@ var _petals: Dictionary = {}
 var _records: Dictionary = {}
 var _active_dwell_id: StringName = &""
 var _hint_generation := 0
+var _vfx: Node = null
+var _completed_this_physics_frame := false
 
 func _ready() -> void:
 	_collect_petals()
@@ -92,23 +95,36 @@ func get_state_name() -> StringName:
 	return StringName(MeadowState.keys()[state])
 
 func _physics_process(delta: float) -> void:
-	if state != MeadowState.ACTIVE or _active_dwell_id == &"":
+	_completed_this_physics_frame = false
+	if state != MeadowState.ACTIVE:
 		return
+	var occupied_ids := _get_occupied_incomplete_petals()
+	if occupied_ids.is_empty():
+		_reset_active_dwell()
+		return
+	if occupied_ids.size() > 1:
+		_reset_incomplete_dwell_timers(occupied_ids)
+		_active_dwell_id = &""
+		return
+	var petal_id: StringName = occupied_ids[0]
 	if _player == null or not _player.has_method("is_on_floor") or not _player.is_on_floor():
-		_reset_active_dwell()
+		_reset_dwell_elapsed(petal_id)
+		_active_dwell_id = &""
 		return
-	var petal_id := _active_dwell_id
+	if _active_dwell_id != petal_id:
+		_active_dwell_id = petal_id
+		_reset_dwell_elapsed(petal_id)
 	var record: Dictionary = _records[petal_id]
-	if not record.entered or record.logical_completed:
-		_reset_active_dwell()
-		return
 	record.dwell_elapsed += delta
 	_records[petal_id] = record
-	if record.dwell_elapsed >= dwell_seconds:
+	if record.dwell_elapsed >= dwell_seconds and not _completed_this_physics_frame:
 		_complete_petal(petal_id)
 
 func _prepare_runtime_contract() -> bool:
 	_player = get_node_or_null(player_path)
+	_vfx = get_node_or_null(vfx_path)
+	if _vfx != null and _vfx.has_signal("petal_presentation_finished") and not _vfx.petal_presentation_finished.is_connected(_on_vfx_petal_presentation_finished):
+		_vfx.petal_presentation_finished.connect(_on_vfx_petal_presentation_finished)
 	if _player == null or not _player.has_method("is_on_floor"):
 		return false
 	_collect_petals()
@@ -148,6 +164,7 @@ func _complete_petal(petal_id: StringName) -> void:
 	visited.append(petal_id)
 	_records[petal_id] = record
 	_active_dwell_id = &""
+	_completed_this_physics_frame = true
 	petal_activated.emit(petal_id)
 	petal_completed.emit(petal_id)
 	meadow_progress_changed.emit(visited.duplicate())
@@ -162,26 +179,49 @@ func _start_petal_presentation(petal_id: StringName) -> void:
 	_records[petal_id] = record
 	var presentation_generation: int = record.presentation_generation
 	petal_presentation_started.emit(petal_id, presentation_generation)
-	_start_real_presentation_timer(petal_id, presentation_generation)
+	_start_vfx_petal_presentation(petal_id, presentation_generation)
 	_start_fallback_presentation_timer(petal_id, presentation_generation)
 
-func _start_real_presentation_timer(petal_id: StringName, presentation_generation: int) -> void:
-	await get_tree().create_timer(presentation_seconds).timeout
+func _start_vfx_petal_presentation(petal_id: StringName, presentation_generation: int) -> bool:
+	if _vfx == null or not _vfx.has_method("play_petal_presentation"):
+		return false
+	return _vfx.play_petal_presentation(petal_id, presentation_generation, presentation_seconds)
+
+func _on_vfx_petal_presentation_finished(petal_id: StringName, presentation_generation: int) -> void:
 	petal_presentation_terminal(petal_id, presentation_generation, false)
 
 func _start_fallback_presentation_timer(petal_id: StringName, presentation_generation: int) -> void:
 	await get_tree().create_timer(fallback_deadline_seconds).timeout
 	petal_presentation_terminal(petal_id, presentation_generation, true)
 
-func _reset_active_dwell() -> void:
-	if _active_dwell_id == &"":
+func _get_occupied_incomplete_petals() -> Array[StringName]:
+	var result: Array[StringName] = []
+	for id in REQUIRED:
+		if not _records.has(id):
+			continue
+		var record: Dictionary = _records[id]
+		if record.logical_completed:
+			continue
+		var petal: Node = _petals.get(id)
+		if petal != null and petal.has_method("is_registered_player_inside") and petal.is_registered_player_inside():
+			result.append(id)
+	return result
+
+func _reset_incomplete_dwell_timers(ids: Array[StringName]) -> void:
+	for id in ids:
+		_reset_dwell_elapsed(id)
+
+func _reset_dwell_elapsed(petal_id: StringName) -> void:
+	if not _records.has(petal_id):
 		return
-	var petal_id := _active_dwell_id
-	if _records.has(petal_id):
-		var record: Dictionary = _records[petal_id]
-		if not record.logical_completed:
-			record.dwell_elapsed = 0.0
-		_records[petal_id] = record
+	var record: Dictionary = _records[petal_id]
+	if not record.logical_completed:
+		record.dwell_elapsed = 0.0
+	_records[petal_id] = record
+
+func _reset_active_dwell() -> void:
+	if _active_dwell_id != &"":
+		_reset_dwell_elapsed(_active_dwell_id)
 	_active_dwell_id = &""
 
 func _start_hint_timer(source_generation: int, delay: float, level: int) -> void:

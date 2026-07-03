@@ -25,6 +25,9 @@ func set_acceptance_enabled(enabled: bool) -> void:
 func is_player_inside() -> bool:
 	return _occupied
 
+func is_registered_player_inside() -> bool:
+	return _occupied
+
 func reevaluate_registered_player_overlap() -> void:
 	if not _acceptance_enabled or _registered_player == null:
 		return
