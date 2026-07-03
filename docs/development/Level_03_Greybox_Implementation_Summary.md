@@ -1,203 +1,154 @@
 # Level_03 Greybox Implementation Summary
 
-## Correction Identity
-
-- Branch: `work`
-- Predecessor PR: `#109`
-- New PR for this task: `NOT CREATED — manual publication required; Codex did not branch, push, or publish`
-- Implementation PR: `#107`
-- Truthful summary correction PR: `#108`
-- Approved Reference: `docs/design/Level_03_Greybox_Development_Reference_v1.1.md`
-- Production scene under review: `res://scenes/levels/Level_03.tscn`
-- Temporary harness location: `/tmp/level03_group6` (outside repository)
-
-- Current checkout preflight: branch `work`; starting HEAD `a0c91c5` (`Merge pull request #109 from MindDevastation/feature/execute-real-factual-group-6`); worktree clean before task; summary file exists; production Level_03 scene exists.
-- Current task rerun date: `2026-07-03 UTC`.
-
-## Classification After Full Import Regeneration
-
-Classification: **A. IMPORT CACHE RESOLVED**.
-
-The PR #109 blocker is reclassified as an environment/import-cache blocker rather than a proven source/resource defect. The required full editor import regeneration was rerun from the current checkout and completed with exit `0`. After regeneration, the production `Level_03.tscn` smoke load, `check-only` command, and startup command emitted zero `ERROR:`, zero `SCRIPT ERROR:`, zero parse errors, zero script-load errors, and zero failed-resource loads. The previous missing `.godot/imported/...` resources disappeared from the post-import production load logs.
-
-No source fix was applied. Because the import-cache blocker resolved but the full ST-02 and T01 factual assertion sets were not executed, `ST-02` and `T01` are reclassified from `FAIL` to `NOT_VERIFIED`, not PASS.
-
-## Before / After Error Counts
-
-| Phase | Command | Exit | ERROR | SCRIPT ERROR | Parse Error | Failed loading resource | Failed to load script | Evidence |
-|---|---|---:|---:|---:|---:|---:|---:|---|
-| Before import regeneration, from PR #109 record | `godot --headless --path . --script /tmp/level03_group6/gd/smoke.gd` | `0` | `183` combined `ERROR` / `SCRIPT ERROR` | included in `183` | present | present | present | prior `/tmp/level03_group6/logs/level03_load.log` and prior summary |
-| Full import regeneration | `timeout 600s godot --headless --editor --quit --path .` | `0` | `0` stderr errors | `0` | `0` | `0` | `0` | `/tmp/level03_import_regen_stdout.log`, `/tmp/level03_import_regen_stderr.log` |
-| After import smoke | `godot --headless --path . --script /tmp/level03_group6/gd/smoke.gd` | `0` | `0` | `0` | `0` | `0` | `0` | `/tmp/level03_after_import_smoke_stdout.log`, `/tmp/level03_after_import_smoke_stderr.log` |
-| After import Level_03 check-only | `godot --headless --path . --quit --check-only scenes/levels/Level_03.tscn` | `0` | `0` | `0` | `0` | `0` | `0` | `/tmp/level03_after_import_check_stdout.log`, `/tmp/level03_after_import_check_stderr.log` |
-| After import startup | `timeout 60s godot --headless --path . --quit` | `0` | `0` | `0` | `0` | `0` | `0` | `/tmp/level03_after_import_startup_stdout.log`, `/tmp/level03_after_import_startup_stderr.log` |
-
-
-## Real Factual Group 6 Execution Attempt After PR #110
+## PR #111 Continuation Handoff
 
 - Branch: `work`.
-- Starting HEAD: `17173e8` (`Merge pull request #110 from MindDevastation/feature/re-run-import-regeneration-for-group-6`).
-- Import regeneration command: `timeout 600s godot --headless --editor --quit --path .`; result `exit 0`; stderr empty; stdout completed import regeneration.
-- Post-import `Level_03.tscn` check-only: `exit 0`.
-- Post-import project startup smoke: `exit 0`.
-- Temporary harness remained outside the repository at `/tmp/level03_group6`.
+- Current PR: `#111`.
+- Starting HEAD for this continuation: `186f51d` (`docs: update Level 03 factual group 6 evidence`).
+- Final HEAD at summary edit time: `PENDING_COMMIT`.
+- Worktree preflight: clean before this continuation.
+- Source fix already present at preflight: `activation_duration = 1.8` is serialized on the production `PortalCore`, and `portal.activation_duration = 1.8` is enforced by the Level_03 portal adapter before calling the shared `activate()` API.
+- Production scene under test: `res://scenes/levels/Level_03.tscn`.
+- Approved reference: `docs/design/Level_03_Greybox_Development_Reference_v1.1.md`.
+- Temporary harness location: `/tmp/level03_group6` outside the repository.
 
-### Factual source blocker found and corrected
+## Import and Load Health
 
-During static portal-config verification, the production `PortalCore` instance serialized the canonical `Level_04` target, `AUTO_ENTER` enum value, and disabled confirmation, but did not serialize the required `activation_duration = 1.8`. The Level_03 portal adapter also enforced target, confirmation, and entry mode at activation time, but did not enforce activation duration. This was a Level_03-local factual blocker for the portal exact-config requirement.
+- Full import regeneration command: `timeout 600s godot --headless --editor --quit --path .`.
+- Import regeneration result: `exit 0`.
+- Level_03 check-only command: `godot --headless --path . --quit --check-only scenes/levels/Level_03.tscn`.
+- Level_03 check-only result: `exit 0`.
+- Project startup command: `godot --headless --path . --quit`.
+- Project startup result: `exit 0`.
+- Error counts across import/check/startup logs: `ERROR:=0`, `SCRIPT ERROR:=0`, parse errors `0`, failed resource loads `0`, failed script loads `0`.
 
-Corrective source commit created locally:
+## Authoritative Group 6 Counts
 
-- `b410199` — `fix: correct Level 03 factual group 6 blocker`
+- ST-01–ST-19: `19 PASS`, `0 FAIL`, `0 NOT_VERIFIED`.
+- T01–T52: `13 PASS`, `0 FAIL`, `39 NOT_VERIFIED`.
+- Failed tests: `None` in the final evidence set.
+- NOT_VERIFIED runtime tests: `T03, T04, T05, T06, T07, T08, T10, T11, T13, T16, T17, T18, T19, T20, T22, T23, T24, T25, T26, T27, T29, T30, T31, T32, T33, T34, T36, T37, T39, T40, T41, T42, T43, T44, T46, T47, T48, T49, T50`.
+- Group 6 factual P0: `NOT COMPLETE` because production input route, recovery volume matrix, natural shared reward chains, finale/portal natural transition, and rendering-dependent gates remain incomplete.
 
-Corrected files:
+## ST-01–ST-19 Evidence Rows
 
-- `scenes/levels/Level_03.tscn` — serializes `activation_duration = 1.8` on `PortalCore`.
-- `scripts/levels/level_03/level_03_portal_adapter.gd` — enforces `portal.activation_duration = 1.8` before calling shared `activate()`.
+| Row |
+|---|
+| `ST-01 | PASS | expected=import regeneration/check-only/startup have zero parser/import/script errors | actual=error_counts={'level03_import_regen_stdout.log': 0, 'level03_import_regen_stderr.log': 0, 'level03_check_only_stdout.log': 0, 'level03_check_only_stderr.log': 0, 'level03_startup_stdout.log': 0, 'level03_startup_stderr.log': 0} | evidence=/tmp/level03_*stdout.log,/tmp/level03_*stderr.log` |
+| `ST-02 | PASS | expected=every Level_03 local PackedScene path exists for load coverage | actual=packed_scene_count=20 missing=[] | evidence=logs/static_group6.json:packed_scenes` |
+| `ST-03 | PASS | expected=required NodePaths resolve to serialized production nodes/types | actual=missing_node_names=[]; EnvironmentStateRoot instance present=True | evidence=logs/static_group6.json:node_paths` |
+| `ST-04 | PASS | expected=exact shard IDs/texts and main text are present; legacy copy absent | actual=shard_ids=['Shard_05', 'Shard_06', 'Shard_07'] main_text_present=True | evidence=logs/static_group6.json:text_contract` |
+| `ST-05 | PASS | expected=No LevelManager/PoemRewardUI/Step/RevealTrigger legacy tree | actual=legacy_matches=[] | evidence=rg LevelManager PoemRewardUI Step RevealTrigger scenes/levels/Level_03.tscn` |
+| `ST-06 | PASS | expected=portal target/config/anchor exact including activation_duration in scene and adapter | actual=level04=True auto_enter_0=True confirm_false=True duration_scene=True duration_adapter=True | evidence=scenes/levels/Level_03.tscn:154-L158; scripts/levels/level_03/level_03_portal_adapter.gd:25-L33` |
+| `ST-07 | PASS | expected=environment state resource exists and exposes controller; deep material/fog rendering requires runtime visual check | actual=env_scene_has_controller=True | evidence=scenes/levels/level_03/environment/Level03EnvironmentState.tscn` |
+| `ST-08 | PASS | expected=exact identity sets; no child-order/spatial inference required | actual=wind/spark/meadow identity_ok=True | evidence=logs/static_group6.json:identity_sets` |
+| `ST-09 | PASS | expected=three shards registered; Progress consumes slot macro events; finale armed only by all_rewards_completed | actual=progress_contract=True | evidence=scripts/levels/level_03/level_03_progress_controller.gd` |
+| `ST-10 | PASS | expected=no gameplay scripts inside imported models in Level_03 local scene files | actual=Level_03 local .tscn script refs point to scripts/levels/level_03 or shared PackedScenes only | evidence=rg "script = ExtResource" scenes/levels/level_03` |
+| `ST-11 | PASS | expected=forbidden/shared files have zero diff for this continuation | actual=diff_name_only=[] | evidence=git diff --name-only HEAD` |
+| `ST-12 | PASS | expected=no local change_scene_to_file | actual=matches=False | evidence=rg change_scene_to_file scripts/levels/level_03 scenes/levels/Level_03.tscn` |
+| `ST-13 | PASS | expected=no broad tree search/node_added progression | actual=node_added_present=False | evidence=rg node_added scripts/levels/level_03` |
+| `ST-14 | PASS | expected=no per-frame print spam in Level_03 scripts | actual=print_call_count=0 | evidence=rg "print\s*\(" scripts/levels/level_03` |
+| `ST-15 | PASS | expected=packed shard children disabled before frame 1 and validated before reveal | actual=hidden_contract=True | evidence=scripts/levels/level_03/level_03_shard_slot.gd` |
+| `ST-16 | PASS | expected=portal adapter has no Player export/reference, local loading ownership or success fallback | actual=adapter_ok=True | evidence=scripts/levels/level_03/level_03_portal_adapter.gd` |
+| `ST-17 | PASS | expected=finale overlay API validates and failure path fails closed | actual=failclosed_contract=True | evidence=scripts/levels/level_03/level_03_finale_controller.gd` |
+| `ST-18 | PASS | expected=no unrelated .gd.uid/import churn remains in worktree for Level_03 | actual=tracked_or_untracked_level03_uid_count=0 | evidence=find scripts/levels/level_03 -name "*.gd.uid"` |
+| `ST-19 | PASS | expected=no temporary harness/log/import/DOCX artifacts in repository worktree | actual=artifact_status_entries=[] | evidence=git status --short` |
 
-### Current factual status after source fix
+## T01–T52 Evidence Rows
 
-- ST count: `19 total`; executed static/import subset contains `9 PASS`, `0 FAIL after the source fix`, `10 NOT_VERIFIED`.
-- T count: `52 total`; `0 PASS`, `0 FAIL`, `52 NOT_VERIFIED`.
-- Failed tests before source fix: `ST-06` exact portal config failed because `activation_duration = 1.8` was absent from the production portal instance and adapter enforcement.
-- Failed tests after source fix: `None confirmed by the rerun subset`.
-- NOT_VERIFIED tests: runtime Group 6 matrices remain NOT_VERIFIED because no completed production-movement/runtime harness executed ST/T rows T01-T52 with test-specific runtime evidence.
-- Group 6 factual P0: `NOT COMPLETE`.
-- Rendering: `RENDERED RUNTIME EVIDENCE: NOT VERIFIED — renderer unavailable`; no synthetic screenshots created.
-- DOCX: regenerated outside repository at `/workspace/Level_03_Greybox_Implementation_Summary.docx`; ZIP/package/semantic checks passed; page-render visual inspection remains NOT_VERIFIED.
+| Row |
+|---|
+| `T01 | PASS | expected=production Level_03 startup prepares and commits E0/Wind active | actual=macro=WIND_TRACE_ACTIVE wind_armed=true env=E0 | evidence=logs/runtime_group6.json:T01` |
+| `T02 | PASS | expected=5 fresh production loads expose a Player spawn | actual=loads=5 spawn_positions=["(-6.0, 0.641833, -49.45532)", "(-6.0, 0.633668, -49.05901)", "(-6.0, 0.633667, -49.00764)", "(-6.0, 0.641833, -49.0)", "(-6.0, 0.641833, -49.0)"] | evidence=logs/runtime_group6.json:T02` |
+| `T03 | NOT_VERIFIED | expected=actual Player route P00-P16 using production movement/input | actual=headless harness did not drive CharacterBody3D input route; teleport proof forbidden | evidence=logs/runtime_group6.json:T03_blocker` |
+| `T04 | NOT_VERIFIED | expected=CP0-CP4 readability using camera/frustum/raycast evidence | actual=markers=[&"CP0", &"CP1", &"CP2", &"CP3", &"CP4"]; renderer/frustum capture unavailable in this headless run | evidence=logs/runtime_group6.json:T04_markers` |
+| `T05 | NOT_VERIFIED | expected=RA0-RA6 actual recovery trigger evidence | actual=recovery volumes present but no production falling route driven through each RA volume | evidence=logs/runtime_group6.json:T05_blocker` |
+| `T06 | NOT_VERIFIED | expected=no recovery when standing/slow/blocker/overlook | actual=no production locomotion/recovery trigger matrix executed | evidence=logs/runtime_group6.json:T06_blocker` |
+| `T07 | NOT_VERIFIED | expected=recovery suspended under reward/text lock while remaining in volume | actual=no actual overlap-under-lock recovery matrix executed | evidence=logs/runtime_group6.json:T07_blocker` |
+| `T08 | NOT_VERIFIED | expected=recovery pending clears after exit before unlock | actual=no actual overlap-exit-under-lock recovery matrix executed | evidence=logs/runtime_group6.json:T08_blocker` |
+| `T09 | PASS | expected=Shard_05/06/07 hidden and unavailable before reveal | actual=["Slot_05 visible=false available=false valid_hidden=true", "Slot_06 visible=false available=false valid_hidden=true", "Slot_07 visible=false available=false valid_hidden=true"] | evidence=logs/runtime_group6.json:T09` |
+| `T10 | NOT_VERIFIED | expected=stationary pre-overlap becomes collectable after reveal without re-entry | actual=no production player stationary shard-overlap interaction executed | evidence=logs/runtime_group6.json:T10_blocker` |
+| `T11 | NOT_VERIFIED | expected=normal consecutive rewards serialize one overlay/exact text/controls restore | actual=shared reward overlay chain not completed by actual Player interaction | evidence=logs/runtime_group6.json:T11_blocker` |
+| `T12 | PASS | expected=movement/camera activity confirms Wind immediately | actual=activity_confirmed=true | evidence=logs/runtime_group6.json:T12` |
+| `T14 | PASS | expected=future Wind arch before expected does not advance completion | actual=index_before=0 index_after=0 completed_after_wrong=false | evidence=logs/runtime_group6.json:T14` |
+| `T15 | PASS | expected=Arch_01->Arch_02->Arch_03 completes exactly once and duplicate Arch_01 ignored | actual=a=1 dup=1 b=2 completed=true count=0 | evidence=logs/runtime_group6.json:T15` |
+| `T13 | NOT_VERIFIED | expected=Wind edge case requires timed/future-overlap/VFX production evidence | actual=not executed beyond direct production controller assertions | evidence=logs/runtime_group6.json:T13_blocker` |
+| `T16 | NOT_VERIFIED | expected=Wind edge case requires timed/future-overlap/VFX production evidence | actual=not executed beyond direct production controller assertions | evidence=logs/runtime_group6.json:T16_blocker` |
+| `T17 | NOT_VERIFIED | expected=Wind edge case requires timed/future-overlap/VFX production evidence | actual=not executed beyond direct production controller assertions | evidence=logs/runtime_group6.json:T17_blocker` |
+| `T18 | NOT_VERIFIED | expected=Wind edge case requires timed/future-overlap/VFX production evidence | actual=not executed beyond direct production controller assertions | evidence=logs/runtime_group6.json:T18_blocker` |
+| `T19 | NOT_VERIFIED | expected=Wind edge case requires timed/future-overlap/VFX production evidence | actual=not executed beyond direct production controller assertions | evidence=logs/runtime_group6.json:T19_blocker` |
+| `T20 | NOT_VERIFIED | expected=natural Shard_05 lifecycle through shared reward chain | actual=wind_progress_state=SHARD_05_AVAILABLE slot_revealed=true available=true; actual Player interaction/reward overlay not completed | evidence=logs/runtime_group6.json:T20_partial` |
+| `T21 | PASS | expected=Spark locked before Shard_05 completion | actual=state=LOCKED | evidence=logs/runtime_group6.json:T21` |
+| `T22 | NOT_VERIFIED | expected=Spark matrix/natural Shard_06 lifecycle with production reward prerequisites | actual=not executed because actual Shard_05 shared reward lifecycle was not completed | evidence=logs/runtime_group6.json:T22_blocker` |
+| `T23 | NOT_VERIFIED | expected=Spark matrix/natural Shard_06 lifecycle with production reward prerequisites | actual=not executed because actual Shard_05 shared reward lifecycle was not completed | evidence=logs/runtime_group6.json:T23_blocker` |
+| `T24 | NOT_VERIFIED | expected=Spark matrix/natural Shard_06 lifecycle with production reward prerequisites | actual=not executed because actual Shard_05 shared reward lifecycle was not completed | evidence=logs/runtime_group6.json:T24_blocker` |
+| `T25 | NOT_VERIFIED | expected=Spark matrix/natural Shard_06 lifecycle with production reward prerequisites | actual=not executed because actual Shard_05 shared reward lifecycle was not completed | evidence=logs/runtime_group6.json:T25_blocker` |
+| `T26 | NOT_VERIFIED | expected=Spark matrix/natural Shard_06 lifecycle with production reward prerequisites | actual=not executed because actual Shard_05 shared reward lifecycle was not completed | evidence=logs/runtime_group6.json:T26_blocker` |
+| `T27 | NOT_VERIFIED | expected=Spark matrix/natural Shard_06 lifecycle with production reward prerequisites | actual=not executed because actual Shard_05 shared reward lifecycle was not completed | evidence=logs/runtime_group6.json:T27_blocker` |
+| `T28 | PASS | expected=Meadow locked before Shard_06 reward | actual=state=LOCKED | evidence=logs/runtime_group6.json:T28` |
+| `T29 | NOT_VERIFIED | expected=Meadow permutations/edge cases/natural Shard_07 lifecycle | actual=not executed because actual Shard_06 shared reward lifecycle was not completed | evidence=logs/runtime_group6.json:T29_blocker` |
+| `T30 | NOT_VERIFIED | expected=Meadow permutations/edge cases/natural Shard_07 lifecycle | actual=not executed because actual Shard_06 shared reward lifecycle was not completed | evidence=logs/runtime_group6.json:T30_blocker` |
+| `T31 | NOT_VERIFIED | expected=Meadow permutations/edge cases/natural Shard_07 lifecycle | actual=not executed because actual Shard_06 shared reward lifecycle was not completed | evidence=logs/runtime_group6.json:T31_blocker` |
+| `T32 | NOT_VERIFIED | expected=Meadow permutations/edge cases/natural Shard_07 lifecycle | actual=not executed because actual Shard_06 shared reward lifecycle was not completed | evidence=logs/runtime_group6.json:T32_blocker` |
+| `T33 | NOT_VERIFIED | expected=Meadow permutations/edge cases/natural Shard_07 lifecycle | actual=not executed because actual Shard_06 shared reward lifecycle was not completed | evidence=logs/runtime_group6.json:T33_blocker` |
+| `T34 | NOT_VERIFIED | expected=Meadow permutations/edge cases/natural Shard_07 lifecycle | actual=not executed because actual Shard_06 shared reward lifecycle was not completed | evidence=logs/runtime_group6.json:T34_blocker` |
+| `T35 | PASS | expected=E1->E2->E5 monotonic progression rejects stale lower phase | actual=phase=E5 generation=4 | evidence=logs/runtime_group6.json:T35` |
+| `T36 | NOT_VERIFIED | expected=move/camera during environment phases has no lock | actual=no production movement/camera route driven while phases tween | evidence=logs/runtime_group6.json:T36_blocker` |
+| `T37 | NOT_VERIFIED | expected=optional VFX disabled still permits logical flow | actual=no missing-VFX runtime variant executed | evidence=logs/runtime_group6.json:T37_blocker` |
+| `T38 | PASS | expected=finale early arrival before rewards does not start text/portal | actual=state_before=0 state_after=0 | evidence=logs/runtime_group6.json:T38` |
+| `T39 | NOT_VERIFIED | expected=finale text/overlay/control/duplicate close matrix | actual=not executed because actual all_rewards_completed reward chain not reached | evidence=logs/runtime_group6.json:T39_blocker` |
+| `T40 | NOT_VERIFIED | expected=finale text/overlay/control/duplicate close matrix | actual=not executed because actual all_rewards_completed reward chain not reached | evidence=logs/runtime_group6.json:T40_blocker` |
+| `T41 | NOT_VERIFIED | expected=finale text/overlay/control/duplicate close matrix | actual=not executed because actual all_rewards_completed reward chain not reached | evidence=logs/runtime_group6.json:T41_blocker` |
+| `T42 | NOT_VERIFIED | expected=finale text/overlay/control/duplicate close matrix | actual=not executed because actual all_rewards_completed reward chain not reached | evidence=logs/runtime_group6.json:T42_blocker` |
+| `T43 | NOT_VERIFIED | expected=finale text/overlay/control/duplicate close matrix | actual=not executed because actual all_rewards_completed reward chain not reached | evidence=logs/runtime_group6.json:T43_blocker` |
+| `T44 | NOT_VERIFIED | expected=finale text/overlay/control/duplicate close matrix | actual=not executed because actual all_rewards_completed reward chain not reached | evidence=logs/runtime_group6.json:T44_blocker` |
+| `T45 | PASS | expected=Portal exact config Level_04 AUTO_ENTER no confirmation 1.8s | actual=target=res://scenes/levels/Level_04.tscn entry=0 confirm=false duration=1.80 | evidence=logs/runtime_group6.json:T45` |
+| `T46 | NOT_VERIFIED | expected=portal activation/completion/overlap/failure matrix using shared LevelPortal | actual=not executed because finale/reward chain did not naturally activate portal | evidence=logs/runtime_group6.json:T46_blocker` |
+| `T47 | NOT_VERIFIED | expected=portal activation/completion/overlap/failure matrix using shared LevelPortal | actual=not executed because finale/reward chain did not naturally activate portal | evidence=logs/runtime_group6.json:T47_blocker` |
+| `T48 | NOT_VERIFIED | expected=portal activation/completion/overlap/failure matrix using shared LevelPortal | actual=not executed because finale/reward chain did not naturally activate portal | evidence=logs/runtime_group6.json:T48_blocker` |
+| `T49 | NOT_VERIFIED | expected=portal activation/completion/overlap/failure matrix using shared LevelPortal | actual=not executed because finale/reward chain did not naturally activate portal | evidence=logs/runtime_group6.json:T49_blocker` |
+| `T50 | NOT_VERIFIED | expected=portal activation/completion/overlap/failure matrix using shared LevelPortal | actual=not executed because finale/reward chain did not naturally activate portal | evidence=logs/runtime_group6.json:T50_blocker` |
+| `T51 | PASS | expected=unknown/future puzzle IDs do not mutate macro state | actual=macro=SHARD_05_AVAILABLE completed_shards=[] | evidence=logs/runtime_group6.json:T51` |
+| `T52 | PASS | expected=fresh instances return clean initial macro/E0 state | actual=states=["WIND_TRACE_ACTIVE/E0", "WIND_TRACE_ACTIVE/E0", "WIND_TRACE_ACTIVE/E0"] | evidence=logs/runtime_group6.json:T52` |
 
-### Final status for this handoff
+## Runtime Coverage Notes
 
-`CORRECTION REQUIRED — GROUP 6 FACTUAL P0 NOT COMPLETE`
+- Route evidence: `T03 NOT_VERIFIED`; the headless harness did not drive actual `CharacterBody3D` production input through P00–P16, and teleporting was not used as route proof.
+- Recovery evidence: `T05` through `T08` remain `NOT_VERIFIED`; no production falling/overlap route was driven through every RA recovery trigger.
+- Wind evidence: partial production-controller runtime evidence exists for `T12`, `T14`, and `T15`; timed fallback, future-overlap, leave/re-enter, and missing-VFX Wind rows remain `NOT_VERIFIED`.
+- Spark evidence: locked precondition `T21` passed; Spark matrix and natural Shard_06 reward lifecycle rows remain `NOT_VERIFIED` because the actual Shard_05 shared reward chain was not completed by Player interaction.
+- Meadow evidence: locked precondition `T28` passed; six-petal permutations and Shard_07 lifecycle remain `NOT_VERIFIED` because prerequisite shared reward progression was not naturally completed.
+- Natural reward lifecycle evidence: Shard_05 reveal/availability after Wind was observed as partial `T20` evidence, but actual Player interaction and shared reward overlay completion were not completed; Shard_06 and Shard_07 natural chains remain `NOT_VERIFIED`.
+- E0–E6 evidence: E0 startup and E1→E2→E5 monotonic progression were observed; movement/camera-during-phase and optional VFX disabled variants remain `NOT_VERIFIED`.
+- Finale evidence: early-arrival rejection `T38` passed; main text overlay, controls lock/restore, duplicate close, and natural synthesis rows remain `NOT_VERIFIED`.
+- Portal evidence: exact shared `LevelPortal` config `T45` passed, including `Level_04`, `AUTO_ENTER`, confirmation disabled, and `activation_duration = 1.8`; natural activation/overlap/failure/retry rows remain `NOT_VERIFIED`.
+- Reload evidence: `T52` passed for fresh instance reset to `WIND_TRACE_ACTIVE/E0`.
+- Duration evidence: `NOT_VERIFIED`; uninterrupted natural-flow timestamps were not recorded because T01–T50 natural runtime chain is incomplete.
 
-## Current Status Counts
-
-- ST table status: `1 PASS`, `0 FAIL`, `18 NOT VERIFIED`.
-- T table status: `0 PASS`, `0 FAIL`, `52 NOT VERIFIED`.
-- Group 6 factual P0: `NOT COMPLETE`.
-- Group 6 continued after import classification: `No`; although the import-cache blocker resolved, the mandatory full factual ST/T matrices were not executed in this local rerun, so Group 6 remains incomplete.
-- Rendered runtime evidence: `NOT VERIFIED — renderer unavailable`.
-- DOCX page-render inspection: `NOT VERIFIED — office/page renderer unavailable`.
-- Final status: `CORRECTION REQUIRED — GROUP 6 FACTUAL P0 NOT COMPLETE`.
-
-## Required Commands Run
-
-| Command | Result | Evidence |
-|---|---:|---|
-| `timeout 600s godot --headless --editor --quit --path .` | exit `0` | `/tmp/level03_import_regen_stdout.log`, `/tmp/level03_import_regen_stderr.log` |
-| `godot --headless --path . --script /tmp/level03_group6/gd/smoke.gd` | exit `0`; `loaded=true`; `root=Level_03 children=9` | `/tmp/level03_after_import_smoke_stdout.log`, `/tmp/level03_after_import_smoke_stderr.log` |
-| `godot --headless --path . --quit --check-only scenes/levels/Level_03.tscn` | exit `0` | `/tmp/level03_after_import_check_stdout.log`, `/tmp/level03_after_import_check_stderr.log` |
-| `timeout 60s godot --headless --path . --quit` | exit `0` | `/tmp/level03_after_import_startup_stdout.log`, `/tmp/level03_after_import_startup_stderr.log` |
-
-## ST-01–ST-19 Table
-
-| TEST_ID | Status | Expected | Actual | Evidence |
-|---|---|---|---|---|
-| ST-01 | PASS | Godot headless project check has no parser/import errors | After import regeneration, startup and check-only exit `0` with zero `ERROR:`, `SCRIPT ERROR:`, parse errors, failed resource loads, or script-load errors | `/tmp/level03_after_import_startup_*`, `/tmp/level03_after_import_check_*` |
-| ST-02 | NOT_VERIFIED | Every local PackedScene loads, with full Level_03 PackedScene coverage and dedicated assertions | Previous blocker resolved after import regeneration; production smoke load is clean, but the full ST-02 every-local-PackedScene assertion set was not executed in this classification task | `/tmp/level03_after_import_smoke_*` |
-| ST-03 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Not executed in this import-classification task; no PASS claimed from clean smoke/startup | `/tmp/level03_after_import_*` |
-| ST-04 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Not executed in this import-classification task; no PASS claimed from clean smoke/startup | `/tmp/level03_after_import_*` |
-| ST-05 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Not executed in this import-classification task; no PASS claimed from clean smoke/startup | `/tmp/level03_after_import_*` |
-| ST-06 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Not executed in this import-classification task; no PASS claimed from clean smoke/startup | `/tmp/level03_after_import_*` |
-| ST-07 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Not executed in this import-classification task; no PASS claimed from clean smoke/startup | `/tmp/level03_after_import_*` |
-| ST-08 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Not executed in this import-classification task; no PASS claimed from clean smoke/startup | `/tmp/level03_after_import_*` |
-| ST-09 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Not executed in this import-classification task; no PASS claimed from clean smoke/startup | `/tmp/level03_after_import_*` |
-| ST-10 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Not executed in this import-classification task; no PASS claimed from clean smoke/startup | `/tmp/level03_after_import_*` |
-| ST-11 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Not executed in this import-classification task; no PASS claimed from clean smoke/startup | `/tmp/level03_after_import_*` |
-| ST-12 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Not executed in this import-classification task; no PASS claimed from clean smoke/startup | `/tmp/level03_after_import_*` |
-| ST-13 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Not executed in this import-classification task; no PASS claimed from clean smoke/startup | `/tmp/level03_after_import_*` |
-| ST-14 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Not executed in this import-classification task; no PASS claimed from clean smoke/startup | `/tmp/level03_after_import_*` |
-| ST-15 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Not executed in this import-classification task; no PASS claimed from clean smoke/startup | `/tmp/level03_after_import_*` |
-| ST-16 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Not executed in this import-classification task; no PASS claimed from clean smoke/startup | `/tmp/level03_after_import_*` |
-| ST-17 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Not executed in this import-classification task; no PASS claimed from clean smoke/startup | `/tmp/level03_after_import_*` |
-| ST-18 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Not executed in this import-classification task; no PASS claimed from clean smoke/startup | `/tmp/level03_after_import_*` |
-| ST-19 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Not executed in this import-classification task; no PASS claimed from clean smoke/startup | `/tmp/level03_after_import_*` |
-
-## T01–T52 Table
-
-| TEST_ID | Status | Expected | Actual | Evidence |
-|---|---|---|---|---|
-| T01 | NOT_VERIFIED | Production Level_03 load, startup prepare/commit, mandatory dependency validation, no partial mutation before prepare success, retry after injected prepare failure | Import-cache blocker resolved and production scene smoke-loaded cleanly; full T01 prepare/commit/failure-injection assertions were not executed, so no PASS is claimed | `/tmp/level03_after_import_smoke_*`, `/tmp/level03_after_import_startup_*` |
-| T02 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T03 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T04 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T05 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T06 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T07 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T08 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T09 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T10 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T11 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T12 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T13 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T14 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T15 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T16 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T17 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T18 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T19 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T20 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T21 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T22 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T23 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T24 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T25 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T26 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T27 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T28 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T29 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T30 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T31 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T32 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T33 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T34 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T35 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T36 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T37 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T38 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T39 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T40 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T41 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T42 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T43 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T44 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T45 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T46 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T47 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T48 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T49 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T50 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T51 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-| T52 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
-
-## Runtime Matrices Still Not Executed
-
-The following mandatory Group 6 items remain `NOT_VERIFIED`: full ST-02 every-local-PackedScene coverage, ST-03 through ST-19, T01 prepare/commit/failure-injection details, P00–P16 route traversal with production input, CP0–CP4 camera readability, RA0–RA6 recovery volumes, Wind Trace matrix, natural Shard_05 reward lifecycle, Spark matrix, natural Shard_06 reward lifecycle, Meadow six permutations and edge cases, natural Shard_07 reward lifecycle, E0–E6 environment sequence, finale matrix, portal failure/retry and Level_04 transition, invalid ID/order guards, reload matrix, and duration run.
-
-## Rendering Gates
+## Rendering Checks
 
 `RENDERED RUNTIME EVIDENCE: NOT VERIFIED — renderer unavailable`
 
-Checks after import regeneration observed empty `DISPLAY` and `WAYLAND_DISPLAY`; X11 failed with missing `libXcursor.so.1`; Wayland failed with missing `libwayland-client.so.0`; no package installation was performed and no synthetic screenshots were created.
+- `DISPLAY` was empty.
+- `WAYLAND_DISPLAY` was empty.
+- No virtual display/capture tool was used.
+- No packages were installed.
+- No synthetic screenshots were created.
 
-## DOCX Integrity / Semantic Status
+## DOCX Status
 
-The DOCX at `/workspace/Level_03_Greybox_Implementation_Summary.docx` was regenerated from this Markdown semantic source after the import-cache classification. ZIP integrity, `[Content_Types].xml`, package relationships, `word/document.xml`, styles, extracted text, and semantic marker checks passed. Office/page rendering remains `DOCX PAGE RENDER: NOT VERIFIED — renderer unavailable`. DOCX was regenerated outside the repository at `/workspace/Level_03_Greybox_Implementation_Summary.docx` from the Markdown semantic source using a minimal local DOCX package writer because `pandoc`/office tooling is unavailable.
-
-## Changed Files
-
-- `docs/development/Level_03_Greybox_Implementation_Summary.md`
-- `/workspace/Level_03_Greybox_Implementation_Summary.docx` regenerated outside the repository; not committed unless explicitly requested.
+- External DOCX regenerated from this Markdown semantic source at `/workspace/Level_03_Greybox_Implementation_Summary.docx`.
+- DOCX checks passed: ZIP integrity, `[Content_Types].xml`, root relationships, `word/document.xml`, `word/styles.xml`, extracted text, and semantic comparison.
+- DOCX is outside the repository and must not be committed.
 
 ## Handoff
 
-- Gameplay implemented in this correction: `No`.
-- Source fixes in this correction: `None`.
+- Gameplay implemented in this continuation: `No`.
+- New source fixes in this continuation: `None`; the existing PR #111 portal duration source fix was verified present.
 - Godot project structure preserved: `Yes`.
-- Repository harness files added: `No`.
-- Predecessor PR: `#109`.
-- Push proof: `NOT VERIFIED — no push performed per Producer instruction`.
-- Manual publication handoff: commit locally, then Producer may create branch/PR/push outside Codex if desired.
+- Repository harness/log/import/DOCX artifacts added: `No`.
+- Push proof: `NOT VERIFIED — no push performed`.
+- Manual publication handoff: commit locally, then manually publish this continuation into existing PR #111.
 
 ## Final Status
 
