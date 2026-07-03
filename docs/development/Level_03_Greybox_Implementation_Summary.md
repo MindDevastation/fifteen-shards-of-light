@@ -2,155 +2,146 @@
 
 ## Correction Identity
 
-- Branch: `work`
-- Current PR: `#108`
-- Base PR: `#107`
-- Correction path: factual Group 6 attempt on current PR #108 content
+- Branch: `codex/classify-level03-load-blocker`
+- Predecessor PR: `#109`
+- New PR for this task: `created from this branch after commit`
+- Implementation PR: `#107`
+- Truthful summary correction PR: `#108`
 - Approved Reference: `docs/design/Level_03_Greybox_Development_Reference_v1.1.md`
 - Production scene under review: `res://scenes/levels/Level_03.tscn`
-- Local head before this summary update: `8e93dc653d34a0256609e18cdca966f8ff119db4`
 - Temporary harness location: `/tmp/level03_group6` (outside repository)
 
-## Producer Correction Status
+## Classification After Full Import Regeneration
 
-This update does not claim Group 6 acceptance. A real temporary harness was created outside the repository and attempted to load the production Level_03 scene. The factual production load emitted missing-resource, parser, and script-load errors before the requested runtime matrices could be executed. Therefore only the checks actually run are recorded below; remaining rows stay `NOT_VERIFIED` rather than being converted to PASS from startup smoke.
+Classification: **A. IMPORT CACHE RESOLVED**.
+
+The PR #109 blocker is reclassified as an environment/import-cache blocker rather than a proven source/resource defect. The required full editor import regeneration completed with exit `0`. After regeneration, the production `Level_03.tscn` smoke load, `check-only` command, and startup command emitted zero `ERROR:`, zero `SCRIPT ERROR:`, zero parse errors, zero script-load errors, and zero failed-resource loads. The previous missing `.godot/imported/...` resources disappeared from the post-import production load logs.
+
+No source fix was applied. Because the import-cache blocker resolved but the full ST-02 and T01 factual assertion sets were not executed, `ST-02` and `T01` are reclassified from `FAIL` to `NOT_VERIFIED`, not PASS.
+
+## Before / After Error Counts
+
+| Phase | Command | Exit | ERROR | SCRIPT ERROR | Parse Error | Failed loading resource | Failed to load script | Evidence |
+|---|---|---:|---:|---:|---:|---:|---:|---|
+| Before import regeneration, from PR #109 record | `godot --headless --path . --script /tmp/level03_group6/gd/smoke.gd` | `0` | `183` combined `ERROR` / `SCRIPT ERROR` | included in `183` | present | present | present | prior `/tmp/level03_group6/logs/level03_load.log` and prior summary |
+| Full import regeneration | `timeout 600s godot --headless --editor --quit --path .` | `0` | `0` stderr errors | `0` | `0` | `0` | `0` | `/tmp/level03_import_regen_stdout.log`, `/tmp/level03_import_regen_stderr.log` |
+| After import smoke | `godot --headless --path . --script /tmp/level03_group6/gd/smoke.gd` | `0` | `0` | `0` | `0` | `0` | `0` | `/tmp/level03_after_import_smoke_stdout.log`, `/tmp/level03_after_import_smoke_stderr.log` |
+| After import Level_03 check-only | `godot --headless --path . --quit --check-only scenes/levels/Level_03.tscn` | `0` | `0` | `0` | `0` | `0` | `0` | `/tmp/level03_after_import_check_stdout.log`, `/tmp/level03_after_import_check_stderr.log` |
+| After import startup | `timeout 60s godot --headless --path . --quit` | `0` | `0` | `0` | `0` | `0` | `0` | `/tmp/level03_after_import_startup_stdout.log`, `/tmp/level03_after_import_startup_stderr.log` |
 
 ## Current Status Counts
 
-- ST table status: `1 PASS`, `1 FAIL`, `17 NOT VERIFIED`.
-- T table status: `0 PASS`, `1 FAIL`, `51 NOT VERIFIED`.
+- ST table status: `1 PASS`, `0 FAIL`, `18 NOT VERIFIED`.
+- T table status: `0 PASS`, `0 FAIL`, `52 NOT VERIFIED`.
 - Group 6 factual P0: `NOT COMPLETE`.
+- Group 6 continued after import classification: `No`; this task stopped at blocker classification and did not execute the full factual ST/T matrices.
 - Rendered runtime evidence: `NOT VERIFIED — renderer unavailable`.
 - DOCX page-render inspection: `NOT VERIFIED — office/page renderer unavailable`.
-- Final status: `CORRECTION REQUIRED` because at least one factual ST/T gate failed and many mandatory runtime tests remain not verified.
+- Final status: `CORRECTION REQUIRED — IMPORT CACHE RESOLVED, GROUP 6 FACTUAL P0 NOT COMPLETE`.
 
-## Harness and Commands
+## Required Commands Run
 
 | Command | Result | Evidence |
 |---|---:|---|
-| `godot --headless --version` | exit `0` | `/tmp/level03_group6/logs/godot_version.log` |
-| `godot --headless --path . --quit` | exit `0` | `/tmp/level03_group6/logs/godot_startup.log` |
-| `godot --headless --path . --quit --check-only` | exit `0` | `/tmp/level03_group6/logs/godot_check_only.log` |
-| `godot --headless --path . --script /tmp/level03_group6/gd/smoke.gd` | exit `0` | `/tmp/level03_group6/logs/level03_load.log` |
-
-## Production Load Blocker Evidence
-
-- Godot version: `4.6.2.stable.official.71f334935`.
-- Production `Level_03.tscn` load script exit code: `0` (Godot still returned 0).
-- The load log contains `183` `ERROR:` / `SCRIPT ERROR:` entries, so the production dependency gate is not clean.
-- Representative missing or failed resources from `/tmp/level03_group6/logs/level03_load.log`:
-  - `res://.godot/imported/Character_Base_Animations.glb`
-  - `res://.godot/imported/CormorantGaramond-SemiBold.otf`
-  - `res://.godot/imported/CormorantGaramond-SemiBoldItalic.otf`
-  - `res://.godot/imported/Shoul_Shard.glb`
-  - `res://.godot/imported/SoulOrb_Core.glb`
-  - `res://.godot/imported/SoulOrb_Petal.glb`
-  - `res://.godot/imported/SoulOrb_Ring_Inner.glb`
-  - `res://.godot/imported/button_hovered.png`
-  - `res://.godot/imported/button_idle.png`
-  - `res://.godot/imported/button_pressed.png`
-  - `res://.godot/imported/soul_shard_halo.png`
-  - `res://.godot/imported/soul_shard_light_arc.png`
-  - `res://.godot/imported/soul_shard_light_petal.png`
-  - `res://.godot/imported/soul_shard_spark.png`
-  - `res://.godot/imported/vine_leaf.png`
-
-Because production load emitted parser/resource errors, the harness did not fabricate movement, puzzle, reward, finale, portal, reload, or duration PASS results.
+| `timeout 600s godot --headless --editor --quit --path .` | exit `0` | `/tmp/level03_import_regen_stdout.log`, `/tmp/level03_import_regen_stderr.log` |
+| `godot --headless --path . --script /tmp/level03_group6/gd/smoke.gd` | exit `0`; `loaded=true`; `root=Level_03 children=9` | `/tmp/level03_after_import_smoke_stdout.log`, `/tmp/level03_after_import_smoke_stderr.log` |
+| `godot --headless --path . --quit --check-only scenes/levels/Level_03.tscn` | exit `0` | `/tmp/level03_after_import_check_stdout.log`, `/tmp/level03_after_import_check_stderr.log` |
+| `timeout 60s godot --headless --path . --quit` | exit `0` | `/tmp/level03_after_import_startup_stdout.log`, `/tmp/level03_after_import_startup_stderr.log` |
 
 ## ST-01–ST-19 Table
 
 | TEST_ID | Status | Expected | Actual | Evidence |
 |---|---|---|---|---|
-| ST-01 | PASS | Godot headless project check has no parser/import errors | rc=0, parse_errors=0, script_errors=0 | logs/godot_startup.log |
-| ST-02 | FAIL | Every Level_03 local PackedScene and production Level_03 load without missing-resource/parser errors | Level_03 load rc=0, errors=183, missing_resources=['res://.godot/imported/Character_Base_Animations.glb', 'res://.godot/imported/CormorantGaramond-SemiBold.otf', 'res://.godot/imported/CormorantGaramond-SemiBoldItalic.otf', 'res://.godot/imported/Shoul_Shard.glb', 'res://.godot/imported/SoulOrb_Core.glb', 'res://.godot/imported/SoulOrb_Petal.glb', 'res://.godot/imported/SoulOrb_Ring_Inner.glb', 'res://.godot/imported/button_hovered.png'] | logs/level03_load.log |
-| ST-03 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Blocked after production scene load emitted parser/missing-resource errors; no PASS claimed | logs/level03_load.log |
-| ST-04 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Blocked after production scene load emitted parser/missing-resource errors; no PASS claimed | logs/level03_load.log |
-| ST-05 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Blocked after production scene load emitted parser/missing-resource errors; no PASS claimed | logs/level03_load.log |
-| ST-06 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Blocked after production scene load emitted parser/missing-resource errors; no PASS claimed | logs/level03_load.log |
-| ST-07 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Blocked after production scene load emitted parser/missing-resource errors; no PASS claimed | logs/level03_load.log |
-| ST-08 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Blocked after production scene load emitted parser/missing-resource errors; no PASS claimed | logs/level03_load.log |
-| ST-09 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Blocked after production scene load emitted parser/missing-resource errors; no PASS claimed | logs/level03_load.log |
-| ST-10 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Blocked after production scene load emitted parser/missing-resource errors; no PASS claimed | logs/level03_load.log |
-| ST-11 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Blocked after production scene load emitted parser/missing-resource errors; no PASS claimed | logs/level03_load.log |
-| ST-12 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Blocked after production scene load emitted parser/missing-resource errors; no PASS claimed | logs/level03_load.log |
-| ST-13 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Blocked after production scene load emitted parser/missing-resource errors; no PASS claimed | logs/level03_load.log |
-| ST-14 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Blocked after production scene load emitted parser/missing-resource errors; no PASS claimed | logs/level03_load.log |
-| ST-15 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Blocked after production scene load emitted parser/missing-resource errors; no PASS claimed | logs/level03_load.log |
-| ST-16 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Blocked after production scene load emitted parser/missing-resource errors; no PASS claimed | logs/level03_load.log |
-| ST-17 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Blocked after production scene load emitted parser/missing-resource errors; no PASS claimed | logs/level03_load.log |
-| ST-18 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Blocked after production scene load emitted parser/missing-resource errors; no PASS claimed | logs/level03_load.log |
-| ST-19 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Blocked after production scene load emitted parser/missing-resource errors; no PASS claimed | logs/level03_load.log |
+| ST-01 | PASS | Godot headless project check has no parser/import errors | After import regeneration, startup and check-only exit `0` with zero `ERROR:`, `SCRIPT ERROR:`, parse errors, failed resource loads, or script-load errors | `/tmp/level03_after_import_startup_*`, `/tmp/level03_after_import_check_*` |
+| ST-02 | NOT_VERIFIED | Every local PackedScene loads, with full Level_03 PackedScene coverage and dedicated assertions | Previous blocker resolved after import regeneration; production smoke load is clean, but the full ST-02 every-local-PackedScene assertion set was not executed in this classification task | `/tmp/level03_after_import_smoke_*` |
+| ST-03 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Not executed in this import-classification task; no PASS claimed from clean smoke/startup | `/tmp/level03_after_import_*` |
+| ST-04 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Not executed in this import-classification task; no PASS claimed from clean smoke/startup | `/tmp/level03_after_import_*` |
+| ST-05 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Not executed in this import-classification task; no PASS claimed from clean smoke/startup | `/tmp/level03_after_import_*` |
+| ST-06 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Not executed in this import-classification task; no PASS claimed from clean smoke/startup | `/tmp/level03_after_import_*` |
+| ST-07 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Not executed in this import-classification task; no PASS claimed from clean smoke/startup | `/tmp/level03_after_import_*` |
+| ST-08 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Not executed in this import-classification task; no PASS claimed from clean smoke/startup | `/tmp/level03_after_import_*` |
+| ST-09 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Not executed in this import-classification task; no PASS claimed from clean smoke/startup | `/tmp/level03_after_import_*` |
+| ST-10 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Not executed in this import-classification task; no PASS claimed from clean smoke/startup | `/tmp/level03_after_import_*` |
+| ST-11 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Not executed in this import-classification task; no PASS claimed from clean smoke/startup | `/tmp/level03_after_import_*` |
+| ST-12 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Not executed in this import-classification task; no PASS claimed from clean smoke/startup | `/tmp/level03_after_import_*` |
+| ST-13 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Not executed in this import-classification task; no PASS claimed from clean smoke/startup | `/tmp/level03_after_import_*` |
+| ST-14 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Not executed in this import-classification task; no PASS claimed from clean smoke/startup | `/tmp/level03_after_import_*` |
+| ST-15 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Not executed in this import-classification task; no PASS claimed from clean smoke/startup | `/tmp/level03_after_import_*` |
+| ST-16 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Not executed in this import-classification task; no PASS claimed from clean smoke/startup | `/tmp/level03_after_import_*` |
+| ST-17 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Not executed in this import-classification task; no PASS claimed from clean smoke/startup | `/tmp/level03_after_import_*` |
+| ST-18 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Not executed in this import-classification task; no PASS claimed from clean smoke/startup | `/tmp/level03_after_import_*` |
+| ST-19 | NOT_VERIFIED | Reference-specific static assertion checked with dedicated evidence | Not executed in this import-classification task; no PASS claimed from clean smoke/startup | `/tmp/level03_after_import_*` |
 
 ## T01–T52 Table
 
 | TEST_ID | Status | Expected | Actual | Evidence |
 |---|---|---|---|---|
-| T01 | FAIL | Production Level_03 load, startup prepare/commit, dependencies valid, retry after injected prepare failure | production load produced errors=183; first blocker missing resources/parser errors before prepare/commit could be factually validated | logs/level03_load.log |
-| T02 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T03 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T04 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T05 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T06 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T07 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T08 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T09 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T10 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T11 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T12 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T13 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T14 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T15 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T16 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T17 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T18 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T19 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T20 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T21 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T22 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T23 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T24 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T25 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T26 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T27 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T28 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T29 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T30 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T31 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T32 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T33 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T34 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T35 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T36 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T37 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T38 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T39 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T40 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T41 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T42 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T43 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T44 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T45 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T46 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T47 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T48 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T49 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T50 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T51 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
-| T52 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed because T01 production scene load/dependency gate failed; no startup smoke PASS substituted | logs/level03_load.log |
+| T01 | NOT_VERIFIED | Production Level_03 load, startup prepare/commit, mandatory dependency validation, no partial mutation before prepare success, retry after injected prepare failure | Import-cache blocker resolved and production scene smoke-loaded cleanly; full T01 prepare/commit/failure-injection assertions were not executed, so no PASS is claimed | `/tmp/level03_after_import_smoke_*`, `/tmp/level03_after_import_startup_*` |
+| T02 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T03 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T04 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T05 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T06 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T07 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T08 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T09 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T10 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T11 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T12 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T13 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T14 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T15 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T16 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T17 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T18 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T19 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T20 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T21 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T22 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T23 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T24 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T25 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T26 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T27 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T28 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T29 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T30 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T31 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T32 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T33 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T34 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T35 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T36 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T37 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T38 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T39 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T40 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T41 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T42 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T43 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T44 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T45 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T46 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T47 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T48 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T49 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T50 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T51 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
+| T52 | NOT_VERIFIED | Production runtime behavior from reference executed with test-specific evidence | Not executed in this import-classification task because Group 6 did not continue beyond blocker classification | `/tmp/level03_after_import_*` |
 
-## Runtime Matrices Not Executed After Blocker
+## Runtime Matrices Still Not Executed
 
-The following mandatory items remain `NOT VERIFIED` because the production load/dependency gate failed before deterministic runtime assertions could be made: P00–P16 route traversal with production input, CP0–CP4 camera readability, RA0–RA6 recovery volumes, Wind Trace matrix, natural Shard_05 reward lifecycle, Spark matrix, natural Shard_06 reward lifecycle, Meadow six permutations and edge cases, natural Shard_07 reward lifecycle, E0–E6 environment sequence, finale matrix, portal failure/retry and Level_04 transition, invalid ID/order guards, reload matrix, and duration run.
+The following mandatory Group 6 items remain `NOT_VERIFIED`: full ST-02 every-local-PackedScene coverage, ST-03 through ST-19, T01 prepare/commit/failure-injection details, P00–P16 route traversal with production input, CP0–CP4 camera readability, RA0–RA6 recovery volumes, Wind Trace matrix, natural Shard_05 reward lifecycle, Spark matrix, natural Shard_06 reward lifecycle, Meadow six permutations and edge cases, natural Shard_07 reward lifecycle, E0–E6 environment sequence, finale matrix, portal failure/retry and Level_04 transition, invalid ID/order guards, reload matrix, and duration run.
 
 ## Rendering Gates
 
 `RENDERED RUNTIME EVIDENCE: NOT VERIFIED — renderer unavailable`
 
-Checks in `/tmp/level03_group6/logs/rendering_gates.log` observed empty `DISPLAY` and `WAYLAND_DISPLAY`; X11 failed with missing `libXcursor.so.1`; Wayland failed with missing `libwayland-client.so.0`; no package installation was performed and no synthetic screenshots were created.
+Checks after import regeneration observed empty `DISPLAY` and `WAYLAND_DISPLAY`; X11 failed with missing `libXcursor.so.1`; Wayland failed with missing `libwayland-client.so.0`; no package installation was performed and no synthetic screenshots were created.
 
 ## DOCX Integrity / Semantic Status
 
-The DOCX at `/workspace/Level_03_Greybox_Implementation_Summary.docx` was regenerated from this Markdown semantic source after the factual blocker was recorded. ZIP integrity and required DOCX parts are checked by the local validation command. Office/page rendering remains `DOCX PAGE RENDER: NOT VERIFIED — renderer unavailable`.
+The DOCX at `/workspace/Level_03_Greybox_Implementation_Summary.docx` was regenerated from this Markdown semantic source after the import-cache classification. ZIP integrity, `[Content_Types].xml`, package relationships, `word/document.xml`, styles, extracted text, and semantic marker checks passed. Office/page rendering remains `DOCX PAGE RENDER: NOT VERIFIED — renderer unavailable`.
 
 ## Changed Files
 
@@ -160,11 +151,12 @@ The DOCX at `/workspace/Level_03_Greybox_Implementation_Summary.docx` was regene
 ## Handoff
 
 - Gameplay implemented in this correction: `No`.
-- Source fixes in this correction: `None`; this run stopped at factual evidence/documentation because the user forbade rematerialization repair and the blocker appears to involve broader missing shared/imported assets.
+- Source fixes in this correction: `None`.
 - Godot project structure preserved: `Yes`.
 - Repository harness files added: `No`.
+- Predecessor PR: `#109`.
 - Push proof: `NOT VERIFIED`.
 
 ## Final Status
 
-`CORRECTION REQUIRED`
+`CORRECTION REQUIRED — IMPORT CACHE RESOLVED, GROUP 6 FACTUAL P0 NOT COMPLETE`
