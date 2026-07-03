@@ -41,7 +41,7 @@ func initialize_level() -> bool:
 		if not slot.shard_collected.is_connected(_on_shard_collected):
 			slot.shard_collected.connect(_on_shard_collected)
 		if reward_controller != null and reward_controller.has_method("register_shard"):
-			var shard := slot.get_soul_shard()
+			var shard: Node = slot.get_soul_shard()
 			if shard != null:
 				reward_controller.register_shard(shard)
 	var meadow := get_node_or_null(breathing_meadow_path)

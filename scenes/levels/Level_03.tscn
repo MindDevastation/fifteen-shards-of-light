@@ -132,6 +132,18 @@ transform = Transform3D(1,0,0,0,1,0,0,0,1,-4,1.93,18)
 transform = Transform3D(1,0,0,0,1,0,0,0,1,-7,1.95,28.5)
 [node name="RA6" type="Marker3D" parent="MarkerRoot/RecoveryAnchors"]
 transform = Transform3D(1,0,0,0,1,0,0,0,1,6,2.25,47)
+[node name="SafetyRoot" type="Node3D" parent="GameplayRoot"]
+[node name="SoftReturnVolume" type="Area3D" parent="GameplayRoot/SafetyRoot"]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,0,-4,0)
+[node name="Collision" type="CollisionShape3D" parent="GameplayRoot/SafetyRoot/SoftReturnVolume"]
+shape = SubResource("BoxShape3D_soft_return")
+[node name="OutOfBoundsVolume" type="Area3D" parent="GameplayRoot/SafetyRoot"]
+transform = Transform3D(1,0,0,0,1,0,0,0,1,0,-12,0)
+[node name="Collision" type="CollisionShape3D" parent="GameplayRoot/SafetyRoot/OutOfBoundsVolume"]
+shape = SubResource("BoxShape3D_oob")
+[node name="HardBoundaryBelt" type="StaticBody3D" parent="GameplayRoot/SafetyRoot"]
+metadata/level_03_boundary = "hard boundary belt"
+
 [node name="FinalOverlook" type="Node3D" parent="GameplayRoot"]
 [node name="FinalOverlookGate" type="Area3D" parent="GameplayRoot/FinalOverlook"]
 transform = Transform3D(1,0,0,0,1,0,0,0,1,6,1.6,47)

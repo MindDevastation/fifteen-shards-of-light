@@ -87,7 +87,7 @@ func _set_child_monitoring(enabled: bool) -> void:
 		return
 	var stack: Array[Node] = [_soul_shard]
 	while not stack.is_empty():
-		var node := stack.pop_back()
+		var node: Node = stack.pop_back()
 		if node is Area3D:
 			node.monitoring = enabled
 			node.monitorable = enabled
