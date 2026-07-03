@@ -1,32 +1,181 @@
 class_name PlayfulSparkController
 extends Node3D
+
 signal puzzle_completed(puzzle_id: StringName)
 signal solved
+signal spark_hint_requested(stage_index: int, hint_level: int)
+signal spark_hop_started(from_id: StringName, to_id: StringName, generation: int)
+signal spark_hop_settled(to_id: StringName, generation: int)
+
 @export var progress_controller_path: NodePath = NodePath("../../../LevelRuntimeRoot/Level03ProgressController")
+@export var player_path: NodePath = NodePath("../../../PlayerRoot/Player")
+@export var intro_seconds: float = 0.10
+@export var pre_glow_seconds: float = 0.55
+@export var hop_seconds: float = 0.80
+@export var fallback_deadline_seconds: float = 1.20
+@export var settle_seconds: float = 0.65
+@export var first_hint_seconds: float = 15.0
+@export var second_hint_seconds: float = 30.0
+
 const PUZZLE_ID := &"playful_spark"
-const ORDER := [&"Perch_A", &"Perch_B", &"Perch_C"]
-var armed := false
+const ORDER: Array[StringName] = [&"Perch_A", &"Perch_B", &"Perch_C"]
+enum SparkState { LOCKED, INTRO, WAITING_FOR_PERCH, PRE_GLOW, HOPPING, SETTLING, COMPLETED }
+
+var state: SparkState = SparkState.LOCKED
 var index := 0
 var completed := false
-var generation := 0
-var occupied_perch: StringName = &""
+var presentation_generation := 0
+var accepted_terminal_generation := -1
+var _player: Node = null
+var _perches: Dictionary = {}
+var _completed_perches: Array[StringName] = []
+var _armed_once := false
+var _hint_generation := 0
+
+func _ready() -> void:
+	_collect_perches()
+	_set_all_perches_enabled(false)
+
 func arm() -> bool:
-	if completed: return false
-	armed = true; generation += 1; return true
+	if _armed_once or completed or state != SparkState.LOCKED:
+		return false
+	if not _prepare_runtime_contract():
+		return false
+	_armed_once = true
+	_hint_generation += 1
+	state = SparkState.INTRO
+	_start_intro(_hint_generation)
+	return true
+
 func accept_perch(perch_id: StringName) -> void:
-	if not armed or completed: return
-	if occupied_perch == perch_id: return
-	occupied_perch = perch_id
-	if perch_id != ORDER[index]:
-		index = 0; return
+	if state != SparkState.WAITING_FOR_PERCH or completed:
+		return
+	if index >= ORDER.size() or perch_id != ORDER[index]:
+		return
+	if _completed_perches.has(perch_id):
+		return
+	_completed_perches.append(perch_id)
+	_set_all_perches_enabled(false)
+	state = SparkState.PRE_GLOW
+	presentation_generation += 1
+	accepted_terminal_generation = -1
+	var target_id: StringName = ORDER[index]
+	_start_hop_sequence(target_id, presentation_generation)
+
+func clear_occupancy(_perch_id: StringName) -> void:
+	# Leave/re-enter persistence: logical stage remains untouched.
+	pass
+
+func spark_hop_terminal(to_id: StringName, generation: int, via_fallback: bool) -> bool:
+	if state != SparkState.HOPPING or generation != presentation_generation:
+		return false
+	if accepted_terminal_generation == generation:
+		return false
+	if index >= ORDER.size() or to_id != ORDER[index]:
+		return false
+	accepted_terminal_generation = generation
+	state = SparkState.SETTLING
+	_settle_after_delay(to_id, generation, via_fallback)
+	return true
+
+func get_state_name() -> StringName:
+	return StringName(SparkState.keys()[state])
+
+func get_expected_perch_id() -> StringName:
+	if index >= ORDER.size():
+		return &""
+	return ORDER[index]
+
+func get_completed_perches() -> Array[StringName]:
+	return _completed_perches.duplicate()
+
+func _prepare_runtime_contract() -> bool:
+	_player = get_node_or_null(player_path)
+	if _player == null:
+		return false
+	_collect_perches()
+	for id in ORDER:
+		if not _perches.has(id):
+			return false
+		var perch: Node = _perches[id]
+		if not perch.has_method("register_player") or not perch.has_method("set_acceptance_enabled") or not perch.has_method("reevaluate_registered_player_overlap"):
+			return false
+		perch.register_player(_player)
+	return true
+
+func _collect_perches() -> void:
+	_perches.clear()
+	for child in get_children():
+		if child is PlayfulSparkPerch:
+			_perches[child.perch_id] = child
+
+func _start_intro(source_generation: int) -> void:
+	await get_tree().create_timer(intro_seconds).timeout
+	if state != SparkState.INTRO or source_generation != _hint_generation:
+		return
+	state = SparkState.WAITING_FOR_PERCH
+	_enable_expected_perch()
+	_start_hint_timer(source_generation, first_hint_seconds, 1)
+	_start_hint_timer(source_generation, second_hint_seconds, 2)
+
+func _start_hint_timer(source_generation: int, delay: float, level: int) -> void:
+	await get_tree().create_timer(delay).timeout
+	if completed or state == SparkState.LOCKED or source_generation != _hint_generation:
+		return
+	spark_hint_requested.emit(index, level)
+
+func _start_hop_sequence(to_id: StringName, generation: int) -> void:
+	await get_tree().create_timer(pre_glow_seconds).timeout
+	if state != SparkState.PRE_GLOW or generation != presentation_generation:
+		return
+	state = SparkState.HOPPING
+	spark_hop_started.emit(to_id, to_id, generation)
+	_start_real_terminal_timer(to_id, generation)
+	_start_fallback_terminal_timer(to_id, generation)
+
+func _start_real_terminal_timer(to_id: StringName, generation: int) -> void:
+	await get_tree().create_timer(hop_seconds).timeout
+	spark_hop_terminal(to_id, generation, false)
+
+func _start_fallback_terminal_timer(to_id: StringName, generation: int) -> void:
+	await get_tree().create_timer(fallback_deadline_seconds).timeout
+	spark_hop_terminal(to_id, generation, true)
+
+func _settle_after_delay(to_id: StringName, generation: int, _via_fallback: bool) -> void:
+	await get_tree().create_timer(settle_seconds).timeout
+	if state != SparkState.SETTLING or generation != presentation_generation:
+		return
+	spark_hop_settled.emit(to_id, generation)
 	index += 1
-	if index >= ORDER.size(): _complete(generation)
-func clear_occupancy(perch_id: StringName) -> void:
-	if occupied_perch == perch_id: occupied_perch = &""
-func _complete(source_generation: int) -> void:
-	if completed or source_generation != generation: return
-	completed = true; armed = false
-	puzzle_completed.emit(PUZZLE_ID); solved.emit()
+	if index >= ORDER.size():
+		_complete()
+		return
+	state = SparkState.WAITING_FOR_PERCH
+	_enable_expected_perch()
+	var perch: Node = _perches.get(ORDER[index])
+	if perch != null and perch.has_method("reevaluate_registered_player_overlap"):
+		perch.reevaluate_registered_player_overlap()
+
+func _enable_expected_perch() -> void:
+	_set_all_perches_enabled(false)
+	if index < ORDER.size():
+		var perch: Node = _perches.get(ORDER[index])
+		if perch != null:
+			perch.set_acceptance_enabled(true)
+
+func _set_all_perches_enabled(enabled: bool) -> void:
+	for perch in _perches.values():
+		if perch.has_method("set_acceptance_enabled"):
+			perch.set_acceptance_enabled(enabled)
+
+func _complete() -> void:
+	if completed:
+		return
+	completed = true
+	state = SparkState.COMPLETED
+	_set_all_perches_enabled(false)
+	puzzle_completed.emit(PUZZLE_ID)
+	solved.emit()
 	var progress := get_node_or_null(progress_controller_path)
 	if progress != null and progress.has_method("accept_puzzle_completed"):
 		progress.accept_puzzle_completed(PUZZLE_ID)

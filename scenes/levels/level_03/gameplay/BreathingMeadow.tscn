@@ -2,7 +2,7 @@
 [ext_resource type="Script" path="res://scripts/levels/level_03/breathing_meadow_controller.gd" id="1_controller"]
 [ext_resource type="Script" path="res://scripts/levels/level_03/breathing_meadow_petal.gd" id="2_petal"]
 [sub_resource type="SphereShape3D" id="SphereShape3D_petal"]
-radius = 2.0
+radius = 2.4
 [node name="BreathingMeadow" type="Node3D"]
 script = ExtResource("1_controller")
 [node name="Petal_W" type="Area3D" parent="."]
@@ -26,3 +26,6 @@ shape = SubResource("SphereShape3D_petal")
 [connection signal="petal_entered" from="Petal_W" to="." method="accept_petal"]
 [connection signal="petal_entered" from="Petal_SE" to="." method="accept_petal"]
 [connection signal="petal_entered" from="Petal_NE" to="." method="accept_petal"]
+[connection signal="petal_exited" from="Petal_W" to="." method="clear_petal"]
+[connection signal="petal_exited" from="Petal_SE" to="." method="clear_petal"]
+[connection signal="petal_exited" from="Petal_NE" to="." method="clear_petal"]
