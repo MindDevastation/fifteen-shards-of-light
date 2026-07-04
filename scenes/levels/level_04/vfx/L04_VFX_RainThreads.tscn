@@ -1,0 +1,34 @@
+[gd_scene load_steps=4 format=3]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rain_thread"]
+albedo_color = Color(0.45, 0.62, 0.78, 0.32)
+transparency = 1
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_rain_thread"]
+top_radius = 0.015
+bottom_radius = 0.015
+height = 3.2
+radial_segments = 6
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_soft_thread"]
+top_radius = 0.01
+bottom_radius = 0.01
+height = 2.4
+radial_segments = 6
+
+[node name="L04_VFX_RainThreads" type="Node3D"]
+
+[node name="RainThreadA" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.984808, 0.173648, 0, -0.173648, 0.984808, -8, 5, -18)
+mesh = SubResource("CylinderMesh_rain_thread")
+surface_material_override/0 = SubResource("StandardMaterial3D_rain_thread")
+
+[node name="RainThreadB" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.984808, 0.173648, 0, -0.173648, 0.984808, 0, 5.4, -8)
+mesh = SubResource("CylinderMesh_soft_thread")
+surface_material_override/0 = SubResource("StandardMaterial3D_rain_thread")
+
+[node name="RainThreadC" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.984808, 0.173648, 0, -0.173648, 0.984808, 8, 5.2, 2)
+mesh = SubResource("CylinderMesh_rain_thread")
+surface_material_override/0 = SubResource("StandardMaterial3D_rain_thread")
