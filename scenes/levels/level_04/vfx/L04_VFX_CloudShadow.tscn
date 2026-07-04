@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cloud_shadow"]
+albedo_color = Color(0.18, 0.22, 0.28, 0.22)
+transparency = 1
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_cloud_shadow"]
+size = Vector2(20, 12)
+
+[node name="L04_VFX_CloudShadow" type="Node3D"]
+
+[node name="NeutralCloudShadow" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.965926, 0, -0.258819, 0, 1, 0, 0.258819, 0, 0.965926, 0, 0.035, -6)
+mesh = SubResource("PlaneMesh_cloud_shadow")
+surface_material_override/0 = SubResource("StandardMaterial3D_cloud_shadow")

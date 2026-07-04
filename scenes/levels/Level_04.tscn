@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3]
+[gd_scene load_steps=28 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/levels/level_04/blocks/Block_04_00_Arrival.tscn" id="1_arrival"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_04/blocks/Block_04_01_CrossingTree.tscn" id="2_tree"]
@@ -13,6 +13,18 @@
 [ext_resource type="PackedScene" path="res://scenes/levels/level_04/gameplay/Level04RecoveryVolume.tscn" id="11_recovery_volume"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_04/gameplay/Level04RecoveryAnchorZone.tscn" id="12_recovery_anchor"]
 [ext_resource type="Script" path="res://scripts/levels/level_04/level_04_recovery_controller.gd" id="13_recovery_controller"]
+[ext_resource type="Script" path="res://scripts/levels/level_04/level_04_progress_controller.gd" id="14_progress_controller"]
+[ext_resource type="Script" path="res://scripts/levels/level_04/level_04_environment_state_controller.gd" id="15_environment_state_controller"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_04/vfx/L04_VFX_RainThreads.tscn" id="16_rain_threads"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_04/vfx/L04_VFX_CloudShadow.tscn" id="17_cloud_shadow"]
+
+
+[sub_resource type="Environment" id="Environment_e0_balanced"]
+background_mode = 1
+background_color = Color(0.42, 0.47, 0.55, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.62, 0.66, 0.76, 1)
+ambient_light_energy = 0.45
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_soft_return"]
 size = Vector3(100, 10, 144)
@@ -163,19 +175,40 @@ anchor_id = &"RA11_FINAL_PAVILION"
 shape = SubResource("BoxShape3D_recovery_anchor")
 
 [node name="EnvironmentStateRoot" type="Node3D" parent="."]
+
+[node name="Level04EnvironmentStateController" type="Node" parent="EnvironmentStateRoot"]
+script = ExtResource("15_environment_state_controller")
+world_environment_path = NodePath("../WorldEnvironment")
+lighting_root_path = NodePath("../LightingRoot")
+canopy_guidance_path = NodePath("../../VFXRoot/RemainingBranchGuidanceRoot/CanopyGuidance")
+ripple_guidance_path = NodePath("../../VFXRoot/RemainingBranchGuidanceRoot/RippleGuidance")
+weather_weave_vfx_path = NodePath("../../VFXRoot/WeatherWeaveVFX")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="EnvironmentStateRoot"]
+environment = SubResource("Environment_e0_balanced")
+
 [node name="LightingRoot" type="Node3D" parent="EnvironmentStateRoot"]
 [node name="WarmSun" type="DirectionalLight3D" parent="EnvironmentStateRoot/LightingRoot"]
 transform = Transform3D(0.707107, -0.353553, 0.612372, 0, 0.866025, 0.5, -0.707107, -0.353553, 0.612372, 0, 9, -8)
-light_energy = 1.15
+light_energy = 1.05
 [node name="CoolCloudFill" type="OmniLight3D" parent="EnvironmentStateRoot/LightingRoot"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 8, 12)
-light_energy = 0.22
+light_energy = 0.28
+[node name="PavilionGuidanceLight" type="SpotLight3D" parent="EnvironmentStateRoot/LightingRoot"]
+transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, 7, 42)
+light_energy = 0.18
+spot_range = 18.0
+spot_angle = 34.0
 
 [node name="VFXRoot" type="Node3D" parent="."]
 [node name="NaturalWeatherRoot" type="Node3D" parent="VFXRoot"]
+[node name="E0RainThreads" parent="VFXRoot" instance=ExtResource("16_rain_threads")]
+[node name="E0CloudShadow" parent="VFXRoot" instance=ExtResource("17_cloud_shadow")]
 [node name="CanopyPresentationRoot" type="Node3D" parent="VFXRoot"]
 [node name="RipplePresentationRoot" type="Node3D" parent="VFXRoot"]
 [node name="RemainingBranchGuidanceRoot" type="Node3D" parent="VFXRoot"]
+[node name="CanopyGuidance" type="Node3D" parent="VFXRoot/RemainingBranchGuidanceRoot"]
+[node name="RippleGuidance" type="Node3D" parent="VFXRoot/RemainingBranchGuidanceRoot"]
 [node name="WeatherWeaveVFX" type="Node3D" parent="VFXRoot"]
 [node name="PortalAccentVFX" type="Node3D" parent="VFXRoot"]
 
@@ -202,5 +235,20 @@ recovery_volumes_root_path = NodePath("../../GameplayRoot/SafetyRoot/RecoveryVol
 recovery_anchors_root_path = NodePath("../../GameplayRoot/SafetyRoot/RecoveryAnchors")
 recovery_volume_paths = Array[NodePath]([NodePath("../../GameplayRoot/SafetyRoot/RecoveryVolumes/SoftReturnVolume"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryVolumes/AuthoredOutOfBoundsVolumes/OOB_WestPerimeter"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryVolumes/AuthoredOutOfBoundsVolumes/OOB_EastPerimeter"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryVolumes/AuthoredOutOfBoundsVolumes/OOB_SouthPerimeter"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryVolumes/AuthoredOutOfBoundsVolumes/OOB_NorthPerimeter")])
 recovery_anchor_paths = Array[NodePath]([NodePath("../../GameplayRoot/SafetyRoot/RecoveryAnchors/RA0"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryAnchors/RA1"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryAnchors/RA2"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryAnchors/RA3"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryAnchors/RA4"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryAnchors/RA5"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryAnchors/RA6"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryAnchors/RA7"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryAnchors/RA8"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryAnchors/RA9"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryAnchors/RA10"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryAnchors/RA11")])
+
+
+[node name="Level04ProgressController" type="Node" parent="LevelRuntimeRoot"]
+script = ExtResource("14_progress_controller")
+configuration_mode = 0
+canopy_controller_path = NodePath("../../GameplayRoot/PuzzleRoot/ChangingCanopyPuzzle/ChangingCanopyController")
+ripple_controller_path = NodePath("../../GameplayRoot/PuzzleRoot/RippleConversationPuzzle/RippleConversationController")
+shard_slot_08_path = NodePath("../../GameplayRoot/ShardRoot/ShardSlot_08")
+shard_slot_09_path = NodePath("../../GameplayRoot/ShardRoot/ShardSlot_09")
+canopy_remaining_zone_path = NodePath("../../GameplayRoot/RouteAuthorityRoot/CanopyRemainingShardZone")
+ripple_remaining_zone_path = NodePath("../../GameplayRoot/RouteAuthorityRoot/RippleRemainingShardZone")
+environment_controller_path = NodePath("../../EnvironmentStateRoot/Level04EnvironmentStateController")
+finale_controller_path = NodePath("../Level04FinaleController")
+portal_adapter_path = NodePath("../Level04PortalAdapter")
+recovery_controller_path = NodePath("../Level04RecoveryController")
 
 [node name="UILayer" type="CanvasLayer" parent="."]

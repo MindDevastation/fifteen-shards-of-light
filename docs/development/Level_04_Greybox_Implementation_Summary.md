@@ -282,3 +282,45 @@ The implementation preserves the approved RA X/Z coordinates and serializes the 
 - Rows still NOT_VERIFIED: none.
 - Final Slice 2 status: `SLICE 2 RUNTIME RECOVERY PASS`.
 - Manual publication handoff: local commit only; push proof remains `NOT VERIFIED` because pushing and direct PR publication are prohibited by task process restrictions.
+
+## Slice 3 - Macro Progress Shell, Staged Dependency Mode and E0 Environment Root
+
+- Current branch: `work`.
+- Starting HEAD: `1e3b036851083b7b15abd1abcef86dcfff2e6b7a`.
+- Final HEAD: local Slice 3 commit created after this summary update; see manual publication handoff/final response for exact SHA.
+- Changed files:
+  - `scripts/levels/level_04/level_04_progress_controller.gd`
+  - `scripts/levels/level_04/level_04_progress_controller.gd.uid`
+  - `scripts/levels/level_04/level_04_environment_state_controller.gd`
+  - `scripts/levels/level_04/level_04_environment_state_controller.gd.uid`
+  - `scenes/levels/level_04/vfx/L04_VFX_RainThreads.tscn`
+  - `scenes/levels/level_04/vfx/L04_VFX_CloudShadow.tscn`
+  - `scenes/levels/Level_04.tscn`
+  - `docs/development/Level_04_Greybox_Implementation_Summary.md`
+- Created `.gd.uid` sidecars and sibling mapping: `scripts/levels/level_04/level_04_progress_controller.gd.uid` for `level_04_progress_controller.gd`; `scripts/levels/level_04/level_04_environment_state_controller.gd.uid` for `level_04_environment_state_controller.gd`.
+- Slice 3 contract summary: implemented only the macro progress shell, staged dependency mode, immutable first-terminal candidate arbitration, approved `EnvironmentStateRoot` hierarchy, dedicated environment controller child, and primitive/local E0 placeholder VFX. No Slice 4+, shard slots, reward flow, finale, portal activation, imported assets, final art, audio, production VFX, or gameplay puzzle controllers were added.
+- ProgressController implementation evidence: `Level04ProgressController` exists under `LevelRuntimeRoot`, declares `BRANCH_CANOPY = &"CANOPY"`, `BRANCH_RIPPLE = &"RIPPLE"`, exported Section 12 NodePaths, `validate_available_dependencies()`, `validate_production_configuration()`, `get_state()`, `get_first_branch_candidate()`, `get_remaining_branch()`, `get_collected_shard_ids()`, `report_puzzle_completed(branch_id: StringName) -> bool`, `report_remaining_zone_presence(branch_id, inside)`, and `request_debug_snapshot()`.
+- ConfigurationMode evidence: `enum ConfigurationMode { STAGED_SLICE_3, PRODUCTION }` is implemented and `Level_04.tscn` serializes `configuration_mode = 0`, which is `STAGED_SLICE_3`.
+- MacroState evidence: ten canonical states are implemented: `CANDIDATE_UNSET`, `FIRST_CANDIDATE_CANOPY`, `FIRST_CANDIDATE_RIPPLE`, `FIRST_SHARD_AVAILABLE`, `FIRST_REWARD_COMPLETE`, `REMAINING_DEFERRED`, `SECOND_SHARD_AVAILABLE`, `BOTH_REWARDS_COMPLETE`, `MAIN_TEXT`, and `EXIT`.
+- Candidate arbitration matrix:
+  - CANOPY then RIPPLE: PASS; first call accepted, candidate CANOPY, remaining RIPPLE, state FIRST_CANDIDATE_CANOPY, second call rejected, candidate immutable.
+  - RIPPLE then CANOPY: PASS; first call accepted, candidate RIPPLE, remaining CANOPY, state FIRST_CANDIDATE_RIPPLE, second call rejected, candidate immutable.
+  - Duplicate CANOPY: PASS; first accepted, second rejected, no state drift.
+  - Duplicate RIPPLE: PASS; first accepted, second rejected, no state drift.
+  - Unknown branch: PASS; rejected and state remained CANDIDATE_UNSET.
+  - Same-frame ordered callback harness: PASS; deterministic first call through `report_puzzle_completed` won without a debug-only arbitration path.
+- Staged dependency validation result: PASS; `validate_available_dependencies()` returned true with exactly the eight future dependencies deliberately unresolved: Canopy controller, Ripple controller, ShardSlot_08, ShardSlot_09, CanopyRemainingShardZone, RippleRemainingShardZone, FinaleController, and PortalAdapter.
+- Production validation result: PASS for fail-closed Slice 3 expectation; `validate_production_configuration()` returned false because the future dependencies do not exist yet.
+- Environment hierarchy evidence: `EnvironmentStateRoot` exists as a scriptless `Node3D`; `EnvironmentStateRoot/Level04EnvironmentStateController` owns `level_04_environment_state_controller.gd`; `WorldEnvironment` and `LightingRoot` are siblings of the controller; `WarmSun`, `CoolCloudFill`, and `PavilionGuidanceLight` exist under `LightingRoot`.
+- Exact environment NodePath evidence: controller exports and scene serialization use `../WorldEnvironment`, `../LightingRoot`, `../../VFXRoot/RemainingBranchGuidanceRoot/CanopyGuidance`, `../../VFXRoot/RemainingBranchGuidanceRoot/RippleGuidance`, and `../../VFXRoot/WeatherWeaveVFX`; the validation matrix resolved all five paths.
+- E0 placeholder scene evidence: `L04_VFX_RainThreads.tscn` and `L04_VFX_CloudShadow.tscn` load and are instantiated as `VFXRoot/E0RainThreads` and `VFXRoot/E0CloudShadow`.
+- Resource locality evidence: both E0 placeholder VFX scenes use primitive meshes and local subresources only, with no scripts, imported assets, final art, particles, external materials, or production VFX resources.
+- Check-only result: WARNING due pre-existing shared Player/SoulOrb import/cache and shared script parse issues outside Slice 3 scope; command exited 0 and Slice 3 scene additions parsed.
+- Startup result: WARNING due pre-existing shared Player/SoulOrb import/cache and shared script parse issues outside Slice 3 scope; command exited 0 and emitted the single controlled Slice 3 staged diagnostic.
+- Runtime validation matrix result: PASS; `/tmp/level04_slice3/slice3_validation_matrix.gd` exited 0 and covered ST3-02 through ST3-07 plus candidate arbitration.
+- `git diff --check` result: PASS.
+- Forbidden files touched: no.
+- Remaining FAIL rows: none for Slice 3 implementation/harness assertions.
+- Remaining NOT_VERIFIED rows: ST3-01 import/cache cleanliness remains NOT_VERIFIED because the current checkout reports pre-existing shared imported-asset/script errors outside authorized Slice 3 scope; push proof is NOT VERIFIED because push is forbidden.
+- Final Slice 3 status: `LOCAL HANDOFF READY — MANUAL PUBLICATION REQUIRED`.
+- Manual publication handoff: commit locally only; do not push from this environment. Manual publisher should review the local commit, rerun Godot after resolving/importing shared core assets if needed, then publish through the normal repository workflow.
