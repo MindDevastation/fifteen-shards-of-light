@@ -1,0 +1,31 @@
+[gd_scene load_steps=4 format=3]
+
+[sub_resource type="BoxMesh" id="BoxMesh_floor"]
+size = Vector3(22, 0.4, 18)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_floor"]
+size = Vector3(22, 0.4, 18)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_greybox"]
+albedo_color = Color(0.42, 0.45, 0.50, 1)
+roughness = 0.9
+
+[node name="Block_03_03_PlayfulGlade" type="Node3D"]
+metadata/level_03_label = "Playful Glade"
+
+[node name="EnvironmentRoot" type="Node3D" parent="."]
+[node name="GroundRoot" type="Node3D" parent="EnvironmentRoot"]
+[node name="StructureRoot" type="Node3D" parent="EnvironmentRoot"]
+[node name="DressingRoot" type="Node3D" parent="EnvironmentRoot"]
+[node name="VisualMounts" type="Node3D" parent="EnvironmentRoot"]
+
+[node name="CollisionRoot" type="Node3D" parent="."]
+[node name="WalkableBodies" type="Node3D" parent="CollisionRoot"]
+[node name="FloorBody" type="StaticBody3D" parent="CollisionRoot/WalkableBodies"]
+[node name="Mesh" type="MeshInstance3D" parent="CollisionRoot/WalkableBodies/FloorBody"]
+mesh = SubResource("BoxMesh_floor")
+material_override = SubResource("StandardMaterial3D_greybox")
+[node name="Collision" type="CollisionShape3D" parent="CollisionRoot/WalkableBodies/FloorBody"]
+shape = SubResource("BoxShape3D_floor")
+[node name="BoundaryBodies" type="Node3D" parent="CollisionRoot"]
+[node name="Markers" type="Node3D" parent="."]
