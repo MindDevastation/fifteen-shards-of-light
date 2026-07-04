@@ -1,0 +1,141 @@
+[gd_scene load_steps=20 format=3]
+
+[sub_resource type="StandardMaterial3D" id="Mat"]
+albedo_color = Color(0.38, 0.34, 0.28, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_1"]
+material = SubResource("Mat")
+size = Vector3(8.000, 0.200, 10.000)
+
+[sub_resource type="BoxShape3D" id="Shape_1"]
+size = Vector3(8.000, 0.200, 10.000)
+
+[sub_resource type="BoxMesh" id="Mesh_2"]
+material = SubResource("Mat")
+size = Vector3(8.000, 0.200, 8.000)
+
+[sub_resource type="BoxShape3D" id="Shape_2"]
+size = Vector3(8.000, 0.200, 8.000)
+
+[sub_resource type="BoxMesh" id="Mesh_3"]
+material = SubResource("Mat")
+size = Vector3(8.000, 0.200, 10.000)
+
+[sub_resource type="BoxShape3D" id="Shape_3"]
+size = Vector3(8.000, 0.200, 10.000)
+
+[sub_resource type="BoxMesh" id="Mesh_4"]
+material = SubResource("Mat")
+size = Vector3(8.000, 0.200, 10.000)
+
+[sub_resource type="BoxShape3D" id="Shape_4"]
+size = Vector3(8.000, 0.200, 10.000)
+
+[sub_resource type="BoxMesh" id="Mesh_5"]
+material = SubResource("Mat")
+size = Vector3(8.000, 0.200, 8.000)
+
+[sub_resource type="BoxShape3D" id="Shape_5"]
+size = Vector3(8.000, 0.200, 8.000)
+
+[sub_resource type="BoxMesh" id="Mesh_6"]
+material = SubResource("Mat")
+size = Vector3(8.000, 0.200, 10.000)
+
+[sub_resource type="BoxShape3D" id="Shape_6"]
+size = Vector3(8.000, 0.200, 10.000)
+
+[sub_resource type="BoxMesh" id="Mesh_7"]
+material = SubResource("Mat")
+size = Vector3(2.000, 0.200, 2.000)
+
+[sub_resource type="BoxShape3D" id="Shape_7"]
+size = Vector3(2.000, 0.200, 2.000)
+
+[sub_resource type="BoxMesh" id="Mesh_8"]
+material = SubResource("Mat")
+size = Vector3(1.000, 3.900, 12.000)
+
+[sub_resource type="BoxShape3D" id="Shape_8"]
+size = Vector3(1.000, 3.900, 12.000)
+
+[sub_resource type="BoxMesh" id="Mesh_9"]
+material = SubResource("Mat")
+size = Vector3(1.000, 3.900, 12.000)
+
+[sub_resource type="BoxShape3D" id="Shape_9"]
+size = Vector3(1.000, 3.900, 12.000)
+
+[node name="Block_04_03_BraidedCrossing" type="Node3D"]
+
+[node name="UpperCrossing_UC" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.000, 3.900, 16.000)
+metadata/level_04_slice_1 = "primitive static greybox; centerline width >= 5.5m"
+[node name="Mesh" type="MeshInstance3D" parent="UpperCrossing_UC"]
+mesh = SubResource("Mesh_1")
+[node name="Collision" type="CollisionShape3D" parent="UpperCrossing_UC"]
+shape = SubResource("Shape_1")
+
+[node name="UpperLane_U1" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.000, 3.200, 13.000)
+metadata/level_04_slice_1 = "primitive static greybox; centerline width >= 5.5m"
+[node name="Mesh" type="MeshInstance3D" parent="UpperLane_U1"]
+mesh = SubResource("Mesh_2")
+[node name="Collision" type="CollisionShape3D" parent="UpperLane_U1"]
+shape = SubResource("Shape_2")
+
+[node name="UpperLane_U2" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.000, 0.900, -1.000)
+metadata/level_04_slice_1 = "primitive static greybox; centerline width >= 5.5m"
+[node name="Mesh" type="MeshInstance3D" parent="UpperLane_U2"]
+mesh = SubResource("Mesh_3")
+[node name="Collision" type="CollisionShape3D" parent="UpperLane_U2"]
+shape = SubResource("Shape_3")
+
+[node name="LowerCrossing_LC" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.000, -0.100, 16.000)
+metadata/level_04_slice_1 = "primitive static greybox; centerline width >= 5.5m"
+[node name="Mesh" type="MeshInstance3D" parent="LowerCrossing_LC"]
+mesh = SubResource("Mesh_4")
+[node name="Collision" type="CollisionShape3D" parent="LowerCrossing_LC"]
+shape = SubResource("Shape_4")
+
+[node name="LowerLane_L1" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.000, 0.500, 14.000)
+metadata/level_04_slice_1 = "primitive static greybox; centerline width >= 5.5m"
+[node name="Mesh" type="MeshInstance3D" parent="LowerLane_L1"]
+mesh = SubResource("Mesh_5")
+[node name="Collision" type="CollisionShape3D" parent="LowerLane_L1"]
+shape = SubResource("Shape_5")
+
+[node name="LowerLane_L2" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.000, 2.200, -1.000)
+metadata/level_04_slice_1 = "primitive static greybox; centerline width >= 5.5m"
+[node name="Mesh" type="MeshInstance3D" parent="LowerLane_L2"]
+mesh = SubResource("Mesh_6")
+[node name="Collision" type="CollisionShape3D" parent="LowerLane_L2"]
+shape = SubResource("Shape_6")
+
+[node name="CrossingCenterClearanceMarker" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.000, 2.000, 16.000)
+metadata/level_04_slice_1 = "primitive static greybox; centerline width >= 5.5m"
+[node name="Mesh" type="MeshInstance3D" parent="CrossingCenterClearanceMarker"]
+mesh = SubResource("Mesh_7")
+[node name="Collision" type="CollisionShape3D" parent="CrossingCenterClearanceMarker"]
+shape = SubResource("Shape_7")
+
+[node name="LaneSwitchBlocker_West" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.000, 1.950, 16.000)
+metadata/level_04_slice_1 = "primitive static greybox; centerline width >= 5.5m"
+[node name="Mesh" type="MeshInstance3D" parent="LaneSwitchBlocker_West"]
+mesh = SubResource("Mesh_8")
+[node name="Collision" type="CollisionShape3D" parent="LaneSwitchBlocker_West"]
+shape = SubResource("Shape_8")
+
+[node name="LaneSwitchBlocker_East" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.000, 1.950, 16.000)
+metadata/level_04_slice_1 = "primitive static greybox; centerline width >= 5.5m"
+[node name="Mesh" type="MeshInstance3D" parent="LaneSwitchBlocker_East"]
+mesh = SubResource("Mesh_9")
+[node name="Collision" type="CollisionShape3D" parent="LaneSwitchBlocker_East"]
+shape = SubResource("Shape_9")

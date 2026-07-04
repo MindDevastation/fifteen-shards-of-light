@@ -1,0 +1,51 @@
+[gd_scene load_steps=8 format=3]
+
+[sub_resource type="StandardMaterial3D" id="Mat"]
+albedo_color = Color(0.36, 0.36, 0.42, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_1"]
+material = SubResource("Mat")
+size = Vector3(18.000, 0.200, 14.000)
+
+[sub_resource type="BoxShape3D" id="Shape_1"]
+size = Vector3(18.000, 0.200, 14.000)
+
+[sub_resource type="BoxMesh" id="Mesh_2"]
+material = SubResource("Mat")
+size = Vector3(8.000, 0.200, 14.000)
+
+[sub_resource type="BoxShape3D" id="Shape_2"]
+size = Vector3(8.000, 0.200, 14.000)
+
+[sub_resource type="BoxMesh" id="Mesh_3"]
+material = SubResource("Mat")
+size = Vector3(7.000, 0.200, 14.000)
+
+[sub_resource type="BoxShape3D" id="Shape_3"]
+size = Vector3(7.000, 0.200, 14.000)
+
+[node name="Block_04_05_WeatherWeave" type="Node3D"]
+
+[node name="WeatherWeave_W" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.000, 1.700, 38.000)
+metadata/level_04_slice_1 = "primitive static greybox; centerline width >= 5.5m"
+[node name="Mesh" type="MeshInstance3D" parent="WeatherWeave_W"]
+mesh = SubResource("Mesh_1")
+[node name="Collision" type="CollisionShape3D" parent="WeatherWeave_W"]
+shape = SubResource("Shape_1")
+
+[node name="WeatherApproach_FromCrossing" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.000, 1.650, 31.000)
+metadata/level_04_slice_1 = "primitive static greybox; centerline width >= 5.5m"
+[node name="Mesh" type="MeshInstance3D" parent="WeatherApproach_FromCrossing"]
+mesh = SubResource("Mesh_2")
+[node name="Collision" type="CollisionShape3D" parent="WeatherApproach_FromCrossing"]
+shape = SubResource("Shape_2")
+
+[node name="WeatherToPavilion" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.000, 1.800, 45.000)
+metadata/level_04_slice_1 = "primitive static greybox; centerline width >= 5.5m"
+[node name="Mesh" type="MeshInstance3D" parent="WeatherToPavilion"]
+mesh = SubResource("Mesh_3")
+[node name="Collision" type="CollisionShape3D" parent="WeatherToPavilion"]
+shape = SubResource("Shape_3")

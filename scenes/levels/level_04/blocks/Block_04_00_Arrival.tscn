@@ -1,0 +1,36 @@
+[gd_scene load_steps=6 format=3]
+
+[sub_resource type="StandardMaterial3D" id="Mat"]
+albedo_color = Color(0.34, 0.36, 0.34, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_1"]
+material = SubResource("Mat")
+size = Vector3(12.000, 0.200, 10.000)
+
+[sub_resource type="BoxShape3D" id="Shape_1"]
+size = Vector3(12.000, 0.200, 10.000)
+
+[sub_resource type="BoxMesh" id="Mesh_2"]
+material = SubResource("Mat")
+size = Vector3(6.500, 0.200, 15.000)
+
+[sub_resource type="BoxShape3D" id="Shape_2"]
+size = Vector3(6.500, 0.200, 15.000)
+
+[node name="Block_04_00_Arrival" type="Node3D"]
+
+[node name="ArrivalTerrace_O" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.000, -0.100, -54.000)
+metadata/level_04_slice_1 = "primitive static greybox; centerline width >= 5.5m"
+[node name="Mesh" type="MeshInstance3D" parent="ArrivalTerrace_O"]
+mesh = SubResource("Mesh_1")
+[node name="Collision" type="CollisionShape3D" parent="ArrivalTerrace_O"]
+shape = SubResource("Shape_1")
+
+[node name="ArrivalToTree_WideWalk" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.000, -0.100, -46.500)
+metadata/level_04_slice_1 = "primitive static greybox; centerline width >= 5.5m"
+[node name="Mesh" type="MeshInstance3D" parent="ArrivalToTree_WideWalk"]
+mesh = SubResource("Mesh_2")
+[node name="Collision" type="CollisionShape3D" parent="ArrivalToTree_WideWalk"]
+shape = SubResource("Shape_2")

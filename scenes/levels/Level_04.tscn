@@ -1,62 +1,71 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=11 format=3]
 
-[ext_resource type="Script" path="res://scripts/core/level_manager.gd" id="1_level_manager"]
-[ext_resource type="PackedScene" path="res://scenes/core/Player.tscn" id="2_player"]
-[ext_resource type="Script" path="res://scripts/player/camera_controller.gd" id="3_camera_controller"]
-[ext_resource type="PackedScene" path="res://scenes/core/SoulShard.tscn" id="4_soul_shard"]
-[ext_resource type="PackedScene" path="res://scenes/ui/PoemRewardUI.tscn" id="5_poem_reward_ui"]
-[ext_resource type="PackedScene" path="res://scenes/core/LevelPortal.tscn" id="6_level_portal"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_floor_grey"]
-albedo_color = Color(0.38, 0.38, 0.38, 1)
-
-[sub_resource type="BoxMesh" id="BoxMesh_floor"]
-material = SubResource("StandardMaterial3D_floor_grey")
-size = Vector3(12, 0.2, 12)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_floor"]
-size = Vector3(12, 0.2, 12)
+[ext_resource type="PackedScene" path="res://scenes/levels/level_04/blocks/Block_04_00_Arrival.tscn" id="1_arrival"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_04/blocks/Block_04_01_CrossingTree.tscn" id="2_tree"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_04/blocks/Block_04_02_ChangingCanopy.tscn" id="3_canopy"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_04/blocks/Block_04_03_BraidedCrossing.tscn" id="4_crossing"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_04/blocks/Block_04_04_RippleConversation.tscn" id="5_ripple"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_04/blocks/Block_04_05_WeatherWeave.tscn" id="6_weather"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_04/blocks/Block_04_06_FinalPavilion.tscn" id="7_pavilion"]
+[ext_resource type="PackedScene" path="res://scenes/core/Player.tscn" id="8_player"]
+[ext_resource type="PackedScene" path="res://scenes/core/SoulOrb_Follow.tscn" id="9_orb"]
+[ext_resource type="Script" path="res://scripts/player/camera_controller.gd" id="10_camera"]
 
 [node name="Level_04" type="Node3D"]
+metadata/title = "Level_04 «Я скучаю именно по тебе»"
+metadata/slice_1 = "Scene shell and static braided spatial greybox"
+metadata/approved_base = "13d84fb733f85090caf23487ece419f1ca2951b6"
 
-[node name="LevelManager" type="Node" parent="."]
-script = ExtResource("1_level_manager")
-level_id = 4
-soul_shard_path = NodePath("../SoulShard")
-poem_reward_ui_path = NodePath("../UILayer/PoemRewardUI")
-level_portal_path = NodePath("../LevelPortal")
+[node name="EnvironmentRoot" type="Node3D" parent="."]
+[node name="Block_04_00_Arrival" parent="EnvironmentRoot" instance=ExtResource("1_arrival")]
+[node name="Block_04_01_CrossingTree" parent="EnvironmentRoot" instance=ExtResource("2_tree")]
+[node name="Block_04_02_ChangingCanopy" parent="EnvironmentRoot" instance=ExtResource("3_canopy")]
+[node name="Block_04_03_BraidedCrossing" parent="EnvironmentRoot" instance=ExtResource("4_crossing")]
+[node name="Block_04_04_RippleConversation" parent="EnvironmentRoot" instance=ExtResource("5_ripple")]
+[node name="Block_04_05_WeatherWeave" parent="EnvironmentRoot" instance=ExtResource("6_weather")]
+[node name="Block_04_06_FinalPavilion" parent="EnvironmentRoot" instance=ExtResource("7_pavilion")]
+[node name="Boundaries" type="Node3D" parent="EnvironmentRoot"]
 
-[node name="Floor" type="StaticBody3D" parent="."]
+[node name="GameplayRoot" type="Node3D" parent="."]
+[node name="PuzzleRoot" type="Node3D" parent="GameplayRoot"]
+[node name="ShardRoot" type="Node3D" parent="GameplayRoot"]
+[node name="RouteAuthorityRoot" type="Node3D" parent="GameplayRoot"]
+[node name="PortalRoot" type="Node3D" parent="GameplayRoot"]
+[node name="PortalFloorAnchor" type="Marker3D" parent="GameplayRoot/PortalRoot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 2, 56.5)
+[node name="SafetyRoot" type="Node3D" parent="GameplayRoot"]
 
-[node name="FloorMesh" type="MeshInstance3D" parent="Floor"]
-mesh = SubResource("BoxMesh_floor")
+[node name="EnvironmentStateRoot" type="Node3D" parent="."]
+[node name="LightingRoot" type="Node3D" parent="EnvironmentStateRoot"]
+[node name="WarmSun" type="DirectionalLight3D" parent="EnvironmentStateRoot/LightingRoot"]
+transform = Transform3D(0.707107, -0.353553, 0.612372, 0, 0.866025, 0.5, -0.707107, -0.353553, 0.612372, 0, 9, -8)
+light_energy = 1.15
+[node name="CoolCloudFill" type="OmniLight3D" parent="EnvironmentStateRoot/LightingRoot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 8, 12)
+light_energy = 0.22
 
-[node name="FloorCollision" type="CollisionShape3D" parent="Floor"]
-shape = SubResource("BoxShape3D_floor")
+[node name="VFXRoot" type="Node3D" parent="."]
+[node name="NaturalWeatherRoot" type="Node3D" parent="VFXRoot"]
+[node name="CanopyPresentationRoot" type="Node3D" parent="VFXRoot"]
+[node name="RipplePresentationRoot" type="Node3D" parent="VFXRoot"]
+[node name="RemainingBranchGuidanceRoot" type="Node3D" parent="VFXRoot"]
+[node name="WeatherWeaveVFX" type="Node3D" parent="VFXRoot"]
+[node name="PortalAccentVFX" type="Node3D" parent="VFXRoot"]
 
-[node name="SpawnPoint" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-
-[node name="Player" parent="." instance=ExtResource("2_player")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-
-[node name="FollowCamera" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.863779, -0.503871, 0, 0.503871, 0.863779, 0, 4, 7)
-current = true
-script = ExtResource("3_camera_controller")
+[node name="PlayerRoot" type="Node3D" parent="."]
+[node name="PlayerFloorSpawnMarker" type="Marker3D" parent="PlayerRoot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -54)
+[node name="Player" parent="PlayerRoot" instance=ExtResource("8_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -54)
+[node name="SoulOrb_Follow" parent="PlayerRoot" instance=ExtResource("9_orb")]
 target_path = NodePath("../Player")
 
-[node name="SunLight" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.707107, -0.353553, 0.612372, 0, 0.866025, 0.5, -0.707107, -0.353553, 0.612372, 0, 6, 0)
-light_energy = 1.5
+[node name="CameraRoot" type="Node3D" parent="."]
+[node name="FollowCamera" type="Camera3D" parent="CameraRoot"]
+transform = Transform3D(1, 0, 0, 0, 0.882948, -0.469471, 0, 0.469471, 0.882948, 0, 6, -62)
+current = true
+script = ExtResource("10_camera")
+target_path = NodePath("../../PlayerRoot/Player")
 
-[node name="SoulShard" parent="." instance=ExtResource("4_soul_shard")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 1, 2)
-
-[node name="LevelPortal" parent="." instance=ExtResource("6_level_portal")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4)
-target_scene_path = "res://scenes/levels/Level_05.tscn"
-
+[node name="LevelRuntimeRoot" type="Node3D" parent="."]
 [node name="UILayer" type="CanvasLayer" parent="."]
-
-[node name="PoemRewardUI" parent="UILayer" instance=ExtResource("5_poem_reward_ui")]
