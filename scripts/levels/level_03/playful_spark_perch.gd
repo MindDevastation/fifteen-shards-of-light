@@ -57,5 +57,5 @@ func _on_body_exited(body: Node) -> void:
 		perch_exited.emit(perch_id)
 
 func _update_monitoring_state() -> void:
-	monitoring = _acceptance_enabled
-	monitorable = true
+	set_deferred("monitoring", _acceptance_enabled)
+	set_deferred("monitorable", true)
