@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/levels/level_04/level_04_recovery_anchor_zone.gd" id="1_script"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_arrival"]
+size = Vector3(2, 2, 2)
+
+[node name="Level04RecoveryAnchorZone" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="FloorAnchor" type="Marker3D" parent="."]
+
+[node name="ArrivalZone" type="Area3D" parent="."]
+monitoring = true
+monitorable = true
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ArrivalZone"]
+shape = SubResource("BoxShape3D_arrival")

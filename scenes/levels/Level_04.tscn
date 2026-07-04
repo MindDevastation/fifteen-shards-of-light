@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=20 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/levels/level_04/blocks/Block_04_00_Arrival.tscn" id="1_arrival"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_04/blocks/Block_04_01_CrossingTree.tscn" id="2_tree"]
@@ -10,6 +10,27 @@
 [ext_resource type="PackedScene" path="res://scenes/core/Player.tscn" id="8_player"]
 [ext_resource type="PackedScene" path="res://scenes/core/SoulOrb_Follow.tscn" id="9_orb"]
 [ext_resource type="Script" path="res://scripts/player/camera_controller.gd" id="10_camera"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_04/gameplay/Level04RecoveryVolume.tscn" id="11_recovery_volume"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_04/gameplay/Level04RecoveryAnchorZone.tscn" id="12_recovery_anchor"]
+[ext_resource type="Script" path="res://scripts/levels/level_04/level_04_recovery_controller.gd" id="13_recovery_controller"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_soft_return"]
+size = Vector3(100, 10, 144)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_oob_west"]
+size = Vector3(6, 20, 132)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_oob_east"]
+size = Vector3(6, 20, 132)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_oob_south"]
+size = Vector3(78, 20, 8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_oob_north"]
+size = Vector3(78, 20, 8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_recovery_anchor"]
+size = Vector3(3, 2, 3)
 
 [node name="Level_04" type="Node3D"]
 metadata/title = "Level_04 «Я скучаю именно по тебе»"
@@ -34,6 +55,112 @@ metadata/approved_base = "13d84fb733f85090caf23487ece419f1ca2951b6"
 [node name="PortalFloorAnchor" type="Marker3D" parent="GameplayRoot/PortalRoot"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 2, 56.5)
 [node name="SafetyRoot" type="Node3D" parent="GameplayRoot"]
+[node name="RecoveryVolumes" type="Node3D" parent="GameplayRoot/SafetyRoot"]
+[node name="SoftReturnVolume" parent="GameplayRoot/SafetyRoot/RecoveryVolumes" instance=ExtResource("11_recovery_volume")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -12, 2)
+volume_id = &"RV_SOFT_RETURN"
+[node name="CollisionShape3D" parent="GameplayRoot/SafetyRoot/RecoveryVolumes/SoftReturnVolume" index="0"]
+shape = SubResource("BoxShape3D_soft_return")
+
+[node name="AuthoredOutOfBoundsVolumes" type="Node3D" parent="GameplayRoot/SafetyRoot/RecoveryVolumes"]
+[node name="OOB_WestPerimeter" parent="GameplayRoot/SafetyRoot/RecoveryVolumes/AuthoredOutOfBoundsVolumes" instance=ExtResource("11_recovery_volume")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -42, 1, 2)
+volume_id = &"RV_OOB_WEST_PERIMETER"
+[node name="CollisionShape3D" parent="GameplayRoot/SafetyRoot/RecoveryVolumes/AuthoredOutOfBoundsVolumes/OOB_WestPerimeter" index="0"]
+shape = SubResource("BoxShape3D_oob_west")
+
+[node name="OOB_EastPerimeter" parent="GameplayRoot/SafetyRoot/RecoveryVolumes/AuthoredOutOfBoundsVolumes" instance=ExtResource("11_recovery_volume")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42, 1, 2)
+volume_id = &"RV_OOB_EAST_PERIMETER"
+[node name="CollisionShape3D" parent="GameplayRoot/SafetyRoot/RecoveryVolumes/AuthoredOutOfBoundsVolumes/OOB_EastPerimeter" index="0"]
+shape = SubResource("BoxShape3D_oob_east")
+
+[node name="OOB_SouthPerimeter" parent="GameplayRoot/SafetyRoot/RecoveryVolumes/AuthoredOutOfBoundsVolumes" instance=ExtResource("11_recovery_volume")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -65)
+volume_id = &"RV_OOB_SOUTH_PERIMETER"
+[node name="CollisionShape3D" parent="GameplayRoot/SafetyRoot/RecoveryVolumes/AuthoredOutOfBoundsVolumes/OOB_SouthPerimeter" index="0"]
+shape = SubResource("BoxShape3D_oob_south")
+
+[node name="OOB_NorthPerimeter" parent="GameplayRoot/SafetyRoot/RecoveryVolumes/AuthoredOutOfBoundsVolumes" instance=ExtResource("11_recovery_volume")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 67)
+volume_id = &"RV_OOB_NORTH_PERIMETER"
+[node name="CollisionShape3D" parent="GameplayRoot/SafetyRoot/RecoveryVolumes/AuthoredOutOfBoundsVolumes/OOB_NorthPerimeter" index="0"]
+shape = SubResource("BoxShape3D_oob_north")
+
+[node name="RecoveryAnchors" type="Node3D" parent="GameplayRoot/SafetyRoot"]
+
+
+[node name="RA0" parent="GameplayRoot/SafetyRoot/RecoveryAnchors" instance=ExtResource("12_recovery_anchor")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -54)
+anchor_id = &"RA0_ARRIVAL"
+[node name="CollisionShape3D" parent="GameplayRoot/SafetyRoot/RecoveryAnchors/RA0/ArrivalZone" index="0"]
+shape = SubResource("BoxShape3D_recovery_anchor")
+
+[node name="RA1" parent="GameplayRoot/SafetyRoot/RecoveryAnchors" instance=ExtResource("12_recovery_anchor")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -39)
+anchor_id = &"RA1_CROSSING_TREE"
+[node name="CollisionShape3D" parent="GameplayRoot/SafetyRoot/RecoveryAnchors/RA1/ArrivalZone" index="0"]
+shape = SubResource("BoxShape3D_recovery_anchor")
+
+[node name="RA2" parent="GameplayRoot/SafetyRoot/RecoveryAnchors" instance=ExtResource("12_recovery_anchor")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0.8, -29)
+anchor_id = &"RA2_CANOPY_INITIAL"
+[node name="CollisionShape3D" parent="GameplayRoot/SafetyRoot/RecoveryAnchors/RA2/ArrivalZone" index="0"]
+shape = SubResource("BoxShape3D_recovery_anchor")
+
+[node name="RA3" parent="GameplayRoot/SafetyRoot/RecoveryAnchors" instance=ExtResource("12_recovery_anchor")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 2, 5.5)
+anchor_id = &"RA3_CANOPY_FIRST_PASS"
+[node name="CollisionShape3D" parent="GameplayRoot/SafetyRoot/RecoveryAnchors/RA3/ArrivalZone" index="0"]
+shape = SubResource("BoxShape3D_recovery_anchor")
+
+[node name="RA4" parent="GameplayRoot/SafetyRoot/RecoveryAnchors" instance=ExtResource("12_recovery_anchor")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, -0.2, -29)
+anchor_id = &"RA4_RIPPLE_INITIAL"
+[node name="CollisionShape3D" parent="GameplayRoot/SafetyRoot/RecoveryAnchors/RA4/ArrivalZone" index="0"]
+shape = SubResource("BoxShape3D_recovery_anchor")
+
+[node name="RA5" parent="GameplayRoot/SafetyRoot/RecoveryAnchors" instance=ExtResource("12_recovery_anchor")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, -0.3, 3.5)
+anchor_id = &"RA5_RIPPLE_FIRST_PASS"
+[node name="CollisionShape3D" parent="GameplayRoot/SafetyRoot/RecoveryAnchors/RA5/ArrivalZone" index="0"]
+shape = SubResource("BoxShape3D_recovery_anchor")
+
+[node name="RA6" parent="GameplayRoot/SafetyRoot/RecoveryAnchors" instance=ExtResource("12_recovery_anchor")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4, 14)
+anchor_id = &"RA6_UPPER_CROSSING"
+[node name="CollisionShape3D" parent="GameplayRoot/SafetyRoot/RecoveryAnchors/RA6/ArrivalZone" index="0"]
+shape = SubResource("BoxShape3D_recovery_anchor")
+
+[node name="RA7" parent="GameplayRoot/SafetyRoot/RecoveryAnchors" instance=ExtResource("12_recovery_anchor")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 14)
+anchor_id = &"RA7_LOWER_CROSSING"
+[node name="CollisionShape3D" parent="GameplayRoot/SafetyRoot/RecoveryAnchors/RA7/ArrivalZone" index="0"]
+shape = SubResource("BoxShape3D_recovery_anchor")
+
+[node name="RA8" parent="GameplayRoot/SafetyRoot/RecoveryAnchors" instance=ExtResource("12_recovery_anchor")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28, 4, -22)
+anchor_id = &"RA8_CANOPY_REMAINING"
+[node name="CollisionShape3D" parent="GameplayRoot/SafetyRoot/RecoveryAnchors/RA8/ArrivalZone" index="0"]
+shape = SubResource("BoxShape3D_recovery_anchor")
+
+[node name="RA9" parent="GameplayRoot/SafetyRoot/RecoveryAnchors" instance=ExtResource("12_recovery_anchor")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29, -1, -22)
+anchor_id = &"RA9_RIPPLE_REMAINING"
+[node name="CollisionShape3D" parent="GameplayRoot/SafetyRoot/RecoveryAnchors/RA9/ArrivalZone" index="0"]
+shape = SubResource("BoxShape3D_recovery_anchor")
+
+[node name="RA10" parent="GameplayRoot/SafetyRoot/RecoveryAnchors" instance=ExtResource("12_recovery_anchor")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 38)
+anchor_id = &"RA10_WEATHER_WEAVE"
+[node name="CollisionShape3D" parent="GameplayRoot/SafetyRoot/RecoveryAnchors/RA10/ArrivalZone" index="0"]
+shape = SubResource("BoxShape3D_recovery_anchor")
+
+[node name="RA11" parent="GameplayRoot/SafetyRoot/RecoveryAnchors" instance=ExtResource("12_recovery_anchor")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 50)
+anchor_id = &"RA11_FINAL_PAVILION"
+[node name="CollisionShape3D" parent="GameplayRoot/SafetyRoot/RecoveryAnchors/RA11/ArrivalZone" index="0"]
+shape = SubResource("BoxShape3D_recovery_anchor")
 
 [node name="EnvironmentStateRoot" type="Node3D" parent="."]
 [node name="LightingRoot" type="Node3D" parent="EnvironmentStateRoot"]
@@ -68,4 +195,12 @@ script = ExtResource("10_camera")
 target_path = NodePath("../../PlayerRoot/Player")
 
 [node name="LevelRuntimeRoot" type="Node3D" parent="."]
+[node name="Level04RecoveryController" type="Node" parent="LevelRuntimeRoot"]
+script = ExtResource("13_recovery_controller")
+player_path = NodePath("../../PlayerRoot/Player")
+recovery_volumes_root_path = NodePath("../../GameplayRoot/SafetyRoot/RecoveryVolumes")
+recovery_anchors_root_path = NodePath("../../GameplayRoot/SafetyRoot/RecoveryAnchors")
+recovery_volume_paths = Array[NodePath]([NodePath("../../GameplayRoot/SafetyRoot/RecoveryVolumes/SoftReturnVolume"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryVolumes/AuthoredOutOfBoundsVolumes/OOB_WestPerimeter"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryVolumes/AuthoredOutOfBoundsVolumes/OOB_EastPerimeter"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryVolumes/AuthoredOutOfBoundsVolumes/OOB_SouthPerimeter"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryVolumes/AuthoredOutOfBoundsVolumes/OOB_NorthPerimeter")])
+recovery_anchor_paths = Array[NodePath]([NodePath("../../GameplayRoot/SafetyRoot/RecoveryAnchors/RA0"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryAnchors/RA1"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryAnchors/RA2"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryAnchors/RA3"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryAnchors/RA4"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryAnchors/RA5"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryAnchors/RA6"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryAnchors/RA7"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryAnchors/RA8"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryAnchors/RA9"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryAnchors/RA10"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryAnchors/RA11")])
+
 [node name="UILayer" type="CanvasLayer" parent="."]

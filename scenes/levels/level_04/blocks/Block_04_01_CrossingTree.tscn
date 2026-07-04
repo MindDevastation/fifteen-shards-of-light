@@ -12,17 +12,17 @@ size = Vector3(18.000, 0.200, 16.000)
 
 [sub_resource type="BoxMesh" id="Mesh_2"]
 material = SubResource("Mat")
-size = Vector3(7.000, 0.200, 7.000)
+size = Vector3(8.500, 0.200, 8.500)
 
 [sub_resource type="BoxShape3D" id="Shape_2"]
-size = Vector3(7.000, 0.200, 7.000)
+size = Vector3(8.500, 0.200, 8.500)
 
 [sub_resource type="BoxMesh" id="Mesh_3"]
 material = SubResource("Mat")
-size = Vector3(7.000, 0.200, 7.000)
+size = Vector3(8.500, 0.200, 8.500)
 
 [sub_resource type="BoxShape3D" id="Shape_3"]
-size = Vector3(7.000, 0.200, 7.000)
+size = Vector3(8.500, 0.200, 8.500)
 
 [sub_resource type="BoxMesh" id="Mesh_4"]
 material = SubResource("Mat")
