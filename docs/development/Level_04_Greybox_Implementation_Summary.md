@@ -214,3 +214,71 @@ The implementation preserves the approved RA X/Z coordinates and serializes the 
 - Rows still FAIL: RT-01 for RA2, RA4 and RA5.
 - Rows still NOT_VERIFIED: none introduced by this diagnostic pass.
 - Final Slice 2 status: `BLOCKED BY OUT-OF-SLICE GEOMETRY FIX REQUIREMENT`.
+
+## Slice 2 Producer-Authorized Geometry Correction
+
+- Current branch: `work`.
+- Starting HEAD: `0a2eb0cfa1930bd8c5ba4f7e9a91ae68431676ff`.
+- Final HEAD: pending local commit at time of writing; see handoff final response for committed SHA.
+- Changed files in this correction: `scenes/levels/level_04/blocks/Block_04_01_CrossingTree.tscn`, `scenes/levels/level_04/blocks/Block_04_04_RippleConversation.tscn`, and `docs/development/Level_04_Greybox_Implementation_Summary.md`.
+- Exact Producer-authorized out-of-slice whitelist used for this correction:
+  - `scenes/levels/level_04/blocks/Block_04_01_CrossingTree.tscn`
+  - `scenes/levels/level_04/blocks/Block_04_04_RippleConversation.tscn`
+  - `docs/development/Level_04_Greybox_Implementation_Summary.md`
+- Source fixes: adjusted only the authorized Level_04 block-scene greybox collision/mesh support surfaces; no recovery anchors, recovery sensors, recovery scripts, shared Player, shared Camera, project settings, `.import` files, or unrelated `.gd.uid` files were modified.
+- External harness path: `/tmp/level04_slice2/runtime_recovery_matrix.gd`; evidence log: `/tmp/level04_slice2/logs/runtime_recovery_matrix.json`. Harness files/logs remain outside the repository and are not committed.
+
+### Producer-Authorized Geometry Diagnostics Before Editing
+
+| Anchor | Pre-fix diagnosis | Current support / interference | Required support / clearance | Producer-authorized correction plan |
+|---|---|---|---|---|
+| RA2 `RA2_CANOPY_INITIAL` | `BLOCK_SCENE_GEOMETRY_SUPPORT_MISSING` | `CanopyEntrance_A1` centered at `Vector3(-8.00, 0.40, -33.00)` with `Shape_2` size `Vector3(7.00, 0.20, 7.00)`, coverage X `[-11.50, -4.50]`, Z `[-36.50, -29.50]`; approved RA2 X/Z `(-12.00, -29.00)` sat just outside west and north support. | Approved RA2 X/Z `(-12.00, -29.00)` needs grounded Player floor contact without moving RA2. | Expand only the existing `CanopyEntrance_A1` BoxMesh/BoxShape support to cover approved RA2 with a small margin while preserving route readability and topology. |
+| RA4 `RA4_RIPPLE_INITIAL` | `BLOCK_SCENE_GEOMETRY_SUPPORT_MISSING` | `RippleEntrance_B1` centered at `Vector3(8.00, -0.30, -33.00)` with `Shape_3` size `Vector3(7.00, 0.20, 7.00)`, coverage X `[4.50, 11.50]`, Z `[-36.50, -29.50]`; approved RA4 X/Z `(12.00, -29.00)` sat just outside east and north support. | Approved RA4 X/Z `(12.00, -29.00)` needs grounded Player floor contact without moving RA4. | Expand only the existing `RippleEntrance_B1` BoxMesh/BoxShape support to cover approved RA4 with a small margin while preserving route readability and topology. |
+| RA5 `RA5_RIPPLE_FIRST_PASS` | `SEPARATION_WALL_COLLISION_INTERFERENCE` | `RippleFirstShard_B3F` already supports approved RA5 at floor top `Y=-0.30`, but `RippleTerraceSeparationWall` centered at `Vector3(18.00, -0.05, 8.00)` with `Shape_10` size `Vector3(2.00, 2.70, 12.00)` produced wall X range `[17.00, 19.00]`, overlapping/touching approved RA5 X/Z `(17.00, 3.50)`. | Approved RA5 X/Z `(17.00, 3.50)` must remain grounded on `RippleFirstShard_B3F` without resolving against the separation wall. | Move only `RippleTerraceSeparationWall` slightly east to preserve separation while clearing the approved RA5 contact zone. |
+
+### RA2 Geometry Fix and Retest Result
+
+- Geometry fix: `CanopyEntrance_A1` support mesh/collision was expanded from `Vector3(7.000, 0.200, 7.000)` to `Vector3(8.500, 0.200, 8.500)` for both `Mesh_2` and `Shape_2` in `Block_04_01_CrossingTree.tscn`.
+- New support coverage: center `Vector3(-8.00, 0.40, -33.00)`, half extents `Vector3(4.25, 0.10, 4.25)`, coverage X `[-12.25, -3.75]`, Z `[-37.25, -28.75]`; approved RA2 X/Z `(-12.00, -29.00)` now has `0.25 m` edge margin on both corrected axes.
+- Topology preservation: the edit expands the existing branch-entry floor by `0.75 m` per side; it does not add a new node, shortcut, pavilion connection, same-level crossing junction, or invisible catch floor.
+- Retest result: PASS. Runtime matrix accepted expected `RA2_CANOPY_INITIAL` as actual latest valid anchor while Player was grounded and overlapping the production `RecoveryAnchorZone`.
+- Evidence: approved X/Z `(-12.00, -29.00)`; floor raycast hit `/root/Level_04/EnvironmentRoot/Block_04_01_CrossingTree/CanopyEntrance_A1`; Player `is_on_floor() == true`; Player root Y `0.509722`; FloorAnchor `Vector3(-12.00, 0.80, -29.00)`; ArrivalZone overlap `true`; no wall/interfering collision at accepted contact.
+
+### RA4 Geometry Fix and Retest Result
+
+- Geometry fix: `RippleEntrance_B1` support mesh/collision was expanded from `Vector3(7.000, 0.200, 7.000)` to `Vector3(8.500, 0.200, 8.500)` for both `Mesh_3` and `Shape_3` in `Block_04_01_CrossingTree.tscn`.
+- New support coverage: center `Vector3(8.00, -0.30, -33.00)`, half extents `Vector3(4.25, 0.10, 4.25)`, coverage X `[3.75, 12.25]`, Z `[-37.25, -28.75]`; approved RA4 X/Z `(12.00, -29.00)` now has `0.25 m` edge margin on both corrected axes.
+- Topology preservation: the edit expands the existing branch-entry floor by `0.75 m` per side; it does not add a new node, shortcut, pavilion connection, same-level crossing junction, or invisible catch floor.
+- Retest result: PASS. Runtime matrix accepted expected `RA4_RIPPLE_INITIAL` as actual latest valid anchor while Player was grounded and overlapping the production `RecoveryAnchorZone`.
+- Evidence: approved X/Z `(12.00, -29.00)`; floor raycast hit `/root/Level_04/EnvironmentRoot/Block_04_01_CrossingTree/RippleEntrance_B1`; Player `is_on_floor() == true`; Player root Y `-0.190625`; FloorAnchor `Vector3(12.00, -0.20, -29.00)`; ArrivalZone overlap `true`; no wall/interfering collision at accepted contact.
+
+### RA5 Geometry Fix and Retest Result
+
+- Geometry fix: `RippleTerraceSeparationWall` was moved east from center X `18.000` to `18.750` in `Block_04_04_RippleConversation.tscn`; `RippleFirstShard_B3F` floor support was not moved or resized.
+- New wall clearance: with unchanged `Shape_10` size `Vector3(2.00, 2.70, 12.00)`, wall X range becomes `[17.75, 19.75]`, leaving `0.75 m` clearance from approved RA5 X `17.00` while preserving the separation wall’s Z span and blocker role.
+- Topology preservation: the edit trims no route floor, does not delete the separation wall, does not open a bypass between initial and remaining ripple spaces, and does not move RA5.
+- Retest result: PASS. Runtime matrix accepted expected `RA5_RIPPLE_FIRST_PASS` as actual latest valid anchor while Player was grounded and overlapping the production `RecoveryAnchorZone`.
+- Evidence: approved X/Z `(17.00, 3.50)`; floor raycast hit `/root/Level_04/EnvironmentRoot/Block_04_04_RippleConversation/RippleFirstShard_B3F`; Player `is_on_floor() == true`; Player root Y `-0.290833`; FloorAnchor `Vector3(17.00, -0.30, 3.50)`; ArrivalZone overlap `true`; no wall/interfering collision at accepted contact.
+
+### Runtime Matrix Before / After
+
+- Runtime matrix before Producer-authorized geometry correction: RT-01 `FAIL — PRODUCTION_DEFECT_LEVEL_04_LOCAL` for RA2, RA4, and RA5; RT-02 through RT-07 PASS.
+- Runtime matrix after Producer-authorized geometry correction: RT-01 PASS; RT-02 PASS; RT-03 PASS; RT-04 PASS; RT-05 PASS; RT-06 PASS; RT-07 PASS.
+
+### Post-Correction QA Commands
+
+- `timeout 600s godot --headless --editor --quit --path .`: PASS, exit code 0; used to regenerate import/cache state before final validation, and generated unrelated Level_02/Level_03 `.gd.uid` sidecars were removed before commit because they are outside this authorized scope.
+- `godot --headless --path . --quit --check-only scenes/levels/Level_04.tscn`: PASS, exit code 0.
+- `godot --headless --path . --quit`: PASS, exit code 0.
+- `godot --headless --path . --script /tmp/level04_slice2/runtime_recovery_matrix.gd`: PASS, exit code 0; evidence log `/tmp/level04_slice2/logs/runtime_recovery_matrix.json` records RT-01 through RT-07 all passing.
+- `git diff --check`: PASS, exit code 0.
+
+### Final Slice 2 Producer-Authorized Geometry Status
+
+- RT-01 result: PASS. RA0 through RA11 were each accepted as latest valid anchors with the production Player grounded inside the production `RecoveryAnchorZone`; RA2, RA4, and RA5 are now converted from FAIL to PASS.
+- RT-02 through RT-07 regression result: PASS. Repeated fall recovery, duplicate overlap, latch rearm, suspension clear, suspension perform, velocity zeroing, and explicit-source/static restrictions all remained PASS.
+- Rows converted FAIL -> PASS: RT-01 for RA2 `RA2_CANOPY_INITIAL`, RA4 `RA4_RIPPLE_INITIAL`, and RA5 `RA5_RIPPLE_FIRST_PASS`.
+- Rows still FAIL: none.
+- Rows still NOT_VERIFIED: none.
+- Final Slice 2 status: `SLICE 2 RUNTIME RECOVERY PASS`.
+- Manual publication handoff: local commit only; push proof remains `NOT VERIFIED` because pushing and direct PR publication are prohibited by task process restrictions.

@@ -148,7 +148,7 @@ mesh = SubResource("Mesh_9")
 shape = SubResource("Shape_9")
 
 [node name="RippleTerraceSeparationWall" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.000, -0.050, 8.000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.750, -0.050, 8.000)
 metadata/level_04_slice_1 = "primitive static greybox; centerline width >= 5.5m"
 [node name="Mesh" type="MeshInstance3D" parent="RippleTerraceSeparationWall"]
 mesh = SubResource("Mesh_10")
