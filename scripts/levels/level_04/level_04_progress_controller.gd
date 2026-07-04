@@ -25,7 +25,7 @@ enum MacroState {
 const BRANCH_CANOPY := &"CANOPY"
 const BRANCH_RIPPLE := &"RIPPLE"
 const _UNSET_BRANCH := &""
-const _EXPECTED_FUTURE_DEPENDENCY_COUNT := 8
+const _EXPECTED_FUTURE_DEPENDENCY_COUNT := 7
 
 @export var configuration_mode: ConfigurationMode = ConfigurationMode.STAGED_SLICE_3
 @export var canopy_controller_path := NodePath("../../GameplayRoot/PuzzleRoot/ChangingCanopyPuzzle/ChangingCanopyController")
@@ -57,6 +57,7 @@ func validate_available_dependencies() -> bool:
 	_present_dependency_validation.clear()
 	_deliberately_unresolved_dependencies = _collect_missing_future_dependencies()
 	var ok := _validate_internal_invariants()
+	ok = _validate_present_dependency(&"canopy_controller", canopy_controller_path, "ChangingCanopyController") and ok
 	ok = _validate_present_dependency(&"environment_controller", environment_controller_path, "Level04EnvironmentStateController") and ok
 	ok = _validate_present_dependency(&"recovery_controller", recovery_controller_path, "Level04RecoveryController") and ok
 	if _deliberately_unresolved_dependencies.size() != _EXPECTED_FUTURE_DEPENDENCY_COUNT:
@@ -145,7 +146,6 @@ func _validate_present_dependency(key: StringName, path: NodePath, expected_type
 
 func _collect_missing_future_dependencies() -> Array[StringName]:
 	var missing: Array[StringName] = []
-	_add_missing(missing, &"canopy_controller_path", canopy_controller_path)
 	_add_missing(missing, &"ripple_controller_path", ripple_controller_path)
 	_add_missing(missing, &"shard_slot_08_path", shard_slot_08_path)
 	_add_missing(missing, &"shard_slot_09_path", shard_slot_09_path)

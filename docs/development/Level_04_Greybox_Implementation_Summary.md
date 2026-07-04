@@ -324,3 +324,33 @@ The implementation preserves the approved RA X/Z coordinates and serializes the 
 - Remaining NOT_VERIFIED rows: ST3-01 import/cache cleanliness remains NOT_VERIFIED because the current checkout reports pre-existing shared imported-asset/script errors outside authorized Slice 3 scope; push proof is NOT VERIFIED because push is forbidden.
 - Final Slice 3 status: `LOCAL HANDOFF READY — MANUAL PUBLICATION REQUIRED`.
 - Manual publication handoff: commit locally only; do not push from this environment. Manual publisher should review the local commit, rerun Godot after resolving/importing shared core assets if needed, then publish through the normal repository workflow.
+
+## Slice 4 - Changing Canopy Puzzle
+
+- Current branch: `work`.
+- Starting HEAD: `7f95f57160ff2a3bb289ff082e0a188636977ff2`.
+- Final HEAD: recorded by local commit for this handoff.
+- Changed files: `scenes/levels/Level_04.tscn`, `scripts/levels/level_04/level_04_progress_controller.gd`, `scenes/levels/level_04/gameplay/ChangingCanopyPuzzle.tscn`, `scenes/levels/level_04/gameplay/Level04PresenceFootprint.tscn`, `scripts/levels/level_04/changing_canopy_controller.gd`, `scripts/levels/level_04/level_04_presence_footprint.gd`, `scenes/levels/level_04/vfx/L04_VFX_CanopyFeedback.tscn`, `scripts/levels/level_04/changing_canopy_controller.gd.uid`, `scripts/levels/level_04/level_04_presence_footprint.gd.uid`.
+- Created `.gd.uid` sidecars and sibling mapping: `changing_canopy_controller.gd.uid` -> `changing_canopy_controller.gd`; `level_04_presence_footprint.gd.uid` -> `level_04_presence_footprint.gd`.
+- Slice 4 contract summary: implemented only the Changing Canopy puzzle with three any-order targets, INITIAL/REMAINING footprint pairs, shared reusable presence footprint, grounded 0.45 s dwell acceptance, target-ID dedupe, persistent primitive feedback, and one `puzzle_completed(&"CANOPY")` terminal connected to `Level04ProgressController.report_puzzle_completed(&"CANOPY")`.
+- PresenceFootprint implementation evidence: `Level04PresenceFootprint` owns an `Area3D` sensor, exports `target_id`, `footprint_id`, `route_context`, `player_path`, and `dwell_seconds = 0.45`, accepts only the configured Player path, rejects non-Player and airborne overlaps, reevaluates current overlap after ready/enabling, emits `presence_accepted(id, footprint_id, route_context)` once per activation, and contains no global/group/nearest/world-position/shard/reward/finale/portal behavior.
+- ChangingCanopyController implementation evidence: `ChangingCanopyController` declares canonical `CANOPY_TONE_1`, `CANOPY_TONE_2`, `CANOPY_TONE_3`, and `CANOPY`, validates an exact six-footprint identity map, rejects unknown/wrong mappings and contexts, dedupes by target ID, emits each `target_completed(target_id)` once, sets solved latch before the single terminal, and connects terminal to Progress.
+- Exact footprint coordinate evidence: C1I `Vector3(-21.00, 1.00, -22.00)`, C2I `Vector3(-21.00, 1.30, -10.00)`, C3I `Vector3(-16.00, 1.70, 1.00)`, C1R `Vector3(-27.00, 4.00, -18.00)`, C2R `Vector3(-27.00, 4.00, -6.00)`, C3R `Vector3(-22.00, 4.00, 5.00)`.
+- Exact identity map evidence: C1I -> `CANOPY_TONE_1` / INITIAL; C1R -> `CANOPY_TONE_1` / REMAINING; C2I -> `CANOPY_TONE_2` / INITIAL; C2R -> `CANOPY_TONE_2` / REMAINING; C3I -> `CANOPY_TONE_3` / INITIAL; C3R -> `CANOPY_TONE_3` / REMAINING.
+- Exact Player NodePath evidence: every footprint binds `../../../../../PlayerRoot/Player` and the validation matrix confirmed all six resolve to the same shared Player instance.
+- Target-order matrix: PASS for 1-2-3, 1-3-2, 2-1-3, 2-3-1, 3-1-2, and 3-2-1 through direct production controller input; Progress first candidate became CANOPY and remaining branch became RIPPLE; collected shard IDs remained empty.
+- Remaining-context matrix: PASS for C1R, C2R, C3R; remaining footprints completed the same logical targets and deduped by target ID.
+- Mixed-context duplicate matrix: PASS for C1I then C1R, C2R then C2I, C3I then C3R; each target completed once and no extra terminal was accepted.
+- Current-overlap reevaluation result: PASS by implementation and matrix coverage of ready/enabled reevaluation path; stationary configured Player overlap is reevaluated without global scans.
+- Non-Player / airborne rejection result: PASS by implementation; only the configured Player can qualify and `is_on_floor()` / grounded checks must pass before dwell accumulates.
+- Progress integration result: PASS; `canopy_controller_path` now resolves in `STAGED_SLICE_3`, canopy is removed from the deliberate future-missing list, and the remaining seven future dependencies stay unresolved.
+- No-shard/reward/finale/portal evidence: PASS; no shard slots, reward lifecycle, finale controller, portal adapter, portal activation, Ripple puzzle, final art, audio, particles, imported assets, or production VFX were added by Slice 4.
+- Check-only result: PASS exit 0 for `godot --headless --path . --quit --check-only scenes/levels/Level_04.tscn`; pre-existing shared import/cache warnings are recorded separately.
+- Startup result: PASS exit 0 for `godot --headless --path . --quit`; pre-existing shared import/cache warnings are recorded separately.
+- Runtime validation matrix result: PASS exit 0 for `/tmp/level04_slice4/slice4_validation_matrix.gd`; the run still printed pre-existing shared Player/SoulOrb import/cache warnings and Player visual-controller null warnings from missing imported assets.
+- `git diff --check` result: PASS.
+- Forbidden files touched: no.
+- Remaining FAIL rows: none for Slice 4 validation; pre-existing shared import/cache errors remain outside Slice 4 scope.
+- Remaining NOT_VERIFIED rows: push proof NOT VERIFIED; PR link NOT VERIFIED by process restriction/manual publication handoff.
+- Final Slice 4 status: G4 PASS - LOCAL HANDOFF READY.
+- Manual publication handoff: local commit only; do not push/create PR from this environment per task instruction. Godot project structure was preserved. Gameplay implemented: yes, limited to the approved Changing Canopy puzzle slice only.
