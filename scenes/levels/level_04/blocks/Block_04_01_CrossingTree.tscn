@@ -1,0 +1,66 @@
+[gd_scene load_steps=10 format=3]
+
+[sub_resource type="StandardMaterial3D" id="Mat"]
+albedo_color = Color(0.3, 0.34, 0.3, 1)
+
+[sub_resource type="BoxMesh" id="Mesh_1"]
+material = SubResource("Mat")
+size = Vector3(18.000, 0.200, 16.000)
+
+[sub_resource type="BoxShape3D" id="Shape_1"]
+size = Vector3(18.000, 0.200, 16.000)
+
+[sub_resource type="BoxMesh" id="Mesh_2"]
+material = SubResource("Mat")
+size = Vector3(7.000, 0.200, 7.000)
+
+[sub_resource type="BoxShape3D" id="Shape_2"]
+size = Vector3(7.000, 0.200, 7.000)
+
+[sub_resource type="BoxMesh" id="Mesh_3"]
+material = SubResource("Mat")
+size = Vector3(7.000, 0.200, 7.000)
+
+[sub_resource type="BoxShape3D" id="Shape_3"]
+size = Vector3(7.000, 0.200, 7.000)
+
+[sub_resource type="BoxMesh" id="Mesh_4"]
+material = SubResource("Mat")
+size = Vector3(5.000, 3.200, 14.000)
+
+[sub_resource type="BoxShape3D" id="Shape_4"]
+size = Vector3(5.000, 3.200, 14.000)
+
+[node name="Block_04_01_CrossingTree" type="Node3D"]
+
+[node name="CrossingTree_T" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.000, -0.100, -39.000)
+metadata/level_04_slice_1 = "primitive static greybox; centerline width >= 5.5m"
+[node name="Mesh" type="MeshInstance3D" parent="CrossingTree_T"]
+mesh = SubResource("Mesh_1")
+[node name="Collision" type="CollisionShape3D" parent="CrossingTree_T"]
+shape = SubResource("Shape_1")
+
+[node name="CanopyEntrance_A1" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.000, 0.400, -33.000)
+metadata/level_04_slice_1 = "primitive static greybox; centerline width >= 5.5m"
+[node name="Mesh" type="MeshInstance3D" parent="CanopyEntrance_A1"]
+mesh = SubResource("Mesh_2")
+[node name="Collision" type="CollisionShape3D" parent="CanopyEntrance_A1"]
+shape = SubResource("Shape_2")
+
+[node name="RippleEntrance_B1" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.000, -0.300, -33.000)
+metadata/level_04_slice_1 = "primitive static greybox; centerline width >= 5.5m"
+[node name="Mesh" type="MeshInstance3D" parent="RippleEntrance_B1"]
+mesh = SubResource("Mesh_3")
+[node name="Collision" type="CollisionShape3D" parent="RippleEntrance_B1"]
+shape = SubResource("Shape_3")
+
+[node name="TreeBypassBlocker_NorthSpine" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.000, 1.600, -25.000)
+metadata/level_04_slice_1 = "primitive static greybox; centerline width >= 5.5m"
+[node name="Mesh" type="MeshInstance3D" parent="TreeBypassBlocker_NorthSpine"]
+mesh = SubResource("Mesh_4")
+[node name="Collision" type="CollisionShape3D" parent="TreeBypassBlocker_NorthSpine"]
+shape = SubResource("Shape_4")
