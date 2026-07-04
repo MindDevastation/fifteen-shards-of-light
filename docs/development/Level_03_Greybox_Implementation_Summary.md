@@ -1,43 +1,44 @@
-# Level 03 Greybox Implementation Summary — Group 6 PR #111 Final 3 Runtime Evidence
+# Level 03 Greybox Implementation Summary — Group 6 PR #111 T03 Route Closure
 
 ## Local Handoff Status
 
 - Current PR workstream: `#111` local continuation on branch `work`.
-- Starting HEAD for this final-3 continuation: `8b033f9`.
-- Final HEAD for this final-3 continuation: recorded in final handoff after commit via `git rev-parse HEAD`.
-- Source fixes created in this continuation: `None`.
+- Starting HEAD for this T03-only continuation: `8dc2209`.
+- Final HEAD for this T03-only continuation: recorded in final handoff after commit via `git rev-parse HEAD`.
+- Source fix created in this continuation: `fix: correct Level 03 factual group 6 blocker` moved `P10_GladeExit` from an off-floor/void coordinate at z=`7.0` to a safe route coordinate at z=`5.5`.
 - Existing Level_03-local fixes remain present: `PortalCore.activation_duration = 1.8`, `portal.activation_duration = 1.8` adapter enforcement, deferred Spark/Meadow `Area3D` monitoring updates, and corrected CP0-CP4 CameraQAMarkers.
-- Group 6 factual P0: `NOT COMPLETE` because T03 remains `NOT_VERIFIED` after improved production-input route driving.
-- Final allowed status: `CORRECTION REQUIRED — GROUP 6 FACTUAL P0 NOT COMPLETE`.
+- Group 6 headless factual status: `HEADLESS P0 PASS`; rendered visual evidence remains unavailable in this environment.
+- Final allowed status: `CORRECTION REQUIRED — HEADLESS P0 PASS, RENDER/DOCX VISUAL GATES NOT VERIFIED`.
 
 ## Import / Load Health
 
 - Full import regeneration command: `timeout 600s godot --headless --editor --quit --path . > /tmp/level03_import_regen_stdout.log 2> /tmp/level03_import_regen_stderr.log`.
 - Level_03 check-only command: `godot --headless --path . --quit --check-only scenes/levels/Level_03.tscn > /tmp/level03_check_only_stdout.log 2> /tmp/level03_check_only_stderr.log`.
 - Project startup command: `godot --headless --path . --quit > /tmp/level03_startup_stdout.log 2> /tmp/level03_startup_stderr.log`.
-- Results: import `rc=0`, check-only `rc=0`, startup `rc=0`.
+- Results after the P10 source fix: import `rc=0`, check-only `rc=0`, startup `rc=0`.
 - Error counts across import/check/startup: `ERROR:=0`, `SCRIPT ERROR:=0`, parse errors `0`, failed resource loads `0`, failed script loads `0`.
 
 ## Authoritative Counts
 
 - ST-01–ST-19: `19 PASS`, `0 FAIL`, `0 NOT_VERIFIED`.
-- T count before this final-3 continuation: `49 PASS`, `0 FAIL`, `3 NOT_VERIFIED`.
-- T count after this final-3 continuation: `51 PASS`, `0 FAIL`, `1 NOT_VERIFIED`.
-- Rows converted `NOT_VERIFIED → PASS`: `T04, T34`.
+- T count before this T03-only continuation: `51 PASS`, `0 FAIL`, `1 NOT_VERIFIED`.
+- T count after this T03-only continuation: `52 PASS`, `0 FAIL`, `0 NOT_VERIFIED`.
+- Rows converted `NOT_VERIFIED → PASS`: `T03`.
 - Rows converted `NOT_VERIFIED → FAIL`: `None`.
-- Rows still `NOT_VERIFIED`: `T03`.
+- Rows still `NOT_VERIFIED`: `None`.
 
-## Final 3 Runtime Evidence Rows
+## T03 Final Runtime Evidence Row
 
-| Row |
-| --- |
-| `T03 | previous_status=NOT_VERIFIED | method=fresh production Player; numeric P00-P16; camera placed at Player eye and aimed at next marker; Input.action_press(ui_up); logged stagnation because no InputMap jump action exists; 720-frame budget per marker; no checkpoint teleport after spawn | expected=production Player reaches P00-P16 using input without checkpoint teleport | actual=reached P00-P07; P07 final=1.19m best=1.19m frames=130 grounded=false y=(-7.445917, -11.03598, -17.0484) velocity=(0.0, -15.02665, 0.0) | final_status=NOT_VERIFIED | blocker_if_not_verified=improved 720-frame camera-relative input route reached P07_Shard05Overlook best=1.19m final=1.19m while grounded=false; per-frame log shows harness steering/collision plateau before P00-P16 completion, not a static marker order issue | evidence=/tmp/level03_group6/logs/final_3_rows.json:T03` |
-| `T04 | previous_status=NOT_VERIFIED | method=CP marker as camera position, reference target vector as forward, frustum-equivalent angle, raycasts to target offsets 0/0.5/1.0/1.5m with collider and hit-distance logging | expected=CP0-CP4 readability is proven by camera-position geometry, frustum-equivalent angle, and raycast offset sweep | actual=CP0 clear_offset=1.5 angle=0.00deg; CP1 clear_offset=1.5 angle=0.00deg; CP2 clear_offset=1.5 angle=0.00deg; CP3 clear_offset=1.5 angle=0.00deg; CP4 clear_offset=1.5 angle=0.03deg | final_status=PASS | blocker_if_not_verified=NONE | evidence=/tmp/level03_group6/logs/final_3_rows.json:T04` |
-| `T34 | previous_status=NOT_VERIFIED | method=fresh production Level_03; complete Wind via production accept_arch; collect Shard_05/06/07 through shared SoulShard interact plus ShardRewardSequenceController confirmation/return; complete Spark and Meadow production controllers; count Progress all_rewards_completed before chain | expected=Shard_05/06 prerequisites, Spark complete, Meadow complete, natural shared Shard_07 reward lifecycle, all_rewards_completed exactly once, finale readiness | actual=completed=[&"Shard_05", &"Shard_06", &"Shard_07"] requests=(1,1,1) collections=(1,1,1) all_rewards_count=1 macro=WAITING_FOR_FINAL_OVERLOOK finale_state=1 | final_status=PASS | blocker_if_not_verified=NONE | evidence=/tmp/level03_group6/logs/final_3_rows.json:T34` |
+```text
+T03 | previous_status=NOT_VERIFIED | method=production Player route driver using Input.action_press/release(ui_up), camera-relative steering to numeric P00-P16, InputEventKey SPACE for segments where floor sampling finds a gap, pulsed braking near targets; no checkpoint teleport after production spawn placement | expected=production Player completes P00-P16 using production input/controller with no checkpoint teleporting | actual=P00-P16 complete; arrivals=17/17; max_distance=1.25m; grounded_all=True; jump_segments=['P07_Shard05Overlook', 'P11_ExhaleBend', 'P15_FinalOverlook'] | classification=PRODUCTION_ROUTE_DEFECT_LEVEL_03_LOCAL corrected by moving P10_GladeExit from off-floor z=7.0 to safe floor z=5.5, then rerun PASS | final_status=PASS | blocker_if_not_verified=NONE | evidence=/tmp/level03_group6/logs/final_t03_route.json:T03
+```
 
-## Hard Blocker Remaining
+## T03 Source-Fix Evidence
 
-- `T03`: the improved driver fixed the earlier P03 stall and reached through P07 with production Player input and no checkpoint teleporting, but the Player left the traversable route after P06/P07 and was falling at P07 (`grounded=false`, y below route, downward velocity). The final blocker is an automated route-harness/navigation limitation around the P06→P07 segment under headless camera-relative input; a PASS still requires a complete P00-P16 production-input route or manual/renderer-assisted route validation.
+- Pre-fix floor diagnostics showed `P10_GladeExit (4.0, 1.05, 7.0)` had no floor hit, while nearby `z=5.5` samples had valid `FloorBody` support at y≈`1.2`.
+- The Level_03-local source fix moved only `P10_GladeExit` to `(4.0, 1.05, 5.5)`; no shared Player, shared camera, project settings, Level_04, or test-only nodes were modified.
+- Post-fix T03 completed P00-P16 by production input. Arrival examples: P07 distance `1.205m`, P10 distance `1.249m`, P16 distance `1.181m`; every arrival was grounded.
+- Route gap diagnostics still identify real jump segments P06→P07, P10→P11, and P14→P15; the harness used `InputEventKey KEY_SPACE` only on sampled gap segments and otherwise used `Input.action_press/release("ui_up")` with camera-relative steering.
 
 ## Rendering Status
 
@@ -54,6 +55,6 @@
 
 - Branch: `work`.
 - Push: `NOT PERFORMED` per producer rule; push proof is `NOT VERIFIED`.
-- PR creation/update: `NOT PERFORMED` manually by this agent per producer rule; publish this local commit into existing PR #111 manually.
+- PR creation/update: `NOT PERFORMED` manually by this agent per producer rule; publish these local commits into existing PR #111 manually.
 - Godot project structure preserved: `YES`.
-- Gameplay implementation added: `NO`; this continuation changed only the summary after external runtime evidence.
+- Gameplay implementation added: `NO`; this continuation corrected one Level_03 route marker and updated the summary after external runtime evidence.

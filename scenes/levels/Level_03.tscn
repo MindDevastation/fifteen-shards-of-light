@@ -91,7 +91,7 @@ transform = Transform3D(1,0,0,0,1,0,0,0,1,-1,0.95,-9)
 [node name="P09_PlayfulGladeCenter" type="Marker3D" parent="MarkerRoot/RouteMarkers"]
 transform = Transform3D(1,0,0,0,1,0,0,0,1,7,1,-3)
 [node name="P10_GladeExit" type="Marker3D" parent="MarkerRoot/RouteMarkers"]
-transform = Transform3D(1,0,0,0,1,0,0,0,1,4,1.05,7)
+transform = Transform3D(1,0,0,0,1,0,0,0,1,4,1.05,5.5)
 [node name="P11_ExhaleBend" type="Marker3D" parent="MarkerRoot/RouteMarkers"]
 transform = Transform3D(1,0,0,0,1,0,0,0,1,-1,1.15,13)
 [node name="P12_MeadowEntry" type="Marker3D" parent="MarkerRoot/RouteMarkers"]
