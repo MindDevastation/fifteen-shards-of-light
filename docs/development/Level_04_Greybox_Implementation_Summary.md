@@ -95,3 +95,59 @@ The implementation preserves the approved RA X/Z coordinates and serializes the 
 - Godot project structure preserved: yes.
 - Gameplay implemented: only approved explicit recovery foundation for Level_04 Slice 2; no combat, inventory, dialogue, online, open-world, complex AI, RPG, final art, audio, particles, imported assets, or unrelated systems added.
 - Manual publication handoff: local commit only; push proof `NOT VERIFIED` because pushing and PR creation are prohibited by task process restrictions.
+
+## Slice 2 Runtime Recovery Evidence Continuation
+
+- Current branch: `work`.
+- Starting HEAD: `0a0b37af61ce8552c0b1e24828259bad648fc82a`.
+- Final HEAD: pending local commit at time of writing; see handoff final response for committed SHA.
+- Changed files in continuation: `docs/development/Level_04_Greybox_Implementation_Summary.md` only.
+- Source fixes: none. The runtime matrix proved recovery volume/token/suspension behavior but exposed RA grounding/contact failures that are not corrected in this continuation because fixing route collision support or approved anchor placement would require a design/geometry decision beyond this evidence task.
+- External harness path: `/tmp/level04_slice2/runtime_recovery_matrix.gd` with JSON evidence under `/tmp/level04_slice2/logs/`. Harness files and logs are intentionally not committed.
+
+### Continuation QA Commands
+
+- `timeout 600s godot --headless --editor --quit --path .`: PASS, exit code 0, used to regenerate import/cache state before rerunning the runtime matrix.
+- `godot --headless --path . --quit --check-only scenes/levels/Level_04.tscn`: PASS, exit code 0.
+- `godot --headless --path . --quit`: PASS, exit code 0.
+- `godot --headless --path . --script /tmp/level04_slice2/runtime_recovery_matrix.gd`: FAIL, exit code 1 because RT-01 detected production RA grounding/contact failures for RA2, RA4 and RA5. RT-02 through RT-07 passed.
+- `git diff --check`: PASS, exit code 0.
+
+### RT-01 through RT-07 Runtime Evidence Rows
+
+| TEST_ID | Method | Expected | Actual | Classification | Evidence |
+|---|---|---|---|---|---|
+| RT-01 | Actual production Player placed into each production `RecoveryAnchorZone`; public latest-anchor state observed through `get_latest_valid_anchor_id()` after physics and public `debug_reevaluate_overlap()`; Player public `is_on_floor()` and root Y recorded. | RA0-RA11 each accepted as latest valid anchor while Player is grounded inside its zone. | RA0, RA1, RA3, RA6, RA7, RA8, RA9, RA10 and RA11 passed. RA2 stayed at latest `RA1_CROSSING_TREE`, RA4 and RA5 stayed at latest `RA3_CANOPY_FIRST_PASS`; all three were grounded but not accepted as their expected latest anchors. Ray/overlap diagnostic showed RA2/RA4 fall away from approved anchor floor support and RA5 resolves against separation-wall/terrace collision rather than the approved floor contact. | FAIL — PRODUCTION_DEFECT_LEVEL_04_LOCAL | `/tmp/level04_slice2/logs/rt01_anchor_traversal.json` |
+| RT-02 | Actual production Player entered each production recovery `Area3D`; public `recovery_performed(anchor_id, volume_id)` signal and public Player transform/velocity observed. | Each volume performs exactly one recovery to latest RA and zeroes `Player.velocity`. | PASS for `SoftReturnVolume`, `OOB_WestPerimeter`, `OOB_EastPerimeter`, `OOB_SouthPerimeter` and `OOB_NorthPerimeter`; each emitted exactly one recovery to `RA0_ARRIVAL`, final transform delta was about `0.0091 m`, and velocity was `(0,0,0)`. | PASS | `/tmp/level04_slice2/logs/rt02_each_volume.json` |
+| RT-03 | Actual production Player placed at `Vector3(0,-8,-65)`, overlapping `SoftReturnVolume` and `OOB_SouthPerimeter`; public recovery count observed. | Overlapping/duplicate body-enter events share one fall token and produce one teleport only. | One `recovery_performed` event only, volume `RV_OOB_SOUTH_PERIMETER`, final transform returned to `RA0_ARRIVAL`, delta about `0.0091 m`. | PASS | `/tmp/level04_slice2/logs/rt03_duplicate_overlap.json` |
+| RT-04 | Triggered recovery, observed no duplicate while uncleared, moved Player clear, advanced physics, then re-entered another volume. | Latch prevents duplicate recovery until clear frame and re-arms after one clear physics frame. | First entry count `1`, while-uncleared count remained `1`, after clear/re-entry count became `2`. | PASS | `/tmp/level04_slice2/logs/rt04_latch_rearm.json` |
+| RT-05 | Called public `add_suspension_source(&"shard_reward")`, entered `SoftReturnVolume`, moved clear, then called public `remove_suspension_source(&"shard_reward")`. | Pending recovery clears if Player exits all registered volumes before suspension ends. | During suspension event count `0`; final event count after clear/unlock remained `0`; Player remained at clear setup position rather than being teleported. | PASS | `/tmp/level04_slice2/logs/rt05_suspension_clear.json` |
+| RT-06 | Called public `add_suspension_source(&"main_text")`, entered `SoftReturnVolume`, remained overlapping, then called public `remove_suspension_source(&"main_text")`. | Pending recovery performs once if Player remains invalid/overlapping at unlock. | During suspension event count `0`; after unlock final event count `1`; recovery returned to `RA0_ARRIVAL`, transform delta about `0.0091 m`, velocity `(0,0,0)`. | PASS | `/tmp/level04_slice2/logs/rt06_suspension_perform.json` |
+| RT-07 | Static source scan of Level_04 recovery scripts only. | Explicit NodePaths and public Player API only; no private Player field access, nearest-anchor scan, wildcard discovery, group/global scan, or per-frame world search. | No forbidden source tokens found; explicit `recovery_volume_paths` and `recovery_anchor_paths` present; `_player.velocity = Vector3.ZERO` present. | PASS | `/tmp/level04_slice2/logs/rt07_static_source_check.json` |
+
+### Rows Converted from Previous `NOT_VERIFIED`
+
+#### `NOT_VERIFIED` -> `PASS`
+
+- Repeated fall into each recovery volume with live physics overlap: PASS via RT-02.
+- Duplicate exterior-corner/broad overlap behavior: PASS via RT-03.
+- Latch rearm after one physics-frame clear: PASS via RT-04.
+- Suspended recovery clear branch: PASS via RT-05.
+- Suspended recovery perform branch: PASS via RT-06.
+- `Player.velocity == Vector3.ZERO` observed through live fall recovery: PASS via RT-02 and RT-06.
+- No private Player access / no nearest scan / no wildcard discovery: PASS via RT-07.
+
+#### `NOT_VERIFIED` -> `FAIL`
+
+- Full manual/shared Player traversal through RA0-RA11: FAIL — PRODUCTION_DEFECT_LEVEL_04_LOCAL. Runtime harness accepted 9 of 12 anchors, but RA2, RA4 and RA5 did not become the latest valid anchor through production overlap/grounding evidence.
+- Full shared-Player grounded root-Y traversal evidence: FAIL — PRODUCTION_DEFECT_LEVEL_04_LOCAL. Runtime harness recorded grounded root-Y evidence for the anchors that passed, but RA2, RA4 and RA5 cannot be frozen as accepted grounded RA contacts from current production geometry/anchor configuration.
+
+#### Still `NOT_VERIFIED`
+
+- None. The continuation classified every previously remaining item as either PASS or FAIL using the allowed classification vocabulary.
+
+### Final Slice 2 Runtime Status
+
+- Final Slice 2 status: `CORRECTION REQUIRED — SLICE 2 RUNTIME RECOVERY NOT COMPLETE`.
+- Reason: RT-02 through RT-07 pass, but RT-01 fails because RA2, RA4 and RA5 do not update as latest valid anchors through grounded production `RecoveryAnchorZone` contact in the headless runtime matrix.
+- Manual publication handoff: local evidence and summary update only; push proof remains `NOT VERIFIED` because pushing and PR publication are prohibited for this task.
