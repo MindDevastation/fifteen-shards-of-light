@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/levels/level_04/level_04_recovery_volume.gd" id="1_script"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_default"]
+size = Vector3(2, 2, 2)
+
+[node name="Level04RecoveryVolume" type="Area3D"]
+monitoring = true
+monitorable = true
+script = ExtResource("1_script")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_default")
