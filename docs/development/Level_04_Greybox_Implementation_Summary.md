@@ -151,3 +151,66 @@ The implementation preserves the approved RA X/Z coordinates and serializes the 
 - Final Slice 2 status: `CORRECTION REQUIRED — SLICE 2 RUNTIME RECOVERY NOT COMPLETE`.
 - Reason: RT-02 through RT-07 pass, but RT-01 fails because RA2, RA4 and RA5 do not update as latest valid anchors through grounded production `RecoveryAnchorZone` contact in the headless runtime matrix.
 - Manual publication handoff: local evidence and summary update only; push proof remains `NOT VERIFIED` because pushing and PR publication are prohibited for this task.
+
+## Slice 2 RA2/RA4/RA5 Grounding Correction
+
+- Current branch: `work`.
+- Starting HEAD: `e740cf4d0326b6ef961619501aa057e1da0455d3`.
+- Final HEAD: pending local commit at time of writing; see handoff final response for committed SHA.
+- Changed files in this correction attempt: `docs/development/Level_04_Greybox_Implementation_Summary.md` only.
+- Source fixes: none. Diagnostics show the remaining RT-01 defect requires block-scene geometry/support correction outside the allowed Slice 2 correction scope.
+- External focused diagnostics: `/tmp/level04_slice2/focused_anchor_diagnostics.gd`, evidence JSON `/tmp/level04_slice2/logs/focused_anchor_diagnostics.json`.
+
+### RA2 Diagnosis and Blocker
+
+- Anchor: `RA2_CANOPY_INITIAL`.
+- Anchor node path: `GameplayRoot/SafetyRoot/RecoveryAnchors/RA2`.
+- Current anchor / floor anchor origin: `Vector3(-12.00, 0.80, -29.00)`.
+- Current ArrivalZone extents: `Vector3(1.50, 1.00, 1.50)`.
+- Failure class: `BLOCK_SCENE_GEOMETRY_SUPPORT_MISSING`.
+- Offending block scene path: `scenes/levels/level_04/blocks/Block_04_01_CrossingTree.tscn`.
+- Offending surface/collision node: `CanopyEntrance_A1/Collision` using `Shape_2`, with `CanopyEntrance_A1` centered at `Vector3(-8.00, 0.40, -33.00)` and `Shape_2` size `Vector3(7.00, 0.20, 7.00)`.
+- Current support coverage: X `[-11.50, -4.50]`, Z `[-36.50, -29.50]`; approved RA2 X/Z `(-12.00, -29.00)` is outside both the west and north support edges.
+- Required correction: a block-scene geometry/support change must extend or reposition the Canopy initial floor/support so the approved RA2 X/Z coordinate has grounded Player floor contact without changing approved recovery-anchor X/Z.
+- Why `Level_04.tscn` / recovery anchor local fix is insufficient: moving the anchor or sensor in `Level_04.tscn` to a nearby supported position would change approved RA2 X/Z authority, while enlarging the sensor cannot make the shared Player grounded on missing floor support.
+
+### RA4 Diagnosis and Blocker
+
+- Anchor: `RA4_RIPPLE_INITIAL`.
+- Anchor node path: `GameplayRoot/SafetyRoot/RecoveryAnchors/RA4`.
+- Current anchor / floor anchor origin: `Vector3(12.00, -0.20, -29.00)`.
+- Current ArrivalZone extents: `Vector3(1.50, 1.00, 1.50)`.
+- Failure class: `BLOCK_SCENE_GEOMETRY_SUPPORT_MISSING`.
+- Offending block scene path: `scenes/levels/level_04/blocks/Block_04_01_CrossingTree.tscn`.
+- Offending surface/collision node: `RippleEntrance_B1/Collision` using `Shape_3`, with `RippleEntrance_B1` centered at `Vector3(8.00, -0.30, -33.00)` and `Shape_3` size `Vector3(7.00, 0.20, 7.00)`.
+- Current support coverage: X `[4.50, 11.50]`, Z `[-36.50, -29.50]`; approved RA4 X/Z `(12.00, -29.00)` is outside both the east and north support edges.
+- Required correction: a block-scene geometry/support change must extend or reposition the Ripple initial floor/support so the approved RA4 X/Z coordinate has grounded Player floor contact without changing approved recovery-anchor X/Z.
+- Why `Level_04.tscn` / recovery anchor local fix is insufficient: moving the anchor or sensor in `Level_04.tscn` to a nearby supported position would change approved RA4 X/Z authority, while enlarging the sensor cannot make the shared Player grounded on missing floor support.
+
+### RA5 Diagnosis and Blocker
+
+- Anchor: `RA5_RIPPLE_FIRST_PASS`.
+- Anchor node path: `GameplayRoot/SafetyRoot/RecoveryAnchors/RA5`.
+- Current anchor / floor anchor origin: `Vector3(17.00, -0.30, 3.50)`.
+- Current ArrivalZone extents: `Vector3(1.50, 1.00, 1.50)`.
+- Failure class: `SEPARATION_WALL_COLLISION_INTERFERENCE`.
+- Offending block scene path: `scenes/levels/level_04/blocks/Block_04_04_RippleConversation.tscn`.
+- Offending surface/collision nodes: `RippleFirstShard_B3F/Collision` using `Shape_3` and `RippleTerraceSeparationWall/Collision` using `Shape_10`.
+- Current floor/support node: `RippleFirstShard_B3F`, centered at `Vector3(17.00, -0.40, 5.00)` with `Shape_3` size `Vector3(7.00, 0.20, 6.00)`; this places the floor top at `Y=-0.30` and covers approved RA5 X/Z.
+- Current interfering wall node: `RippleTerraceSeparationWall`, centered at `Vector3(18.00, -0.05, 8.00)` with `Shape_10` size `Vector3(2.00, 2.70, 12.00)`; its X range `[17.00, 19.00]` and Z range `[2.00, 14.00]` touches/overlaps the approved RA5 X/Z `(17.00, 3.50)`, causing the Player to resolve against wall/terrace collision rather than cleanly occupying the approved floor-anchor contact.
+- Required correction: a block-scene geometry/support change must move, trim, or otherwise reshape `RippleTerraceSeparationWall` so the approved RA5 X/Z coordinate remains grounded on `RippleFirstShard_B3F` without wall collision interference.
+- Why `Level_04.tscn` / recovery anchor local fix is insufficient: moving the anchor or sensor in `Level_04.tscn` to avoid the wall would change approved RA5 X/Z authority, while enlarging the sensor would risk accepting wrong wall/neighboring collision instead of proving clean approved floor contact.
+
+### Runtime Matrix Before / After
+
+- Runtime matrix before this diagnostic attempt: RT-01 `FAIL — PRODUCTION_DEFECT_LEVEL_04_LOCAL`; RT-02 through RT-07 PASS.
+- Runtime matrix after this diagnostic attempt: not rerun as a PASS candidate because no source fix was applied; focused diagnostics prove the necessary correction is in out-of-scope block-scene geometry.
+
+### Final Slice 2 RA2/RA4/RA5 Status
+
+- RT-01 result remains: `FAIL — PRODUCTION_DEFECT_LEVEL_04_LOCAL` pending block-scene geometry correction.
+- RT-02 through RT-07 regression status: unchanged from previous continuation (PASS); no recovery token/latch/suspension source was modified.
+- Rows converted FAIL -> PASS: none.
+- Rows still FAIL: RT-01 for RA2, RA4 and RA5.
+- Rows still NOT_VERIFIED: none introduced by this diagnostic pass.
+- Final Slice 2 status: `BLOCKED BY OUT-OF-SLICE GEOMETRY FIX REQUIREMENT`.
