@@ -354,3 +354,35 @@ The implementation preserves the approved RA X/Z coordinates and serializes the 
 - Remaining NOT_VERIFIED rows: push proof NOT VERIFIED; PR link NOT VERIFIED by process restriction/manual publication handoff.
 - Final Slice 4 status: G4 PASS - LOCAL HANDOFF READY.
 - Manual publication handoff: local commit only; do not push/create PR from this environment per task instruction. Godot project structure was preserved. Gameplay implemented: yes, limited to the approved Changing Canopy puzzle slice only.
+
+## Slice 5 - Ripple Conversation Puzzle
+
+- Current branch: `work`.
+- Starting HEAD: `309bf63cb7466dbe09a1f493af580255bb88fa59`.
+- Final HEAD: `85ef43e1ccc2fa9fce057fdf43e5ab20e2f9da07`.
+- Changed files: `scenes/levels/Level_04.tscn`, `scripts/levels/level_04/level_04_progress_controller.gd`, `scenes/levels/level_04/gameplay/RippleConversationPuzzle.tscn`, `scripts/levels/level_04/ripple_conversation_controller.gd`, `scenes/levels/level_04/vfx/L04_VFX_RippleContours.tscn`, `scripts/levels/level_04/ripple_conversation_controller.gd.uid`.
+- Created `.gd.uid` sidecars and sibling mapping: `scripts/levels/level_04/ripple_conversation_controller.gd.uid` maps to `scripts/levels/level_04/ripple_conversation_controller.gd`; no `level_04_progress_controller.gd.uid` change was required.
+- Slice 5 contract summary: implemented only the approved two-marker any-order Ripple Conversation puzzle with INITIAL/REMAINING footprints, marker-ID dedupe, primitive persistent contour placeholders, and one terminal `puzzle_completed(&"RIPPLE")` routed to Progress.
+- RippleConversationController implementation evidence: exact marker registry contains `RIPPLE_MARKER_1` and `RIPPLE_MARKER_2`; exact map is `R1I/R1R -> RIPPLE_MARKER_1` and `R2I/R2R -> RIPPLE_MARKER_2`; unknown footprint, wrong marker mapping, wrong route context, and duplicate marker completions are rejected or ignored before progress.
+- PresenceFootprint reuse evidence: Ripple scene instances reuse `Level04PresenceFootprint.tscn`; no Slice 5 edits were made to `Level04PresenceFootprint.tscn` or `level_04_presence_footprint.gd`.
+- Exact footprint coordinate evidence: `R1I = Vector3(21.00, -0.40, -22.00)`, `R1R = Vector3(29.00, -1.00, -18.00)`, `R2I = Vector3(20.00, -0.50, -9.00)`, `R2R = Vector3(28.00, -0.80, -5.00)`.
+- Exact identity map evidence: `debug_validate_identity_map() == true` in the Slice 5 validation matrix.
+- Exact Player NodePath evidence: every Ripple footprint exports `player_path = NodePath("../../../../../PlayerRoot/Player")` and the validation matrix confirms all resolve to the shared Player node.
+- Marker-order matrix: `RIPPLE_MARKER_1 -> RIPPLE_MARKER_2` PASS; `RIPPLE_MARKER_2 -> RIPPLE_MARKER_1` PASS.
+- Remaining-context matrix: `R1R -> R2R` PASS; `R2R -> R1R` PASS.
+- Mixed-context duplicate matrix: `R1I then R1R` PASS; `R1R then R1I` PASS; `R2I then R2R` PASS; `R2R then R2I` PASS.
+- Current-overlap reuse result: PASS by reusing accepted PresenceFootprint current-overlap reevaluation and 0.45 s grounded dwell contract.
+- Non-Player / airborne rejection reuse result: PASS by reusing accepted PresenceFootprint configured-player and grounded checks.
+- Progress integration result: PASS; `ripple_controller_path` is now a present staged dependency and the deliberately unresolved staged list remains the six future dependencies: `ShardSlot_08`, `ShardSlot_09`, `CanopyRemainingShardZone`, `RippleRemainingShardZone`, `FinaleController`, and `PortalAdapter`.
+- Cross-branch arbitration result: PASS; Ripple-first fixes first candidate to `RIPPLE`, remaining branch to `CANOPY`, and subsequent Canopy completion does not mutate the first candidate or unlock shards/reward/finale/portal.
+- No-shard/reward/finale/portal evidence: no shard slots, reward flow, finale controller, portal adapter, portal activation, scene loading, or shard manipulation were added by Slice 5.
+- No-water-shader/audio/final-art evidence: `L04_VFX_RippleContours.tscn` contains only local primitive CSG contour placeholders and local materials; no imported assets, particles, audio, final water shader, or production VFX were added.
+- Check-only result: PASS with known pre-existing shared Player/SoulOrb import and animation script cache errors still reported by Godot.
+- Startup result: PASS with known pre-existing shared Player/SoulOrb import and animation script cache errors still reported by Godot.
+- Runtime validation matrix result: PASS for ST5-01 through ST5-11.
+- `git diff --check` result: PASS.
+- Forbidden files touched: no.
+- Remaining FAIL rows: none.
+- Remaining NOT_VERIFIED rows: push proof NOT VERIFIED by instruction; PR link NOT VERIFIED by instruction.
+- Final Slice 5 status: G5 PASS - LOCAL HANDOFF READY.
+- Manual publication handoff: commit locally, then manual publisher may push/open PR; this agent did not push or publish.

@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=3]
+[gd_scene load_steps=32 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/levels/level_04/blocks/Block_04_00_Arrival.tscn" id="1_arrival"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_04/blocks/Block_04_01_CrossingTree.tscn" id="2_tree"]
@@ -19,6 +19,8 @@
 [ext_resource type="PackedScene" path="res://scenes/levels/level_04/vfx/L04_VFX_CloudShadow.tscn" id="17_cloud_shadow"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_04/gameplay/ChangingCanopyPuzzle.tscn" id="18_canopy_puzzle"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_04/vfx/L04_VFX_CanopyFeedback.tscn" id="19_canopy_feedback"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_04/gameplay/RippleConversationPuzzle.tscn" id="20_ripple_puzzle"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_04/vfx/L04_VFX_RippleContours.tscn" id="21_ripple_contours"]
 
 
 [sub_resource type="Environment" id="Environment_e0_balanced"]
@@ -64,6 +66,7 @@ metadata/approved_base = "13d84fb733f85090caf23487ece419f1ca2951b6"
 [node name="GameplayRoot" type="Node3D" parent="."]
 [node name="PuzzleRoot" type="Node3D" parent="GameplayRoot"]
 [node name="ChangingCanopyPuzzle" parent="GameplayRoot/PuzzleRoot" instance=ExtResource("18_canopy_puzzle")]
+[node name="RippleConversationPuzzle" parent="GameplayRoot/PuzzleRoot" instance=ExtResource("20_ripple_puzzle")]
 [node name="ShardRoot" type="Node3D" parent="GameplayRoot"]
 [node name="RouteAuthorityRoot" type="Node3D" parent="GameplayRoot"]
 [node name="PortalRoot" type="Node3D" parent="GameplayRoot"]
@@ -210,6 +213,7 @@ spot_angle = 34.0
 [node name="CanopyPresentationRoot" type="Node3D" parent="VFXRoot"]
 [node name="L04_VFX_CanopyFeedback" parent="VFXRoot/CanopyPresentationRoot" instance=ExtResource("19_canopy_feedback")]
 [node name="RipplePresentationRoot" type="Node3D" parent="VFXRoot"]
+[node name="L04_VFX_RippleContours" parent="VFXRoot/RipplePresentationRoot" instance=ExtResource("21_ripple_contours")]
 [node name="RemainingBranchGuidanceRoot" type="Node3D" parent="VFXRoot"]
 [node name="CanopyGuidance" type="Node3D" parent="VFXRoot/RemainingBranchGuidanceRoot"]
 [node name="RippleGuidance" type="Node3D" parent="VFXRoot/RemainingBranchGuidanceRoot"]
