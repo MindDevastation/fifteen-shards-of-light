@@ -490,3 +490,38 @@ The implementation preserves the approved RA X/Z coordinates and serializes the 
 - Remaining NOT_VERIFIED rows: `NOT_VERIFIED — HEADLESS_PHYSICS_LIMITATION` remains inherited for ST7 recovery persistence/manual locomotion physics; no new Slice 8 headless row is unverified.
 - Final Slice 8 status: G8 PASS — LOCAL HANDOFF READY.
 - Manual publication handoff: local commit only; no push performed and push proof is NOT VERIFIED. Godot project structure was preserved. Gameplay authority was not expanded by environment code; Slice 8 added presentation-only environment progression and Weather Weave placeholder behavior.
+
+## Slice 9 - Final Pavilion, Weather-Weave Handoff and Main Text
+
+- Current branch: `work`.
+- Starting HEAD: `ec9eff840bb43e2432defe792665a384e93f02e9`.
+- Final HEAD: `ba660fdad1a9d7f18875bd5b98de431f3e0d2d7a`.
+- Changed files: `scenes/levels/Level_04.tscn`, `scripts/levels/level_04/level_04_finale_controller.gd`, `scripts/levels/level_04/level_04_finale_controller.gd.uid`, `scripts/levels/level_04/level_04_progress_controller.gd`, `docs/development/Level_04_Greybox_Implementation_Summary.md`.
+- Created `.gd.uid` sidecars and sibling mapping: `scripts/levels/level_04/level_04_finale_controller.gd.uid` maps to `scripts/levels/level_04/level_04_finale_controller.gd`.
+- Slice 9 contract summary: implemented FinalTextGate occupancy, `Level04FinaleController`, Progress handoff after Weather Weave terminal, exact fail-closed `LEVEL_04_MAIN_TEXT` presentation, owned Player control lock, owned recovery suspension source `main_text`, shared `LevelFinaleOverlay.closed` handling, and debug evidence without portal activation, portal adapter, scene loading, timer skip, cinematics, audio, particles, or final art.
+- Accepted Slice 8 base / Producer caveat decision: PASS; local checkout starts from merged PR #119 (`ec9eff8`) and contains `L04_VFX_WeatherWeave`, E0/E1/E2/E3 environment state behavior, callback/fallback Weather Weave terminal evidence, `BOTH_REWARDS_COMPLETE`, and Slice 8 `G8 PASS`; inherited ST6/ST7 manual QA caveats remain accepted and non-blocking for Slice 9.
+- Shared LevelFinaleOverlay API revalidation: PASS; read-only API scan confirmed `class_name LevelFinaleOverlay`, `signal closed`, and `func show_finale_text(text: String) -> bool`; Slice 9 uses this API only and does not modify shared UI.
+- Shared Player controls API revalidation: PASS; read-only API scan confirmed public `set_controls_enabled(enabled: bool)`; Slice 9 uses this API only and does not access private Player fields.
+- FinalTextGate evidence: PASS; `FinalTextGate` is an `Area3D` under `GameplayRoot/RouteAuthorityRoot`, centered at `Vector3(0,2,52)` with explicit `CollisionShape3D` and `BoxShape3D` size `Vector3(8,3,8)`, plus explicit body-entered/body-exited connections to `Level04FinaleController` wrappers.
+- FinaleController implementation evidence: PASS; created `Level04FinaleController` with required signals, exports, public APIs, exact text validation, deferred arm reevaluation, fail-closed overlay acceptance, owned lock/suspension cleanup, duplicate-close guard, and debug snapshot evidence.
+- Exact text ID/text equality evidence: PASS; harness and static scan verified `main_text_id == &"LEVEL_04_MAIN_TEXT"` and byte/string equality with the locked Russian text, including `ё` and the short hyphen, with no decorative outer quotation marks.
+- Unarmed gate occupancy evidence: PASS; runtime harness placed the configured Player inside the gate while disarmed and verified no text start, no Player lock, no recovery suspension, and no portal activation request.
+- Early-overlap reevaluation evidence: PASS; runtime harness reported gate presence before arming, called `arm_finale()`, awaited the deferred pass, and verified the text started without exit/re-entry with exactly one `main_text_started(&"LEVEL_04_MAIN_TEXT")`.
+- Normal entry after arming evidence: PASS; controller path supports armed-but-outside no-op and starts only when `report_gate_presence(true)` observes the configured Player; runtime harness verified active text disables controls and adds only `main_text` while active.
+- Normal close path evidence: PASS; runtime harness used the actual shared-style `closed` signal path and verified exactly one `main_text_closed(&"LEVEL_04_MAIN_TEXT")`, Player controls re-enabled, recovery `main_text` removed, no `EXIT`, and no portal activation request.
+- Overlay false-return fail-closed evidence: PASS; runtime harness stubbed `show_finale_text()` to return `false` and verified no `main_text_started`, no `MAIN_TEXT`, no Player lock leak, no recovery suspension leak, and an error snapshot.
+- Missing overlay/API fail-closed evidence: PASS; runtime harness removed the overlay and verified `debug_validate_configuration() == false`, `arm_finale() == false`, no text start, no Player lock, no recovery suspension, and no crash.
+- Duplicate event idempotence evidence: PASS; duplicate `arm_finale()` is a no-op success, duplicate gate entry cannot duplicate text because showing/completed latches block restarts, duplicate overlay close is ignored, and duplicate Weather Weave terminal returns before a second arm.
+- Progress integration evidence for both branch orders: PASS by code path and harness assertions; Progress preserves Slice 8 reward ordering, arms Finale only after `_both_rewards_complete` and `_weather_weave_terminal_seen`, enters `MAIN_TEXT` only from `main_text_started`, records `main_text_closed`, does not enter `EXIT`, and keeps unresolved future dependency count exactly one: `portal_adapter_path`.
+- Control/recovery ownership evidence: PASS; Finale disables Player controls and adds `main_text` only after overlay acceptance, re-enables/removes only if it owns those latches, and never removes `shard_reward`.
+- No-portal/scene-loading evidence: PASS; static scan found no `LevelPortal` instance, no `Level04PortalAdapter` node, no portal activation call, no `change_scene`, no `SceneTransition`, no timer-based text skip, no root/global scans, no group-based gate identity, no world-position identity inference, and no private Player field access in Slice 9 code.
+- Import/load result: WARNING; known pre-existing import/cache/resource errors remain in shared Player, SoulOrb, reward overlay, and finale overlay assets. No new uncontrolled Slice 9 configuration error was introduced.
+- Check-only result: WARNING; `godot --headless --path . --quit --check-only scenes/levels/Level_04.tscn` exited 0 but printed the accepted pre-existing shared import/cache/script-resource errors.
+- Startup result: PASS; `godot --headless --path . --quit` exited 0.
+- Runtime validation matrix result: PASS; `godot --headless --path . --script /tmp/level04_slice9/slice9_validation_matrix.gd` exited 0 with `ST9 validation matrix PASS`.
+- `git diff --check` result: PASS; no whitespace errors.
+- Forbidden files touched: no; changes are limited to the allowed create/modify set and the allowed sibling `.gd.uid` sidecar.
+- Remaining FAIL rows: none for Slice 9 harness assertions.
+- Remaining NOT_VERIFIED rows: none; renderer-dependent polish remains outside Slice 9 and no manual renderer row was required for this greybox handoff.
+- Final Slice 9 status: G9 PASS — LOCAL HANDOFF READY.
+- Manual publication handoff: commit locally, do not push, do not create PR, and publish manually after review.

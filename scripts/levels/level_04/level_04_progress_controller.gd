@@ -30,7 +30,8 @@ const SHARD_09 := &"Shard_09"
 const SUSPENSION_SHARD_REWARD := &"shard_reward"
 const CANOPY_REMAINING_ZONE := &"CanopyRemainingShardZone"
 const RIPPLE_REMAINING_ZONE := &"RippleRemainingShardZone"
-const _EXPECTED_FUTURE_DEPENDENCY_COUNT := 2
+const MAIN_TEXT_ID := &"LEVEL_04_MAIN_TEXT"
+const _EXPECTED_FUTURE_DEPENDENCY_COUNT := 1
 
 @export var configuration_mode: ConfigurationMode = ConfigurationMode.STAGED_SLICE_3
 @export var canopy_controller_path := NodePath("../../GameplayRoot/PuzzleRoot/ChangingCanopyPuzzle/ChangingCanopyController")
@@ -72,6 +73,11 @@ var _weather_weave_generation := 0
 var _weather_weave_terminal_seen := false
 var _weather_weave_terminal_source := &""
 var _environment_phase_requested := &"E0"
+var _finale_armed := false
+var _main_text_started := false
+var _main_text_closed := false
+var _main_text_id := &""
+var _portal_activation_requested := false
 
 func _ready() -> void:
 	if configuration_mode == ConfigurationMode.STAGED_SLICE_3:
@@ -93,8 +99,10 @@ func validate_available_dependencies() -> bool:
 	ok = _validate_present_dependency(&"canopy_remaining_zone", canopy_remaining_zone_path, "Area3D") and ok
 	ok = _validate_present_dependency(&"ripple_remaining_zone", ripple_remaining_zone_path, "Area3D") and ok
 	ok = _validate_present_dependency(&"environment_controller", environment_controller_path, "Level04EnvironmentStateController") and ok
+	ok = _validate_present_dependency(&"finale_controller", finale_controller_path, "Level04FinaleController") and ok
 	ok = _validate_present_dependency(&"recovery_controller", recovery_controller_path, "Level04RecoveryController") and ok
 	_wire_slice_6_dependencies()
+	_wire_slice_9_dependencies()
 	if _deliberately_unresolved_dependencies.size() != _EXPECTED_FUTURE_DEPENDENCY_COUNT:
 		_emit_configuration_error(&"Level04ProgressController", "staged future dependency set does not match the Slice 3 contract")
 		ok = false
@@ -119,6 +127,7 @@ func validate_production_configuration() -> bool:
 	ok = _validate_present_dependency(&"shard_reward_overlay", shard_reward_overlay_path, "Node") and ok
 	ok = _validate_present_dependency(&"player", player_path, "Node") and ok
 	_wire_slice_6_dependencies()
+	_wire_slice_9_dependencies()
 	return ok
 
 func get_state() -> MacroState:
@@ -191,6 +200,11 @@ func request_debug_snapshot() -> Dictionary:
 		"weather_weave_terminal_seen": _weather_weave_terminal_seen,
 		"weather_weave_terminal_source": _weather_weave_terminal_source,
 		"environment_phase_requested": _environment_phase_requested,
+		"finale_armed": _finale_armed,
+		"main_text_started": _main_text_started,
+		"main_text_closed": _main_text_closed,
+		"main_text_id": _main_text_id,
+		"portal_activation_requested": _portal_activation_requested,
 		"unresolved_future_dependencies": _deliberately_unresolved_dependencies.duplicate(),
 		"deliberately_unresolved_dependencies": _deliberately_unresolved_dependencies.duplicate(),
 		"present_dependency_validation": _present_dependency_validation.duplicate(true),
@@ -211,6 +225,16 @@ func _wire_slice_6_dependencies() -> void:
 		_register_slot_soul_shard_with_reward_controller(slot)
 	_wire_remaining_zone(canopy_remaining_zone_path, BRANCH_CANOPY)
 	_wire_remaining_zone(ripple_remaining_zone_path, BRANCH_RIPPLE)
+
+
+func _wire_slice_9_dependencies() -> void:
+	var finale := get_node_or_null(finale_controller_path)
+	if finale == null:
+		return
+	if finale.has_signal(&"main_text_started") and not finale.is_connected(&"main_text_started", _on_main_text_started):
+		finale.connect(&"main_text_started", _on_main_text_started)
+	if finale.has_signal(&"main_text_closed") and not finale.is_connected(&"main_text_closed", _on_main_text_closed):
+		finale.connect(&"main_text_closed", _on_main_text_closed)
 
 
 func _wire_remaining_zone(path: NodePath, branch_id: StringName) -> void:
@@ -338,8 +362,44 @@ func _request_e2_weather_weave() -> void:
 
 
 func _on_weather_weave_terminal(source: StringName) -> void:
+	if _weather_weave_terminal_seen:
+		return
 	_weather_weave_terminal_seen = true
 	_weather_weave_terminal_source = source
+	_arm_finale_after_weather_weave()
+
+
+func _arm_finale_after_weather_weave() -> void:
+	if _finale_armed or not _both_rewards_complete or not _weather_weave_terminal_seen:
+		return
+	var finale := get_node_or_null(finale_controller_path)
+	if finale == null or not finale.has_method(&"arm_finale"):
+		_emit_configuration_error(&"Level04ProgressController", "finale controller missing arm_finale")
+		return
+	_finale_armed = bool(finale.call(&"arm_finale"))
+
+
+func _on_main_text_started(text_id) -> void:
+	var typed_id := StringName(text_id)
+	if typed_id != MAIN_TEXT_ID:
+		_emit_configuration_error(&"Level04ProgressController", "unexpected main text ID started")
+		return
+	if _main_text_started:
+		return
+	_main_text_started = true
+	_main_text_id = typed_id
+	_state = MacroState.MAIN_TEXT
+
+
+func _on_main_text_closed(text_id) -> void:
+	var typed_id := StringName(text_id)
+	if typed_id != MAIN_TEXT_ID:
+		_emit_configuration_error(&"Level04ProgressController", "unexpected main text ID closed")
+		return
+	if _main_text_closed:
+		return
+	_main_text_closed = true
+	_main_text_id = typed_id
 
 
 func _expected_first_shard_id() -> StringName:
@@ -415,7 +475,6 @@ func _validate_present_dependency(key: StringName, path: NodePath, expected_type
 
 func _collect_missing_future_dependencies() -> Array[StringName]:
 	var missing: Array[StringName] = []
-	_add_missing(missing, &"finale_controller_path", finale_controller_path)
 	_add_missing(missing, &"portal_adapter_path", portal_adapter_path)
 	return missing
 

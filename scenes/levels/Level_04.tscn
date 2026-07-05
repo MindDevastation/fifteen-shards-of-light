@@ -1,4 +1,4 @@
-[gd_scene load_steps=39 format=3]
+[gd_scene load_steps=42 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/levels/level_04/blocks/Block_04_00_Arrival.tscn" id="1_arrival"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_04/blocks/Block_04_01_CrossingTree.tscn" id="2_tree"]
@@ -26,6 +26,8 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/ShardRewardOverlay.tscn" id="24_reward_overlay"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_04/vfx/L04_VFX_RemainingGuidance.tscn" id="25_remaining_guidance"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_04/vfx/L04_VFX_WeatherWeave.tscn" id="26_weather_weave"]
+[ext_resource type="Script" path="res://scripts/levels/level_04/level_04_finale_controller.gd" id="27_finale_controller"]
+[ext_resource type="PackedScene" path="res://scenes/ui/LevelFinaleOverlay.tscn" id="28_finale_overlay"]
 
 
 [sub_resource type="Environment" id="Environment_e0_balanced"]
@@ -61,6 +63,9 @@ size = Vector3(10, 2, 18)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ripple_remaining_reward_zone"]
 size = Vector3(4, 2, 4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_final_text_gate"]
+size = Vector3(8, 3, 8)
 
 [node name="Level_04" type="Node3D"]
 metadata/title = "Level_04 «Я скучаю именно по тебе»"
@@ -134,6 +139,17 @@ shape = SubResource("BoxShape3D_ripple_remaining_reward_zone")
 [node name="PortalRoot" type="Node3D" parent="GameplayRoot"]
 [node name="PortalFloorAnchor" type="Marker3D" parent="GameplayRoot/PortalRoot"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 2, 56.5)
+
+[node name="FinalTextGate" type="Area3D" parent="GameplayRoot/RouteAuthorityRoot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 52)
+collision_layer = 0
+collision_mask = 1
+monitorable = false
+metadata/coverage = "center Vector3(0,2,52), size Vector3(8,3,8); covers final pavilion rest point without Weather Weave center or portal activation ownership"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GameplayRoot/RouteAuthorityRoot/FinalTextGate"]
+shape = SubResource("BoxShape3D_final_text_gate")
+
 [node name="SafetyRoot" type="Node3D" parent="GameplayRoot"]
 [node name="RecoveryVolumes" type="Node3D" parent="GameplayRoot/SafetyRoot"]
 [node name="SoftReturnVolume" parent="GameplayRoot/SafetyRoot/RecoveryVolumes" instance=ExtResource("11_recovery_volume")]
@@ -316,6 +332,13 @@ overlay_path = NodePath("../../UILayer/ShardRewardOverlay")
 player_path = NodePath("../../PlayerRoot/Player")
 shard_search_root_path = NodePath("../../GameplayRoot/ShardRoot")
 
+[node name="Level04FinaleController" type="Node" parent="LevelRuntimeRoot"]
+script = ExtResource("27_finale_controller")
+player_path = NodePath("../../PlayerRoot/Player")
+final_text_gate_path = NodePath("../../GameplayRoot/RouteAuthorityRoot/FinalTextGate")
+finale_overlay_path = NodePath("../../UILayer/LevelFinaleOverlay")
+recovery_controller_path = NodePath("../Level04RecoveryController")
+
 [node name="Level04ProgressController" type="Node" parent="LevelRuntimeRoot"]
 script = ExtResource("14_progress_controller")
 configuration_mode = 0
@@ -335,8 +358,12 @@ player_path = NodePath("../../PlayerRoot/Player")
 
 [node name="UILayer" type="CanvasLayer" parent="."]
 [node name="ShardRewardOverlay" parent="UILayer" instance=ExtResource("24_reward_overlay")]
+[node name="LevelFinaleOverlay" parent="UILayer" instance=ExtResource("28_finale_overlay")]
 
 [connection signal="body_entered" from="GameplayRoot/RouteAuthorityRoot/CanopyRemainingShardZone" to="LevelRuntimeRoot/Level04ProgressController" method="_on_remaining_zone_body_entered" binds= [&"CANOPY"]]
 [connection signal="body_exited" from="GameplayRoot/RouteAuthorityRoot/CanopyRemainingShardZone" to="LevelRuntimeRoot/Level04ProgressController" method="_on_remaining_zone_body_exited" binds= [&"CANOPY"]]
 [connection signal="body_entered" from="GameplayRoot/RouteAuthorityRoot/RippleRemainingShardZone" to="LevelRuntimeRoot/Level04ProgressController" method="_on_remaining_zone_body_entered" binds= [&"RIPPLE"]]
 [connection signal="body_exited" from="GameplayRoot/RouteAuthorityRoot/RippleRemainingShardZone" to="LevelRuntimeRoot/Level04ProgressController" method="_on_remaining_zone_body_exited" binds= [&"RIPPLE"]]
+
+[connection signal="body_entered" from="GameplayRoot/RouteAuthorityRoot/FinalTextGate" to="LevelRuntimeRoot/Level04FinaleController" method="_on_final_text_gate_body_entered"]
+[connection signal="body_exited" from="GameplayRoot/RouteAuthorityRoot/FinalTextGate" to="LevelRuntimeRoot/Level04FinaleController" method="_on_final_text_gate_body_exited"]
