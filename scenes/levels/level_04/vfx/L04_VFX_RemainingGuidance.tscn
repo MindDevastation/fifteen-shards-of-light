@@ -1,0 +1,21 @@
+[gd_scene load_steps=3 format=3]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_remaining_guidance"]
+albedo_color = Color(0.45, 0.7, 1, 0.35)
+transparency = 1
+shading_mode = 0
+
+[sub_resource type="BoxMesh" id="BoxMesh_remaining_guidance"]
+material = SubResource("StandardMaterial3D_remaining_guidance")
+size = Vector3(1, 0.08, 1)
+
+[node name="L04_VFX_RemainingGuidance" type="Node3D"]
+visible = false
+
+[node name="CanopyRemainingHint" type="MeshInstance3D" parent="."]
+transform = Transform3D(18, 0, 0, 0, 1, 0, 0, 0, 29, -23, 4.08, -3.5)
+mesh = SubResource("BoxMesh_remaining_guidance")
+
+[node name="RippleRemainingHint" type="MeshInstance3D" parent="."]
+transform = Transform3D(16, 0, 0, 0, 1, 0, 0, 0, 31, 24, -0.62, -3.5)
+mesh = SubResource("BoxMesh_remaining_guidance")
