@@ -1,4 +1,4 @@
-[gd_scene load_steps=35 format=3]
+[gd_scene load_steps=38 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/levels/level_04/blocks/Block_04_00_Arrival.tscn" id="1_arrival"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_04/blocks/Block_04_01_CrossingTree.tscn" id="2_tree"]
@@ -24,6 +24,7 @@
 [ext_resource type="PackedScene" path="res://scenes/levels/level_04/gameplay/Level04ShardSlot.tscn" id="22_shard_slot"]
 [ext_resource type="PackedScene" path="res://scenes/core/ShardRewardSequenceController.tscn" id="23_reward_controller"]
 [ext_resource type="PackedScene" path="res://scenes/ui/ShardRewardOverlay.tscn" id="24_reward_overlay"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_04/vfx/L04_VFX_RemainingGuidance.tscn" id="25_remaining_guidance"]
 
 
 [sub_resource type="Environment" id="Environment_e0_balanced"]
@@ -50,6 +51,15 @@ size = Vector3(78, 20, 8)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_recovery_anchor"]
 size = Vector3(3, 2, 3)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_canopy_remaining_zone"]
+size = Vector3(20, 2, 60)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ripple_remaining_route_zone"]
+size = Vector3(10, 2, 18)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ripple_remaining_reward_zone"]
+size = Vector3(4, 2, 4)
 
 [node name="Level_04" type="Node3D"]
 metadata/title = "Level_04 «Я скучаю именно по тебе»"
@@ -93,6 +103,33 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, -0.3, 5)
 [node name="RemainingPassAnchor" parent="GameplayRoot/ShardRoot/ShardSlot_09" index="1"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, -0.3, 11)
 [node name="RouteAuthorityRoot" type="Node3D" parent="GameplayRoot"]
+[node name="CanopyRemainingShardZone" type="Area3D" parent="GameplayRoot/RouteAuthorityRoot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21, 4, -5)
+collision_layer = 0
+collision_mask = 1
+monitorable = false
+metadata/branch_id = &"CANOPY"
+metadata/coverage = "center Vector3(-21,4,-5), size Vector3(20,2,60); includes C1R/C2R/C3R/A3R; excludes lower Canopy initial C1I/C2I/C3I/A3F by Y, Ripple by X, Weather Weave and pavilion by X/Z"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GameplayRoot/RouteAuthorityRoot/CanopyRemainingShardZone"]
+shape = SubResource("BoxShape3D_canopy_remaining_zone")
+
+[node name="RippleRemainingShardZone" type="Area3D" parent="GameplayRoot/RouteAuthorityRoot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23, -0.7, -4)
+collision_layer = 0
+collision_mask = 1
+monitorable = false
+metadata/branch_id = &"RIPPLE"
+metadata/coverage = "two explicit boxes: route center Vector3(28,-0.7,-11.5), size Vector3(10,2,18) includes R1R/R2R and excludes R1I/R2I; reward center Vector3(17,-0.3,11), size Vector3(4,2,4) includes B3R and excludes B3F; both exclude Canopy, Weather Weave and pavilion"
+
+[node name="RouteCollisionShape3D" type="CollisionShape3D" parent="GameplayRoot/RouteAuthorityRoot/RippleRemainingShardZone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -7.5)
+shape = SubResource("BoxShape3D_ripple_remaining_route_zone")
+
+[node name="RewardCollisionShape3D" type="CollisionShape3D" parent="GameplayRoot/RouteAuthorityRoot/RippleRemainingShardZone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.4, 15)
+shape = SubResource("BoxShape3D_ripple_remaining_reward_zone")
+
 [node name="PortalRoot" type="Node3D" parent="GameplayRoot"]
 [node name="PortalFloorAnchor" type="Marker3D" parent="GameplayRoot/PortalRoot"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 2, 56.5)
@@ -239,6 +276,7 @@ spot_angle = 34.0
 [node name="RipplePresentationRoot" type="Node3D" parent="VFXRoot"]
 [node name="L04_VFX_RippleContours" parent="VFXRoot/RipplePresentationRoot" instance=ExtResource("21_ripple_contours")]
 [node name="RemainingBranchGuidanceRoot" type="Node3D" parent="VFXRoot"]
+[node name="L04_VFX_RemainingGuidance" parent="VFXRoot/RemainingBranchGuidanceRoot" instance=ExtResource("25_remaining_guidance")]
 [node name="CanopyGuidance" type="Node3D" parent="VFXRoot/RemainingBranchGuidanceRoot"]
 [node name="RippleGuidance" type="Node3D" parent="VFXRoot/RemainingBranchGuidanceRoot"]
 [node name="WeatherWeaveVFX" type="Node3D" parent="VFXRoot"]
@@ -289,6 +327,12 @@ portal_adapter_path = NodePath("../Level04PortalAdapter")
 recovery_controller_path = NodePath("../Level04RecoveryController")
 shard_reward_controller_path = NodePath("../ShardRewardSequenceController")
 shard_reward_overlay_path = NodePath("../../UILayer/ShardRewardOverlay")
+player_path = NodePath("../../PlayerRoot/Player")
 
 [node name="UILayer" type="CanvasLayer" parent="."]
 [node name="ShardRewardOverlay" parent="UILayer" instance=ExtResource("24_reward_overlay")]
+
+[connection signal="body_entered" from="GameplayRoot/RouteAuthorityRoot/CanopyRemainingShardZone" to="LevelRuntimeRoot/Level04ProgressController" method="_on_remaining_zone_body_entered" binds= [&"CANOPY"]]
+[connection signal="body_exited" from="GameplayRoot/RouteAuthorityRoot/CanopyRemainingShardZone" to="LevelRuntimeRoot/Level04ProgressController" method="_on_remaining_zone_body_exited" binds= [&"CANOPY"]]
+[connection signal="body_entered" from="GameplayRoot/RouteAuthorityRoot/RippleRemainingShardZone" to="LevelRuntimeRoot/Level04ProgressController" method="_on_remaining_zone_body_entered" binds= [&"RIPPLE"]]
+[connection signal="body_exited" from="GameplayRoot/RouteAuthorityRoot/RippleRemainingShardZone" to="LevelRuntimeRoot/Level04ProgressController" method="_on_remaining_zone_body_exited" binds= [&"RIPPLE"]]

@@ -45,6 +45,16 @@ func start_weather_weave() -> int:
 func get_phase() -> EnvironmentPhase:
 	return _phase
 
+func request_remaining_branch_guidance(branch_id: StringName) -> bool:
+	var canopy_guidance := get_node_or_null(canopy_guidance_path) as Node3D
+	var ripple_guidance := get_node_or_null(ripple_guidance_path) as Node3D
+	if canopy_guidance != null:
+		canopy_guidance.visible = branch_id == &"CANOPY"
+	if ripple_guidance != null:
+		ripple_guidance.visible = branch_id == &"RIPPLE"
+	return branch_id == &"CANOPY" or branch_id == &"RIPPLE"
+
+
 func debug_get_active_tween_domains() -> Array[StringName]:
 	return _active_tween_domains.duplicate()
 
