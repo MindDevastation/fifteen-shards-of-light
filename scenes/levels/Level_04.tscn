@@ -1,4 +1,4 @@
-[gd_scene load_steps=28 format=3]
+[gd_scene load_steps=30 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/levels/level_04/blocks/Block_04_00_Arrival.tscn" id="1_arrival"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_04/blocks/Block_04_01_CrossingTree.tscn" id="2_tree"]
@@ -17,6 +17,8 @@
 [ext_resource type="Script" path="res://scripts/levels/level_04/level_04_environment_state_controller.gd" id="15_environment_state_controller"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_04/vfx/L04_VFX_RainThreads.tscn" id="16_rain_threads"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_04/vfx/L04_VFX_CloudShadow.tscn" id="17_cloud_shadow"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_04/gameplay/ChangingCanopyPuzzle.tscn" id="18_canopy_puzzle"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_04/vfx/L04_VFX_CanopyFeedback.tscn" id="19_canopy_feedback"]
 
 
 [sub_resource type="Environment" id="Environment_e0_balanced"]
@@ -61,6 +63,7 @@ metadata/approved_base = "13d84fb733f85090caf23487ece419f1ca2951b6"
 
 [node name="GameplayRoot" type="Node3D" parent="."]
 [node name="PuzzleRoot" type="Node3D" parent="GameplayRoot"]
+[node name="ChangingCanopyPuzzle" parent="GameplayRoot/PuzzleRoot" instance=ExtResource("18_canopy_puzzle")]
 [node name="ShardRoot" type="Node3D" parent="GameplayRoot"]
 [node name="RouteAuthorityRoot" type="Node3D" parent="GameplayRoot"]
 [node name="PortalRoot" type="Node3D" parent="GameplayRoot"]
@@ -205,6 +208,7 @@ spot_angle = 34.0
 [node name="E0RainThreads" parent="VFXRoot" instance=ExtResource("16_rain_threads")]
 [node name="E0CloudShadow" parent="VFXRoot" instance=ExtResource("17_cloud_shadow")]
 [node name="CanopyPresentationRoot" type="Node3D" parent="VFXRoot"]
+[node name="L04_VFX_CanopyFeedback" parent="VFXRoot/CanopyPresentationRoot" instance=ExtResource("19_canopy_feedback")]
 [node name="RipplePresentationRoot" type="Node3D" parent="VFXRoot"]
 [node name="RemainingBranchGuidanceRoot" type="Node3D" parent="VFXRoot"]
 [node name="CanopyGuidance" type="Node3D" parent="VFXRoot/RemainingBranchGuidanceRoot"]

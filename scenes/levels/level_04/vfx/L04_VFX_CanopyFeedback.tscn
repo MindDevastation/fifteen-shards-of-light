@@ -1,0 +1,22 @@
+[gd_scene load_steps=2 format=3]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_canopy_feedback"]
+albedo_color = Color(0.55, 0.9, 0.55, 0.6)
+transparency = 1
+
+[node name="L04_VFX_CanopyFeedback" type="Node3D"]
+
+[node name="CANOPY_TONE_1_CompletionFeedback" type="CSGSphere3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 2.5, -20)
+radius = 0.45
+material = SubResource("StandardMaterial3D_canopy_feedback")
+
+[node name="CANOPY_TONE_2_CompletionFeedback" type="CSGSphere3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 2.7, -8)
+radius = 0.45
+material = SubResource("StandardMaterial3D_canopy_feedback")
+
+[node name="CANOPY_TONE_3_CompletionFeedback" type="CSGSphere3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19, 2.9, 3)
+radius = 0.45
+material = SubResource("StandardMaterial3D_canopy_feedback")

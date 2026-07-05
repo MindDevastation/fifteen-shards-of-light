@@ -1,0 +1,31 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/levels/level_04/level_04_presence_footprint.gd" id="1_footprint_script"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_presence"]
+radius = 1.25
+height = 1.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_presence"]
+albedo_color = Color(0.35, 0.75, 0.45, 0.35)
+transparency = 1
+
+[node name="Level04PresenceFootprint" type="Node3D"]
+script = ExtResource("1_footprint_script")
+dwell_seconds = 0.45
+sensor_path = NodePath("Area3D")
+
+[node name="Area3D" type="Area3D" parent="."]
+collision_layer = 0
+collision_mask = 2
+monitoring = true
+monitorable = true
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
+shape = SubResource("CylinderShape3D_presence")
+
+[node name="GreyboxRing" type="CSGCylinder3D" parent="."]
+radius = 1.25
+height = 0.04
+sides = 24
+material = SubResource("StandardMaterial3D_presence")
