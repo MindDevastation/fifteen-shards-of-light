@@ -1,4 +1,4 @@
-[gd_scene load_steps=38 format=3]
+[gd_scene load_steps=39 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/levels/level_04/blocks/Block_04_00_Arrival.tscn" id="1_arrival"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_04/blocks/Block_04_01_CrossingTree.tscn" id="2_tree"]
@@ -25,6 +25,7 @@
 [ext_resource type="PackedScene" path="res://scenes/core/ShardRewardSequenceController.tscn" id="23_reward_controller"]
 [ext_resource type="PackedScene" path="res://scenes/ui/ShardRewardOverlay.tscn" id="24_reward_overlay"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_04/vfx/L04_VFX_RemainingGuidance.tscn" id="25_remaining_guidance"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_04/vfx/L04_VFX_WeatherWeave.tscn" id="26_weather_weave"]
 
 
 [sub_resource type="Environment" id="Environment_e0_balanced"]
@@ -280,6 +281,9 @@ spot_angle = 34.0
 [node name="CanopyGuidance" type="Node3D" parent="VFXRoot/RemainingBranchGuidanceRoot"]
 [node name="RippleGuidance" type="Node3D" parent="VFXRoot/RemainingBranchGuidanceRoot"]
 [node name="WeatherWeaveVFX" type="Node3D" parent="VFXRoot"]
+visible = false
+[node name="L04_VFX_WeatherWeave" parent="VFXRoot/WeatherWeaveVFX" instance=ExtResource("26_weather_weave")]
+
 [node name="PortalAccentVFX" type="Node3D" parent="VFXRoot"]
 
 [node name="PlayerRoot" type="Node3D" parent="."]

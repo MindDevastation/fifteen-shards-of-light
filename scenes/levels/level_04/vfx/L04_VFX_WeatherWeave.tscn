@@ -1,0 +1,38 @@
+[gd_scene load_steps=5 format=3]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_weave_leaf"]
+albedo_color = Color(0.55, 0.78, 0.62, 0.42)
+transparency = 1
+shading_mode = 0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_weave_ripple"]
+albedo_color = Color(0.42, 0.66, 0.95, 0.38)
+transparency = 1
+shading_mode = 0
+
+[sub_resource type="TorusMesh" id="TorusMesh_weather_weave"]
+material = SubResource("StandardMaterial3D_weave_ripple")
+inner_radius = 0.22
+outer_radius = 2.6
+rings = 32
+ring_segments = 8
+
+[sub_resource type="BoxMesh" id="BoxMesh_weather_leaf_thread"]
+material = SubResource("StandardMaterial3D_weave_leaf")
+size = Vector3(0.16, 0.04, 5.2)
+
+[node name="L04_VFX_WeatherWeave" type="Node3D"]
+visible = false
+metadata/slice = "Slice 8 Weather Weave placeholder: presentation only, no collision, audio, portal, finale, main text, or gameplay authority."
+
+[node name="RippleRing" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.173648, 0.984808, 0, -0.984808, 0.173648, 0, 2.05, 39)
+mesh = SubResource("TorusMesh_weather_weave")
+
+[node name="LeafThreadA" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.866025, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866025, -1.35, 2.12, 39)
+mesh = SubResource("BoxMesh_weather_leaf_thread")
+
+[node name="LeafThreadB" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.866025, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866025, 1.35, 2.12, 39)
+mesh = SubResource("BoxMesh_weather_leaf_thread")
