@@ -456,3 +456,37 @@ The implementation preserves the approved RA X/Z coordinates and serializes the 
 - Manual publication handoff: local commit only, no push performed by this handoff; PR publication must be performed manually by the Producer.
 - Godot project structure preserved: yes.
 - Gameplay implemented: yes, limited to the requested Slice 7 Level 04 remaining-branch second reward progression.
+
+## Slice 8 - Environment E1-E3 and Weather Weave
+
+- Current branch: `work`.
+- Starting HEAD: `88c06f72932ff86ed797df7aebf00376c475eb59`.
+- Final HEAD: pending local commit at time of writing; see final handoff commit SHA.
+- Changed files: `scenes/levels/Level_04.tscn`, `scripts/levels/level_04/level_04_progress_controller.gd`, `scripts/levels/level_04/level_04_environment_state_controller.gd`, `scenes/levels/level_04/vfx/L04_VFX_WeatherWeave.tscn`, `docs/development/Level_04_Greybox_Implementation_Summary.md`.
+- Created `.gd.uid` sidecars and sibling mapping: none.
+- Slice 8 contract summary: implemented presentation-only E0/E1/E2/E3 environment phases, monotonic/idempotent one-step `request_phase()`, remaining-branch guidance through fixed guidance NodePaths, E2 Weather Weave placeholder activation, generation-token `start_weather_weave()`, first-terminal-wins callback/fallback terminal handling with a 2.5 s controller-owned fallback, E3 weather preservation, progress debug evidence, and non-blocking integration after `BOTH_REWARDS_COMPLETE` without finale, portal, main text, audio, imported assets, shard reveal, reward authority, or Player control locks.
+- Accepted Slice 7 base / Producer caveat decision: preflight verified merged PR #118 at `88c06f72932ff86ed797df7aebf00376c475eb59`, remaining zones, second reward path, `BOTH_REWARDS_COMPLETE`, Slice 7 summary evidence, and the Producer decision that ST7 recovery persistence remains deferred to manual physics QA and is not blocking Slice 8.
+- Exact hierarchy/path validation evidence: ST8 harness verified `EnvironmentStateRoot` exists and remains scriptless; `EnvironmentStateRoot/Level04EnvironmentStateController` remains a dedicated child; `WorldEnvironment` and `LightingRoot` remain siblings; `../WorldEnvironment`, `../LightingRoot`, `../../VFXRoot/RemainingBranchGuidanceRoot/CanopyGuidance`, `../../VFXRoot/RemainingBranchGuidanceRoot/RippleGuidance`, and `../../VFXRoot/WeatherWeaveVFX` resolve; `VFXRoot/WeatherWeaveVFX/L04_VFX_WeatherWeave` exists; finale, portal adapter and main-text nodes remain absent.
+- Environment phase implementation evidence: `EnvironmentPhase` includes E0/E1/E2/E3; E0 preserves balanced placeholder lighting and neutral weather, E1 preserves local remaining-branch guidance, E2 activates Weather Weave/pavilion guidance presentation, and E3 preserves final semantic weather state only.
+- Phase monotonicity/idempotence matrix: PASS for E0->E0 no-op true, E0->E1 one transition, E1->E1 no-op true, E1->E0 false/no transition, E1->E2 one transition, E2->E2 no-op true, E2->E1 false/no transition, E2->E3 one transition, E3->E3 no-op true, E3->E2 false/no transition. Forward skip E0->E2 is explicitly rejected and validated.
+- E1 branch guidance evidence for both orders: PASS for `CANOPY` enabling only `CanopyGuidance` and matching summary hint; PASS for `RIPPLE` enabling only `RippleGuidance` and matching summary hint; invalid branch ID returns false without mutating current guidance.
+- E1 failure continuity evidence: PASS; invalid guidance request does not crash, does not mutate macro state, and does not reveal shards, trigger reward action, activate finale/portal, or lock Player control.
+- E2 Weather Weave placeholder evidence: PASS; `L04_VFX_WeatherWeave.tscn` loads and is instanced under `VFXRoot/WeatherWeaveVFX/L04_VFX_WeatherWeave`; it uses only local primitive mesh/material subresources and metadata documents presentation-only scope.
+- Weather Weave callback terminal evidence: PASS; `start_weather_weave()` returned a generation token and `debug_request_weather_weave_callback(generation, &"callback")` emitted exactly one `weather_weave_terminal(&"callback")`; later fallback did not emit a duplicate.
+- Weather Weave fallback terminal evidence: PASS; with no callback, the controller-owned 2.5 s fallback emitted exactly one `weather_weave_terminal(&"fallback")`.
+- Weather Weave race protection evidence: PASS; callback-first/fallback-later and fallback-first/callback-later both emitted exactly once; stale and duplicate callbacks returned false; a new generation reset the latch.
+- E3 weather preservation evidence: PASS; weather terminal requests E3 through environment state only, preserves Weather Weave visibility, and does not activate portal, finale, main text, or scene transition.
+- Progress integration after `BOTH_REWARDS_COMPLETE` evidence: PASS; synthetic Canopy-first and Ripple-first second-reward traces requested E2, started Weather Weave, recorded generation/debug evidence, and remained in `BOTH_REWARDS_COMPLETE`; `MAIN_TEXT` and `EXIT` were not entered.
+- Resource locality evidence: PASS; `L04_VFX_RainThreads.tscn`, `L04_VFX_CloudShadow.tscn`, `L04_VFX_RemainingGuidance.tscn`, and `L04_VFX_WeatherWeave.tscn` loaded; new Weather Weave placeholder uses only local subresources and no imported assets, audio, collisions, portal/finale/main-text references, or scene loading.
+- Tween/domain independence evidence: PASS; deterministic placeholder domain registration independently tracks `color`, `fog`, `light`, `guidance`, and `weave`; repeated phase/guidance/weave requests do not clear unrelated domains.
+- No-portal-accent/finale/portal/main-text evidence: PASS; environment controller static scan contains no `PortalAccentVFX`, no scene loading, no portal/finale/main-text activation, no group discovery, no `find_children`, no Player lock, no shard reveal, and no reward action. Existing progress controller references to future finale/portal paths remain Slice 7/Stage contract validation only and unresolved future dependency count remains exactly 2.
+- No-player-lock evidence: PASS; no Slice 8 code calls Player lock/disable APIs or changes traversal authority.
+- Check-only result: `godot --headless --path . --quit --check-only scenes/levels/Level_04.tscn` exit code 0 with pre-existing shared import/cache/script errors outside Slice 8 scope.
+- Startup result: `godot --headless --path . --quit` exit code 0.
+- Runtime validation matrix result: `godot --headless --path . --script /tmp/level04_slice8/slice8_validation_matrix.gd` exit code 0, `SLICE8_VALIDATION_MATRIX: PASS`, with pre-existing shared asset/import warnings/errors emitted during level instantiation.
+- `git diff --check` result: PASS.
+- Forbidden files touched: no.
+- Remaining FAIL rows: none for Slice 8 harness assertions.
+- Remaining NOT_VERIFIED rows: `NOT_VERIFIED — HEADLESS_PHYSICS_LIMITATION` remains inherited for ST7 recovery persistence/manual locomotion physics; no new Slice 8 headless row is unverified.
+- Final Slice 8 status: G8 PASS — LOCAL HANDOFF READY.
+- Manual publication handoff: local commit only; no push performed and push proof is NOT VERIFIED. Godot project structure was preserved. Gameplay authority was not expanded by environment code; Slice 8 added presentation-only environment progression and Weather Weave placeholder behavior.

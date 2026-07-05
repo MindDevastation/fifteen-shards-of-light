@@ -67,6 +67,11 @@ var _e1_request_issued := false
 var _second_reward_in_progress := false
 var _second_reward_complete := false
 var _both_rewards_complete := false
+var _weather_weave_started := false
+var _weather_weave_generation := 0
+var _weather_weave_terminal_seen := false
+var _weather_weave_terminal_source := &""
+var _environment_phase_requested := &"E0"
 
 func _ready() -> void:
 	if configuration_mode == ConfigurationMode.STAGED_SLICE_3:
@@ -181,6 +186,11 @@ func request_debug_snapshot() -> Dictionary:
 		"second_reward_in_progress": _second_reward_in_progress,
 		"second_reward_complete": _second_reward_complete,
 		"both_rewards_complete": _both_rewards_complete,
+		"weather_weave_started": _weather_weave_started,
+		"weather_weave_generation": _weather_weave_generation,
+		"weather_weave_terminal_seen": _weather_weave_terminal_seen,
+		"weather_weave_terminal_source": _weather_weave_terminal_source,
+		"environment_phase_requested": _environment_phase_requested,
 		"unresolved_future_dependencies": _deliberately_unresolved_dependencies.duplicate(),
 		"deliberately_unresolved_dependencies": _deliberately_unresolved_dependencies.duplicate(),
 		"present_dependency_validation": _present_dependency_validation.duplicate(true),
@@ -287,6 +297,7 @@ func _commit_second_reward(shard_id: StringName) -> void:
 	_both_rewards_complete = true
 	_remove_recovery_suspension()
 	_state = MacroState.BOTH_REWARDS_COMPLETE
+	_request_e2_weather_weave()
 
 
 func _remove_recovery_suspension() -> void:
@@ -300,8 +311,35 @@ func _request_e1_transition() -> void:
 		return
 	_e1_request_issued = true
 	var environment := get_node_or_null(environment_controller_path)
-	if environment != null and environment.has_method(&"request_phase"):
-		environment.call(&"request_phase", 1)
+	if environment != null:
+		if environment.has_method(&"request_phase"):
+			var accepted := bool(environment.call(&"request_phase", 1))
+			if accepted:
+				_environment_phase_requested = &"E1"
+		if environment.has_method(&"request_remaining_branch_guidance") and _remaining_branch != _UNSET_BRANCH:
+			environment.call(&"request_remaining_branch_guidance", _remaining_branch)
+
+
+func _request_e2_weather_weave() -> void:
+	if _weather_weave_started:
+		return
+	var environment := get_node_or_null(environment_controller_path)
+	if environment == null:
+		return
+	if environment.has_signal(&"weather_weave_terminal") and not environment.is_connected(&"weather_weave_terminal", _on_weather_weave_terminal):
+		environment.connect(&"weather_weave_terminal", _on_weather_weave_terminal)
+	if environment.has_method(&"request_phase"):
+		var accepted := bool(environment.call(&"request_phase", 2))
+		if accepted:
+			_environment_phase_requested = &"E2"
+	if environment.has_method(&"start_weather_weave"):
+		_weather_weave_started = true
+		_weather_weave_generation = int(environment.call(&"start_weather_weave"))
+
+
+func _on_weather_weave_terminal(source: StringName) -> void:
+	_weather_weave_terminal_seen = true
+	_weather_weave_terminal_source = source
 
 
 func _expected_first_shard_id() -> StringName:
