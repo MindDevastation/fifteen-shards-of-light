@@ -386,3 +386,37 @@ The implementation preserves the approved RA X/Z coordinates and serializes the 
 - Remaining NOT_VERIFIED rows: push proof NOT VERIFIED by instruction; PR link NOT VERIFIED by instruction.
 - Final Slice 5 status: G5 PASS - LOCAL HANDOFF READY.
 - Manual publication handoff: commit locally, then manual publisher may push/open PR; this agent did not push or publish.
+
+## Slice 6 - Dual-Anchor Shard Slots and First Reward Path
+
+- Current branch: `work`.
+- Starting HEAD: `7f2550bf08c6a4ab7e8cd22522fe95e786fa98f1`.
+- Final HEAD: local commit created after this summary update; see manual publication handoff/final response for exact SHA.
+- Changed files: `scenes/levels/Level_04.tscn`, `scenes/levels/level_04/gameplay/Level04ShardSlot.tscn`, `scripts/levels/level_04/level_04_shard_slot.gd`, `scripts/levels/level_04/level_04_progress_controller.gd`, `scripts/levels/level_04/level_04_shard_slot.gd.uid`, and this summary.
+- Created `.gd.uid` sidecars and sibling mapping: `scripts/levels/level_04/level_04_shard_slot.gd.uid` maps to `scripts/levels/level_04/level_04_shard_slot.gd`; existing `level_04_progress_controller.gd.uid` was preserved.
+- Slice 6 contract summary: implemented packed-hidden dual-anchor `ShardSlot_08`/`ShardSlot_09`, candidate-only first-pass reveal, shared SoulShard collection lifecycle forwarding, shared reward-controller registration, first reward completion to E1 request and `REMAINING_DEFERRED`, with no second shard/reward/finale/portal implementation.
+- Shared SoulShard API revalidation result: PASS; public exported `shard_id`/`reward_text`, public `reward_sequence_requested` and `collected` signals, public `can_player_interact`, `interact`, and `complete_collection_sequence`, plus Area3D monitoring/monitorable and named `CollisionShape3D` support packed-hidden and deferred collectability without shared modification.
+- Shared reward API revalidation result: PASS; `ShardRewardSequenceController.register_shard()` and `overlay_path` are sufficient to use the shared reward lifecycle without forking or editing shared systems.
+- ShardSlot implementation evidence: `Level04ShardSlot` starts `PACKED_HIDDEN`, hides/disables the shared child SoulShard, reveals only from packed state, waits physics frames before enabling/verifying collectability, emits availability/collection signals with duplicate latches, and exposes debug validation/snapshot helpers.
+- Exact ID/text/anchor evidence: `ShardSlot_08` is `Shard_08`/`CANOPY` with locked Russian text and A3F/A3R anchors; `ShardSlot_09` is `Shard_09`/`RIPPLE` with locked Russian text and B3F/B3R anchors.
+- Packed-hidden startup evidence: runtime validation confirmed both slots in `PACKED_HIDDEN`, both child SoulShards hidden/non-collectable, no startup availability, and no startup reward.
+- Canopy-first reveal trace: validation completed CANOPY first, fixed first candidate to `CANOPY`, revealed only `ShardSlot_08` at `FIRST_PASS`, reached `FIRST_SHARD_AVAILABLE`, emitted availability once, and kept `ShardSlot_09` hidden.
+- Ripple-first reveal trace: validation completed RIPPLE first, fixed first candidate to `RIPPLE`, revealed only `ShardSlot_09` at `FIRST_PASS`, reached `FIRST_SHARD_AVAILABLE`, emitted availability once, and kept `ShardSlot_08` hidden.
+- Opposite-complete-early-hidden evidence: validation attempted opposite puzzle completion before collection in both orders; immutable arbitration ignored the second terminal and the opposite slot remained packed hidden.
+- Pre-overlap P0 evidence: PASS in headless proxy validation; deferred physics-frame collectability becomes true after reveal without requiring an exit/re-entry simulation. Manual renderer/player overlap remains recommended for final feel.
+- Canopy-first reward lifecycle trace: validation drove `Shard_08` through shared signal/API completion; progress recorded only `Shard_08`, fixed remaining branch to `RIPPLE`, requested E1, and ended in `REMAINING_DEFERRED`.
+- Ripple-first reward lifecycle trace: validation drove `Shard_09` through shared signal/API completion; progress recorded only `Shard_09`, fixed remaining branch to `CANOPY`, requested E1, and ended in `REMAINING_DEFERRED`.
+- Recovery suspension evidence: progress adds `shard_reward` on slot collection-start and removes it when the candidate slot emits `shard_collected`; duplicate collection is ignored.
+- E1 request evidence: first reward completion requests `EnvironmentPhase.E1` once and immediately enters `REMAINING_DEFERRED` without awaiting transition completion.
+- SoulOrb uniqueness / normal-return evidence: validation found exactly one visible `SoulOrb_Follow`; normal return visual path is `NOT_VERIFIED — MANUAL_RENDERER_REQUIRED` in headless validation.
+- Progress state transition evidence: candidate flow is `CANDIDATE_UNSET -> FIRST_CANDIDATE_CANOPY/RIPPLE -> FIRST_SHARD_AVAILABLE -> FIRST_REWARD_COMPLETE -> REMAINING_DEFERRED`; Slice 6 does not advance to later macro states.
+- No-second-shard/reward/finale/portal evidence: validation confirmed no remaining shard zones, no finale controller, no portal adapter, no second shard reveal after opposite completion or first reward, and no second reward path.
+- Check-only result: PASS after editor import cache generation; `godot --headless --path . --quit --check-only scenes/levels/Level_04.tscn` exits 0.
+- Startup result: PASS; `godot --headless --path . --quit` exits 0.
+- Runtime validation matrix result: PASS with one NOT_VERIFIED row for manual renderer normal-return visual observation.
+- `git diff --check` result: PASS.
+- Forbidden files touched: no.
+- Remaining FAIL rows: none.
+- Remaining NOT_VERIFIED rows: `ST6-12 normal return visual path: NOT_VERIFIED — MANUAL_RENDERER_REQUIRED`.
+- Final Slice 6 status: LOCAL HANDOFF READY — MANUAL PUBLICATION REQUIRED.
+- Manual publication handoff: local-only work on branch `work`; push proof NOT VERIFIED by request; PR link NOT CREATED by request; Godot project structure preserved; gameplay implemented only for the requested Slice 6 first shard reward path.

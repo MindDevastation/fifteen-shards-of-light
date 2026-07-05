@@ -1,4 +1,4 @@
-[gd_scene load_steps=32 format=3]
+[gd_scene load_steps=35 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/levels/level_04/blocks/Block_04_00_Arrival.tscn" id="1_arrival"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_04/blocks/Block_04_01_CrossingTree.tscn" id="2_tree"]
@@ -21,6 +21,9 @@
 [ext_resource type="PackedScene" path="res://scenes/levels/level_04/vfx/L04_VFX_CanopyFeedback.tscn" id="19_canopy_feedback"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_04/gameplay/RippleConversationPuzzle.tscn" id="20_ripple_puzzle"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_04/vfx/L04_VFX_RippleContours.tscn" id="21_ripple_contours"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_04/gameplay/Level04ShardSlot.tscn" id="22_shard_slot"]
+[ext_resource type="PackedScene" path="res://scenes/core/ShardRewardSequenceController.tscn" id="23_reward_controller"]
+[ext_resource type="PackedScene" path="res://scenes/ui/ShardRewardOverlay.tscn" id="24_reward_overlay"]
 
 
 [sub_resource type="Environment" id="Environment_e0_balanced"]
@@ -68,6 +71,27 @@ metadata/approved_base = "13d84fb733f85090caf23487ece419f1ca2951b6"
 [node name="ChangingCanopyPuzzle" parent="GameplayRoot/PuzzleRoot" instance=ExtResource("18_canopy_puzzle")]
 [node name="RippleConversationPuzzle" parent="GameplayRoot/PuzzleRoot" instance=ExtResource("20_ripple_puzzle")]
 [node name="ShardRoot" type="Node3D" parent="GameplayRoot"]
+[node name="ShardSlot_08" parent="GameplayRoot/ShardRoot" instance=ExtResource("22_shard_slot")]
+shard_id = &"Shard_08"
+branch_id = &"CANOPY"
+shard_text = "Ты можешь рассмешить меня, а через минуту сказать что-то так серьёзно, что я просто слушаю."
+
+[node name="FirstPassAnchor" parent="GameplayRoot/ShardRoot/ShardSlot_08" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 2, 7)
+
+[node name="RemainingPassAnchor" parent="GameplayRoot/ShardRoot/ShardSlot_08" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 4, 11)
+
+[node name="ShardSlot_09" parent="GameplayRoot/ShardRoot" instance=ExtResource("22_shard_slot")]
+shard_id = &"Shard_09"
+branch_id = &"RIPPLE"
+shard_text = "Мне дороги и наши разговоры, в которых пауз больше, чем слов."
+
+[node name="FirstPassAnchor" parent="GameplayRoot/ShardRoot/ShardSlot_09" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, -0.3, 5)
+
+[node name="RemainingPassAnchor" parent="GameplayRoot/ShardRoot/ShardSlot_09" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, -0.3, 11)
 [node name="RouteAuthorityRoot" type="Node3D" parent="GameplayRoot"]
 [node name="PortalRoot" type="Node3D" parent="GameplayRoot"]
 [node name="PortalFloorAnchor" type="Marker3D" parent="GameplayRoot/PortalRoot"]
@@ -245,6 +269,11 @@ recovery_volume_paths = Array[NodePath]([NodePath("../../GameplayRoot/SafetyRoot
 recovery_anchor_paths = Array[NodePath]([NodePath("../../GameplayRoot/SafetyRoot/RecoveryAnchors/RA0"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryAnchors/RA1"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryAnchors/RA2"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryAnchors/RA3"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryAnchors/RA4"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryAnchors/RA5"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryAnchors/RA6"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryAnchors/RA7"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryAnchors/RA8"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryAnchors/RA9"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryAnchors/RA10"), NodePath("../../GameplayRoot/SafetyRoot/RecoveryAnchors/RA11")])
 
 
+[node name="ShardRewardSequenceController" parent="LevelRuntimeRoot" instance=ExtResource("23_reward_controller")]
+overlay_path = NodePath("../../UILayer/ShardRewardOverlay")
+player_path = NodePath("../../PlayerRoot/Player")
+shard_search_root_path = NodePath("../../GameplayRoot/ShardRoot")
+
 [node name="Level04ProgressController" type="Node" parent="LevelRuntimeRoot"]
 script = ExtResource("14_progress_controller")
 configuration_mode = 0
@@ -258,5 +287,8 @@ environment_controller_path = NodePath("../../EnvironmentStateRoot/Level04Enviro
 finale_controller_path = NodePath("../Level04FinaleController")
 portal_adapter_path = NodePath("../Level04PortalAdapter")
 recovery_controller_path = NodePath("../Level04RecoveryController")
+shard_reward_controller_path = NodePath("../ShardRewardSequenceController")
+shard_reward_overlay_path = NodePath("../../UILayer/ShardRewardOverlay")
 
 [node name="UILayer" type="CanvasLayer" parent="."]
+[node name="ShardRewardOverlay" parent="UILayer" instance=ExtResource("24_reward_overlay")]

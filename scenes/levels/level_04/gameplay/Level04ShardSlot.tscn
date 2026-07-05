@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/levels/level_04/level_04_shard_slot.gd" id="1_slot_script"]
+[ext_resource type="PackedScene" path="res://scenes/core/SoulShard.tscn" id="2_soul_shard"]
+
+[node name="Level04ShardSlot" type="Node3D"]
+script = ExtResource("1_slot_script")
+
+[node name="FirstPassAnchor" type="Marker3D" parent="."]
+
+[node name="RemainingPassAnchor" type="Marker3D" parent="."]
+
+[node name="RevealVFXRoot" type="Node3D" parent="."]
+visible = false
+
+[node name="SoulShard" parent="." instance=ExtResource("2_soul_shard")]
+visible = false
+monitoring = false
+monitorable = false
