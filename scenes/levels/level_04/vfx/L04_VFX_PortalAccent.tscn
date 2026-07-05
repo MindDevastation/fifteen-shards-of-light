@@ -1,0 +1,23 @@
+[gd_scene load_steps=3 format=3]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_portal_accent_ring"]
+top_radius = 1.35
+bottom_radius = 1.35
+height = 0.025
+radial_segments = 48
+rings = 1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_portal_accent"]
+albedo_color = Color(0.55, 0.82, 1, 0.42)
+emission_enabled = true
+emission = Color(0.35, 0.68, 1, 1)
+emission_energy_multiplier = 0.35
+transparency = 1
+
+[node name="L04_VFX_PortalAccent" type="Node3D"]
+visible = false
+
+[node name="PortalAccentRing" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.03, 0)
+material_override = SubResource("StandardMaterial3D_portal_accent")
+mesh = SubResource("CylinderMesh_portal_accent_ring")

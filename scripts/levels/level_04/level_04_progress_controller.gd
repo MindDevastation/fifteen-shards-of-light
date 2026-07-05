@@ -31,9 +31,9 @@ const SUSPENSION_SHARD_REWARD := &"shard_reward"
 const CANOPY_REMAINING_ZONE := &"CanopyRemainingShardZone"
 const RIPPLE_REMAINING_ZONE := &"RippleRemainingShardZone"
 const MAIN_TEXT_ID := &"LEVEL_04_MAIN_TEXT"
-const _EXPECTED_FUTURE_DEPENDENCY_COUNT := 1
+const _EXPECTED_FUTURE_DEPENDENCY_COUNT := 0
 
-@export var configuration_mode: ConfigurationMode = ConfigurationMode.STAGED_SLICE_3
+@export var configuration_mode: ConfigurationMode = ConfigurationMode.PRODUCTION
 @export var canopy_controller_path := NodePath("../../GameplayRoot/PuzzleRoot/ChangingCanopyPuzzle/ChangingCanopyController")
 @export var ripple_controller_path := NodePath("../../GameplayRoot/PuzzleRoot/RippleConversationPuzzle/RippleConversationController")
 @export var shard_slot_08_path := NodePath("../../GameplayRoot/ShardRoot/ShardSlot_08")
@@ -78,6 +78,10 @@ var _main_text_started := false
 var _main_text_closed := false
 var _main_text_id := &""
 var _portal_activation_requested := false
+var _portal_activated := false
+var _portal_activation_blocked := false
+var _portal_activation_blocked_reason := &""
+var _exit_reached := false
 
 func _ready() -> void:
 	if configuration_mode == ConfigurationMode.STAGED_SLICE_3:
@@ -103,6 +107,7 @@ func validate_available_dependencies() -> bool:
 	ok = _validate_present_dependency(&"recovery_controller", recovery_controller_path, "Level04RecoveryController") and ok
 	_wire_slice_6_dependencies()
 	_wire_slice_9_dependencies()
+	_wire_slice_10_dependencies()
 	if _deliberately_unresolved_dependencies.size() != _EXPECTED_FUTURE_DEPENDENCY_COUNT:
 		_emit_configuration_error(&"Level04ProgressController", "staged future dependency set does not match the Slice 3 contract")
 		ok = false
@@ -120,14 +125,16 @@ func validate_production_configuration() -> bool:
 	ok = _validate_present_dependency(&"canopy_remaining_zone", canopy_remaining_zone_path, "Node") and ok
 	ok = _validate_present_dependency(&"ripple_remaining_zone", ripple_remaining_zone_path, "Node") and ok
 	ok = _validate_present_dependency(&"environment_controller", environment_controller_path, "Level04EnvironmentStateController") and ok
-	ok = _validate_present_dependency(&"finale_controller", finale_controller_path, "Node") and ok
-	ok = _validate_present_dependency(&"portal_adapter", portal_adapter_path, "Node") and ok
+	ok = _validate_present_dependency(&"finale_controller", finale_controller_path, "Level04FinaleController") and ok
+	ok = _validate_present_dependency(&"portal_adapter", portal_adapter_path, "Level04PortalAdapter") and ok
 	ok = _validate_present_dependency(&"recovery_controller", recovery_controller_path, "Level04RecoveryController") and ok
 	ok = _validate_present_dependency(&"shard_reward_controller", shard_reward_controller_path, "ShardRewardSequenceController") and ok
 	ok = _validate_present_dependency(&"shard_reward_overlay", shard_reward_overlay_path, "Node") and ok
 	ok = _validate_present_dependency(&"player", player_path, "Node") and ok
 	_wire_slice_6_dependencies()
 	_wire_slice_9_dependencies()
+	_wire_slice_10_dependencies()
+	ok = _validate_portal_adapter_configuration() and ok
 	return ok
 
 func get_state() -> MacroState:
@@ -205,6 +212,10 @@ func request_debug_snapshot() -> Dictionary:
 		"main_text_closed": _main_text_closed,
 		"main_text_id": _main_text_id,
 		"portal_activation_requested": _portal_activation_requested,
+		"portal_activated": _portal_activated,
+		"portal_activation_blocked": _portal_activation_blocked,
+		"portal_activation_blocked_reason": _portal_activation_blocked_reason,
+		"exit_reached": _exit_reached,
 		"unresolved_future_dependencies": _deliberately_unresolved_dependencies.duplicate(),
 		"deliberately_unresolved_dependencies": _deliberately_unresolved_dependencies.duplicate(),
 		"present_dependency_validation": _present_dependency_validation.duplicate(true),
@@ -235,6 +246,28 @@ func _wire_slice_9_dependencies() -> void:
 		finale.connect(&"main_text_started", _on_main_text_started)
 	if finale.has_signal(&"main_text_closed") and not finale.is_connected(&"main_text_closed", _on_main_text_closed):
 		finale.connect(&"main_text_closed", _on_main_text_closed)
+
+
+func _wire_slice_10_dependencies() -> void:
+	var portal_adapter := get_node_or_null(portal_adapter_path)
+	if portal_adapter == null:
+		return
+	if portal_adapter.has_signal(&"portal_activation_requested") and not portal_adapter.is_connected(&"portal_activation_requested", _on_portal_activation_requested):
+		portal_adapter.connect(&"portal_activation_requested", _on_portal_activation_requested)
+	if portal_adapter.has_signal(&"portal_activated") and not portal_adapter.is_connected(&"portal_activated", _on_portal_activated):
+		portal_adapter.connect(&"portal_activated", _on_portal_activated)
+	if portal_adapter.has_signal(&"portal_activation_blocked") and not portal_adapter.is_connected(&"portal_activation_blocked", _on_portal_activation_blocked):
+		portal_adapter.connect(&"portal_activation_blocked", _on_portal_activation_blocked)
+
+
+func _validate_portal_adapter_configuration() -> bool:
+	var portal_adapter := get_node_or_null(portal_adapter_path)
+	if portal_adapter == null:
+		return false
+	if not portal_adapter.has_method(&"debug_validate_configuration"):
+		_emit_configuration_error(&"Level04ProgressController", "portal adapter missing debug_validate_configuration")
+		return false
+	return bool(portal_adapter.call(&"debug_validate_configuration"))
 
 
 func _wire_remaining_zone(path: NodePath, branch_id: StringName) -> void:
@@ -400,6 +433,50 @@ func _on_main_text_closed(text_id) -> void:
 		return
 	_main_text_closed = true
 	_main_text_id = typed_id
+	_request_e3_exit_environment()
+	_request_portal_activation_once()
+
+
+func _request_e3_exit_environment() -> void:
+	var environment := get_node_or_null(environment_controller_path)
+	if environment == null:
+		return
+	if environment.has_method(&"request_phase"):
+		var accepted := bool(environment.call(&"request_phase", 3))
+		if accepted:
+			_environment_phase_requested = &"E3"
+
+
+func _request_portal_activation_once() -> void:
+	if _portal_activation_requested:
+		return
+	var portal_adapter := get_node_or_null(portal_adapter_path)
+	if portal_adapter == null or not portal_adapter.has_method(&"request_activation"):
+		_emit_configuration_error(&"Level04ProgressController", "portal adapter missing request_activation")
+		return
+	var accepted := bool(portal_adapter.call(&"request_activation"))
+	if not accepted:
+		_portal_activation_blocked = true
+		if _portal_activation_blocked_reason == &"":
+			_portal_activation_blocked_reason = &"request_rejected"
+
+
+func _on_portal_activation_requested() -> void:
+	_portal_activation_requested = true
+
+
+func _on_portal_activated() -> void:
+	if _portal_activated:
+		return
+	_portal_activated = true
+	if not _exit_reached:
+		_state = MacroState.EXIT
+		_exit_reached = true
+
+
+func _on_portal_activation_blocked(reason) -> void:
+	_portal_activation_blocked = true
+	_portal_activation_blocked_reason = StringName(reason)
 
 
 func _expected_first_shard_id() -> StringName:
@@ -475,7 +552,6 @@ func _validate_present_dependency(key: StringName, path: NodePath, expected_type
 
 func _collect_missing_future_dependencies() -> Array[StringName]:
 	var missing: Array[StringName] = []
-	_add_missing(missing, &"portal_adapter_path", portal_adapter_path)
 	return missing
 
 func _add_missing(missing: Array[StringName], label: StringName, path: NodePath) -> void:

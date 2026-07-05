@@ -1,4 +1,4 @@
-[gd_scene load_steps=42 format=3]
+[gd_scene load_steps=45 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/levels/level_04/blocks/Block_04_00_Arrival.tscn" id="1_arrival"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_04/blocks/Block_04_01_CrossingTree.tscn" id="2_tree"]
@@ -28,6 +28,9 @@
 [ext_resource type="PackedScene" path="res://scenes/levels/level_04/vfx/L04_VFX_WeatherWeave.tscn" id="26_weather_weave"]
 [ext_resource type="Script" path="res://scripts/levels/level_04/level_04_finale_controller.gd" id="27_finale_controller"]
 [ext_resource type="PackedScene" path="res://scenes/ui/LevelFinaleOverlay.tscn" id="28_finale_overlay"]
+[ext_resource type="PackedScene" path="res://scenes/core/LevelPortal.tscn" id="29_level_portal"]
+[ext_resource type="Script" path="res://scripts/levels/level_04/level_04_portal_adapter.gd" id="30_portal_adapter"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_04/vfx/L04_VFX_PortalAccent.tscn" id="31_portal_accent"]
 
 
 [sub_resource type="Environment" id="Environment_e0_balanced"]
@@ -139,6 +142,11 @@ shape = SubResource("BoxShape3D_ripple_remaining_reward_zone")
 [node name="PortalRoot" type="Node3D" parent="GameplayRoot"]
 [node name="PortalFloorAnchor" type="Marker3D" parent="GameplayRoot/PortalRoot"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 2, 56.5)
+
+[node name="LevelPortal" parent="GameplayRoot/PortalRoot/PortalFloorAnchor" instance=ExtResource("29_level_portal")]
+target_scene_path = "res://scenes/levels/Level_05.tscn"
+entry_mode = 0
+require_entry_confirmation = false
 
 [node name="FinalTextGate" type="Area3D" parent="GameplayRoot/RouteAuthorityRoot"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 52)
@@ -301,6 +309,7 @@ visible = false
 [node name="L04_VFX_WeatherWeave" parent="VFXRoot/WeatherWeaveVFX" instance=ExtResource("26_weather_weave")]
 
 [node name="PortalAccentVFX" type="Node3D" parent="VFXRoot"]
+[node name="L04_VFX_PortalAccent" parent="VFXRoot/PortalAccentVFX" instance=ExtResource("31_portal_accent")]
 
 [node name="PlayerRoot" type="Node3D" parent="."]
 [node name="PlayerFloorSpawnMarker" type="Marker3D" parent="PlayerRoot"]
@@ -339,9 +348,15 @@ final_text_gate_path = NodePath("../../GameplayRoot/RouteAuthorityRoot/FinalText
 finale_overlay_path = NodePath("../../UILayer/LevelFinaleOverlay")
 recovery_controller_path = NodePath("../Level04RecoveryController")
 
+[node name="Level04PortalAdapter" type="Node" parent="LevelRuntimeRoot"]
+script = ExtResource("30_portal_adapter")
+portal_path = NodePath("../../GameplayRoot/PortalRoot/PortalFloorAnchor/LevelPortal")
+portal_floor_anchor_path = NodePath("../../GameplayRoot/PortalRoot/PortalFloorAnchor")
+portal_accent_vfx_path = NodePath("../../VFXRoot/PortalAccentVFX")
+
 [node name="Level04ProgressController" type="Node" parent="LevelRuntimeRoot"]
 script = ExtResource("14_progress_controller")
-configuration_mode = 0
+configuration_mode = 1
 canopy_controller_path = NodePath("../../GameplayRoot/PuzzleRoot/ChangingCanopyPuzzle/ChangingCanopyController")
 ripple_controller_path = NodePath("../../GameplayRoot/PuzzleRoot/RippleConversationPuzzle/RippleConversationController")
 shard_slot_08_path = NodePath("../../GameplayRoot/ShardRoot/ShardSlot_08")
