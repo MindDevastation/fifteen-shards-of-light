@@ -1,0 +1,75 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/levels/level_04/ripple_conversation_controller.gd" id="1_controller"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_04/gameplay/Level04PresenceFootprint.tscn" id="2_footprint"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_marker"]
+albedo_color = Color(0.35, 0.62, 0.95, 0.45)
+transparency = 1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_marker_done"]
+albedo_color = Color(0.65, 0.85, 1, 0.65)
+transparency = 1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_marker_base"]
+albedo_color = Color(0.2, 0.45, 0.75, 0.35)
+transparency = 1
+
+[node name="RippleConversationPuzzle" type="Node3D"]
+
+[node name="RippleConversationController" type="Node" parent="."]
+script = ExtResource("1_controller")
+footprint_root_path = NodePath("../FootprintRoot")
+progress_controller_path = NodePath("../../../../LevelRuntimeRoot/Level04ProgressController")
+presentation_controller_path = NodePath("../../../../VFXRoot/RipplePresentationRoot")
+player_path = NodePath("../../../../PlayerRoot/Player")
+
+[node name="FootprintRoot" type="Node3D" parent="."]
+
+[node name="R1I" parent="FootprintRoot" instance=ExtResource("2_footprint")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21, -0.4, -22)
+target_id = &"RIPPLE_MARKER_1"
+footprint_id = &"R1I"
+route_context = 0
+player_path = NodePath("../../../../../PlayerRoot/Player")
+
+[node name="R1R" parent="FootprintRoot" instance=ExtResource("2_footprint")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29, -1, -18)
+target_id = &"RIPPLE_MARKER_1"
+footprint_id = &"R1R"
+route_context = 1
+player_path = NodePath("../../../../../PlayerRoot/Player")
+
+[node name="R2I" parent="FootprintRoot" instance=ExtResource("2_footprint")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, -0.5, -9)
+target_id = &"RIPPLE_MARKER_2"
+footprint_id = &"R2I"
+route_context = 0
+player_path = NodePath("../../../../../PlayerRoot/Player")
+
+[node name="R2R" parent="FootprintRoot" instance=ExtResource("2_footprint")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28, -0.8, -5)
+target_id = &"RIPPLE_MARKER_2"
+footprint_id = &"R2R"
+route_context = 1
+player_path = NodePath("../../../../../PlayerRoot/Player")
+
+[node name="MarkerRoot" type="Node3D" parent="."]
+[node name="RIPPLE_MARKER_1_VisualMarker" type="CSGSphere3D" parent="MarkerRoot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, -0.7, -20)
+radius = 0.35
+material = SubResource("StandardMaterial3D_marker")
+[node name="RIPPLE_MARKER_1_BaseRing" type="CSGCylinder3D" parent="MarkerRoot/RIPPLE_MARKER_1_VisualMarker"]
+radius = 1.4
+height = 0.025
+sides = 32
+material = SubResource("StandardMaterial3D_marker_base")
+[node name="RIPPLE_MARKER_2_VisualMarker" type="CSGSphere3D" parent="MarkerRoot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, -0.65, -7)
+radius = 0.35
+material = SubResource("StandardMaterial3D_marker_done")
+[node name="RIPPLE_MARKER_2_BaseRing" type="CSGCylinder3D" parent="MarkerRoot/RIPPLE_MARKER_2_VisualMarker"]
+radius = 1.4
+height = 0.025
+sides = 32
+material = SubResource("StandardMaterial3D_marker_base")
