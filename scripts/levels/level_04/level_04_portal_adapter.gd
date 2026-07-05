@@ -51,7 +51,7 @@ func debug_validate_configuration() -> bool:
 		_record_validation_error(&"Level04PortalAdapter", "portal_path does not resolve")
 		ok = false
 	else:
-		if portal.get_script() == null or portal.get_script().get_global_name() != "LevelPortal":
+		if not _is_shared_level_portal(portal):
 			_record_validation_error(&"Level04PortalAdapter", "portal_path does not resolve to shared LevelPortal")
 			ok = false
 		if not portal.has_method(&"activate"):
@@ -115,6 +115,15 @@ func _validate_portal_configuration(portal: Node) -> bool:
 		_record_validation_error(&"Level04PortalAdapter", "LevelPortal require_entry_confirmation is not false")
 		ok = false
 	return ok
+
+func _is_shared_level_portal(portal: Node) -> bool:
+	var script: Script = portal.get_script()
+	if script == null:
+		return false
+	if script.get_global_name() == "LevelPortal":
+		return true
+	return script.resource_path == "res://scripts/core/level_portal.gd"
+
 
 func _connect_portal_signals(portal: Node) -> void:
 	if portal.has_signal(&"activation_started") and not portal.is_connected(&"activation_started", _on_shared_portal_activation_started):
