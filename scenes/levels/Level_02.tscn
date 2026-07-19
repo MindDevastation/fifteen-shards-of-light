@@ -1,11 +1,12 @@
-[gd_scene load_steps=29 format=3]
+[gd_scene format=3 uid="uid://fsjd5lg00dxa"]
 
-[ext_resource type="PackedScene" path="res://scenes/core/Player.tscn" id="1_player"]
-[ext_resource type="Script" path="res://scripts/player/camera_controller.gd" id="2_camera"]
-[ext_resource type="PackedScene" path="res://scenes/core/SoulOrb_Follow.tscn" id="3_orb"]
+[ext_resource type="PackedScene" uid="uid://buybh0c880w1y" path="res://scenes/core/Player.tscn" id="1_player"]
+[ext_resource type="Script" uid="uid://b5fastfa3rppc" path="res://scripts/player/camera_controller.gd" id="2_camera"]
+[ext_resource type="PackedScene" uid="uid://csfl8x4m5vwdf" path="res://scenes/core/SoulOrb_Follow.tscn" id="3_orb"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_02/blocks/Block_02_00_CentralArena.tscn" id="4_center"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_02/blocks/Block_02_01_Arrival.tscn" id="5_arrival"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_02/blocks/Block_02_02_TrialA.tscn" id="6_a"]
+[ext_resource type="PackedScene" uid="uid://cus8lu4kr652n" path="res://scenes/environment/terrain/level_02_island.tscn" id="6_msc46"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_02/blocks/Block_02_03_TrialB.tscn" id="7_b"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_02/blocks/Block_02_04_RoutesAndBoundaries.tscn" id="8_routes"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_02/gameplay/Level02SoftReturnVolume.tscn" id="9_return"]
@@ -14,62 +15,83 @@
 [ext_resource type="PackedScene" path="res://scenes/levels/level_02/gameplay/Level02CentralArenaGameplay.tscn" id="12_central_gameplay"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_02/vfx/Level02ArrivalVFX.tscn" id="13_arrival_vfx"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_02/vfx/Level02CentralLightVFX.tscn" id="14_central_vfx"]
-[ext_resource type="Script" path="res://scripts/levels/level_02/level_02_runtime_contract_validator.gd" id="15_validator"]
+[ext_resource type="Script" uid="uid://byp7cbt4os70t" path="res://scripts/levels/level_02/level_02_runtime_contract_validator.gd" id="15_validator"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_02/gameplay/TrialA_ThreeBeams.tscn" id="16_trial_a"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_02/vfx/Level02TrialAVFX.tscn" id="17_trial_a_vfx"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_02/gameplay/TrialB_EchoOfLight.tscn" id="18_trial_b"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_02/vfx/Level02TrialBVFX.tscn" id="19_trial_b_vfx"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_02/state/Level02EnvironmentState.tscn" id="20_env_state"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_02/vfx/Level02EnvironmentVFX.tscn" id="21_env_vfx"]
-[ext_resource type="Script" path="res://scripts/levels/level_02/level_02_reward_gate.gd" id="22_reward_gate"]
+[ext_resource type="Script" uid="uid://3q0s071664x7" path="res://scripts/levels/level_02/level_02_reward_gate.gd" id="22_reward_gate"]
 [ext_resource type="PackedScene" path="res://scenes/core/ShardRewardSequenceController.tscn" id="23_reward_controller"]
 [ext_resource type="PackedScene" path="res://scenes/ui/ShardRewardOverlay.tscn" id="24_reward_overlay"]
-[ext_resource type="PackedScene" path="res://scenes/core/LevelPortal.tscn" id="27_portal"]
-[ext_resource type="PackedScene" path="res://scenes/ui/LevelFinaleOverlay.tscn" id="28_finale"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_02/gameplay/Level02PortalAdapter.tscn" id="25_portal_adapter"]
 [ext_resource type="PackedScene" path="res://scenes/levels/level_02/vfx/Level02PortalVFX.tscn" id="26_portal_vfx"]
+[ext_resource type="PackedScene" path="res://scenes/core/LevelPortal.tscn" id="27_portal"]
+[ext_resource type="PackedScene" uid="uid://xm215olcv6cg" path="res://scenes/ui/LevelFinaleOverlay.tscn" id="28_finale"]
+[ext_resource type="PackedScene" uid="uid://biraoyhdn7qli" path="res://scenes/environment/assets/trial_a_platform.tscn" id="30_hjrl7"]
+[ext_resource type="PackedScene" uid="uid://jny3fqqcqjn1" path="res://scenes/environment/assets/light_pillar_01.tscn" id="31_3qisv"]
+[ext_resource type="PackedScene" uid="uid://c6mykgljpqfvi" path="res://scenes/environment/assets/shou_shard_cage.tscn" id="32_r2c1o"]
+[ext_resource type="PackedScene" path="res://scenes/core/SoulShard.tscn" id="33_3qisv"]
 
-[node name="Level_02" type="Node3D"]
+[node name="Level_02" type="Node3D" unique_id=2120425184]
 
-[node name="Blocks" type="Node3D" parent="."]
-[node name="Block_02_00_CentralArena" parent="Blocks" instance=ExtResource("4_center")]
-[node name="Block_02_01_Arrival" parent="Blocks" instance=ExtResource("5_arrival")]
-[node name="Block_02_02_TrialA" parent="Blocks" instance=ExtResource("6_a")]
-[node name="Block_02_03_TrialB" parent="Blocks" instance=ExtResource("7_b")]
-[node name="Block_02_04_RoutesAndBoundaries" parent="Blocks" instance=ExtResource("8_routes")]
+[node name="Blocks" type="Node3D" parent="." unique_id=1879939155]
 
-[node name="SafeAnchors" type="Node3D" parent="."]
-[node name="Center" type="Marker3D" parent="SafeAnchors"]
+[node name="Block_02_00_CentralArena" parent="Blocks" unique_id=1431028780 instance=ExtResource("4_center")]
+
+[node name="Block_02_01_Arrival" parent="Blocks" unique_id=2095853949 instance=ExtResource("5_arrival")]
+
+[node name="Block_02_02_TrialA" parent="Blocks" unique_id=2042095235 instance=ExtResource("6_a")]
+
+[node name="Block_02_03_TrialB" parent="Blocks" unique_id=462811969 instance=ExtResource("7_b")]
+
+[node name="Block_02_04_RoutesAndBoundaries" parent="Blocks" unique_id=1315260384 instance=ExtResource("8_routes")]
+
+[node name="Level_02_island" parent="Blocks" unique_id=419920018 instance=ExtResource("6_msc46")]
+transform = Transform3D(1.75, 0, 0, 0, 1.75, 0, 0, 0, 1.75, 0, 4.9446507, 0)
+
+[node name="SafeAnchors" type="Node3D" parent="." unique_id=845477529]
+
+[node name="Center" type="Marker3D" parent="SafeAnchors" unique_id=1568095313]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-[node name="Arrival" type="Marker3D" parent="SafeAnchors"]
+
+[node name="Arrival" type="Marker3D" parent="SafeAnchors" unique_id=91884728]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -22)
-[node name="TrialA" type="Marker3D" parent="SafeAnchors"]
+
+[node name="TrialA" type="Marker3D" parent="SafeAnchors" unique_id=2007146937]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -34.64, 1, 20)
-[node name="TrialB" type="Marker3D" parent="SafeAnchors"]
+
+[node name="TrialB" type="Marker3D" parent="SafeAnchors" unique_id=1908046265]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.64, 1, 20)
 
-[node name="Player" parent="." instance=ExtResource("1_player")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -22)
+[node name="Player" parent="." unique_id=1125910419 instance=ExtResource("1_player")]
+transform = Transform3D(0.43585953, 0, -0.90001464, 0, 1, 0, 0.90001464, 0, 0.43585953, 27.943577, 35.738503, -27.742325)
 controls_enabled = false
 
-[node name="FollowCamera" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.906308, -0.422618, 0, 0.422618, 0.906308, 0, 10, -30)
+[node name="FollowCamera" type="Camera3D" parent="." unique_id=1541307989]
+transform = Transform3D(-0.58673227, 0.342228, 0.733911, 0, 0.90630794, -0.42261797, -0.8097811, -0.24796356, -0.53176004, 30.516369, 37.60967, -28.94859)
 current = true
 script = ExtResource("2_camera")
 target_path = NodePath("../Player")
 
-[node name="SoulOrb" parent="." instance=ExtResource("3_orb")]
+[node name="SoulOrb" parent="." unique_id=1014297217 instance=ExtResource("3_orb")]
 target_path = NodePath("../Player")
 
-[node name="Level02SoftReturnVolume" parent="." instance=ExtResource("9_return")]
+[node name="Level02SoftReturnVolume" parent="." unique_id=922016993 instance=ExtResource("9_return")]
 
-[node name="Level02ProgressController" parent="." instance=ExtResource("10_progress")]
-[node name="Level02ArrivalGameplay" parent="." instance=ExtResource("11_arrival_gameplay")]
+[node name="Level02ProgressController" parent="." unique_id=459569286 instance=ExtResource("10_progress")]
+
+[node name="Level02ArrivalGameplay" parent="." unique_id=148438494 instance=ExtResource("11_arrival_gameplay")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -22)
-[node name="Level02CentralArenaGameplay" parent="." instance=ExtResource("12_central_gameplay")]
-[node name="Level02ArrivalVFX" parent="." instance=ExtResource("13_arrival_vfx")]
-[node name="Level02CentralLightVFX" parent="." instance=ExtResource("14_central_vfx")]
-[node name="Level02RuntimeContractValidator" type="Node" parent="."]
+
+[node name="Level02CentralArenaGameplay" parent="." unique_id=1416053443 instance=ExtResource("12_central_gameplay")]
+
+[node name="Level02ArrivalVFX" parent="." unique_id=1167051065 instance=ExtResource("13_arrival_vfx")]
+
+[node name="Level02CentralLightVFX" parent="." unique_id=1412617235 instance=ExtResource("14_central_vfx")]
+
+[node name="Level02RuntimeContractValidator" type="Node" parent="." unique_id=153828296]
 script = ExtResource("15_validator")
 player_path = NodePath("../Player")
 progress_path = NodePath("../Level02ProgressController")
@@ -83,38 +105,65 @@ central_presence_path = NodePath("../Level02CentralArenaGameplay")
 portal_adapter_path = NodePath("../Level02PortalAdapter")
 shared_reward_controller_path = NodePath("../ShardRewardSequenceController")
 
-[node name="TrialA_ThreeBeams" parent="." instance=ExtResource("16_trial_a")]
-transform = Transform3D(1,0,0,0,1,0,0,0,1,-34.64,1,20)
-[node name="Level02TrialAVFX" parent="." instance=ExtResource("17_trial_a_vfx")]
-transform = Transform3D(1,0,0,0,1,0,0,0,1,-34.64,1,20)
+[node name="TrialA_ThreeBeams" parent="." unique_id=295341121 instance=ExtResource("16_trial_a")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -34.64, 1, 20)
 
-[node name="TrialB_EchoOfLight" parent="." instance=ExtResource("18_trial_b")]
-transform = Transform3D(1,0,0,0,1,0,0,0,1,34.64,1,20)
-[node name="Level02TrialBVFX" parent="." instance=ExtResource("19_trial_b_vfx")]
-transform = Transform3D(1,0,0,0,1,0,0,0,1,34.64,1,20)
+[node name="Level02TrialAVFX" parent="." unique_id=369478457 instance=ExtResource("17_trial_a_vfx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -34.64, 1, 20)
 
-[node name="Level02RewardGate" type="Node" parent="."]
+[node name="TrialB_EchoOfLight" parent="." unique_id=1448579350 instance=ExtResource("18_trial_b")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.64, 1, 20)
+
+[node name="Level02TrialBVFX" parent="." unique_id=1804519304 instance=ExtResource("19_trial_b_vfx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.64, 1, 20)
+
+[node name="Level02RewardGate" type="Node" parent="." unique_id=1405131968]
 script = ExtResource("22_reward_gate")
-[node name="Level02EnvironmentState" parent="." instance=ExtResource("20_env_state")]
-[node name="Level02EnvironmentVFX" parent="." instance=ExtResource("21_env_vfx")]
 
-[node name="LevelFinaleOverlay" parent="." instance=ExtResource("28_finale")]
-visible = false
-[node name="LevelPortal" parent="." instance=ExtResource("27_portal")]
-transform = Transform3D(1,0,0,0,1,0,0,0,1,4,0,0)
+[node name="Level02EnvironmentState" parent="." unique_id=1917061710 instance=ExtResource("20_env_state")]
+
+[node name="Level02EnvironmentVFX" parent="." unique_id=924784232 instance=ExtResource("21_env_vfx")]
+
+[node name="LevelFinaleOverlay" parent="." unique_id=1689948506 instance=ExtResource("28_finale")]
+
+[node name="LevelPortal" parent="." unique_id=1955166613 instance=ExtResource("27_portal")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 0)
 target_scene_path = "res://scenes/levels/Level_03.tscn"
-entry_mode = 0
-require_entry_confirmation = false
-[node name="Level02PortalAdapter" parent="." instance=ExtResource("25_portal_adapter")]
+
+[node name="Level02PortalAdapter" parent="." unique_id=222767811 instance=ExtResource("25_portal_adapter")]
 portal_path = NodePath("../LevelPortal")
 finale_overlay_path = NodePath("../LevelFinaleOverlay")
 player_path = NodePath("../Player")
-[node name="Level02PortalVFX" parent="." instance=ExtResource("26_portal_vfx")]
 
-[node name="ShardRegistrationScope" type="Node" parent="."]
-[node name="ShardRewardSequenceController" parent="." instance=ExtResource("23_reward_controller")]
+[node name="Level02PortalVFX" parent="." unique_id=1662056999 instance=ExtResource("26_portal_vfx")]
+
+[node name="ShardRegistrationScope" type="Node" parent="." unique_id=783851887]
+
+[node name="ShardRewardSequenceController" parent="." unique_id=2074568337 instance=ExtResource("23_reward_controller")]
 overlay_path = NodePath("../UILayer/ShardRewardOverlay")
 player_path = NodePath("../Player")
 shard_search_root_path = NodePath("../ShardRegistrationScope")
-[node name="UILayer" type="CanvasLayer" parent="."]
-[node name="ShardRewardOverlay" parent="UILayer" instance=ExtResource("24_reward_overlay")]
+
+[node name="UILayer" type="CanvasLayer" parent="." unique_id=1620887747]
+
+[node name="ShardRewardOverlay" parent="UILayer" unique_id=2104604468 instance=ExtResource("24_reward_overlay")]
+
+[node name="Trial_A_Platform" parent="." unique_id=1073102204 instance=ExtResource("30_hjrl7")]
+transform = Transform3D(-7.330612, 0, -7.0923967, 0, 10.199999, 0, 7.0923967, 0, -7.330612, 24.382706, 37.033287, 24.403778)
+
+[node name="Trial_A" type="Node3D" parent="." unique_id=1000453657]
+
+[node name="Light_Pillar_Trial_A_03" parent="Trial_A" unique_id=637441964 instance=ExtResource("31_3qisv")]
+transform = Transform3D(-1.2855753, 0, 1.5320889, 0, 2, 0, -1.5320889, 0, -1.2855753, 30.761454, 38.619965, 25.590199)
+
+[node name="Light_Pillar_Trial_A_02" parent="Trial_A" unique_id=2016978553 instance=ExtResource("31_3qisv")]
+transform = Transform3D(0.6840403, 0, 1.8793852, 0, 2, 0, -1.8793852, 0, 0.6840403, 25.520475, 38.58692, 30.689465)
+
+[node name="Light_Pillar_Trial_A_01" parent="Trial_A" unique_id=725389734 instance=ExtResource("31_3qisv")]
+transform = Transform3D(-1.5320889, 0, -1.2855753, 0, 2, 0, 1.2855753, 0, -1.5320889, 21.072254, 38.120594, 20.919287)
+
+[node name="Shou_Shard_Cage" parent="Trial_A" unique_id=1822455056 instance=ExtResource("32_r2c1o")]
+transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, 24.642258, 39.31001, 24.628103)
+
+[node name="SoulShard_03" parent="Trial_A" unique_id=167962439 instance=ExtResource("33_3qisv")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.696625, 38.157997, 24.598827)

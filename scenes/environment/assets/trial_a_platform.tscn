@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://biraoyhdn7qli"]
+
+[ext_resource type="PackedScene" uid="uid://bro46xo1aoil2" path="res://assets/props/Trial_A_Platform/Trial_A_Platform.glb" id="1_ik5bn"]
+[ext_resource type="Shape3D" uid="uid://bkb1y0slkjwjf" path="res://assets/collisions/terrain/Trial_A_Platform.res" id="2_au2mv"]
+
+[node name="Trial_A_Platform" unique_id=1073102204 instance=ExtResource("1_ik5bn")]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Mesh1_0" parent_id_path=PackedInt32Array(431974129) index="0" unique_id=1436825391]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Mesh1_0/StaticBody3D" index="0" unique_id=1086701636]
+shape = ExtResource("2_au2mv")

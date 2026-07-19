@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://cus8lu4kr652n"]
+
+[ext_resource type="PackedScene" uid="uid://bgc7ndivwl7ao" path="res://assets/terrain/Level_02_Island/Level_02_island.glb" id="1_aunp5"]
+[ext_resource type="Shape3D" uid="uid://b7pmw508rilcf" path="res://assets/collisions/terrain/Level_02_Island.res" id="2_4v2o2"]
+
+[node name="Level_02_island" unique_id=419920018 instance=ExtResource("1_aunp5")]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Mesh1_0" parent_id_path=PackedInt32Array(436127844) index="0" unique_id=17196302]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Mesh1_0/StaticBody3D" index="0" unique_id=881591511]
+shape = ExtResource("2_4v2o2")

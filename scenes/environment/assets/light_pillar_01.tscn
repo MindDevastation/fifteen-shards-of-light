@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://jny3fqqcqjn1"]
+
+[ext_resource type="PackedScene" uid="uid://bf2v0ppvet2ut" path="res://assets/architecture/Light_Pillar_01/Light_Pillar_01.glb" id="1_474e8"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_osril"]
+size = Vector3(0.67871094, 1.8796387, 0.5864868)
+
+[node name="Light_Pillar_01" unique_id=637441964 instance=ExtResource("1_474e8")]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Mesh1_0" parent_id_path=PackedInt32Array(1539241944) index="0" unique_id=216661022]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Mesh1_0/StaticBody3D" index="0" unique_id=865834490]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.024902344, -0.008911133, 0.00064086914)
+shape = SubResource("BoxShape3D_osril")
