@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://bxft4exs8lgnm"]
+
+[ext_resource type="PackedScene" uid="uid://ddj13auo02k4" path="res://assets/props/wave_platform/wave_platform.glb" id="1_qboip"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_osril"]
+height = 0.17468262
+radius = 0.95166016
+
+[node name="wave_platform" unique_id=86385610 instance=ExtResource("1_qboip")]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Mesh1_0" parent_id_path=PackedInt32Array(113864060) index="0" unique_id=2118610810]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Mesh1_0/StaticBody3D" index="0" unique_id=1427620181]
+transform = Transform3D(0.9973778, 0, 0.07237032, 0, 1, 0, -0.07237032, 0, 0.9973778, 0, -0.007751465, 0)
+shape = SubResource("CylinderShape3D_osril")

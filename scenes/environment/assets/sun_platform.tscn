@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://bhwo615jfwhnu"]
+
+[ext_resource type="PackedScene" uid="uid://b7nqdiylb6umx" path="res://assets/props/sun_platform/sun_platform.glb" id="1_snbyk"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_osril"]
+height = 0.20117188
+radius = 0.9589844
+
+[node name="sun_platform" unique_id=136328048 instance=ExtResource("1_snbyk")]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Mesh1_0" parent_id_path=PackedInt32Array(1200082449) index="0" unique_id=893048453]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Mesh1_0/StaticBody3D" index="0" unique_id=495765734]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.0009765625, 0)
+shape = SubResource("CylinderShape3D_osril")

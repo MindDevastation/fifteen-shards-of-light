@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://dd1ba5mn3d0s3"]
+
+[ext_resource type="PackedScene" uid="uid://db3vnhv6mvqwy" path="res://assets/props/star_platform/star_platform.glb" id="1_ljkv5"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_osril"]
+height = 0.13989258
+radius = 0.92285156
+
+[node name="star_platform" unique_id=2035512630 instance=ExtResource("1_ljkv5")]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Mesh1_0" parent_id_path=PackedInt32Array(1419442834) index="0" unique_id=1426141622]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Mesh1_0/StaticBody3D" index="0" unique_id=499901652]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.01965332, 0)
+shape = SubResource("CylinderShape3D_osril")

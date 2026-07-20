@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://cw6isttnkc4rf"]
+
+[ext_resource type="PackedScene" uid="uid://d04bs6gj566xf" path="res://assets/props/leaf_platform/leaf_platform.glb" id="1_f5ups"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_osril"]
+height = 0.22839355
+radius = 0.9291992
+
+[node name="leaf_platform" unique_id=634337922 instance=ExtResource("1_f5ups")]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Mesh1_0" parent_id_path=PackedInt32Array(1121937773) index="0" unique_id=1091293243]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Mesh1_0/StaticBody3D" index="0" unique_id=1358485322]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.014587402, 0)
+shape = SubResource("CylinderShape3D_osril")

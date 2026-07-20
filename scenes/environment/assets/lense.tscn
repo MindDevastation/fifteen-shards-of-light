@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://c7am8nclw1eap"]
+
+[ext_resource type="PackedScene" uid="uid://diyntga0am6r1" path="res://assets/architecture/lense/lense.glb" id="1_bb5os"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_osril"]
+size = Vector3(1.3665161, 1.9206543, 0.6008301)
+
+[node name="lense" unique_id=1116647100 instance=ExtResource("1_bb5os")]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Mesh1_0" parent_id_path=PackedInt32Array(88389922) index="0" unique_id=645927981]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Mesh1_0/StaticBody3D" index="0" unique_id=480746215]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0014953613, 0.0057373047, -0.052612305)
+shape = SubResource("BoxShape3D_osril")

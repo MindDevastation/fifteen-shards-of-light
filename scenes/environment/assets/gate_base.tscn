@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://barup50bhg3wm"]
+
+[ext_resource type="PackedScene" uid="uid://dsoeb64a43jba" path="res://assets/architecture/gate_base/gate_base.glb" id="1_m7m03"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_osril"]
+size = Vector3(1.8210144, 1.2123413, 0.3624878)
+
+[node name="gate_base" unique_id=303205886 instance=ExtResource("1_m7m03")]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Mesh1_0" parent_id_path=PackedInt32Array(1438660264) index="0" unique_id=935299530]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Mesh1_0/StaticBody3D" index="0" unique_id=566204931]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.005081892, 0.00503543, -0.013356313)
+shape = SubResource("BoxShape3D_osril")

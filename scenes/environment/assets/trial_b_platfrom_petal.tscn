@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://beb36r7tvqjmf"]
+
+[ext_resource type="PackedScene" uid="uid://dryupn5dcwyh4" path="res://assets/props/trial_b_platform_petal/trial_b_platfrom_petal.glb" id="1_i6tlc"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_osril"]
+size = Vector3(1.2077637, 0.2763672, 1.5861816)
+
+[node name="trial_b_platfrom_petal" unique_id=846634913 instance=ExtResource("1_i6tlc")]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Mesh1_0" parent_id_path=PackedInt32Array(278675694) index="0" unique_id=327880510]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Mesh1_0/StaticBody3D" index="0" unique_id=807661218]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.009887695, -0.05419922, 0.06213379)
+shape = SubResource("BoxShape3D_osril")
