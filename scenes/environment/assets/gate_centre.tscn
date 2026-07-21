@@ -1,0 +1,5 @@
+[gd_scene format=3 uid="uid://dxltq3amb6pqn"]
+
+[ext_resource type="PackedScene" uid="uid://djo8dno0adk40" path="res://assets/architecture/gate_centre/gate_centre.glb" id="1_2bckv"]
+
+[node name="gate_centre" unique_id=575058083 instance=ExtResource("1_2bckv")]
